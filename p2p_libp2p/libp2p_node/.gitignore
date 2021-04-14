@@ -1,0 +1,4 @@
+coverage.txt
+dht/dhtclient/agent_records_store*
+dht/dhtpeer/agent_records_store*
+libp2p_node
