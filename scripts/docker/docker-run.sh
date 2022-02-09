@@ -1,3 +1,4 @@
+#!/bin/bash -e
 # Usage:
 #   ./docker-run.sh <docker parameters> -- <executable> <executable parameters>
 # Examples:
@@ -7,7 +8,6 @@
 #   # The following example provides `-p 8080:8080` parameter to `docker run` command (exports inner docker network port 8080 to outer(host OS) port 8080) and excutes `http_server` executable inside of the docker container:
 #   ./docker-run.sh -p 8080:8080 -- build/examples/http_server
 # NOTE: For more details, please see description for the `split_params()` shell function in the `docker-common.sh` script.
-
 
 SCRIPTS_DIR=${0%/*}
 . "$SCRIPTS_DIR"/docker-env-common.sh

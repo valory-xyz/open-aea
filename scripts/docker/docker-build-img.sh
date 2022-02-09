@@ -1,3 +1,4 @@
+#!/bin/bash -e
 # Usage:
 #   ./docker-build-img.sh <IMMEDIATE_PARAMS> -- <TAIL_PARAMS>
 # Where:

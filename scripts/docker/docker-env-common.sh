@@ -1,8 +1,8 @@
 #!/bin/bash -e
-
+ 
 ##############################################################################
 # ####  PRIVATE section  #####################################################
-# Shall **not** be overridden in DOCKER_ENV_SCRIPT file.
+# Shall **not** be overriden in DOCKER_ENV_SCRIPT file.
 if [[ -z ${SCRIPTS_DIR+x} ]]
 then
     SCRIPTS_DIR=${0%/*}
@@ -14,16 +14,16 @@ SCRIPTS_PARENT_DIR="$(dirname "$SCRIPTS_DIR")"
 
 ##############################################################################
 # ####  PUBLIC section  ######################################################
-# Env vars in this section can or must be overridden in DOCKER_ENV_SCRIPT file.
+# Env vars in this section can or must be overriden in DOCKER_ENV_SCRIPT file.
 
 # Following variables **MUST** be defined in DOCKER_ENV_SCRIPT file.
 DOCKER_IMAGE_TAG=
 
-# Following variables **CAN** be overridden in DOCKER_ENV_SCRIPT file.
+# Following variables **CAN** be overriden in DOCKER_ENV_SCRIPT file.
 DOCKER_CONTAINER_REGISTRY=gcr.io/organic-storm-201412
 DOCKER_BUILD_CONTEXT_DIR=
 DOCKERFILE=
-# The 'DOCKER_LOCAL_MAKE' must be either absolut path or relative to the working directory 'WORKDIR' in the running docker container environment!
+# The 'DOCKER_LOCAL_MAKE' must be etiher absolut path or relative to the working directory 'WORKDIR' in the running docker container environment!
 DOCKER_LOCAL_MAKE=
 WORKDIR=/build
 
