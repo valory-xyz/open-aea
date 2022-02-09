@@ -154,7 +154,7 @@ my_image/scripts/docker-run.sh -p 8080:80 --cpus 4 -d -- build/examples/http_ser
 Docker <a name="docker_inst_setup"></a>
 =======================================
 
-The advantage of using the `Docker` is absolutely stable and reproducible setup (what is definitely important for test environment, but also for development and production environments) no matter what host OS setup is. Advantage is that this avoids necessity to install & maintain all necessary components directly on host OS (e.g. whole build chain, dependencies, tools, etc.) - this is done in docker and so it will eliminate issue with differencies of setup on different development machines, etc. ... 
+The advantage of using the `Docker` is absolutely stable and reproducible setup (what is definitely important for test environments, but also for development and production environments) no matter what host OS setup is. Advantage is that this avoids necessity to install & maintain all necessary components directly on host OS (e.g. whole build chain, dependencies, tools, etc.) - this is done in docker and so it will eliminate issue with differencies of setup on different development machines, etc. ... 
 
 ## Installation
 Download the Docker (Community Edition) installtion package for your plafrom from https://store.docker.com/search?type=edition&offering=community (or alternativelly use more general https://www.docker.com/community-edition instead if the previous link does not work for you) and install it.
