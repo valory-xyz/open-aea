@@ -1,8 +1,10 @@
-#!/bin/bash
+#! /bin/bash
 
 # Swap the following lines if you want to work with 'latest'
 DOCKER_IMAGE_TAG=valory/open-aea-develop:1.4.0
 # DOCKER_IMAGE_TAG=valory/open-aea-develop:latest
 
-DOCKER_BUILD_CONTEXT_DIR=..
-DOCKERFILE=./Dockerfile
+DOCKER_BUILD_CONTEXT_DIR=./
+DOCKERFILE=./develop-image/Dockerfile
+
+DOCKER_LOCAL_MAKE=develop-image
