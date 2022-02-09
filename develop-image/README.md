@@ -18,7 +18,7 @@ E.g.:
 
 ## Run
 
-    ./develop-image/scripts/docker-run.sh -- /bin/bash
+    ./develop-image/scripts/docker-run.sh  /bin/bash
  
 As before, to pass parameters to the `docker run` command:
 
