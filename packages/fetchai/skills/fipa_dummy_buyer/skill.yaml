@@ -1,5 +1,5 @@
 name: fipa_dummy_buyer
-author: open_aea
+author: fetchai
 version: 0.2.0
 type: skill
 description: Sample skill for FIPA interaction as a buyer.

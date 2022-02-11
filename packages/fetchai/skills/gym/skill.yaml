@@ -1,5 +1,5 @@
 name: gym
-author: open_aea
+author: fetchai
 version: 0.20.0
 type: skill
 description: The gym skill wraps an RL agent.

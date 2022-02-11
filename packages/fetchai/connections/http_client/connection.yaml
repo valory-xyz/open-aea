@@ -1,5 +1,5 @@
 name: http_client
-author: open_aea
+author: fetchai
 version: 0.23.0
 type: connection
 description: The HTTP_client connection that wraps a web-based client connecting to

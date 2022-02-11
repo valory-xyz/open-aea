@@ -1,5 +1,5 @@
 name: error_test_skill
-author: open_aea
+author: fetchai
 version: 0.1.0
 type: skill
 description: The error test skil for testing.

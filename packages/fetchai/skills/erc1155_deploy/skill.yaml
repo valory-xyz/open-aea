@@ -1,5 +1,5 @@
 name: erc1155_deploy
-author: open_aea
+author: fetchai
 version: 0.30.0
 type: skill
 description: The ERC1155 deploy skill has the ability to deploy and interact with

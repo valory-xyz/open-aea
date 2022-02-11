@@ -1,5 +1,5 @@
 agent_name: my_first_aea
-author: open_aea
+author: fetchai
 version: 0.27.0
 description: A simple agent to demo the echo skill.
 license: Apache-2.0

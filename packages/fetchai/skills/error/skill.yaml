@@ -1,5 +1,5 @@
 name: error
-author: open_aea
+author: fetchai
 version: 0.17.0
 type: skill
 description: The error skill implements basic error handling required by all AEAs.

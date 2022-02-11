@@ -1,5 +1,5 @@
 name: erc1155_client
-author: open_aea
+author: fetchai
 version: 0.28.0
 type: skill
 description: The erc1155 client interacts with the erc1155 deployer to conduct an

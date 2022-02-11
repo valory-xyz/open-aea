@@ -1,6 +1,6 @@
 ---
 name: fipa
-author: open_aea
+author: fetchai
 version: 1.0.0
 description: A protocol for FIPA ACL.
 license: Apache-2.0

@@ -1,5 +1,5 @@
 name: http
-author: open_aea
+author: fetchai
 version: 1.0.0
 protocol_specification_id: fetchai/http:1.0.0
 type: protocol

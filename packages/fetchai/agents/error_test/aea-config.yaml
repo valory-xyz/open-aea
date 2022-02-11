@@ -1,5 +1,5 @@
 agent_name: error_test
-author: open_aea
+author: fetchai
 version: 0.1.0
 description: A simple agent to test error raised in skill.
 license: Apache-2.0

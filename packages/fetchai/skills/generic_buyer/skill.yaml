@@ -1,5 +1,5 @@
 name: generic_buyer
-author: open_aea
+author: fetchai
 version: 0.26.0
 type: skill
 description: The weather client skill implements the skill to purchase weather data.

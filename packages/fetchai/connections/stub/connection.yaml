@@ -1,5 +1,5 @@
 name: stub
-author: open_aea
+author: fetchai
 version: 0.21.0
 type: connection
 description: The stub connection implements a connection stub which reads/writes messages

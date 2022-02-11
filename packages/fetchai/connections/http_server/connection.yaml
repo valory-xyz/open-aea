@@ -1,5 +1,5 @@
 name: http_server
-author: open_aea
+author: fetchai
 version: 0.22.0
 type: connection
 description: The HTTP server connection that wraps http server implementing a RESTful
