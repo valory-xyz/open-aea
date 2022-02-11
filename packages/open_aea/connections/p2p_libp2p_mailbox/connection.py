@@ -45,8 +45,8 @@ from aea.helpers.acn.agent_record import AgentRecord
 from aea.helpers.acn.uri import Uri
 from aea.mail.base import Envelope
 
-from packages.fetchai.protocols.acn import acn_pb2
-from packages.fetchai.protocols.acn.message import AcnMessage
+from packages.open_aea.protocols.acn import acn_pb2
+from packages.open_aea.protocols.acn.message import AcnMessage
 
 
 try:
@@ -56,7 +56,7 @@ except ImportError:  # pragma: nocover
 
 
 _default_logger = logging.getLogger(
-    "aea.packages.fetchai.connections.p2p_libp2p_client"
+    "aea.packages.open_aea.connections.p2p_libp2p_client"
 )
 
 PUBLIC_ID = PublicId.from_str("fetchai/p2p_libp2p_mailbox:0.2.0")
