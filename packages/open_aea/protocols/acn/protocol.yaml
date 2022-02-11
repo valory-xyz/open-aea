@@ -1,5 +1,5 @@
 name: acn
-author: fetchai
+author: open_aea
 version: 1.1.0
 protocol_specification_id: aea/acn:1.0.0
 type: protocol
