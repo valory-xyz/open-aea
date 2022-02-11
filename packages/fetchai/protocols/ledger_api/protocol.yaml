@@ -1,5 +1,5 @@
 name: ledger_api
-author: fetchai
+author: open_aea
 version: 1.0.0
 protocol_specification_id: fetchai/ledger_api:1.0.0
 type: protocol

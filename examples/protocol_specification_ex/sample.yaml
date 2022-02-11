@@ -1,6 +1,6 @@
 ---
 name: two_party_negotiation
-author: fetchai
+author: open_aea
 version: 0.1.0
 description: An example of a protocol specification that describes a protocol for bilateral negotiation.
 license: Apache-2.0

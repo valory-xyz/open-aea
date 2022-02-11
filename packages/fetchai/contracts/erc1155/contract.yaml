@@ -1,5 +1,5 @@
 name: erc1155
-author: fetchai
+author: open_aea
 version: 0.22.0
 type: contract
 description: The erc1155 contract implements an ERC1155 contract package.

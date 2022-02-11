@@ -1,5 +1,5 @@
 name: dummy
-author: fetchai
+author: open_aea
 version: 0.1.0
 type: connection
 description: dummy_connection connection description.

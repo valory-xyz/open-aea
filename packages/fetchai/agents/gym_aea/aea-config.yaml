@@ -1,5 +1,5 @@
 agent_name: gym_aea
-author: fetchai
+author: open_aea
 version: 0.25.0
 description: The gym aea demos the interaction between a skill containing a RL agent
   and a gym connection.

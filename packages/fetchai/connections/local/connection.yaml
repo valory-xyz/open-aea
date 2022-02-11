@@ -1,5 +1,5 @@
 name: local
-author: fetchai
+author: open_aea
 version: 0.20.0
 type: connection
 description: The local connection provides a stub for an OEF node.

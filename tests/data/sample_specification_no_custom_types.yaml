@@ -1,6 +1,6 @@
 ---
 name: t_protocol_no_ct
-author: fetchai
+author: open_aea
 version: 0.1.0
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'

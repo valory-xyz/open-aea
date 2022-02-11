@@ -1,5 +1,5 @@
 name: http_echo
-author: fetchai
+author: open_aea
 version: 0.20.0
 type: skill
 description: The http echo skill prints out the content of received http messages
