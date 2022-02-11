@@ -27,7 +27,9 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
 
-from packages.open_aea.protocols.acn.custom_types import AgentRecord as CustomAgentRecord
+from packages.open_aea.protocols.acn.custom_types import (
+    AgentRecord as CustomAgentRecord,
+)
 from packages.open_aea.protocols.acn.custom_types import StatusBody as CustomStatusBody
 
 
