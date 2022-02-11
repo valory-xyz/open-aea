@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 fetchai
+#   Copyright 2022 fetchai
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ This module contains the support resources for the acn protocol.
 It was created with protocol buffer compiler version `libprotoc 3.11.4` and aea version `1.1.1`.
 """
 
-from packages.open_aea.protocols.acn.message import AcnMessage
-from packages.open_aea.protocols.acn.serialization import AcnSerializer
+from packages.fetchai.protocols.acn.message import AcnMessage
+from packages.fetchai.protocols.acn.serialization import AcnSerializer
 
 
 AcnMessage.serializer = AcnSerializer
