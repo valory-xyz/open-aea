@@ -57,8 +57,7 @@ RUN sudo make clean
 
 RUN pipenv --python python3.8
 RUN pipenv run pip3 install --upgrade pip
-RUN pipenv install --dev --skip-lock
+RUN pipenv install --dev --skip-lock --system
 
-RUN pipenv run pip3 install .[all]
-
+RUN python3 setup.py install 
 CMD ["/bin/bash"]
