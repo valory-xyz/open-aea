@@ -85,6 +85,7 @@ SIGNING_PROTOCOL = "fetchai/signing:latest"
 STATE_UPDATE_PROTOCOL = "fetchai/state_update:latest"
 LEDGER_CONNECTION = "fetchai/ledger:latest"
 DEFAULT_LEDGER = _FETCHAI_IDENTIFIER
+DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
 DEFAULT_SEARCH_SERVICE_ADDRESS = "fetchai/soef:any"
 SCAFFOLD_PUBLIC_ID = "fetchai/scaffold:0.1.0"
 DEFAULT_DEPENDENCIES: Dict[str, Dict] = {"aea-ledger-fetchai": {}}
