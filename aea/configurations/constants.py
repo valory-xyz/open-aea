@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 Valory AG
+#   Copyright 2021-2022 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ _FETCHAI_IDENTIFIER = "fetchai"
 _ETHEREUM_IDENTIFIER = "ethereum"
 _COSMOS_IDENTIFIER = "cosmos"
 SIGNING_PROTOCOL = "open_aea/signing:latest"
-DEFAULT_LEDGER = _ETHEREUM_IDENTIFIER
+DEFAULT_LEDGER = _FETCHAI_IDENTIFIER  # TODO: _ETHEREUM_IDENTIFIER
 PRIVATE_KEY_PATH_SCHEMA = "{}_private_key.txt"
 DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
 DEFAULT_LICENSE = "Apache-2.0"
@@ -77,13 +77,10 @@ IMPORT_TEMPLATE_2 = "import packages.{author}.{type}.{name}"
 DEFAULT_ENV_DOTFILE = ".env"
 DOTTED_PATH_MODULE_ELEMENT_SEPARATOR = ":"
 DEFAULT_BUILD_DIR_NAME = ".build"
-DEFAULT_DEPENDENCIES: Dict[str, Dict] = {"open-aea-ledger-ethereum": {}}
-
-# TODO: next block (4-lines) temporary for testing the porting of ACN
-LEDGER_CONNECTION = "fetchai/ledger:latest"
-DEFAULT_LEDGER = _FETCHAI_IDENTIFIER
-DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
-DEFAULT_DEPENDENCIES: Dict[str, Dict] = {"aea-ledger-fetchai": {}}
+DEFAULT_DEPENDENCIES: Dict[str, Dict] = {
+    "aea-ledger-fetchai": {},  # TODO: remove when libp2p integration is completed
+    "open-aea-ledger-ethereum": {},
+}
 
 CONFIG_FILE_TO_PACKAGE_TYPE = {
     DEFAULT_SKILL_CONFIG_FILE: SKILL,
