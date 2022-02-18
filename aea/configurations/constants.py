@@ -79,15 +79,10 @@ DOTTED_PATH_MODULE_ELEMENT_SEPARATOR = ":"
 DEFAULT_BUILD_DIR_NAME = ".build"
 DEFAULT_DEPENDENCIES: Dict[str, Dict] = {"open-aea-ledger-ethereum": {}}
 
-# next block temporary for testing the porting of ACN
-DEFAULT_PROTOCOL = "fetchai/default:latest"
-SIGNING_PROTOCOL = "fetchai/signing:latest"
-STATE_UPDATE_PROTOCOL = "fetchai/state_update:latest"
+# TODO: next block (4-lines) temporary for testing the porting of ACN
 LEDGER_CONNECTION = "fetchai/ledger:latest"
 DEFAULT_LEDGER = _FETCHAI_IDENTIFIER
 DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
-DEFAULT_SEARCH_SERVICE_ADDRESS = "fetchai/soef:any"
-SCAFFOLD_PUBLIC_ID = "fetchai/scaffold:0.1.0"
 DEFAULT_DEPENDENCIES: Dict[str, Dict] = {"aea-ledger-fetchai": {}}
 
 CONFIG_FILE_TO_PACKAGE_TYPE = {
