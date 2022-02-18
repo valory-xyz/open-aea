@@ -26,7 +26,9 @@ _FETCHAI_IDENTIFIER = "fetchai"
 _ETHEREUM_IDENTIFIER = "ethereum"
 _COSMOS_IDENTIFIER = "cosmos"
 SIGNING_PROTOCOL = "open_aea/signing:latest"
-DEFAULT_LEDGER = _FETCHAI_IDENTIFIER  # TODO: _ETHEREUM_IDENTIFIER
+DEFAULT_LEDGER = (
+    _FETCHAI_IDENTIFIER  # TODO: _ETHEREUM_IDENTIFIER  # pylint: disable=fixme
+)
 PRIVATE_KEY_PATH_SCHEMA = "{}_private_key.txt"
 DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
 DEFAULT_LICENSE = "Apache-2.0"
@@ -78,7 +80,7 @@ DEFAULT_ENV_DOTFILE = ".env"
 DOTTED_PATH_MODULE_ELEMENT_SEPARATOR = ":"
 DEFAULT_BUILD_DIR_NAME = ".build"
 DEFAULT_DEPENDENCIES: Dict[str, Dict] = {
-    "aea-ledger-fetchai": {},  # TODO: remove when libp2p integration is completed
+    "aea-ledger-fetchai": {},  # TODO: remove when libp2p integration is completed  # pylint: disable=fixme
     "open-aea-ledger-ethereum": {},
 }
 
