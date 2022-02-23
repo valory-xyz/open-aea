@@ -29,6 +29,8 @@ from aea.exceptions import AEAException
 
 from packages.open_aea.connections.p2p_libp2p import check_dependencies
 from packages.open_aea.connections.p2p_libp2p.check_dependencies import (
+    ERROR_MESSAGE_TEMPLATE_BINARY_NOT_FOUND,
+    ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW,
     MINIMUM_GCC_VERSION,
     MINIMUM_GO_VERSION,
     build_node,
@@ -43,8 +45,8 @@ def test_check_versions():
     with mock.patch("sys.stdout", new_callable=StringIO) as mock_stdout:
         check_versions()
         stdout = mock_stdout.getvalue()
-    assert f"check 'go'>={version_to_string(MINIMUM_GO_VERSION)}, found " in stdout
-    assert f"check 'gcc'>={version_to_string(MINIMUM_GCC_VERSION)}, found " in stdout
+    assert f"check 'go'>={version_to_string(MINIMUM_GO_VERSION)}, found: " in stdout
+    assert f"check 'gcc'>={version_to_string(MINIMUM_GCC_VERSION)}, found: " in stdout
 
 
 def test_check_versions_negative_binary_not_found():
@@ -52,7 +54,7 @@ def test_check_versions_negative_binary_not_found():
     with mock.patch("shutil.which", return_value=None):
         with pytest.raises(
             AEAException,
-            match="'go' is required by the libp2p connection, but it is not installed, or it is not accessible from the system path.",
+            match=ERROR_MESSAGE_TEMPLATE_BINARY_NOT_FOUND.format(command="go"),
         ):
             check_versions()
 
@@ -62,9 +64,12 @@ def test_check_versions_negative_version_too_low():
     with mock.patch.object(
         check_dependencies, "get_version", return_value=(0, 0, 0),
     ):
+        minimal = version_to_string(MINIMUM_GO_VERSION)
         with pytest.raises(
             AEAException,
-            match=f"The installed version of 'go' is too low: expected at least {version_to_string(MINIMUM_GO_VERSION)}; found 0.0.0.",
+            match=ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW.format(
+                command="go", minimal=minimal, current="0.0.0"
+            ),
         ):
             check_versions()
 
@@ -75,13 +80,9 @@ def test_check_versions_negative_cannot_parse_version():
         with mock.patch("subprocess.check_output", return_value=b""):
             check_versions()
         stdout = mock_stdout.getvalue()
-    assert (
-        "Warning: cannot parse 'go' version from command: ['go', 'version']." in stdout
-    )
-    assert (
-        "Warning: cannot parse 'gcc' version from command: ['gcc', '--version']."
-        in stdout
-    )
+    go_msg = "Warning: cannot parse 'go' version from command: ['go', 'version']."
+    gcc_msg = "Warning: cannot parse 'gcc' version from command: ['gcc', '--version']."
+    assert go_msg in stdout and gcc_msg in stdout
 
 
 def test_build_node():

@@ -32,31 +32,18 @@ from itertools import islice
 from subprocess import Popen, TimeoutExpired  # nosec
 from typing import Iterable, List, Optional, Pattern, Tuple
 
+from aea.exceptions import AEAException
 from aea.helpers.base import ensure_dir
 
-
-try:
-    # flake8: noqa
-    # pylint: disable=unused-import,ungrouped-imports
-    from .consts import (  # type: ignore
-        LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
-        LIBP2P_NODE_MODULE,
-        LIBP2P_NODE_MODULE_NAME,
-    )
-except ImportError:  # pragma: nocover
-    # flake8: noqa
-    # pylint: disable=unused-import,ungrouped-imports
-    from consts import (  # type: ignore
-        LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
-        LIBP2P_NODE_MODULE,
-        LIBP2P_NODE_MODULE_NAME,
-    )
-
-from aea.exceptions import AEAException
+from packages.open_aea.connections.p2p_libp2p.consts import (
+    LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
+    LIBP2P_NODE_MODULE,
+    LIBP2P_NODE_MODULE_NAME,
+)
 
 
-ERROR_MESSAGE_TEMPLATE_BINARY_NOT_FOUND = "'{command}' is required by the libp2p connection, but it is not installed, or it is not accessible from the system path."
-ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW = "The installed version of '{command}' is too low: expected at least {lower_bound}; found {actual_version}."
+ERROR_MESSAGE_TEMPLATE_BINARY_NOT_FOUND = "'{command}' is required by the libp2p connection, but it is not installed or not accessible from the system path."
+ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW = "The installed version of '{command}' is too low: expected at least {minimal}; found: {current}."
 
 # for the purposes of this script,
 # a version is a tuple of integers: (major, minor, patch)
@@ -105,9 +92,9 @@ def print_ok_message(
     :param actual_version: the actual version.
     :param version_lower_bound: the version lower bound.
     """
-    print(
-        f"check '{binary_name}'>={version_to_string(version_lower_bound)}, found {version_to_string(actual_version)}"
-    )
+
+    minimal, current = map(version_to_string, (version_lower_bound, actual_version))
+    print(f"check '{binary_name}'>={minimal}, found: {current}")
 
 
 def check_binary(
@@ -144,39 +131,24 @@ def check_binary(
         return
     actual_version: VERSION = get_version(*map(int, version_match.groups(default="0")))
     if actual_version < version_lower_bound:
-        raise AEAException(
-            ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW.format(
-                command=binary_name,
-                lower_bound=version_to_string(version_lower_bound),
-                actual_version=version_to_string(actual_version),
-            )
-        )
+        minimal, current = map(version_to_string, (version_lower_bound, actual_version))
+        kwargs = dict(command=binary_name, minimal=minimal, current=current)
+        raise AEAException(ERROR_MESSAGE_TEMPLATE_VERSION_TOO_LOW.format(**kwargs))
 
     print_ok_message(binary_name, actual_version, version_lower_bound)
 
 
 def check_versions() -> None:
     """Check versions."""
-    check_binary(
-        "go",
-        ["version"],
-        re.compile(r"go version go([0-9]+)\.([0-9]+)"),
-        MINIMUM_GO_VERSION,
-    )
+
+    go_pattern = r"go version go([0-9]+)\.([0-9]+)"
+    check_binary("go", ["version"], re.compile(go_pattern), MINIMUM_GO_VERSION)
+
     if platform.system() == "Darwin":
-        check_binary(  # pragma: nocover
-            "gcc",
-            ["--version"],
-            re.compile(r"clang version.* ([0-9]+)\.([0-9]+)\.([0-9]+) "),
-            MINIMUM_GCC_VERSION,
-        )
+        gcc_pattern = r"clang version.* ([0-9]+)\.([0-9]+)\.([0-9]+) "
     else:
-        check_binary(
-            "gcc",
-            ["--version"],
-            re.compile(r"gcc.* ([0-9]+)\.([0-9]+)\.([0-9]+)"),
-            MINIMUM_GCC_VERSION,
-        )
+        gcc_pattern = r"gcc.* ([0-9]+)\.([0-9]+)\.([0-9]+)"
+    check_binary("gcc", ["--version"], re.compile(gcc_pattern), MINIMUM_GCC_VERSION)
 
 
 def main() -> None:  # pragma: nocover
@@ -188,7 +160,7 @@ def main() -> None:  # pragma: nocover
     build_node(build_dir)
 
 
-def _golang_module_build(
+def golang_module_build(
     path: str, timeout: float = LIBP2P_NODE_DEPS_DOWNLOAD_TIMEOUT,
 ) -> Optional[str]:
     """
@@ -222,7 +194,7 @@ def build_node(build_dir: str) -> None:
     """Build node placed inside build_dir."""
     with tempfile.TemporaryDirectory() as dirname:
         copy_tree(LIBP2P_NODE_MODULE, dirname)
-        err_str = _golang_module_build(dirname)
+        err_str = golang_module_build(dirname)
         if err_str:  # pragma: nocover
             raise Exception(f"Node build failed: {err_str}")
         ensure_dir(build_dir)
