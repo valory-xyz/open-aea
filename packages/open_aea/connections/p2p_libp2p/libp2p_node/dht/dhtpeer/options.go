@@ -46,6 +46,18 @@ func IdentityFromFetchAIKey(key string) Option {
 	}
 }
 
+// IdentityFromEthereumKey for dhtpeer.New
+func IdentityFromEthereumKey(key string) Option {
+	return func(dhtPeer *DHTPeer) error {
+		var err error
+		dhtPeer.key, dhtPeer.publicKey, err = utils.KeyPairFromEthereumKey(key)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
 // RegisterAgentAddress for dhtpeer.New
 func RegisterAgentAddress(record *acn.AgentRecord, isReady func() bool) Option {
 	return func(dhtPeer *DHTPeer) error {

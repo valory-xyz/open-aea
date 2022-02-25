@@ -252,6 +252,7 @@ func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 
 // BTCPubKeyFromFetchAIPublicKey from public key string
 func BTCPubKeyFromFetchAIPublicKey(publicKey string) (*btcec.PublicKey, error) {
+
 	pbkBytes, err := hex.DecodeString(publicKey)
 	if err != nil {
 		return nil, err
@@ -441,6 +442,22 @@ func VerifyEthereumSignatureETH(message []byte, signature string, pubkey string)
 // KeyPairFromFetchAIKey  key pair from hex encoded secp256k1 private key
 func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	pkBytes, err := hex.DecodeString(key)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	btcPrivateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
+	prvKey, pubKey, err := crypto.KeyPairFromStdKey(btcPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return prvKey, pubKey, nil
+}
+
+// KeyPairFromEthereumKey  key pair from hex encoded secp256k1 private key
+func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
+	pkBytes, err := hex.DecodeString(key[2:]) // slice of the "0x"
 	if err != nil {
 		return nil, nil, err
 	}

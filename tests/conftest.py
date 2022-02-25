@@ -122,7 +122,6 @@ from tests.common.docker_image import (
 )
 from tests.data.dummy_connection.connection import DummyConnection  # type: ignore
 
-
 logger = logging.getLogger(__name__)
 
 CliRunner = ImportedCliRunner
@@ -271,8 +270,8 @@ PUBLIC_STAGING_DHT_P2P_PUBLIC_KEY_1 = (
 PUBLIC_STAGING_DHT_P2P_PUBLIC_KEY_2 = (
     "0321bac023b7f7cf655cf5e0f988a4c1cf758f7b530528362c4ba8d563f7b090c4"
 )
-# TODO: temporary overwriting of addresses, URIs and public keys
-#  used in test_p2p_libp2p/test_public_dht.py
+# # TODO: temporary overwriting of addresses, URIs and public keys
+# #  used in test_p2p_libp2p/test_public_dht.py
 PUBLIC_DHT_P2P_MADDR_1 = PUBLIC_STAGING_DHT_P2P_MADDR_1
 PUBLIC_DHT_P2P_MADDR_2 = PUBLIC_STAGING_DHT_P2P_MADDR_2
 PUBLIC_DHT_DELEGATE_URI_1 = PUBLIC_STAGING_DHT_DELEGATE_URI_1
@@ -369,9 +368,9 @@ agent_config_files = [
 ]
 
 protocol_specification_files = [
-    os.path.join(PROTOCOL_SPECS_PREF_1, "sample.yaml",),
-    os.path.join(PROTOCOL_SPECS_PREF_2, "sample_specification.yaml",),
-    os.path.join(PROTOCOL_SPECS_PREF_2, "sample_specification_no_custom_types.yaml",),
+    os.path.join(PROTOCOL_SPECS_PREF_1, "sample.yaml", ),
+    os.path.join(PROTOCOL_SPECS_PREF_2, "sample_specification.yaml", ),
+    os.path.join(PROTOCOL_SPECS_PREF_2, "sample_specification_no_custom_types.yaml", ),
 ]
 
 
@@ -552,7 +551,7 @@ def tcpping(ip, port, log_exception: bool = True) -> bool:
 
 
 def wait_for_localhost_ports_to_close(
-    ports: List[int], timeout: int = 120, sleep_time: int = 2
+        ports: List[int], timeout: int = 120, sleep_time: int = 2
 ) -> None:
     """Wait for ports to close with timeout."""
     open_ports = ports
@@ -690,11 +689,11 @@ def update_default_ethereum_ledger_api(ethereum_testnet_config):
 @pytest.mark.ledger
 @pytest.fixture(scope="class")
 def ganache(
-    ganache_configuration,
-    ganache_addr,
-    ganache_port,
-    timeout: float = 2.0,
-    max_attempts: int = 10,
+        ganache_configuration,
+        ganache_addr,
+        ganache_port,
+        timeout: float = 2.0,
+        max_attempts: int = 10,
 ):
     """Launch the Ganache image."""
     client = docker.from_env()
@@ -709,7 +708,7 @@ def ganache(
 @pytest.fixture(scope="class")
 @action_for_platform("Linux", skip=False)
 def fetchd(
-    fetchd_configuration, timeout: float = 2.0, max_attempts: int = 20,
+        fetchd_configuration, timeout: float = 2.0, max_attempts: int = 20,
 ):
     """Launch the Fetch ledger image."""
     client = docker.from_env()
@@ -787,7 +786,7 @@ def double_escape_windows_path_separator(path):
 
 
 def _make_dummy_connection() -> Connection:
-    configuration = ConnectionConfig(connection_id=DummyConnection.connection_id,)
+    configuration = ConnectionConfig(connection_id=DummyConnection.connection_id, )
     dummy_connection = DummyConnection(
         configuration=configuration,
         data_dir=MagicMock(),
@@ -797,11 +796,11 @@ def _make_dummy_connection() -> Connection:
 
 
 def _make_local_connection(
-    address: Address,
-    public_key: str,
-    node: LocalNode,
-    restricted_to_protocols=None,
-    excluded_protocols=None,
+        address: Address,
+        public_key: str,
+        node: LocalNode,
+        restricted_to_protocols=None,
+        excluded_protocols=None,
 ) -> Connection:
     configuration = ConnectionConfig(
         restricted_to_protocols=restricted_to_protocols,
@@ -837,23 +836,44 @@ def _process_cert(key: Crypto, cert: CertRequest, path_prefix: str):
     )
 
 
+DEFAULT_KWARGS = dict(
+    data_dir='/home/karrenbelt/Repositories/valory/open-aea/tmp_debug',
+    port=10234,
+    host="127.0.0.1",
+    relay=True,
+    delegate=False,
+    mailbox=False,
+    entry_peers=None,
+    delegate_port=11234,
+    delegate_host="127.0.0.1",
+    mailbox_port=8888,
+    mailbox_host="127.0.0.1",
+    node_key_file=None,
+    agent_key=None,
+    build_directory=None,
+    peer_registration_delay="0.0",
+)
+
+TEST_DEFAULT_LEDGER = "fetchai"  # TODO: replace with DEFAULT_LEDGER
+TEST_DEFAULT_LEDGER = DEFAULT_LEDGER
 def _make_libp2p_connection(
-    data_dir: str,
-    port: int = 10234,
-    host: str = "127.0.0.1",
-    relay: bool = True,
-    delegate: bool = False,
-    mailbox: bool = False,
-    entry_peers: Optional[Sequence[MultiAddr]] = None,
-    delegate_port: int = 11234,
-    delegate_host: str = "127.0.0.1",
-    mailbox_port: int = 8888,
-    mailbox_host: str = "127.0.0.1",
-    node_key_file: Optional[str] = None,
-    agent_key: Optional[Crypto] = None,
-    build_directory: Optional[str] = None,
-    peer_registration_delay: str = "0.0",
+        data_dir: str,
+        port: int = 10234,
+        host: str = "127.0.0.1",
+        relay: bool = True,
+        delegate: bool = False,
+        mailbox: bool = False,
+        entry_peers: Optional[Sequence[MultiAddr]] = None,
+        delegate_port: int = 11234,
+        delegate_host: str = "127.0.0.1",
+        mailbox_port: int = 8888,
+        mailbox_host: str = "127.0.0.1",
+        node_key_file: Optional[str] = None,
+        agent_key: Optional[Crypto] = None,
+        build_directory: Optional[str] = None,
+        peer_registration_delay: str = "0.0",
 ) -> P2PLibp2pConnection:
+    logging.info(f"_make_libp2p_connection:\n{locals()}")
     if not os.path.isdir(data_dir) or not os.path.exists(data_dir):
         raise ValueError("Data dir must be directory and exist!")
     log_file = os.path.join(data_dir, "libp2p_node_{}.log".format(port))
@@ -861,7 +881,7 @@ def _make_libp2p_connection(
         os.remove(log_file)
     key = agent_key
     if key is None:
-        key = make_crypto("fetchai")  # TODO: replace with DEFAULT_LEDGER
+        key = make_crypto(TEST_DEFAULT_LEDGER)
     identity = Identity(
         "identity",
         address=key.address,
@@ -870,14 +890,14 @@ def _make_libp2p_connection(
     )
     conn_crypto_store = None
     if node_key_file is not None:
-        conn_crypto_store = CryptoStore({"fetchai": node_key_file})
+        conn_crypto_store = CryptoStore({TEST_DEFAULT_LEDGER: node_key_file})
     else:
-        node_key = make_crypto("fetchai")
+        node_key = make_crypto(TEST_DEFAULT_LEDGER)
         node_key_path = os.path.join(data_dir, f"{node_key.public_key}.txt")
         node_key.dump(node_key_path)
         conn_crypto_store = CryptoStore({node_key.identifier: node_key_path})
     cert_request = CertRequest(
-        conn_crypto_store.public_keys["fetchai"],
+        conn_crypto_store.public_keys[TEST_DEFAULT_LEDGER],
         POR_DEFAULT_SERVICE_ID,
         key.identifier,
         "2021-01-01",
@@ -946,12 +966,12 @@ def _make_libp2p_connection(
 
 
 def _make_libp2p_client_connection(
-    peer_public_key: str,
-    data_dir: str,
-    node_port: int = 11234,
-    node_host: str = "127.0.0.1",
-    uri: Optional[str] = None,
-    ledger_api_id: Union[SimpleId, str] = "fetchai",  # TOFIX: DEFAULT_LEDGER,
+        peer_public_key: str,
+        data_dir: str,
+        node_port: int = 11234,
+        node_host: str = "127.0.0.1",
+        uri: Optional[str] = None,
+        ledger_api_id: Union[SimpleId, str] = "fetchai",  # TOFIX: DEFAULT_LEDGER,
 ) -> P2PLibp2pClientConnection:
     if not os.path.isdir(data_dir) or not os.path.exists(data_dir):
         raise ValueError("Data dir must be directory and exist!")
@@ -993,12 +1013,12 @@ def _make_libp2p_client_connection(
 
 
 def _make_libp2p_mailbox_connection(
-    peer_public_key: str,
-    data_dir: str,
-    node_port: int = 8888,
-    node_host: str = "127.0.0.1",
-    uri: Optional[str] = None,
-    ledger_api_id: Union[SimpleId, str] = "fetchai",  # DEFAULT_LEDGER,
+        peer_public_key: str,
+        data_dir: str,
+        node_port: int = 8888,
+        node_host: str = "127.0.0.1",
+        uri: Optional[str] = None,
+        ledger_api_id: Union[SimpleId, str] = "fetchai",  # DEFAULT_LEDGER,
 ) -> P2PLibp2pMailboxConnection:
     """Get a libp2p mailbox connection."""
     if not os.path.isdir(data_dir) or not os.path.exists(data_dir):
@@ -1103,9 +1123,9 @@ def aea_testcase_teardown_check(request):
 
     yield
     if (
-        request.cls
-        and issubclass(request.cls, BaseAEATestCase)
-        and getattr(request.cls, "_skipped", False) is False
+            request.cls
+            and issubclass(request.cls, BaseAEATestCase)
+            and getattr(request.cls, "_skipped", False) is False
     ):
         assert getattr(
             request.cls, "_is_teardown_class_called", None
@@ -1329,7 +1349,7 @@ def docker_exec_cmd(image_tag: str, cmd: str, **kwargs):
 
 
 def fund_accounts_from_local_validator(
-    addresses: List[str], amount: int, denom: str = DEFAULT_DENOMINATION
+        addresses: List[str], amount: int, denom: str = DEFAULT_DENOMINATION
 ):
     """Send funds to local accounts from the local genesis validator."""
     rest_client = RestClient(

@@ -53,7 +53,8 @@ func check(err error) {
 }
 
 func main() {
-
+	//     fmt.Println("MAIN1")
+	//     logger.Info().Msg("MAIN2")
 	var err error
 
 	// Initialize connection to aea
@@ -92,14 +93,26 @@ func main() {
 
 	// persist agent records to file
 	storagePath := agent.RecordStoragePath()
+
 	// libp2p node
 	var node dhtnode.DHTNode
 
 	// Run as a peer or just as a client
 	if nodePortPublic == 0 {
 		// if no external address is provided, run as a client
+
+		// NOTE: Looks like we need to get the change the ledger API
+		//       to be able to detect the ledger id
+
+		var identity string
+		if agent.ledgerID == "fetchAI" {
+			identity = dhtclient.IdentityFromFetchAIKey(key)
+		} else { // Ethereum
+			identity = dhtclient.IdentityFromEthereumKey(key)
+		}
+
 		opts := []dhtclient.Option{
-			dhtclient.IdentityFromFetchAIKey(key),
+			identity,
 			dhtclient.BootstrapFrom(entryPeers),
 		}
 		if record != nil {
@@ -110,7 +123,7 @@ func main() {
 		opts := []dhtpeer.Option{
 			dhtpeer.LocalURI(nodeHost, nodePort),
 			dhtpeer.PublicURI(nodeHostPublic, nodePortPublic),
-			dhtpeer.IdentityFromFetchAIKey(key),
+			dhtpeer.IdentityFromFetchAIKey(key), // TODO
 			dhtpeer.EnableRelayService(),
 			dhtpeer.EnableDelegateService(nodePortDelegate),
 			dhtpeer.BootstrapFrom(entryPeers),
