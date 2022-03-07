@@ -455,7 +455,7 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	return prvKey, pubKey, nil
 }
 
-// KeyPairFromEthereumKey  key pair from hex encoded secp256k1 private key
+// KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
 func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	pkBytes, err := hex.DecodeString(key[2:]) // slice of the "0x"
 	if err != nil {

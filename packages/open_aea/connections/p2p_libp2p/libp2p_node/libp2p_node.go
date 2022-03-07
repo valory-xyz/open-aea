@@ -104,15 +104,15 @@ func main() {
 		// NOTE: Looks like we need to get the change the ledger API
 		//       to be able to detect the ledger id
 
-		var identity string
-		if agent.ledgerID == "fetchAI" {
-			identity = dhtclient.IdentityFromFetchAIKey(key)
-		} else { // Ethereum
-			identity = dhtclient.IdentityFromEthereumKey(key)
-		}
+		// var identity string
+		// if record.LedgerId == "fetchAI" {
+		// 	identity = dhtclient.IdentityFromFetchAIKey(key)
+		// } else {
+		// 	identity = dhtclient.IdentityFromEthereumKey(key)
+		// }
 
 		opts := []dhtclient.Option{
-			identity,
+			dhtclient.IdentityFromEthereumKey(key),
 			dhtclient.BootstrapFrom(entryPeers),
 		}
 		if record != nil {
@@ -123,7 +123,7 @@ func main() {
 		opts := []dhtpeer.Option{
 			dhtpeer.LocalURI(nodeHost, nodePort),
 			dhtpeer.PublicURI(nodeHostPublic, nodePortPublic),
-			dhtpeer.IdentityFromFetchAIKey(key), // TODO
+			dhtpeer.IdentityFromEthereumKey(key),
 			dhtpeer.EnableRelayService(),
 			dhtpeer.EnableDelegateService(nodePortDelegate),
 			dhtpeer.BootstrapFrom(entryPeers),
