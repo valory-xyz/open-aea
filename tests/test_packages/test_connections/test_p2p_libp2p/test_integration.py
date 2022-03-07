@@ -38,7 +38,7 @@ from tests.conftest import (
     libp2p_log_on_failure,
     libp2p_log_on_failure_all,
 )
-
+import pytest
 
 DEFAULT_PORT = 10234
 DEFAULT_NET_SIZE = 4
@@ -50,6 +50,7 @@ MockDefaultMessageProtocol.protocol_specification_id = (
 )
 
 
+@pytest.mark.skip
 @libp2p_log_on_failure_all
 class TestP2PLibp2pConnectionIntegrationTest:
     """Test mix of relay/delegate agents and client connections work together"""
