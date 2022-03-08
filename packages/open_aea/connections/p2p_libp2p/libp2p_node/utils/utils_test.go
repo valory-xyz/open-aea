@@ -29,9 +29,19 @@ import (
 	mocks "libp2p_node/mocks"
 	"net"
 	"reflect"
+	"strings"
 	"testing"
 
 	"bou.ke/monkey"
+
+	"crypto/ecdsa"
+	// "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	// "github.com/ethereum/go-ethereum/crypto/sha3"
+	"golang.org/x/crypto/sha3"
+	// "github.com/ethereum/go-ethereum/crypto/secp256k1"
+
 	gomock "github.com/golang/mock/gomock"
 	"github.com/libp2p/go-libp2p-core/peer"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -420,4 +430,47 @@ func TestBootstrapConnect(t *testing.T) {
 		assert.Equal(t, "failed to bootstrap: some error", err.Error())
 	})
 
+}
+
+// Ethereum tests
+// address: 0xfF516F1273232fB64936FF03DA6eC85108b1d09A
+// private: 0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042
+// public: 0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade
+
+func TestHexutilDecodeEncode(t *testing.T) {
+	keyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	keyBytes, err := hexutil.Decode(keyHex)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, hexutil.Encode(keyBytes), keyHex)
+}
+
+func TestPublicKeyAndAddressFromPrivateKey(t *testing.T) {
+	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	expectedPublicKeyHex := "0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade"
+	expectedAddressHex := "0xfF516F1273232fB64936FF03DA6eC85108b1d09A"
+	privateKey, err := ethCrypto.HexToECDSA(privateKeyHex[2:]) // remove "0x"
+	assert.Equal(t, nil, err)
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	assert.Equal(t, true, ok)
+	publicKeyBytes := ethCrypto.FromECDSAPub(publicKeyECDSA)
+	publicKeyHex := hexutil.Encode(publicKeyBytes[1:]) // remove EC prefix 04
+	assert.Equal(t, expectedPublicKeyHex, publicKeyHex)
+	address := ethCrypto.PubkeyToAddress(*publicKeyECDSA)
+	addressHex := address.Hex()
+	assert.Equal(t, expectedAddressHex, addressHex)
+}
+
+func TestAddressFromPublicKey(t *testing.T) {
+	// take last 20 bytes of the keccack256 hash of the public key
+	publicKeyHex := "0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade"
+	expectedAddressHex := "0xfF516F1273232fB64936FF03DA6eC85108b1d09A"
+	publicKeyBytes, err := hexutil.Decode(publicKeyHex)
+	assert.Equal(t, nil, err)
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(publicKeyBytes)
+	buf := hash.Sum(nil)
+	address := hexutil.Encode(buf[12:])
+	// TODO: convert to checksummmed address
+	assert.Equal(t, strings.ToLower(expectedAddressHex), address)
 }

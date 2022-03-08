@@ -252,7 +252,7 @@ func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 	return hex.EncodeToString(raw), nil
 }
 
-// EthereumPublicKeyFromPubKey return FetchAI's format serialized public key
+// EthereumPublicKeyFromPubKey return Ethereum's format serialized public key
 func EthereumPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 	raw, err := publicKey.Raw()
 	if err != nil {
@@ -467,12 +467,6 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	return prvKey, pubKey, nil
 }
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 // KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
 func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 
@@ -489,6 +483,19 @@ func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 
 	return prvKey, pubKey, nil
 }
+
+// // KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
+// func KeyPairFromEthereumKey(key string) (ecdsa.PrivateKey, ethCrypto.PublicKey, error) {
+
+// 	prvKey, err := ethCrypto.HexToECDSA(key[2:]) // slice of the "0x"
+// 	if err != nil {
+// 		logger.Error().Msg("Cannot encode ETH hex key to PrivateKeys")
+// 		// return nil, nil, err
+// 	}
+// 	pubKey := prvKey.Public()
+
+// 	return *prvKey, pubKey, nil
+// }
 
 // AgentAddressFromPublicKey get wallet address from public key associated with ledgerId
 // format from: https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L120
