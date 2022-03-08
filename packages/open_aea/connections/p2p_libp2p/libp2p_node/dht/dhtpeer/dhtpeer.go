@@ -232,7 +232,8 @@ func New(opts ...Option) (*DHTPeer, error) {
 
 	// check if the PoR is delivered for my public  key
 	if dhtPeer.myAgentRecord != nil {
-		myPublicKey, err := utils.FetchAIPublicKeyFromPubKey(dhtPeer.publicKey)
+		// myPublicKey, err := utils.FetchAIPublicKeyFromPubKey(dhtPeer.publicKey)  // TODO
+		myPublicKey, err := utils.EthereumPublicKeyFromPubKey(dhtPeer.publicKey)
 		status, errPoR := dhtnode.IsValidProofOfRepresentation(
 			dhtPeer.myAgentRecord, dhtPeer.myAgentRecord.Address, myPublicKey,
 		)
@@ -492,7 +493,7 @@ func (dhtPeer *DHTPeer) initAgentRecordPersistentStorage() (int, error) {
 			return 0, errors.Wrap(err, "while loading agent records")
 		}
 		dhtPeer.agentRecords[record.Address] = record
-		relayPeerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey)
+		relayPeerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
 		if err != nil {
 			return 0, errors.Wrap(err, "While loading agent records")
 		}
@@ -817,7 +818,8 @@ L:
 
 func (dhtPeer *DHTPeer) CheckPOR(record *acn.AgentRecord) (*acn.StatusBody, error) {
 	addr := record.Address
-	myPubKey, err := utils.FetchAIPublicKeyFromPubKey(dhtPeer.publicKey)
+	// myPubKey, err := utils.FetchAIPublicKeyFromPubKey(dhtPeer.publicKey) // TODO
+	myPubKey, err := utils.EthereumPublicKeyFromPubKey(dhtPeer.publicKey)
 	ignore(err)
 	status, err := dhtnode.IsValidProofOfRepresentation(record, addr, myPubKey)
 	return status, err
@@ -1406,7 +1408,7 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 				continue
 			}
 
-			peerid, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey)
+			peerid, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
 			if err != nil {
 				return "", nil, errors.New(
 					"CRITICAL couldn't get peer ID from message:" + err.Error(),
@@ -1720,7 +1722,8 @@ func (dhtPeer *DHTPeer) handleAeaRegisterStream(stream network.Stream) {
 	//	stream.Conn().RemotePeer().Pretty(), clientAddr)
 
 	// check if the PoR is valid
-	clientPubKey, err := utils.FetchAIPublicKeyFromPubKey(stream.Conn().RemotePublicKey())
+	// clientPubKey, err := utils.FetchAIPublicKeyFromPubKey(stream.Conn().RemotePublicKey()) // TODO
+	clientPubKey, err := utils.EthereumPublicKeyFromPubKey(stream.Conn().RemotePublicKey())
 	ignore(err)
 	status, err := dhtnode.IsValidProofOfRepresentation(record, record.Address, clientPubKey)
 

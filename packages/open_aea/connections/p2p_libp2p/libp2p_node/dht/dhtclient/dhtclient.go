@@ -180,7 +180,8 @@ func New(opts ...Option) (*DHTClient, error) {
 	}
 
 	// check if the PoR is delivered for my public key
-	myPublicKey, err := utils.FetchAIPublicKeyFromPubKey(dhtClient.publicKey)
+	// myPublicKey, err := utils.FetchAIPublicKeyFromPubKey(dhtClient.publicKey)  // TODO
+	myPublicKey, err := utils.EthereumPublicKeyFromPubKey(dhtClient.publicKey)
 	status, errPoR := dhtnode.IsValidProofOfRepresentation(
 		dhtClient.myAgentRecord,
 		dhtClient.myAgentRecord.Address,
@@ -494,7 +495,7 @@ func (dhtClient *DHTClient) RouteEnvelope(envel *aea.Envelope) error {
 	stream.Close()
 
 	// retrieve peerID
-	peerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey)
+	peerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
 	if err != nil {
 		lerror(err).
 			Str("op", "route").

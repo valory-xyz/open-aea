@@ -54,6 +54,8 @@ import (
 	"github.com/btcsuite/btcutil/bech32"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+
+	// ethutil "github.com/miguelmota/go-ethutil"
 	proto "google.golang.org/protobuf/proto"
 
 	"libp2p_node/aea"
@@ -248,6 +250,16 @@ func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(raw), nil
+}
+
+// EthereumPublicKeyFromPubKey return FetchAI's format serialized public key
+func EthereumPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
+	raw, err := publicKey.Raw()
+	if err != nil {
+		return "", err
+	}
+	// return hexutil.Encode(raw), nil
+	return "0x" + hex.EncodeToString(raw)[2:], nil
 }
 
 // BTCPubKeyFromFetchAIPublicKey from public key string
@@ -455,8 +467,15 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	return prvKey, pubKey, nil
 }
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 // KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
 func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
+
 	pkBytes, err := hex.DecodeString(key[2:]) // slice of the "0x"
 	if err != nil {
 		return nil, nil, err

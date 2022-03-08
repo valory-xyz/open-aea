@@ -73,7 +73,8 @@ func IsValidProofOfRepresentation(
 
 	// check public key matches
 	if record.PeerPublicKey != representativePeerPubKey {
-		err := errors.New("Wrong peer public key, expected " + representativePeerPubKey)
+		err := errors.New("Wrong peer public key, representativePeerPubKey: " +
+			representativePeerPubKey + " record.PeerPublicKey: " + record.PeerPublicKey)
 		response := &acn.StatusBody{Code: acn.ERROR_WRONG_PUBLIC_KEY, Msgs: []string{err.Error()}}
 		return response, err
 	}

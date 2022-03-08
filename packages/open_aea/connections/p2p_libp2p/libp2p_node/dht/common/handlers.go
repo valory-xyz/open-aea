@@ -75,7 +75,8 @@ func receiveEnvelopeFromPeer(dhtHandler DHTHandler, stream network.Stream) (*aea
 		return nil, err
 	}
 
-	remotePubkey, err := utils.FetchAIPublicKeyFromPubKey(stream.Conn().RemotePublicKey())
+	// remotePubkey, err := utils.FetchAIPublicKeyFromPubKey(stream.Conn().RemotePublicKey())  // TODO
+	remotePubkey, err := utils.EthereumPublicKeyFromPubKey(stream.Conn().RemotePublicKey())
 	ignore(err)
 	status, err := dhtnode.IsValidProofOfRepresentation(
 		aeaEnvelope.Record,
