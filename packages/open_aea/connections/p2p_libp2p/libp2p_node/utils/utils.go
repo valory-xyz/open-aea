@@ -23,6 +23,7 @@ package utils
 import (
 	"bufio"
 	"context"
+	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
@@ -253,13 +254,20 @@ func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 }
 
 // EthereumPublicKeyFromPubKey return Ethereum's format serialized public key
-func EthereumPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
-	raw, err := publicKey.Raw()
+func EthereumPublicKeyFromPubKey(pubKey crypto.PubKey) (string, error) {
+	// pubKeyBytes, err = pubKey.Raw() // x509: unsupported elliptic curve
+	publicKey, err := crypto.PubKeyToStdKey(pubKey)
 	if err != nil {
 		return "", err
 	}
-	// return hexutil.Encode(raw), nil
-	return "0x" + hex.EncodeToString(raw)[2:], nil
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		err := errors.New("cannot cast publicKey to publicKeyECDSA")
+		return "", err
+	}
+	publicKeyBytes := ethCrypto.FromECDSAPub(publicKeyECDSA)
+	publicKeyHex := hexutil.Encode(publicKeyBytes[1:]) // remove EC prefix
+	return publicKeyHex, nil
 }
 
 // BTCPubKeyFromFetchAIPublicKey from public key string
@@ -469,33 +477,15 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 
 // KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
 func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
-
-	pkBytes, err := hex.DecodeString(key[2:]) // slice of the "0x"
+	privateKey, err := ethCrypto.HexToECDSA(key[2:]) // slice off the "0x"
 	if err != nil {
+		logger.Error().Msg("Cannot encode ETH hexadecimal key to PrivateKey")
 		return nil, nil, err
 	}
+	privKey, pubKey, err := crypto.ECDSAKeyPairFromKey(privateKey)
+	return privKey, pubKey, err
 
-	btcPrivateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
-	prvKey, pubKey, err := crypto.KeyPairFromStdKey(btcPrivateKey)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return prvKey, pubKey, nil
 }
-
-// // KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
-// func KeyPairFromEthereumKey(key string) (ecdsa.PrivateKey, ethCrypto.PublicKey, error) {
-
-// 	prvKey, err := ethCrypto.HexToECDSA(key[2:]) // slice of the "0x"
-// 	if err != nil {
-// 		logger.Error().Msg("Cannot encode ETH hex key to PrivateKeys")
-// 		// return nil, nil, err
-// 	}
-// 	pubKey := prvKey.Public()
-
-// 	return *prvKey, pubKey, nil
-// }
 
 // AgentAddressFromPublicKey get wallet address from public key associated with ledgerId
 // format from: https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L120
@@ -590,7 +580,7 @@ func encodeChecksumEIP55(address []byte) string {
 	return "0x" + string(result)
 }
 
-// IDFromFetchAIPublicKey Get PeeID (multihash) from fetchai public key
+// IDFromFetchAIPublicKey Get PeerID (multihash) from fetchai public key
 func IDFromFetchAIPublicKey(publicKey string) (peer.ID, error) {
 	b, err := hex.DecodeString(publicKey)
 	if err != nil {
@@ -624,13 +614,28 @@ func BTCPubKeyFromUncompressedHex(publicKey string) (*btcec.PublicKey, error) {
 	return btcec.ParsePubKey(pubBytes, btcec.S256())
 }
 
-// IDFromFetchAIPublicKeyUncompressed Get PeeID (multihash) from fetchai public key
+// IDFromFetchAIPublicKeyUncompressed Get PeerID (multihash) from fetchai public key
 func IDFromFetchAIPublicKeyUncompressed(publicKey string) (peer.ID, error) {
 	pubKey, err := BTCPubKeyFromUncompressedHex(publicKey)
 	if err != nil {
 		return "", err
 	}
 
+	multihash, err := peer.IDFromPublicKey((*crypto.Secp256k1PublicKey)(pubKey))
+	if err != nil {
+		return "", err
+	}
+
+	return multihash, nil
+}
+
+// IDFromEthereumPublicKey Get PeerID (multihash) from ethereum public key
+func IDFromEthereumPublicKey(publicKey string) (peer.ID, error) {
+	// Uncompressed
+	pubKey, err := BTCPubKeyFromUncompressedHex(publicKey[2:]) // slice off "0x"
+	if err != nil {
+		return "", err
+	}
 	multihash, err := peer.IDFromPublicKey((*crypto.Secp256k1PublicKey)(pubKey))
 	if err != nil {
 		return "", err

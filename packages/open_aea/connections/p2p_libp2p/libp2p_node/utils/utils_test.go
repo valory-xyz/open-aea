@@ -21,18 +21,18 @@
 package utils
 
 import (
+	"bou.ke/monkey"
 	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/libp2p/go-libp2p-core/crypto"
 	"libp2p_node/aea"
 	mocks "libp2p_node/mocks"
 	"net"
 	"reflect"
 	"strings"
 	"testing"
-
-	"bou.ke/monkey"
 
 	"crypto/ecdsa"
 	// "github.com/ethereum/go-ethereum/common"
@@ -454,7 +454,7 @@ func TestPublicKeyAndAddressFromPrivateKey(t *testing.T) {
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	assert.Equal(t, true, ok)
 	publicKeyBytes := ethCrypto.FromECDSAPub(publicKeyECDSA)
-	publicKeyHex := hexutil.Encode(publicKeyBytes[1:]) // remove EC prefix 04
+	publicKeyHex := hexutil.Encode(publicKeyBytes[1:]) // remove EC prefix "04"
 	assert.Equal(t, expectedPublicKeyHex, publicKeyHex)
 	address := ethCrypto.PubkeyToAddress(*publicKeyECDSA)
 	addressHex := address.Hex()
@@ -473,4 +473,42 @@ func TestAddressFromPublicKey(t *testing.T) {
 	address := hexutil.Encode(buf[12:])
 	// TODO: convert to checksummmed address
 	assert.Equal(t, strings.ToLower(expectedAddressHex), address)
+}
+
+// actual tests
+
+func TestKeyPairFromEthereumKey(t *testing.T) {
+	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	expectedPublicKeyHex := "0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade"
+	_, pubKey, err := KeyPairFromEthereumKey(privateKeyHex)
+	assert.Equal(t, nil, err)
+	// pubKeyBytes, err = pubKey.Raw() // x509: unsupported elliptic curve
+	publicKey, err := crypto.PubKeyToStdKey(pubKey)
+	assert.Equal(t, nil, err)
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	assert.Equal(t, true, ok)
+	publicKeyBytes := ethCrypto.FromECDSAPub(publicKeyECDSA)
+	publicKeyHex := hexutil.Encode(publicKeyBytes[1:]) // remove EC prefix "04"
+	assert.Equal(t, expectedPublicKeyHex, publicKeyHex)
+}
+
+func TestEthereumPublicKeyFromPubKey(t *testing.T) {
+	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	expectedPublicKeyHex := "0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade"
+	_, pubKey, err := KeyPairFromEthereumKey(privateKeyHex)
+	assert.Equal(t, nil, err)
+	publicKeyHex, err := EthereumPublicKeyFromPubKey(pubKey)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedPublicKeyHex, publicKeyHex)
+}
+
+func TestIDFromEthereumPublicKey(t *testing.T) {
+	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	_, pubKey, err := KeyPairFromEthereumKey(privateKeyHex)
+	assert.Equal(t, nil, err)
+	key, err := EthereumPublicKeyFromPubKey(pubKey)
+	assert.Equal(t, nil, err)
+	peerID, err := IDFromEthereumPublicKey(key) // Uncompressed
+	assert.Equal(t, nil, err)
+	assert.NotEqual(t, 0, len(peerID))
 }

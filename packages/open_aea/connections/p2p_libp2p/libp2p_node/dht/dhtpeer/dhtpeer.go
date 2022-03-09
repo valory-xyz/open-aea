@@ -493,7 +493,8 @@ func (dhtPeer *DHTPeer) initAgentRecordPersistentStorage() (int, error) {
 			return 0, errors.Wrap(err, "while loading agent records")
 		}
 		dhtPeer.agentRecords[record.Address] = record
-		relayPeerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+		// relayPeerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+		relayPeerID, err := utils.IDFromEthereumPublicKey(record.PeerPublicKey)
 		if err != nil {
 			return 0, errors.Wrap(err, "While loading agent records")
 		}
@@ -1408,7 +1409,8 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 				continue
 			}
 
-			peerid, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+			// peerid, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+			peerid, err := utils.IDFromEthereumPublicKey(record.PeerPublicKey)
 			if err != nil {
 				return "", nil, errors.New(
 					"CRITICAL couldn't get peer ID from message:" + err.Error(),

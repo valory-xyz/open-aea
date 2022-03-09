@@ -495,7 +495,8 @@ func (dhtClient *DHTClient) RouteEnvelope(envel *aea.Envelope) error {
 	stream.Close()
 
 	// retrieve peerID
-	peerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+	// peerID, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey) // TODO
+	peerID, err := utils.IDFromEthereumPublicKey(record.PeerPublicKey)
 	if err != nil {
 		lerror(err).
 			Str("op", "route").
