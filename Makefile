@@ -138,14 +138,26 @@ v := $(shell pip -V | grep virtualenvs)
 .PHONY: checks
 checks:
 	make clean \
-	&& make static \
-	&& make lint \
-	&& make pylint \
-	&& make copyright \
-	&& make docs \
-	&& make api-docs \
-	&& make hashes \
-	&& make security \
+	&& tox -e bandit \
+	&& tox -e safety \
+	&& tox -e black \
+	&& tox -e isort \
+	&& tox -e flake8 \
+	&& tox -e darglint \
+	&& tox -e vulture \
+	&& tox -e mypy \
+	&& tox -e pylint \
+	&& tox -e liccheck \
+	&& tox -e hash_check -- --timeout 60.0 \
+	&& tox -e package_version_checks \
+	&& tox -e package_dependencies_checks \
+	&& tox -e check_generate_all_protocols \
+	&& tox -e docs \
+	&& tox -e check-copyright \
+	&& tox -e check_doc_links \
+	&& tox -e check_api_docs \
+	&& tox -e spell_check \
+	&& tox -e dependencies_check
 
 .PHONY: new_env
 new_env: clean
