@@ -33,10 +33,7 @@ func IdentityFromFetchAIKey(key string) Option {
 	return func(dhtClient *DHTClient) error {
 		var err error
 		dhtClient.key, dhtClient.publicKey, err = utils.KeyPairFromFetchAIKey(key)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err // is nil if none
 	}
 }
 
@@ -45,10 +42,7 @@ func IdentityFromEthereumKey(key string) Option {
 	return func(dhtClient *DHTClient) error {
 		var err error
 		dhtClient.key, dhtClient.publicKey, err = utils.KeyPairFromEthereumKey(key)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err // is nil if none
 	}
 }
 
@@ -75,9 +69,6 @@ func BootstrapFrom(entryPeers []string) Option {
 	return func(dhtClient *DHTClient) error {
 		var err error
 		dhtClient.bootstrapPeers, err = utils.GetPeersAddrInfo(entryPeers)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err // is nil if none
 	}
 }

@@ -34,6 +34,7 @@ import (
 	"libp2p_node/dht/dhtnode"
 	"libp2p_node/dht/dhtpeer"
 	"libp2p_node/utils"
+	"runtime/debug"
 )
 
 const (
@@ -47,14 +48,12 @@ var logger zerolog.Logger = utils.NewDefaultLogger()
 // panics if err is not nil
 func check(err error) {
 	if err != nil {
-		fmt.Println(libp2pNodePanicError, ":", err.Error())
 		panic(err)
 	}
 }
 
 func main() {
-	//     fmt.Println("MAIN1")
-	//     logger.Info().Msg("MAIN2")
+	debug.SetTraceback("all")
 	var err error
 
 	// Initialize connection to aea
@@ -99,6 +98,7 @@ func main() {
 
 	// Run as a peer or just as a client
 	if nodePortPublic == 0 {
+		logger.Info().Msg("setting up dhtclient connection")
 		// if no external address is provided, run as a client
 
 		// NOTE: Looks like we need to get the change the ledger API
@@ -120,6 +120,7 @@ func main() {
 		}
 		node, err = dhtclient.New(opts...)
 	} else {
+		logger.Info().Msg("setting up dhtpeer connection")
 		opts := []dhtpeer.Option{
 			dhtpeer.LocalURI(nodeHost, nodePort),
 			dhtpeer.PublicURI(nodeHostPublic, nodePortPublic),

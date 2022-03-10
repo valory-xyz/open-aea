@@ -31,6 +31,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 	proto "google.golang.org/protobuf/proto"
 
 	acn "libp2p_node/acn"
@@ -45,9 +46,9 @@ const OutQueueSize = 100
 var logger zerolog.Logger = zerolog.New(zerolog.ConsoleWriter{
 	Out:        os.Stdout,
 	NoColor:    false,
-	TimeFormat: "15:04:05.000",
+	TimeFormat: time.RFC3339Nano,
 }).
-	With().Timestamp().
+	With().Caller().Timestamp().
 	Str("package", "AeaApi").
 	Logger()
 
@@ -170,6 +171,7 @@ func (aea *AeaApi) Stop() {
 
 func (aea *AeaApi) Init() error {
 	zerolog.TimeFieldFormat = time.RFC3339Nano
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
 	if aea.sandbox {
 		return nil
@@ -181,7 +183,7 @@ func (aea *AeaApi) Init() error {
 	aea.connected = false
 
 	env_file := os.Args[1]
-	logger.Debug().Msgf("env_file: %s", env_file)
+	logger.Debug().Stack().Msgf("env_file: %s", env_file)
 
 	// get config
 	err := godotenv.Overload(env_file)

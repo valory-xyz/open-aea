@@ -27,6 +27,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/libp2p/go-libp2p-core/crypto"
+	// pb "github.com/libp2p/go-libp2p-core/crypto/pb"
 	"libp2p_node/aea"
 	mocks "libp2p_node/mocks"
 	"net"
@@ -477,12 +478,29 @@ func TestAddressFromPublicKey(t *testing.T) {
 
 // actual tests
 
+func TestFetchAIKeyType(t *testing.T) {
+	privateKeyHex := "3e7a1f43b2d8a4b9f63a2ffeb1d597f971a8db7ffd95453173268b453106cadc"
+	privKey, pubKey, err := KeyPairFromFetchAIKey(privateKeyHex)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "Secp256k1", privKey.Type().String())
+	assert.Equal(t, "Secp256k1", pubKey.Type().String())
+}
+
+func TestEthereumKeyType(t *testing.T) {
+	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
+	privKey, pubKey, err := KeyPairFromEthereumKey(privateKeyHex)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "ECDSA", privKey.Type().String())
+	assert.Equal(t, "ECDSA", pubKey.Type().String())
+}
+
 func TestKeyPairFromEthereumKey(t *testing.T) {
 	privateKeyHex := "0xbb0c01836c9ddfc89a890d829dfaa569be545bac71cf20bbff8e02a114a2f042"
 	expectedPublicKeyHex := "0x4a47e8a74fab63f0a8e7615cc9776960159bc79cefc9b6e3164c4c4e018247f58ee51a200a4286fb49af6246c1e14649395a5e658209dbc6086c89530acf7ade"
 	_, pubKey, err := KeyPairFromEthereumKey(privateKeyHex)
 	assert.Equal(t, nil, err)
-	// pubKeyBytes, err = pubKey.Raw() // x509: unsupported elliptic curve
+	// pubKeyBytes, err := pubKey.Raw() // x509: unsupported elliptic curve
+	// assert.Equal(t, nil, err)
 	publicKey, err := crypto.PubKeyToStdKey(pubKey)
 	assert.Equal(t, nil, err)
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)

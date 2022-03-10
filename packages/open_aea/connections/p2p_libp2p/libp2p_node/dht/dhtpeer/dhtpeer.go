@@ -75,6 +75,8 @@ const AcnStatusTimeout = 5.0 * time.Second
 const AcnStatusesQueueSize = 1000
 const SlowQueueSize = 100
 
+var logger zerolog.Logger = utils.NewDefaultLogger()
+
 // panics if err is not nil
 func check(err error) {
 	if err != nil {
@@ -186,6 +188,7 @@ type DHTPeer struct {
 // New creates a new DHTPeer
 func New(opts ...Option) (*DHTPeer, error) {
 	var err error
+
 	dhtPeer := &DHTPeer{registrationDelay: addressRegistrationDelay, isClosing: false}
 
 	dhtPeer.dhtAddresses = map[string]string{}
@@ -273,19 +276,23 @@ func New(opts ...Option) (*DHTPeer, error) {
 	}
 
 	// create a basic host
+
 	basicHost, err := libp2p.New(ctx, libp2pOpts...)
 	if err != nil {
+		logger.Error().Msg("libp2p host could not be instantiated")
 		return nil, err
 	}
 
 	// create the dht
 	dhtPeer.dht, err = kaddht.New(ctx, basicHost, kaddht.Mode(kaddht.ModeServer))
 	if err != nil {
+		logger.Error().Msg("Kademlia DHT peer could not be instantiated")
 		return nil, err
 	}
 
 	err = dhtPeer.makeSSLCertifiateAndSignature()
 	if err != nil {
+		logger.Error().Msg("SSL certifiate and signature failed")
 		return nil, err
 	}
 	// make the routed host

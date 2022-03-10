@@ -38,7 +38,7 @@ import (
 	"time"
 
 	"github.com/ipfs/go-cid"
-	"github.com/libp2p/go-libp2p-core/crypto"
+	libp2pCrypto "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -109,14 +109,14 @@ func newConsoleLogger() zerolog.Logger {
 // NewDefaultLogger basic zerolog console writer
 func NewDefaultLogger() zerolog.Logger {
 	return newConsoleLogger().
-		With().Timestamp().
+		With().Caller().Timestamp().
 		Logger().Level(loggerGlobalLevel)
 }
 
 // NewDefaultLoggerWithFields zerolog console writer
 func NewDefaultLoggerWithFields(fields map[string]string) zerolog.Logger {
 	logger := newConsoleLogger().
-		With().Timestamp()
+		With().Caller().Timestamp()
 	for key, val := range fields {
 		logger = logger.Str(key, val)
 	}
@@ -239,13 +239,13 @@ func GetPeersAddrInfo(peers []string) ([]peer.AddrInfo, error) {
 */
 
 // PubKeyFromFetchAIPublicKey create libp2p public key from fetchai hex encoded secp256k1 key
-func PubKeyFromFetchAIPublicKey(publicKey string) (crypto.PubKey, error) {
+func PubKeyFromFetchAIPublicKey(publicKey string) (libp2pCrypto.PubKey, error) {
 	hexBytes, _ := hex.DecodeString(publicKey)
-	return crypto.UnmarshalSecp256k1PublicKey(hexBytes)
+	return libp2pCrypto.UnmarshalSecp256k1PublicKey(hexBytes)
 }
 
 // FetchAIPublicKeyFromPubKey return FetchAI's format serialized public key
-func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
+func FetchAIPublicKeyFromPubKey(publicKey libp2pCrypto.PubKey) (string, error) {
 	raw, err := publicKey.Raw()
 	if err != nil {
 		return "", err
@@ -254,9 +254,9 @@ func FetchAIPublicKeyFromPubKey(publicKey crypto.PubKey) (string, error) {
 }
 
 // EthereumPublicKeyFromPubKey return Ethereum's format serialized public key
-func EthereumPublicKeyFromPubKey(pubKey crypto.PubKey) (string, error) {
+func EthereumPublicKeyFromPubKey(pubKey libp2pCrypto.PubKey) (string, error) {
 	// pubKeyBytes, err = pubKey.Raw() // x509: unsupported elliptic curve
-	publicKey, err := crypto.PubKeyToStdKey(pubKey)
+	publicKey, err := libp2pCrypto.PubKeyToStdKey(pubKey)
 	if err != nil {
 		return "", err
 	}
@@ -460,14 +460,14 @@ func VerifyEthereumSignatureETH(message []byte, signature string, pubkey string)
 }
 
 // KeyPairFromFetchAIKey  key pair from hex encoded secp256k1 private key
-func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
+func KeyPairFromFetchAIKey(key string) (libp2pCrypto.PrivKey, libp2pCrypto.PubKey, error) {
 	pkBytes, err := hex.DecodeString(key)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	btcPrivateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
-	prvKey, pubKey, err := crypto.KeyPairFromStdKey(btcPrivateKey)
+	prvKey, pubKey, err := libp2pCrypto.KeyPairFromStdKey(btcPrivateKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -475,14 +475,14 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 	return prvKey, pubKey, nil
 }
 
-// KeyPairFromEthereumKey key pair from hex encoded secp256k1 private key
-func KeyPairFromEthereumKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
+// KeyPairFromEthereumKey key pair from hex encoded ECDSA private key
+func KeyPairFromEthereumKey(key string) (libp2pCrypto.PrivKey, libp2pCrypto.PubKey, error) {
 	privateKey, err := ethCrypto.HexToECDSA(key[2:]) // slice off the "0x"
 	if err != nil {
 		logger.Error().Msg("Cannot encode ETH hexadecimal key to PrivateKey")
 		return nil, nil, err
 	}
-	privKey, pubKey, err := crypto.ECDSAKeyPairFromKey(privateKey)
+	privKey, pubKey, err := libp2pCrypto.ECDSAKeyPairFromKey(privateKey)
 	return privKey, pubKey, err
 
 }
@@ -592,7 +592,7 @@ func IDFromFetchAIPublicKey(publicKey string) (peer.ID, error) {
 		return "", err
 	}
 
-	multihash, err := peer.IDFromPublicKey((*crypto.Secp256k1PublicKey)(pubKey))
+	multihash, err := peer.IDFromPublicKey((*libp2pCrypto.Secp256k1PublicKey)(pubKey))
 	if err != nil {
 		return "", err
 	}
@@ -621,7 +621,7 @@ func IDFromFetchAIPublicKeyUncompressed(publicKey string) (peer.ID, error) {
 		return "", err
 	}
 
-	multihash, err := peer.IDFromPublicKey((*crypto.Secp256k1PublicKey)(pubKey))
+	multihash, err := peer.IDFromPublicKey((*libp2pCrypto.Secp256k1PublicKey)(pubKey))
 	if err != nil {
 		return "", err
 	}
@@ -629,14 +629,39 @@ func IDFromFetchAIPublicKeyUncompressed(publicKey string) (peer.ID, error) {
 	return multihash, nil
 }
 
+// // IDFromEthereumPublicKey Get PeerID (multihash) from ethereum public key
+// func IDFromEthereumPublicKey(publicKey string) (peer.ID, error) {
+// 	// Uncompressed
+// 	pubKey, err := BTCPubKeyFromUncompressedHex(publicKey[2:]) // slice off "0x"
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	multihash, err := peer.IDFromPublicKey((*libp2pCrypto.Secp256k1PublicKey)(pubKey))
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	return multihash, nil
+// }
+
 // IDFromEthereumPublicKey Get PeerID (multihash) from ethereum public key
 func IDFromEthereumPublicKey(publicKey string) (peer.ID, error) {
-	// Uncompressed
-	pubKey, err := BTCPubKeyFromUncompressedHex(publicKey[2:]) // slice off "0x"
+
+	// WIP: TestIDFromEthereumPublicKey still gives error
+	//      "invalid length, need 256 bits"
+	_, pubKey, err := KeyPairFromEthereumKey(publicKey)
 	if err != nil {
 		return "", err
 	}
-	multihash, err := peer.IDFromPublicKey((*crypto.Secp256k1PublicKey)(pubKey))
+	pKey, err := libp2pCrypto.PubKeyToStdKey(pubKey)
+	if err != nil {
+		return "", err
+	}
+	publicKeyECDSA, ok := pKey.(*ecdsa.PublicKey)
+	if !ok {
+		return "", errors.New("ecdsa.PublicKey casting failed")
+	}
+	multihash, err := peer.IDFromPublicKey((*libp2pCrypto.Secp256k1PublicKey)(publicKeyECDSA))
 	if err != nil {
 		return "", err
 	}
