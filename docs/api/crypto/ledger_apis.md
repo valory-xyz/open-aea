@@ -94,6 +94,25 @@ Send a signed transaction and wait for confirmation.
 
 the tx_digest, if present
 
+<a name="aea.crypto.ledger_apis.LedgerApis.send_signed_transaction_unsafe"></a>
+#### send`_`signed`_`transaction`_`unsafe
+
+```python
+ | @classmethod
+ | send_signed_transaction_unsafe(cls, identifier: str, tx_signed: Any) -> Optional[str]
+```
+
+Send a signed transaction and wait for confirmation.
+
+**Arguments**:
+
+- `identifier`: the identifier of the ledger
+- `tx_signed`: the signed transaction
+
+**Returns**:
+
+the tx_digest, if present
+
 <a name="aea.crypto.ledger_apis.LedgerApis.get_transaction_receipt"></a>
 #### get`_`transaction`_`receipt
 

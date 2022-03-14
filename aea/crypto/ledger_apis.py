@@ -161,6 +161,25 @@ class LedgerApis:
         return tx_digest
 
     @classmethod
+    def send_signed_transaction_unsafe(
+        cls, identifier: str, tx_signed: Any
+    ) -> Optional[str]:
+        """
+        Send a signed transaction and wait for confirmation.
+
+        :param identifier: the identifier of the ledger
+        :param tx_signed: the signed transaction
+        :return: the tx_digest, if present
+        """
+        enforce(
+            identifier in ledger_apis_registry.supported_ids,
+            "Not a registered ledger api identifier.",
+        )
+        api = make_ledger_api(identifier, **cls.ledger_api_configs[identifier])
+        tx_digest = api.send_signed_transaction_unsafe(tx_signed)
+        return tx_digest
+
+    @classmethod
     def get_transaction_receipt(cls, identifier: str, tx_digest: str) -> Optional[Any]:
         """
         Get the transaction receipt for a transaction digest.
