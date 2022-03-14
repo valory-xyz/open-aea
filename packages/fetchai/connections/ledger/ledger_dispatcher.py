@@ -312,10 +312,8 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             transaction_digest = api.send_signed_transaction_unsafe(
                 message.signed_transaction.body
             )
-        except Exception as e:
-            return self.get_error_message(
-                e, api, message, dialogue
-            )
+        except Exception as e:  # pylint: disable=broad-except
+            return self.get_error_message(e, api, message, dialogue)
 
         if transaction_digest is None:  # pragma: nocover
             return self.get_error_message(
