@@ -389,6 +389,15 @@ class LedgerApi(Helper, ABC):
         """
 
     @abstractmethod
+    def send_signed_transaction_unsafe(self, tx_signed: JSONLike) -> Optional[str]:
+        """
+        Send a signed transaction. Might raise an error in case it fails for any reason.
+
+        :param tx_signed: the signed transaction
+        :return: tx_digest, if an exception is not raised
+        """
+
+    @abstractmethod
     def get_transaction_receipt(self, tx_digest: str) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.

@@ -548,6 +548,24 @@ Use keyword arguments for the specifying the signed transaction payload.
 
 - `tx_signed`: the signed transaction
 
+<a name="aea.crypto.base.LedgerApi.send_signed_transaction_unsafe"></a>
+#### send`_`signed`_`transaction`_`unsafe
+
+```python
+ | @abstractmethod
+ | send_signed_transaction_unsafe(tx_signed: JSONLike) -> Optional[str]
+```
+
+Send a signed transaction. Might raise an error in case it fails for any reason.
+
+**Arguments**:
+
+- `tx_signed`: the signed transaction
+
+**Returns**:
+
+tx_digest, if an exception is not raised
+
 <a name="aea.crypto.base.LedgerApi.get_transaction_receipt"></a>
 #### get`_`transaction`_`receipt
 
