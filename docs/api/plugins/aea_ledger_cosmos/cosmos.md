@@ -694,6 +694,15 @@ Send a signed transaction and wait for confirmation.
 
 tx_digest, if present
 
+<a name="plugins.aea-ledger-cosmos.aea_ledger_cosmos.cosmos._CosmosApi.send_signed_transaction_unsafe"></a>
+#### send`_`signed`_`transaction`_`unsafe
+
+```python
+ | send_signed_transaction_unsafe(tx_signed: JSONLike) -> Optional[str]
+```
+
+Send a signed transaction in a non-safe way.
+
 <a name="plugins.aea-ledger-cosmos.aea_ledger_cosmos.cosmos._CosmosApi.get_transaction_receipt"></a>
 #### get`_`transaction`_`receipt
 

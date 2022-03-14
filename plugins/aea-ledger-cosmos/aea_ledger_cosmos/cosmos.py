@@ -1311,6 +1311,10 @@ class _CosmosApi(LedgerApi):
 
         return tx_digest
 
+    def send_signed_transaction_unsafe(self, tx_signed: JSONLike) -> Optional[str]:
+        """Send a signed transaction in a non-safe way."""
+        raise NotImplementedError()
+
     def get_transaction_receipt(self, tx_digest: str) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.
