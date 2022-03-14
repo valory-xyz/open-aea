@@ -297,6 +297,42 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             )
         return response
 
+    def send_signed_transaction_unsafe(
+        self, api: LedgerApi, message: LedgerApiMessage, dialogue: LedgerApiDialogue,
+    ) -> LedgerApiMessage:
+        """
+        Send the request 'send_signed_tx' unsafe.
+
+        :param api: the API object.
+        :param message: the Ledger API message
+        :param dialogue: the dialogue
+        :return: the ledger api message
+        """
+        try:
+            transaction_digest = api.send_signed_transaction_unsafe(
+                message.signed_transaction.body
+            )
+        except Exception as e:
+            return self.get_error_message(
+                e, api, message, dialogue
+            )
+
+        if transaction_digest is None:  # pragma: nocover
+            return self.get_error_message(
+                ValueError("No transaction_digest returned"), api, message, dialogue
+            )
+
+        return cast(
+            LedgerApiMessage,
+            dialogue.reply(
+                performative=LedgerApiMessage.Performative.TRANSACTION_DIGEST,
+                target_message=message,
+                transaction_digest=TransactionDigest(
+                    message.signed_transaction.ledger_id, transaction_digest
+                ),
+            ),
+        )
+
     def get_error_message(
         self, e: Exception, api: LedgerApi, message: Message, dialogue: BaseDialogue,
     ) -> LedgerApiMessage:
