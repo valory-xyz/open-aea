@@ -1036,6 +1036,15 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param tx_signed: the signed transaction
         :return: tx_digest, if present
         """
+        return self.send_signed_transaction_unsafe(tx_signed)
+
+    def send_signed_transaction_unsafe(self, tx_signed: JSONLike) -> Optional[str]:
+        """
+        Send a signed transaction. Might raise an error in case it fails for any reason.
+
+        :param tx_signed: the signed transaction
+        :return: tx_digest, if an exception is not raised
+        """
         signed_transaction = SignedTransactionTranslator.from_dict(tx_signed)
         hex_value = self._api.eth.send_raw_transaction(  # pylint: disable=no-member
             signed_transaction.rawTransaction

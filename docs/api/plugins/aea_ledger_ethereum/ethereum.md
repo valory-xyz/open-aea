@@ -617,6 +617,23 @@ Send a signed transaction and wait for confirmation.
 
 tx_digest, if present
 
+<a name="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.send_signed_transaction_unsafe"></a>
+#### send`_`signed`_`transaction`_`unsafe
+
+```python
+ | send_signed_transaction_unsafe(tx_signed: JSONLike) -> Optional[str]
+```
+
+Send a signed transaction. Might raise an error in case it fails for any reason.
+
+**Arguments**:
+
+- `tx_signed`: the signed transaction
+
+**Returns**:
+
+tx_digest, if an exception is not raised
+
 <a name="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.get_transaction_receipt"></a>
 #### get`_`transaction`_`receipt
 
