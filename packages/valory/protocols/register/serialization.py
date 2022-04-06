@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 fetchai
+#   Copyright 2022 valory
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ from aea.mail.base_pb2 import DialogueMessage
 from aea.mail.base_pb2 import Message as ProtobufMessage
 from aea.protocols.base import Message, Serializer
 
-from packages.fetchai.protocols.register import register_pb2
-from packages.fetchai.protocols.register.message import RegisterMessage
+from packages.valory.protocols.register import register_pb2
+from packages.valory.protocols.register.message import RegisterMessage
 
 
 class RegisterSerializer(Serializer):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,13 +29,13 @@ from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.protocols.dialogue.base import DialogueLabel
 
-from packages.fetchai.protocols.register.dialogues import (
+from packages.valory.protocols.register.dialogues import (
     RegisterDialogue as BaseRegisterDialogue,
 )
-from packages.fetchai.protocols.register.dialogues import (
+from packages.valory.protocols.register.dialogues import (
     RegisterDialogues as BaseRegisterDialogues,
 )
-from packages.fetchai.protocols.register.message import RegisterMessage
+from packages.valory.protocols.register.message import RegisterMessage
 
 
 class TestRegisterMessage:

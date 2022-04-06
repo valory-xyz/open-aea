@@ -9,12 +9,12 @@ This is a protocol for communication between two AEAs for registration.
 ```yaml
 ---
 name: register
-author: fetchai
-version: 1.1.0
+author: valory
+version: 0.1.0
 description: A protocol for communication between two AEAs for registration.
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
-protocol_specification_id: fetchai/register:1.0.0
+protocol_specification_id: valory/register:0.1.0
 speech_acts:
   register:
     info: pt:dict[pt:str, pt:str]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 fetchai
+#   Copyright 2022 valory
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ from aea.exceptions import AEAEnforceError, enforce
 from aea.protocols.base import Message
 
 
-_default_logger = logging.getLogger("aea.packages.fetchai.protocols.register.message")
+_default_logger = logging.getLogger("aea.packages.valory.protocols.register.message")
 
 DEFAULT_BODY_SIZE = 4
 
@@ -36,8 +36,8 @@ DEFAULT_BODY_SIZE = 4
 class RegisterMessage(Message):
     """A protocol for communication between two AEAs for registration."""
 
-    protocol_id = PublicId.from_str("fetchai/register:1.1.0")
-    protocol_specification_id = PublicId.from_str("fetchai/register:1.0.0")
+    protocol_id = PublicId.from_str("valory/register:0.1.0")
+    protocol_specification_id = PublicId.from_str("valory/register:0.1.0")
 
     class Performative(Message.Performative):
         """Performatives for the register protocol."""
