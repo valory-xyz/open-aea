@@ -59,7 +59,12 @@ def output_function(report):
 
 def extract_object_counts(log: str) -> Dict[str, Dict[str, int]]:
     """Extract object counts from the profiling log."""
-    result: Dict[str, Dict[str, int]] = {"created": {}, "present": {}, "gc": {}}
+    result: Dict[str, Dict[str, int]] = {
+        "created": {},
+        "present": {},
+        "gc_common": {},
+        "gc_len": {},
+    }
 
     for line in log.split("\n"):
         # Created (tracked objects)
@@ -78,10 +83,20 @@ def extract_object_counts(log: str) -> Dict[str, Dict[str, int]]:
             )
             continue
 
-        # Present (garbage collector)
-        match = re.match(r".*\* (?P<field>.*) \(gc\):  (?P<count>\d+).*", line)
+        # Present (garbage collector, common)
+        match = re.match(r".*\* (?P<field>.*) \(gc-common\):  (?P<count>\d+).*", line)
         if match:
-            result["gc"][match.groupdict()["field"]] = int(match.groupdict()["count"])
+            result["gc_common"][match.groupdict()["field"]] = int(
+                match.groupdict()["count"]
+            )
+            continue
+
+        # Present (garbage collector, len)
+        match = re.match(r".*\* (?P<field>.*) \(gc-len\):  (?P<count>\d+).*", line)
+        if match:
+            result["gc_len"][match.groupdict()["field"]] = int(
+                match.groupdict()["count"]
+            )
 
     return result
 
@@ -131,7 +146,8 @@ def test_profiling_instance_number():
 
         assert count_dict["created"] == {"Message": MESSAGE_NUMBER}
         assert count_dict["present"] == {"Message": MESSAGE_NUMBER}
-        assert count_dict["gc"]["DummyClass"] == len(dummy_classes_to_count)
+        assert count_dict["gc_common"]["DummyClass"] == len(dummy_classes_to_count)
+        assert count_dict["gc_len"]["list[DummyClass]"] == len(dummy_classes_to_count)
 
         # Modify the number of messages
         messages = messages[: int(MESSAGE_NUMBER / 2)]
@@ -230,7 +246,12 @@ def test_profiling_counts_not_equal():
         assert (
             len(set(count_dict["created"].values())) == 3
         ), "All element counts are equal"
-        assert len(set(count_dict["gc"].values())) > 1, "All element counts are equal"
+        assert (
+            len(set(count_dict["gc_common"].values())) > 1
+        ), "All element counts are equal"
+        assert (
+            len(set(count_dict["gc_len"].values())) > 1
+        ), "All element counts are equal"
 
     finally:
         p.stop()
