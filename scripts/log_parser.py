@@ -290,13 +290,20 @@ class LogParser:
 
 def extract_gc_objects_set(log_file_path):
     """Extract a set of all objects that appeared in the garbage collector count section"""
-    objs = set()
+    objs_common = set()
+    objs_len = set()
     with open(log_file_path, "r") as log:
         for line in log.readlines():
-            match = re.match(r".*\* (?P<name>.*) \(gc\):  (?P<value>\d+).*", line)
+            match = re.match(
+                r".*\* (?P<name>.*) \(gc-common\):  (?P<value>\d+).*", line
+            )
             if match:
-                objs.add(match.groupdict()["name"])
-    return sorted(objs)
+                objs_common.add(match.groupdict()["name"])
+                continue
+            match = re.match(r".*\* (?P<name>.*) \(gc-len\):  (?P<value>\d+).*", line)
+            if match:
+                objs_len.add(match.groupdict()["name"])
+    return sorted(objs_common), sorted(objs_len)
 
 
 def add_count_trackers(
@@ -326,7 +333,8 @@ def main():
     log_parser.add_figure(fig_name="Memory", y_label="Memory [MB]")
     log_parser.add_figure(fig_name="Object count (present)", y_label="Count")
     log_parser.add_figure(fig_name="Object count (created)", y_label="Count")
-    log_parser.add_figure(fig_name="Object count (gc)", y_label="Count")
+    log_parser.add_figure(fig_name="Object count (gc-common)", y_label="Count")
+    log_parser.add_figure(fig_name="Object count (gc-len)", y_label="Count")
 
     # Memory
     log_parser.add_tracker(
@@ -356,7 +364,8 @@ def main():
             "Memory",
             "Object count (present)",
             "Object count (created)",
-            "Object count (gc)",
+            "Object count (gc-common)",
+            "Object count (gc-len)",
         ],
         tracker_type="event",
         line_styles={
@@ -376,7 +385,8 @@ def main():
             "Memory",
             "Object count (present)",
             "Object count (created)",
-            "Object count (gc)",
+            "Object count (gc-common)",
+            "Object count (gc-len)",
         ],
         tracker_type="event",
         line_styles={
@@ -417,13 +427,23 @@ def main():
         tracker_name_appendix=" (created)",
     )
     # Present common objects in the garbage collector
-    tracked_objects_in_gc = extract_gc_objects_set(log_parser.log_file_path)
+    objects_in_gc_common, objects_in_gc_len = extract_gc_objects_set(
+        log_parser.log_file_path
+    )
 
     add_count_trackers(
         parser=log_parser,
-        tracker_names=tracked_objects_in_gc,
-        figure_names=["Object count (gc)"],
-        tracker_name_appendix=" (gc)",
+        tracker_names=objects_in_gc_common,
+        figure_names=["Object count (gc-common)"],
+        tracker_name_appendix=" (gc-common)",
+    )
+
+    # Present long objects in the garbage collector
+    add_count_trackers(
+        parser=log_parser,
+        tracker_names=objects_in_gc_len,
+        figure_names=["Object count (gc-len)"],
+        tracker_name_appendix=" (gc-len)",
     )
 
     # Process and plot
