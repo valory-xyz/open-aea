@@ -185,7 +185,18 @@ class Profiling(Runnable):
             + "\n"
             + """Most common objects in garbage collector (excluding blacklisted):\n"""
             + "\n".join(
-                [f" * {i[0]} (gc):  {i[1]}" for i in data["most_common_objects_in_gc"]]
+                [
+                    f" * {i[0]} (gc-common):  {i[1]}"
+                    for i in data["most_common_objects_in_gc"]["counts"]
+                ]
+            )
+            + "\n"
+            + """Longest objects in garbage collector:\n"""
+            + "\n".join(
+                [
+                    f" * {i[0]} (gc-len):  {i[1]}"
+                    for i in data["most_common_objects_in_gc"]["lengths"]
+                ]
             )
             + "\n"
         )
@@ -208,18 +219,44 @@ class Profiling(Runnable):
         }
 
 
-def get_most_common_objects_in_gc(number: int = 15) -> List[Tuple[str, int]]:
+def get_object_type(obj: Any) -> str:
+    """Returns a string representation of an object's type"""
+    return str(
+        getattr(obj, "__class__", type(obj)).__name__
+    )  # not all objects have the __class__ attribute
+
+
+def get_most_common_objects_in_gc(number: int = 10) -> Dict[str, List[Tuple[str, int]]]:
     """Get the highest-count objects in the garbage collector."""
 
     object_count: CounterType = Counter()
+    object_lengths: CounterType = Counter()
     lock.acquire()
     try:
         for obj in gc.get_objects():
-            object_type = str(
-                getattr(obj, "__class__", type(obj)).__name__
-            )  # not all objects have the __class__ attribute
+            object_type = get_object_type(obj)
             if object_type not in PROFILER_TYPE_BLACK_LIST:
                 object_count[object_type] += 1
+            if type(obj) in (dict, list, set) and len(obj) > 0:
+                key_type = None
+                if isinstance(obj, dict):
+                    first_key = list(obj.keys())[0]
+                    key_type = get_object_type(first_key)
+                    first_element = obj[first_key]
+                elif isinstance(obj, set):
+                    first_element = next(iter(obj))
+                elif isinstance(obj, list):
+                    first_element = obj[0]
+                else:
+                    continue
+                content_type = get_object_type(first_element)
+                object_lengths[
+                    f"{object_type}[{str(key_type) + ', ' if key_type else ''}{content_type}]"
+                ] = obj.__len__()
+
     finally:
         lock.release()
-    return object_count.most_common(number)
+    return {
+        "counts": object_count.most_common(number),
+        "lengths": object_lengths.most_common(number),
+    }
