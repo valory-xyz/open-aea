@@ -276,6 +276,8 @@ ipfs
 command_line
 PublicId
 multiaddr
+1.9.0.post1
+dorado
  - docs/language-agnostic-definition.md
 fetchai
 protocol_id
