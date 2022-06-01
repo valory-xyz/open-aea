@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,19 +27,19 @@ from unittest import mock
 from unittest.mock import Mock, call
 
 import pytest
-from aea_ledger_ethereum import EthereumCrypto
-from aea_ledger_fetchai import FetchAICrypto
 
 from aea.mail.base import Empty, Envelope
 from aea.multiplexer import Multiplexer
 
-from packages.fetchai.connections.p2p_libp2p_client.connection import NodeClient, Uri
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.default.serialization import DefaultSerializer
+from packages.valory.connections.p2p_libp2p_client.connection import NodeClient, Uri
 
 from tests.common.mocks import RegexComparator
 from tests.common.utils import wait_for_condition
 from tests.conftest import (
+    DEFAULT_LEDGER,
+    DEFAULT_LEDGER_LIBP2P_NODE,
     _make_libp2p_client_connection,
     _make_libp2p_connection,
     libp2p_log_on_failure,
@@ -134,7 +135,7 @@ class TestLibp2pClientConnectionEchoEnvelope:
             cls.connection_client_1 = _make_libp2p_client_connection(
                 data_dir=temp_dir_client_1,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=FetchAICrypto.identifier,
+                ledger_api_id=DEFAULT_LEDGER_LIBP2P_NODE,
             )
             cls.multiplexer_client_1 = Multiplexer(
                 [cls.connection_client_1], protocols=[MockDefaultMessageProtocol]
@@ -146,7 +147,7 @@ class TestLibp2pClientConnectionEchoEnvelope:
             cls.connection_client_2 = _make_libp2p_client_connection(
                 data_dir=temp_dir_client_2,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=EthereumCrypto.identifier,
+                ledger_api_id=DEFAULT_LEDGER,
             )
             cls.multiplexer_client_2 = Multiplexer(
                 [cls.connection_client_2], protocols=[MockDefaultMessageProtocol]
@@ -679,7 +680,7 @@ class BaseTestLibp2pClientSamePeer:
             cls.connection_client_1 = _make_libp2p_client_connection(
                 data_dir=temp_dir_client_1,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=FetchAICrypto.identifier,
+                ledger_api_id=DEFAULT_LEDGER_LIBP2P_NODE,
             )
             cls.multiplexer_client_1 = Multiplexer(
                 [cls.connection_client_1], protocols=[MockDefaultMessageProtocol]
@@ -691,7 +692,7 @@ class BaseTestLibp2pClientSamePeer:
             cls.connection_client_2 = _make_libp2p_client_connection(
                 data_dir=temp_dir_client_2,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=EthereumCrypto.identifier,
+                ledger_api_id=DEFAULT_LEDGER,
             )
             cls.multiplexer_client_2 = Multiplexer(
                 [cls.connection_client_2], protocols=[MockDefaultMessageProtocol]

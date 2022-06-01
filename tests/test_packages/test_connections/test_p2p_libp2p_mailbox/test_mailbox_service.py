@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,11 +30,11 @@ import requests
 from aea.mail.base import Envelope
 from aea.multiplexer import Multiplexer
 
-from packages.fetchai.connections.p2p_libp2p_mailbox.connection import NodeClient
-from packages.fetchai.protocols.acn import acn_pb2
-from packages.fetchai.protocols.acn.message import AcnMessage
 from packages.fetchai.protocols.default import DefaultSerializer
 from packages.fetchai.protocols.default.message import DefaultMessage
+from packages.valory.connections.p2p_libp2p_mailbox.connection import NodeClient
+from packages.valory.protocols.acn import acn_pb2
+from packages.valory.protocols.acn.message import AcnMessage
 
 from tests.common.utils import wait_for_condition
 from tests.conftest import _make_libp2p_client_connection, _make_libp2p_connection
@@ -80,7 +81,7 @@ class TestMailboxAPI:
 
     @pytest.mark.asyncio
     async def test_message_delivery(self):  # nosec
-        """Test connnect then disconnect."""
+        """Test connect then disconnect."""
         r = requests.get("https://localhost:8888/ssl_signature", verify=False)  # nosec
         assert r.status_code == 200, r.text
 

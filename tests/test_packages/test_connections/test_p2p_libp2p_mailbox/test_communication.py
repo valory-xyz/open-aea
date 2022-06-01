@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +24,8 @@ import tempfile
 from unittest.mock import Mock
 
 import pytest
+from aea_ledger_cosmos import CosmosCrypto
 from aea_ledger_ethereum import EthereumCrypto
-from aea_ledger_fetchai import FetchAICrypto
 
 from aea.mail.base import Empty, Envelope
 from aea.multiplexer import Multiplexer
@@ -132,7 +133,7 @@ class TestLibp2pClientConnectionEchoEnvelope:
             cls.connection_client_1 = _make_libp2p_mailbox_connection(
                 data_dir=temp_dir_client_1,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=FetchAICrypto.identifier,
+                ledger_api_id=CosmosCrypto.identifier,
             )
             cls.multiplexer_client_1 = Multiplexer(
                 [cls.connection_client_1], protocols=[MockDefaultMessageProtocol]
@@ -678,7 +679,7 @@ class BaseTestLibp2pClientSamePeer:
             cls.connection_client_1 = _make_libp2p_mailbox_connection(
                 data_dir=temp_dir_client_1,
                 peer_public_key=cls.connection_node.node.pub,
-                ledger_api_id=FetchAICrypto.identifier,
+                ledger_api_id=CosmosCrypto.identifier,
             )
             cls.multiplexer_client_1 = Multiplexer(
                 [cls.connection_client_1], protocols=[MockDefaultMessageProtocol]

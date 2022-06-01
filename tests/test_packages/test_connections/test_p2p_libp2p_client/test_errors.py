@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,13 +34,14 @@ from aea.helpers.base import CertRequest
 from aea.identity.base import Identity
 from aea.multiplexer import Multiplexer
 
-from packages.fetchai.connections.p2p_libp2p_client.connection import (
+from packages.valory.connections.p2p_libp2p_client.connection import (
     NodeClient,
     P2PLibp2pClientConnection,
     POR_DEFAULT_SERVICE_ID,
 )
 
 from tests.conftest import (
+    DEFAULT_LEDGER_LIBP2P_NODE,
     _make_libp2p_client_connection,
     _make_libp2p_connection,
     _process_cert,
@@ -293,7 +295,7 @@ class TestLibp2pClientConnectionCheckSignature:
     @pytest.mark.asyncio
     async def test_signature_check_fail(self):
         """Test signature check failed."""
-        key = make_crypto(DEFAULT_LEDGER)
+        key = make_crypto(DEFAULT_LEDGER_LIBP2P_NODE)
 
         assert self.connection.is_connected is False
         await self.connection_node.connect()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,18 +23,24 @@
 import json
 import os
 
+from aea_ledger_cosmos import CosmosCrypto
 from aea_ledger_ethereum.ethereum import EthereumCrypto as Ethereum
-from aea_ledger_fetchai import FetchAICrypto as FetchAI
 
 from aea.test_tools.test_cases import AEATestCaseEmpty
 
-from packages.fetchai.connections.p2p_libp2p.connection import (
+from packages.valory.connections import p2p_libp2p
+from packages.valory.connections.p2p_libp2p.connection import (
     PUBLIC_ID as P2P_CONNECTION_PUBLIC_ID,
 )
 
-from tests.conftest import libp2p_log_on_failure
+from tests.conftest import (
+    DEFAULT_LEDGER,
+    DEFAULT_LEDGER_LIBP2P_NODE,
+    libp2p_log_on_failure,
+)
 
 
+p2p_libp2p_path = f"vendor.{p2p_libp2p.__name__.split('.', 1)[-1]}"
 DEFAULT_PORT = 10234
 DEFAULT_DELEGATE_PORT = 11234
 DEFAULT_NET_SIZE = 4
@@ -54,16 +61,28 @@ class TestP2PLibp2pConnectionAEARunningDefaultConfigNode(AEATestCaseEmpty):
     @libp2p_log_on_failure
     def test_agent(self):
         """Test with aea."""
-        self.generate_private_key()
-        self.add_private_key()
-        self.generate_private_key(private_key_file=self.conn_key_file)
-        self.add_private_key(private_key_filepath=self.conn_key_file, connection=True)
+        agent_ledger_id, node_ledger_id = DEFAULT_LEDGER, DEFAULT_LEDGER_LIBP2P_NODE
+        # set config
+        self.set_config("agent.default_ledger", agent_ledger_id)
+        self.set_config(
+            "agent.required_ledgers",
+            json.dumps([agent_ledger_id, node_ledger_id]),
+            "list",
+        )
+        self.set_config("agent.default_connection", str(P2P_CONNECTION_PUBLIC_ID))
+        # agent keys
+        self.generate_private_key(agent_ledger_id)
+        self.add_private_key(agent_ledger_id, f"{agent_ledger_id}_private_key.txt")
+        # libp2p node keys
+        self.generate_private_key(node_ledger_id, private_key_file=self.conn_key_file)
+        self.add_private_key(
+            node_ledger_id, private_key_filepath=self.conn_key_file, connection=True
+        )
+        # add connection and build
         self.add_item("connection", str(P2P_CONNECTION_PUBLIC_ID))
         self.run_cli_command("build", cwd=self._get_cwd())
-        self.set_config("agent.default_connection", str(P2P_CONNECTION_PUBLIC_ID))
-
         # for logging
-        config_path = "vendor.fetchai.connections.p2p_libp2p.config"
+        config_path = f"{p2p_libp2p_path}.config"
         log_file = "libp2p_node_{}.log".format(self.agent_name)
         log_file = os.path.join(os.path.abspath(os.getcwd()), log_file)
         self.set_config("{}.log_file".format(config_path), log_file)
@@ -114,23 +133,29 @@ class TestP2PLibp2pConnectionAEARunningEthereumConfigNode(AEATestCaseEmpty):
         self.add_private_key(
             ledger_api_id=Ethereum.identifier, private_key_filepath=key_path
         )
-        self.generate_private_key(private_key_file=self.conn_key_file)
-        self.add_private_key(private_key_filepath=self.conn_key_file, connection=True)
+        self.generate_private_key(
+            CosmosCrypto.identifier, private_key_file=self.conn_key_file
+        )
+        self.add_private_key(
+            CosmosCrypto.identifier,
+            private_key_filepath=self.conn_key_file,
+            connection=True,
+        )
         self.add_item("connection", str(P2P_CONNECTION_PUBLIC_ID))
         self.run_cli_command("build", cwd=self._get_cwd())
         self.set_config("agent.default_ledger", Ethereum.identifier)
         self.nested_set_config(
-            "agent.required_ledgers", [FetchAI.identifier, Ethereum.identifier]
+            "agent.required_ledgers", [CosmosCrypto.identifier, Ethereum.identifier]
         )
         self.set_config("agent.default_connection", str(P2P_CONNECTION_PUBLIC_ID))
 
         # for logging
-        config_path = "vendor.fetchai.connections.p2p_libp2p.config"
+        config_path = f"{p2p_libp2p_path}.config"
         log_file = "libp2p_node_{}.log".format(self.agent_name)
         log_file = os.path.join(os.path.abspath(os.getcwd()), log_file)
         self.set_config("{}.log_file".format(config_path), log_file)
         self.log_files.append(log_file)
-        setting_path = "vendor.fetchai.connections.p2p_libp2p.cert_requests"
+        setting_path = f"{p2p_libp2p_path}.cert_requests"
         settings = json.dumps(
             [
                 {
@@ -138,7 +163,7 @@ class TestP2PLibp2pConnectionAEARunningEthereumConfigNode(AEATestCaseEmpty):
                     "ledger_id": Ethereum.identifier,
                     "not_after": "2022-01-01",
                     "not_before": "2021-01-01",
-                    "public_key": "fetchai",
+                    "public_key": CosmosCrypto.identifier,
                     "message_format": "{public_key}",
                     "save_path": ".certs/conn_cert.txt",
                 }
@@ -185,15 +210,27 @@ class TestP2PLibp2pConnectionAEARunningFullNode(AEATestCaseEmpty):
     @libp2p_log_on_failure
     def test_agent(self):
         """Test with aea."""
-        self.generate_private_key()
-        self.add_private_key()
-        self.generate_private_key(private_key_file=self.conn_key_file)
-        self.add_private_key(private_key_filepath=self.conn_key_file, connection=True)
+        agent_ledger_id, node_ledger_id = DEFAULT_LEDGER, DEFAULT_LEDGER_LIBP2P_NODE
+        # set config
+        self.set_config("agent.default_ledger", agent_ledger_id)
+        self.set_config(
+            "agent.required_ledgers",
+            json.dumps([agent_ledger_id, node_ledger_id]),
+            "list",
+        )
+        # agent keys
+        self.generate_private_key(agent_ledger_id)
+        self.add_private_key(agent_ledger_id, f"{agent_ledger_id}_private_key.txt")
+        # libp2p node keys
+        self.generate_private_key(node_ledger_id, private_key_file=self.conn_key_file)
+        self.add_private_key(
+            node_ledger_id, private_key_filepath=self.conn_key_file, connection=True
+        )
+        # add connection and build
         self.add_item("connection", str(P2P_CONNECTION_PUBLIC_ID))
         self.run_cli_command("build", cwd=self._get_cwd())
-
         # setup a full node: with public uri, relay service, and delegate service
-        config_path = "vendor.fetchai.connections.p2p_libp2p.config"
+        config_path = f"{p2p_libp2p_path}.config"
         self.set_config(
             "{}.local_uri".format(config_path), "127.0.0.1:{}".format(DEFAULT_PORT)
         )

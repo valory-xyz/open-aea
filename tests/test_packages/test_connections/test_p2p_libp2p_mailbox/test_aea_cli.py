@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2022 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +19,25 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains AEA cli tests for Libp2p tcp client connection."""
+import json
 import os
-
-from aea_ledger_fetchai import FetchAICrypto
 
 from aea.helpers.base import CertRequest
 from aea.multiplexer import Multiplexer
 from aea.test_tools.test_cases import AEATestCaseEmpty
 
-from packages.fetchai.connections.p2p_libp2p_mailbox.connection import PUBLIC_ID
+from packages.valory.connections import p2p_libp2p_mailbox
+from packages.valory.connections.p2p_libp2p_mailbox.connection import PUBLIC_ID
 
 from tests.conftest import (
+    DEFAULT_LEDGER,
     _make_libp2p_connection,
     libp2p_log_on_failure,
     libp2p_log_on_failure_all,
 )
 
 
+p2p_libp2p_mailbox_path = f"vendor.{p2p_libp2p_mailbox.__name__.split('.', 1)[-1]}"
 DEFAULT_PORT = 10234
 DEFAULT_DELEGATE_PORT = 11234
 DEFAULT_HOST = "127.0.0.1"
@@ -75,10 +78,13 @@ class TestP2PLibp2pClientConnectionAEARunning(AEATestCaseEmpty):
 
     def test_connection(self):
         """Test the connection can be used in an aea."""
-        self.generate_private_key()
-        self.add_private_key()
+        ledger_id = DEFAULT_LEDGER
+        self.generate_private_key(ledger_id)
+        self.add_private_key(ledger_id, f"{ledger_id}_private_key.txt")
+        self.set_config("agent.default_ledger", ledger_id)
+        self.set_config("agent.required_ledgers", json.dumps([ledger_id]), "list")
         self.add_item("connection", str(PUBLIC_ID))
-        conn_path = "vendor.fetchai.connections.p2p_libp2p_mailbox"
+        conn_path = p2p_libp2p_mailbox_path
         self.nested_set_config(
             conn_path + ".config",
             {
@@ -97,7 +103,7 @@ class TestP2PLibp2pClientConnectionAEARunning(AEATestCaseEmpty):
             [
                 CertRequest(
                     identifier="acn",
-                    ledger_id=FetchAICrypto.identifier,
+                    ledger_id=ledger_id,
                     not_after="2022-01-01",
                     not_before="2021-01-01",
                     public_key=self.node_connection.node.pub,
