@@ -1,5 +1,14 @@
 # Release History - open AEA
 
+## 1.9.0.post1 (2022-06-01)
+
+AEA:
+- Adds support for dorado testnet
+- Adds patch to support service component
+  
+Chores:
+- Fixes flaky ACN tests.
+
 
 ## 1.9.0 (2022-05-25)
 
