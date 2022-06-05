@@ -22,9 +22,9 @@ import asyncio
 import base64
 import os
 import shutil
-import sys
 import tempfile
 import time
+from asyncio import ensure_future
 from pathlib import Path
 from unittest import mock
 
@@ -351,10 +351,6 @@ async def test_multiple_envelopes():
 
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 @pytest.mark.asyncio
-@pytest.mark.skipif(
-    sys.version_info.major == 3 and sys.version_info.minor == 9,
-    reason="needs investigation; repeatedly fails on py3.9",
-)  # needs investigation; repeatedly fails on py3.9
 async def test_bad_envelope():
     """Test bad format envelop."""
     tmpdir = Path(tempfile.mkdtemp())
@@ -371,7 +367,8 @@ async def test_bad_envelope():
         f.flush()
 
     with pytest.raises(asyncio.TimeoutError):
-        await asyncio.wait_for(connection.receive(), timeout=0.1)
+        f = ensure_future(connection.receive())
+        await asyncio.wait_for(f, timeout=0.1)
 
     await connection.disconnect()
 
