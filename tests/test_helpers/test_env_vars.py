@@ -78,3 +78,12 @@ def test_convert_value_str_to_type():
     assert convert_value_str_to_type("none", "str") is None
     assert convert_value_str_to_type("null", "str") is None
     assert convert_value_str_to_type("None", "str") is None
+
+def test_convert_list_string_to_type():
+    """Test convert_string lists to list."""
+    assert convert_value_str_to_type("['a']", "list") == ['a']
+    assert convert_value_str_to_type('["a"]', "list") == ['a']
+    assert convert_value_str_to_type('[["a"]]', "list") == [['a']]
+
+
+
