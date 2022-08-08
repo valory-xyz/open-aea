@@ -20,7 +20,7 @@
 
 """This module contains the scaffold contract definition."""
 
-from typing import Any
+from typing import Any, Optional
 
 from aea.common import JSONLike
 from aea.configurations.base import PublicId
@@ -83,3 +83,39 @@ class MyScaffoldContract(Contract):
         :return: the tx  # noqa: DAR202
         """
         raise NotImplementedError
+
+    @classmethod
+    def build_transaction(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        method_name: str,
+        method_args: dict,
+        tx_args: dict,
+    ) -> Optional[JSONLike]:
+        """Build a transaction for a given method."""
+        contract_instance = cls.get_instance(ledger_api, contract_address)
+
+        return ledger_api.build_transaction(
+            contract_instance,
+            method_name=method_name,
+            method_args=method_args,
+            tx_args=tx_args,
+        )
+
+    @classmethod
+    def contract_method_call(
+        cls,
+        ledger_api: LedgerApi,
+        contract_address: str,
+        method_name: str,
+        **method_args: Any
+    ) -> Optional[JSONLike]:
+        """Call a constant method that just reads from the contract without sending a transaction."""
+        contract_instance = cls.get_instance(ledger_api, contract_address)
+
+        return ledger_api.contract_method_call(
+            contract_instance=contract_instance,
+            method_name=method_name,
+            **method_args,
+        )
