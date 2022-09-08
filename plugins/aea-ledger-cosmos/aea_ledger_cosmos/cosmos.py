@@ -1411,15 +1411,31 @@ class _CosmosApi(LedgerApi):
         return broad_tx_resp.tx_response.txhash
 
     def get_transaction_receipt(
-        self, tx_digest: str, raise_on_try: bool = False
+        self,
+        tx_digest: str,
+        timeout: Optional[int] = None,
+        poll_latency: Optional[float] = None,
+        raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.
 
+        WARNING: `timeout` and `poll_latency` are not supported by this method.
+        If provided they will be ignored.
+
         :param tx_digest: the digest associated to the transaction.
+        :param timeout: time to wait before assuming the receipt is not available, defaults to infinite.
+        :param poll_latency: backoff between retries, if None, a single try (call) will be made.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx receipt, if present
         """
+
+        if poll_latency is not None or timeout is not None:
+            _default_logger.warning(
+                f'"timeout" and "poll_latency" are not supported by "{self.__class__.__name__}". '
+                f"They will be ignored."
+            )
+
         tx_with_receipt = self._try_get_transaction_with_receipt(
             tx_digest, raise_on_try=raise_on_try
         )
