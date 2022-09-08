@@ -402,12 +402,18 @@ class LedgerApi(Helper, ABC):
 
     @abstractmethod
     def get_transaction_receipt(
-        self, tx_digest: str, raise_on_try: bool = False
+        self,
+        tx_digest: str,
+        timeout: Optional[int] = None,
+        poll_latency: Optional[float] = None,
+        raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.
 
         :param tx_digest: the digest associated to the transaction.
+        :param timeout: time to wait before assuming the receipt is not available, defaults to infinite.
+        :param poll_latency: backoff between retries, if None, a single try (call) will be made.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx receipt, if present
         """

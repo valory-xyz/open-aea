@@ -1156,17 +1156,25 @@ class EthereumApi(LedgerApi, EthereumHelper):
         return tx_digest
 
     def get_transaction_receipt(
-        self, tx_digest: str, raise_on_try: bool = False
+        self,
+        tx_digest: str,
+        timeout: Optional[int] = None,
+        poll_latency: Optional[float] = None,
+        raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.
 
         :param tx_digest: the digest associated to the transaction.
+        :param timeout: time to wait before assuming the receipt is not available, defaults to infinite.
+        :param poll_latency: backoff between retries, if None, a single try (call) will be made.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx receipt, if present
         """
         tx_receipt = self._try_get_transaction_receipt(
             tx_digest,
+            timeout=timeout,
+            poll_latency=poll_latency,
             raise_on_try=raise_on_try,
         )
 
@@ -1183,18 +1191,46 @@ class EthereumApi(LedgerApi, EthereumHelper):
         "Error when attempting getting tx receipt: {}", logger_method="debug"
     )
     def _try_get_transaction_receipt(
-        self, tx_digest: str, **_kwargs: Any
+        self,
+        tx_digest: str,
+        timeout: Optional[int] = None,
+        poll_latency: Optional[float] = None,
+        **_kwargs: Any,
     ) -> Optional[JSONLike]:
         """
         Try get the transaction receipt.
 
         :param tx_digest: the digest associated to the transaction.
+        :param timeout: time to wait before assuming the receipt is not available, defaults to infinite.
+        :param poll_latency: backoff between retries, if None, a single try (call) will be made.
         :param _kwargs: the keyword arguments. Possible kwargs are:
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-        tx_receipt = self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
-            cast(HexStr, tx_digest)
+        if timeout is None and poll_latency is None:
+            # if timeout and poll_latency have not been provided
+            # we make a single request
+            tx_receipt = (
+                self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
+                    cast(HexStr, tx_digest),
+                )
+            )
+            return AttributeDictTranslator.to_dict(tx_receipt)
+
+        # either a polling interval or a timeout was provided
+        if timeout is None:
+            # if not provided, we wait for ~31 years.
+            timeout = 10**9
+        if poll_latency is None:
+            # if not provided, we don't make multiple retires.
+            poll_latency = float(timeout)
+
+        tx_receipt = (
+            self._api.eth.wait_for_transaction_receipt(  # pylint: disable=no-member
+                cast(HexStr, tx_digest),
+                timeout=timeout,
+                poll_latency=poll_latency,
+            )
         )
         return AttributeDictTranslator.to_dict(tx_receipt)
 
