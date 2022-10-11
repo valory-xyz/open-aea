@@ -171,7 +171,10 @@ class ErrorTypes:  # pylint: disable=too-few-public-methods
 
 def get_modification_date(file: Path) -> datetime:
     """Returns modification date for the file."""
-    (date_string, _,) = subprocess.Popen(  # nosec
+    (
+        date_string,
+        _,
+    ) = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
         [str(GIT_PATH), "log", "-1", '--format="%ad"', "--", str(file)],
         stdout=subprocess.PIPE,
     ).communicate()

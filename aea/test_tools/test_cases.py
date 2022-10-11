@@ -221,7 +221,7 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
         )
         kwargs.update(win_popen_kwargs())
 
-        process = subprocess.Popen(  # type: ignore # nosec # mypy fails on **kwargs
+        process = subprocess.Popen(  # type: ignore # nosec # mypy fails on **kwargs  # pylint: disable=consider-using-with
             [sys.executable, *args],
             **kwargs,
         )

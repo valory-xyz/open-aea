@@ -532,7 +532,7 @@ class CoveragercFile:
     def __init__(self, root_dir: Path) -> None:
         """Initialize object."""
 
-        self._t = tempfile.TemporaryDirectory()
+        self._t = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         self.file = Path(self._t.name, COVERAGERC_FILE)
         self.root_dir = root_dir
 

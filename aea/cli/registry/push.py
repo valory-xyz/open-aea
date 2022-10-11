@@ -147,10 +147,14 @@ def push_item(ctx: Context, item_type: str, item_id: PublicId) -> None:
             click.echo(f"Error: Cannot find {package_type} {package_id} in registry!")
         raise click.ClickException("Found missing dependencies! Push canceled!")
     try:
-        files = {"file": open(output_filepath, "rb")}
+        files = {
+            "file": open(output_filepath, "rb")  # pylint: disable=consider-using-with
+        }
         readme_path = os.path.join(item_path, DEFAULT_README_FILE)
         if is_readme_present(readme_path):
-            files["readme"] = open(readme_path, "rb")
+            files["readme"] = open(  # pylint: disable=consider-using-with
+                readme_path, "rb"
+            )
 
         path = f"/{item_type_plural}/create"
         logger.debug(f"Pushing {item_id.name} {item_type} to Registry ...")

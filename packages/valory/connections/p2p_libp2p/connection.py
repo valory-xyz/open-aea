@@ -107,7 +107,7 @@ def _golang_module_run(
     env = os.environ
     try:
         logger.debug(cmd)
-        proc = subprocess.Popen(  # nosec
+        proc = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
             cmd,
             cwd=path,
             env=env,
@@ -459,7 +459,9 @@ class Libp2pNode:
         if self._loop is None:
             self._loop = asyncio.get_event_loop()
 
-        self._log_file_desc = open(self.log_file, "a", 1, encoding="utf-8")
+        self._log_file_desc = open(  # pylint: disable=consider-using-with
+            self.log_file, "a", 1, encoding="utf-8"
+        )
 
         # tcp socket on every platform
         self.pipe = TCPSocketChannel(logger=self.logger)

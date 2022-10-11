@@ -111,7 +111,9 @@ def run_install_subprocess(
     :return: the return code of the subprocess
     """
     try:
-        subp = subprocess.Popen(install_command)  # nosec
+        subp = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
+            install_command
+        )
         subp.wait(install_timeout)
         return_code = subp.returncode
     finally:

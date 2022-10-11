@@ -199,7 +199,7 @@ def _golang_module_build(
     :param timeout: the build timeout
     :return: str with logs or error description if happens
     """
-    proc = Popen(  # nosec
+    proc = Popen(  # nosec  # pylint: disable=consider-using-with
         ["go", "build"],
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,

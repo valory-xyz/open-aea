@@ -198,9 +198,9 @@ def extract(source: str, target: str) -> None:
     :param target: str path to target directory.
     """
     if source.endswith("tar.gz"):
-        tar = tarfile.open(source, "r:gz")
-        tar.extractall(path=target)
-        tar.close()
+        with tarfile.open(source, "r:gz") as tar:
+            tar.extractall(path=target)
+            tar.close()
     else:
         raise ValueError(f"Unknown file type: {source}")
 

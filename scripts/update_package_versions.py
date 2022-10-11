@@ -127,7 +127,9 @@ def check_if_running_allowed() -> None:
 
     Script should only be run on a clean branch.
     """
-    git_call = subprocess.Popen(["git", "diff"], stdout=subprocess.PIPE)  # nosec
+    git_call = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
+        ["git", "diff"], stdout=subprocess.PIPE
+    )
     (stdout, _) = git_call.communicate()
     git_call.wait()
     if len(stdout) > 0:
@@ -145,7 +147,7 @@ def run_hashing() -> None:
 
 def get_hashes_from_last_release() -> Dict[str, str]:
     """Get hashes from last release."""
-    svn_call = subprocess.Popen(  # nosec
+    svn_call = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
         [
             "svn",
             "export",
@@ -588,7 +590,14 @@ def bump_version_in_yaml(
     loader = ConfigLoader.from_configuration_type(type_[:-1])
     config = loader.load(configuration_file_path.open())
     config.version = version
-    loader.dump(config, open(configuration_file_path, "w", encoding="utf-8"))
+    loader.dump(
+        config,
+        open(  # pylint: disable=consider-using-with
+            configuration_file_path,
+            "w",
+            encoding="utf-8",
+        ),
+    )
 
 
 class Updater:
@@ -625,7 +634,9 @@ class Updater:
 
         Script should only be run on a clean branch.
         """
-        git_call = subprocess.Popen(["git", "diff"], stdout=subprocess.PIPE)  # nosec
+        git_call = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
+            ["git", "diff"], stdout=subprocess.PIPE
+        )
         (stdout, _) = git_call.communicate()
         git_call.wait()
         if len(stdout) > 0:

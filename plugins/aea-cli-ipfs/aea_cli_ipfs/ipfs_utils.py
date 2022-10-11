@@ -128,7 +128,7 @@ class IPFSDaemon:
         res = shutil.which("ipfs")
         if res is None:
             raise Exception("Please install IPFS first!")
-        process = subprocess.Popen(  # nosec
+        process = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
             ["ipfs", "--version"],
             stdout=subprocess.PIPE,
             env=os.environ.copy(),
@@ -158,7 +158,7 @@ class IPFSDaemon:
     def start(self) -> None:
         """Run the ipfs daemon."""
         cmd = ["ipfs", "daemon", "--offline"]
-        self.process = subprocess.Popen(  # nosec
+        self.process = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
             cmd,
             stdout=subprocess.PIPE,
             env=os.environ.copy(),
