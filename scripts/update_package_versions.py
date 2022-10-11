@@ -256,7 +256,7 @@ def public_id_in_registry(type_: str, name: str) -> PublicId:
         [*CLI_LOG_OPTION, "search", type_, "--query", name],
         standalone_mode=False,
     )
-    reg = r"({}/{}:{})".format("fetchai", name, PublicId.VERSION_REGEX)
+    reg = rf"(fetchai/{name}:{PublicId.VERSION_REGEX})"
     ids = re.findall(
         reg,
         result.output,

@@ -36,7 +36,10 @@ def get_lib_path(env_dir: str) -> str:
         libpath = os.path.join(env_dir, "Lib", "site-packages")
     else:  # pragma: nocover
         libpath = os.path.join(
-            env_dir, "lib", "python%d.%d" % sys.version_info[:2], "site-packages"
+            env_dir,
+            "lib",
+            f"python{sys.version_info[0]}.{sys.version_info[1]}",
+            "site-packages",
         )
     return libpath
 

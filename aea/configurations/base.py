@@ -1932,37 +1932,21 @@ def _compare_fingerprints(
         if is_vendor:
             raise ValueError(
                 (
-                    "Fingerprints for package {} do not match:\nExpected: {}\nActual: {}\n"
-                    "Vendorized projects should not be tampered with, please revert any changes to {} {}"
-                ).format(
-                    package_directory,
-                    pprint.pformat(expected_fingerprints),
-                    pprint.pformat(actual_fingerprints),
-                    str(item_type),
-                    package_configuration.public_id,
+                    f"Fingerprints for package {package_directory} do not match:\nExpected: {pprint.pformat(expected_fingerprints)}\nActual: {pprint.pformat(actual_fingerprints)}\n"
+                    f"Vendorized projects should not be tampered with, please revert any changes to {str(item_type)} {package_configuration.public_id}"
                 )
             )
         if item_type == PackageType.AGENT:
             raise ValueError(
                 (
-                    "Fingerprints for package {} do not match:\nExpected: {}\nActual: {}\n"
+                    f"Fingerprints for package {package_directory} do not match:\nExpected: {pprint.pformat(expected_fingerprints)}\nActual: {pprint.pformat(actual_fingerprints)}\n"
                     "Please fingerprint the package before continuing: 'aea fingerprint'"
-                ).format(
-                    package_directory,
-                    pprint.pformat(expected_fingerprints),
-                    pprint.pformat(actual_fingerprints),
                 )
             )
         raise ValueError(
             (
-                "Fingerprints for package {} do not match:\nExpected: {}\nActual: {}\n"
-                "Please fingerprint the package before continuing: 'aea fingerprint {} {}'"
-            ).format(
-                package_directory,
-                pprint.pformat(expected_fingerprints),
-                pprint.pformat(actual_fingerprints),
-                str(item_type),
-                package_configuration.public_id,
+                f"Fingerprints for package {package_directory} do not match:\nExpected: {pprint.pformat(expected_fingerprints)}\nActual: {pprint.pformat(actual_fingerprints)}\n"
+                f"Please fingerprint the package before continuing: 'aea fingerprint {str(item_type)} {package_configuration.public_id}'"
             )
         )
 

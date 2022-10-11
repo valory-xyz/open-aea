@@ -51,9 +51,8 @@ def _replace_fingerprint_non_invasive(
     if len(fingerprint_dict) == 0:
         replacement = "\nfingerprint: {}\n"
     else:
-        replacement = "\nfingerprint:\n  {}\n".format(
-            "\n  ".join(map(to_row, sorted(fingerprint_dict.items())))
-        )
+        fingerprint = "\n  ".join(map(to_row, sorted(fingerprint_dict.items())))
+        replacement = f"\nfingerprint:\n  {fingerprint}\n"
 
     return re.sub(r"\nfingerprint:\W*\n(?:\W+.*\n)*", replacement, text)
 

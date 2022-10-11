@@ -435,7 +435,7 @@ class AgentConfigManager:
                 return cast(JSON_TYPES, value)
 
         raise VariableDoesNotExist(
-            f"Attribute `{'.'.join(json_path)}` for {'{}({}) config'.format(component_id.component_type,component_id.public_id) if component_id else 'AgentConfig'} does not exist"
+            f"Attribute `{'.'.join(json_path)}` for {f'{component_id.component_type}({component_id.public_id}) config' if component_id else 'AgentConfig'} does not exist"
         )
 
     @staticmethod

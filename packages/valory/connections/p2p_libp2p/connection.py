@@ -389,15 +389,16 @@ class Libp2pNode:
         config += f"AEA_AGENT_ADDR={self.address}\n"
         config += f"AEA_P2P_ID={self.key}\n"
         config += f"AEA_P2P_URI={str(self.uri)}\n"
-        config += "AEA_P2P_ENTRY_URIS={}\n".format(
-            ",".join(
-                [
-                    str(maddr)
-                    for maddr in self.entry_peers
-                    if str(maddr) != str(self.uri)  # TOFIX(LR) won't exclude self
-                ]
-            )
+
+        aea_p2p_entry_uris = ",".join(
+            [
+                str(maddr)
+                for maddr in self.entry_peers
+                if str(maddr) != str(self.uri)  # TOFIX(LR) won't exclude self
+            ]
         )
+
+        config += f"AEA_P2P_ENTRY_URIS={aea_p2p_entry_uris}\n"
         config += f"NODE_TO_AEA={pipe_in_path}\n"
         config += f"AEA_TO_NODE={pipe_out_path}\n"
         config += f"AEA_P2P_URI_PUBLIC={str(self.public_uri) if self.public_uri is not None else ''}\n"

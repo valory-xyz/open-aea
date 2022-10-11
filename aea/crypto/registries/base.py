@@ -45,7 +45,7 @@ def _handle_malformed_string(class_name: str, malformed_id: str) -> None:
 class ItemId(RegexConstrainedString):
     """The identifier of an item class."""
 
-    REGEX = re.compile(r"^({})$".format(ITEM_ID_REGEX))
+    REGEX = re.compile(rf"^({ITEM_ID_REGEX})$")
 
     @property
     def name(self) -> str:

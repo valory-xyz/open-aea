@@ -505,17 +505,8 @@ class PublicId(JSONSerializable):
 class PackageId:
     """A package identifier."""
 
-    PACKAGE_TYPE_REGEX = r"({}|{}|{}|{}|{}|{})".format(
-        PackageType.AGENT,
-        PackageType.PROTOCOL,
-        PackageType.SKILL,
-        PackageType.CONNECTION,
-        PackageType.CONTRACT,
-        PackageType.SERVICE,
-    )
-    PACKAGE_ID_URI_REGEX = r"{}/{}".format(
-        PACKAGE_TYPE_REGEX, PublicId.PUBLIC_ID_URI_REGEX[1:-1]
-    )
+    PACKAGE_TYPE_REGEX = rf"({PackageType.AGENT}|{PackageType.PROTOCOL}|{PackageType.SKILL}|{PackageType.CONNECTION}|{PackageType.CONTRACT}|{PackageType.SERVICE})"
+    PACKAGE_ID_URI_REGEX = rf"{PACKAGE_TYPE_REGEX}/{PublicId.PUBLIC_ID_URI_REGEX[1:-1]}"
 
     __slots__ = ("_package_type", "_public_id")
 

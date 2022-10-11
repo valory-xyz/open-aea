@@ -295,9 +295,7 @@ class DataModel:
 
     def __str__(self) -> str:
         """Get the string representation of the data model."""
-        return "DataModel(name={},attributes={},description={})".format(
-            self.name, {a.name: str(a) for a in self.attributes}, self.description
-        )
+        return f"DataModel(name={self.name},attributes={ {a.name: str(a) for a in self.attributes} },description={self.description})"
 
     def encode(self) -> models_pb2.Query.DataModel:  # type: ignore
         """
