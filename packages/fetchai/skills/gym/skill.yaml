@@ -23,11 +23,11 @@ fingerprint:
   tests/test_task.py: bafybeic4y7wulvlx2eparks3wyftfsx5ya2xsufoaohxfqhxrabm7zt7pi
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeid4v7ss6ifquugklcmzbbmgovieuslse4il3kfqhx4bsqhnnu2luy
+- fetchai/gym:0.19.0:bafybeifriqt33dg5yyrtrdszcchywhb5pche5pcjcf64iaae6l3e5ztr3q
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeihbqto4eagboyeff4ujxvqsjoyxmd5fegzg4pohiy6dhspbpdx6si
-- fetchai/gym:1.0.0:bafybeibeessaffdzh2ffgd4gnx7626via4s2rsuvufevj7taoed33dy7hm
+- fetchai/default:1.0.0:bafybeidxskwqtj5nhmg5opkmn2u5xlcspvwbge6jtcqdgc76qhusgnm7xm
+- fetchai/gym:1.0.0:bafybeicq66rmxywsbmcu67foyyycqg24n7h3c3kagqngx4n3yeqvvfc43e
 skills: []
 behaviours: {}
 handlers:

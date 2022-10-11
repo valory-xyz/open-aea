@@ -21,16 +21,16 @@ fingerprint:
   tests/test_strategy.py: bafybeigxtw2j2c7vl6xhdwos62jbtmx62xfgdyadptm5eewmkesmcooyea
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeihuqkonuh5dzik6o5254jnjkvevuzgm4bkmpfpo3ijt2j7lktqbz4
+- valory/ledger:0.19.0:bafybeifni57kw7mkddkpmzupsrcrnb3x2fb45tw5axjlf5juz7hulkod7e
 contracts:
 - fetchai/erc1155:0.22.0:bafybeianby6xcyhyqpdy6jvpabkeecu3frdthhucegca7d54dwgouixo7i
 protocols:
-- fetchai/default:1.0.0:bafybeihbqto4eagboyeff4ujxvqsjoyxmd5fegzg4pohiy6dhspbpdx6si
-- fetchai/fipa:1.0.0:bafybeia4alj4t2i2tejzsysotznakzaqycrqdw3imcevlhac6x3y5jz6z4
-- fetchai/oef_search:1.0.0:bafybeicj37qg5z7cnfaibv3r2xpwhbkesietk7ozrrxicxjcmdkxxgqwb4
-- open_aea/signing:1.0.0:bafybeici65xn4rwrtccvpg5o3lvzfcfn3oxo56fdypdfbpj7d3lxarevw4
-- valory/contract_api:1.0.0:bafybeielbnpu6f7ifbn6vhzh4gph4jj7p3y76prnc2cakytdrt2x3pxbpm
-- valory/ledger_api:1.0.0:bafybeidxtnftfcda7igmmjyefjpxvqt5tlfpujznjxwodryzwbavmimat4
+- fetchai/default:1.0.0:bafybeidxskwqtj5nhmg5opkmn2u5xlcspvwbge6jtcqdgc76qhusgnm7xm
+- fetchai/fipa:1.0.0:bafybeif47i67dd2mktvuaeknuncye43l6gq6rnz2eqd4ltxpnlbaeueb4a
+- fetchai/oef_search:1.0.0:bafybeig4oo3ywg77ytnyb4ynylz2nuz44tdob4mrxbbe7c3tkukyznk22y
+- open_aea/signing:1.0.0:bafybeieogwcbuzqyfvnqortya75jktfkpw42sgqqas2lijoe6vio6j4eaa
+- valory/contract_api:1.0.0:bafybeidxkz4kmt7pk533z72uby25ak7hekdjegszqxai6mcygjll6aiduy
+- valory/ledger_api:1.0.0:bafybeibi4dw7lb4q7zkqgxsu5lyhvtqxeg3k3are4masy5owghendii7dm
 skills: []
 behaviours:
   service_registration:
