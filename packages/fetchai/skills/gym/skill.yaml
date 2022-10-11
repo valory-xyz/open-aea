@@ -9,10 +9,10 @@ fingerprint:
   README.md: bafybeictcczi3z3o7gcz3764jjotnfpek4da2w25j7d3sedbjb5phsskvu
   __init__.py: bafybeihcv27rv6jafmrgjgeqn3fsmep54k2epi7tkiv6zfxwtczwah4klm
   dialogues.py: bafybeicnd6qc3hrzk5unxfcvcrvv4qflqwfcuq6trsih4i57btxxrxc56a
-  handlers.py: bafybeihung2kbhewqdjceudcgmlbv5jbgh66knjsboigpo2qsoei6xrute
-  helpers.py: bafybeiepac2mjvl4xnhzsthwen5nstzjoopzuv6fvoisw36frww2km4fpa
-  rl_agent.py: bafybeignbkbhfiswcohlk7ode6uc76bekownpcnsmqjtasv5bm4bzsisfm
-  tasks.py: bafybeifvuancp2y57rjgwuzxgrzxiqkc4gzzbskgwch3uze5vlbvptlswm
+  handlers.py: bafybeiakezu5spit5macydjzkgglwyz7fwrm2vh3i44jyao3cldcrdb5qm
+  helpers.py: bafybeiefabgqabziulrkbuzkyxha4kw7r34z3f3c37onfi7xwvgvt4ws5q
+  rl_agent.py: bafybeidb6adlghrjdppuwsktchtxm6u3oygatjhmhi5l434x5w3wlulreq
+  tasks.py: bafybeie26y6smr4mqtrdnwecj644ugrbwlcxbnhgqskp6a75rwqr4yzoqq
   tests/__init__.py: bafybeihojk75sixkhbsmwxbrzdaqwouq6dh2oo6u7zk2clqcgxqrhklhny
   tests/helpers.py: bafybeifbvlf5ahttwz7uddixxp5ggw3uu3sby65ya4xr2gy3gfb5xouj5i
   tests/intermediate_class.py: bafybeihidlqiqoornluroa5bzzc5nr4ixgmbu6clipcqspcqcpet657ibq
@@ -23,11 +23,11 @@ fingerprint:
   tests/test_task.py: bafybeic4y7wulvlx2eparks3wyftfsx5ya2xsufoaohxfqhxrabm7zt7pi
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeiak5qnlo4b6ai5ep5cp5tyw26dyv5finwjcbwo3aryhtjqmdl2keu
+- fetchai/gym:0.19.0:bafybeid4v7ss6ifquugklcmzbbmgovieuslse4il3kfqhx4bsqhnnu2luy
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeihzesahyayexkhk26fg7rqnjuqaab3bmcijtjekvskvs4xw6ecyuu
-- fetchai/gym:1.0.0:bafybeihpjm2sgnrpuwaqicikw4aybltm7xrjmf7cscpp2cy2xdoi6pekbq
+- fetchai/default:1.0.0:bafybeihbqto4eagboyeff4ujxvqsjoyxmd5fegzg4pohiy6dhspbpdx6si
+- fetchai/gym:1.0.0:bafybeibeessaffdzh2ffgd4gnx7626via4s2rsuvufevj7taoed33dy7hm
 skills: []
 behaviours: {}
 handlers:

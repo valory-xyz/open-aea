@@ -66,7 +66,7 @@ def _is_text(file_path: str) -> bool:
 def _read(file_path: str) -> bytes:
     """Read a file, replacing Windows line endings if it is a text file."""
     is_text = _is_text(file_path)
-    with open(file_path, "rb", encoding="utf-8") as file:
+    with open(file_path, "rb") as file:
         file_b = file.read()
         if is_text:
             file_b = _dos2unix(file_b)

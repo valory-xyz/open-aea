@@ -277,7 +277,7 @@ class TProtocolSerializer(Serializer):
             performative = t_protocol_pb2.TProtocolMessage.Performative_Empty_Contents_Performative()  # type: ignore
             t_protocol_msg.performative_empty_contents.CopyFrom(performative)
         else:
-            raise ValueError(f"Performative not valid: {performative_id}")
+            raise ValueError("Performative not valid: {}".format(performative_id))
 
         dialogue_message_pb.content = t_protocol_msg.SerializeToString()
 
@@ -532,12 +532,12 @@ class TProtocolSerializer(Serializer):
         ):
             pass
         else:
-            raise ValueError(f"Performative not valid: {performative_id}.")
+            raise ValueError("Performative not valid: {}.".format(performative_id))
 
         return TProtocolMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content,
+            **performative_content
         )

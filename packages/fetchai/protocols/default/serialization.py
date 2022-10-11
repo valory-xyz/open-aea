@@ -72,7 +72,7 @@ class DefaultSerializer(Serializer):
             performative = default_pb2.DefaultMessage.End_Performative()  # type: ignore
             default_msg.end.CopyFrom(performative)
         else:
-            raise ValueError(f"Performative not valid: {performative_id}")
+            raise ValueError("Performative not valid: {}".format(performative_id))
 
         dialogue_message_pb.content = default_msg.SerializeToString()
 
@@ -117,12 +117,12 @@ class DefaultSerializer(Serializer):
         elif performative_id == DefaultMessage.Performative.END:
             pass
         else:
-            raise ValueError(f"Performative not valid: {performative_id}.")
+            raise ValueError("Performative not valid: {}.".format(performative_id))
 
         return DefaultMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content,
+            **performative_content
         )

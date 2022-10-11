@@ -9,15 +9,15 @@ fingerprint:
   README.md: bafybeiadln5ca6tu6rzbsgjpeluf6nz5efxl3u223c3vxwgf2iynkj5n6q
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeiak5qnlo4b6ai5ep5cp5tyw26dyv5finwjcbwo3aryhtjqmdl2keu
+- fetchai/gym:0.19.0:bafybeid4v7ss6ifquugklcmzbbmgovieuslse4il3kfqhx4bsqhnnu2luy
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeihzesahyayexkhk26fg7rqnjuqaab3bmcijtjekvskvs4xw6ecyuu
-- fetchai/gym:1.0.0:bafybeihpjm2sgnrpuwaqicikw4aybltm7xrjmf7cscpp2cy2xdoi6pekbq
-- fetchai/state_update:1.0.0:bafybeidtndlmppst6l6iughpflqbbbkzditixo2fy2dncxfkb5apkx5y4m
-- open_aea/signing:1.0.0:bafybeiambqptflge33eemdhis2whik67hjplfnqwieoa6wblzlaf7vuo44
+- fetchai/default:1.0.0:bafybeihbqto4eagboyeff4ujxvqsjoyxmd5fegzg4pohiy6dhspbpdx6si
+- fetchai/gym:1.0.0:bafybeibeessaffdzh2ffgd4gnx7626via4s2rsuvufevj7taoed33dy7hm
+- fetchai/state_update:1.0.0:bafybeiecgnsfp5velbg32pp6oe2w63e5u7kto7vzscxoy7e7vvphqfjco4
+- open_aea/signing:1.0.0:bafybeici65xn4rwrtccvpg5o3lvzfcfn3oxo56fdypdfbpj7d3lxarevw4
 skills:
-- fetchai/gym:0.20.0:bafybeiexgdek5fajc5od4irk4haj4v22iy4gjbjaqbp3rm6624xhxxsj3q
+- fetchai/gym:0.20.0:bafybeidnvaaj5teykhf2x4xe25kd6hbt732s2kzksob4d3vdbenr7susyy
 default_connection: fetchai/gym:0.19.0
 default_ledger: fetchai
 required_ledgers:

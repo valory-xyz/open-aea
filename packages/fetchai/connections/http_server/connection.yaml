@@ -9,7 +9,7 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeihkuhhsdfw5qqtz2jwpfppub6yvsehzmvmaqjlxnal4v76x47mcrq
   __init__.py: bafybeif5pkr5oarwd7yagdgn46miolmdmvgdyxv4kadgws2bf3iwshom24
-  connection.py: bafybeicvabh5c6hu6ple5s2peoj2kukxigz6z2uxcz5qo7k7sfw5ebi5sy
+  connection.py: bafybeiebdcrem24tcal6mqbxaul3wzyc3g3eszpbaxe4jvvemjot7davsy
   tests/__init__.py: bafybeidpthyhnhsvpixejrud77klcfkb3titlmyrssovfzt4a76dn3wnpm
   tests/data/certs/server.crt: bafybeiev5i3xxkvn36wflf633gkumuxexsw4y2bubwbvl7edrz4igfgv34
   tests/data/certs/server.csr: bafybeicvp7xdl5w3o4bzikkudpduitss3bpp6xqfwlxbw6kabdangohy5u
@@ -19,7 +19,7 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeigzqo2zaakcjtzzsm6dh4x73v72xg6ctk6muyp5uq5ueb7y34fbxy
+- valory/http:1.0.0:bafybeidg7paxhexl55jbnf4aremzwzxfenxnjd5typgnbn6qll264vdfwu
 class_name: HTTPServerConnection
 config:
   api_spec_path: null

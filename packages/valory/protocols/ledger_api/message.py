@@ -294,30 +294,42 @@ class LedgerApiMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
+                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
+                    type(self.dialogue_reference)
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
+                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[0])
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
+                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[1])
+                ),
             )
             enforce(
                 type(self.message_id) is int,
-                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
+                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
+                    type(self.message_id)
+                ),
             )
             enforce(
                 type(self.target) is int,
-                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
+                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
+                    type(self.target)
+                ),
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, LedgerApiMessage.Performative),
-                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
+                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
+                    self.valid_performatives, self.performative
+                ),
             )
 
             # Check correct contents
@@ -327,17 +339,23 @@ class LedgerApiMessage(Message):
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.address, str),
-                    f"Invalid type for content 'address'. Expected 'str'. Found '{type(self.address)}'.",
+                    "Invalid type for content 'address'. Expected 'str'. Found '{}'.".format(
+                        type(self.address)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.GET_RAW_TRANSACTION:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.terms, CustomTerms),
-                    f"Invalid type for content 'terms'. Expected 'Terms'. Found '{type(self.terms)}'.",
+                    "Invalid type for content 'terms'. Expected 'Terms'. Found '{}'.".format(
+                        type(self.terms)
+                    ),
                 )
             elif (
                 self.performative
@@ -346,7 +364,9 @@ class LedgerApiMessage(Message):
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.signed_transaction, CustomSignedTransaction),
-                    f"Invalid type for content 'signed_transaction'. Expected 'SignedTransaction'. Found '{type(self.signed_transaction)}'.",
+                    "Invalid type for content 'signed_transaction'. Expected 'SignedTransaction'. Found '{}'.".format(
+                        type(self.signed_transaction)
+                    ),
                 )
             elif (
                 self.performative
@@ -355,63 +375,85 @@ class LedgerApiMessage(Message):
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.transaction_digest, CustomTransactionDigest),
-                    f"Invalid type for content 'transaction_digest'. Expected 'TransactionDigest'. Found '{type(self.transaction_digest)}'.",
+                    "Invalid type for content 'transaction_digest'. Expected 'TransactionDigest'. Found '{}'.".format(
+                        type(self.transaction_digest)
+                    ),
                 )
                 if self.is_set("retry_timeout"):
                     expected_nb_of_contents += 1
                     retry_timeout = cast(int, self.retry_timeout)
                     enforce(
                         type(retry_timeout) is int,
-                        f"Invalid type for content 'retry_timeout'. Expected 'int'. Found '{type(retry_timeout)}'.",
+                        "Invalid type for content 'retry_timeout'. Expected 'int'. Found '{}'.".format(
+                            type(retry_timeout)
+                        ),
                     )
                 if self.is_set("retry_attempts"):
                     expected_nb_of_contents += 1
                     retry_attempts = cast(int, self.retry_attempts)
                     enforce(
                         type(retry_attempts) is int,
-                        f"Invalid type for content 'retry_attempts'. Expected 'int'. Found '{type(retry_attempts)}'.",
+                        "Invalid type for content 'retry_attempts'. Expected 'int'. Found '{}'.".format(
+                            type(retry_attempts)
+                        ),
                     )
             elif self.performative == LedgerApiMessage.Performative.BALANCE:
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     type(self.balance) is int,
-                    f"Invalid type for content 'balance'. Expected 'int'. Found '{type(self.balance)}'.",
+                    "Invalid type for content 'balance'. Expected 'int'. Found '{}'.".format(
+                        type(self.balance)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.RAW_TRANSACTION:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.raw_transaction, CustomRawTransaction),
-                    f"Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{type(self.raw_transaction)}'.",
+                    "Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{}'.".format(
+                        type(self.raw_transaction)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.TRANSACTION_DIGEST:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.transaction_digest, CustomTransactionDigest),
-                    f"Invalid type for content 'transaction_digest'. Expected 'TransactionDigest'. Found '{type(self.transaction_digest)}'.",
+                    "Invalid type for content 'transaction_digest'. Expected 'TransactionDigest'. Found '{}'.".format(
+                        type(self.transaction_digest)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.TRANSACTION_RECEIPT:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.transaction_receipt, CustomTransactionReceipt),
-                    f"Invalid type for content 'transaction_receipt'. Expected 'TransactionReceipt'. Found '{type(self.transaction_receipt)}'.",
+                    "Invalid type for content 'transaction_receipt'. Expected 'TransactionReceipt'. Found '{}'.".format(
+                        type(self.transaction_receipt)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.GET_STATE:
                 expected_nb_of_contents = 4
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.callable, str),
-                    f"Invalid type for content 'callable'. Expected 'str'. Found '{type(self.callable)}'.",
+                    "Invalid type for content 'callable'. Expected 'str'. Found '{}'.".format(
+                        type(self.callable)
+                    ),
                 )
                 enforce(
                     isinstance(self.args, tuple),
-                    f"Invalid type for content 'args'. Expected 'tuple'. Found '{type(self.args)}'.",
+                    "Invalid type for content 'args'. Expected 'tuple'. Found '{}'.".format(
+                        type(self.args)
+                    ),
                 )
                 enforce(
                     all(isinstance(element, str) for element in self.args),
@@ -419,50 +461,66 @@ class LedgerApiMessage(Message):
                 )
                 enforce(
                     isinstance(self.kwargs, CustomKwargs),
-                    f"Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{type(self.kwargs)}'.",
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.STATE:
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.state, CustomState),
-                    f"Invalid type for content 'state'. Expected 'State'. Found '{type(self.state)}'.",
+                    "Invalid type for content 'state'. Expected 'State'. Found '{}'.".format(
+                        type(self.state)
+                    ),
                 )
             elif self.performative == LedgerApiMessage.Performative.ERROR:
                 expected_nb_of_contents = 1
                 enforce(
                     type(self.code) is int,
-                    f"Invalid type for content 'code'. Expected 'int'. Found '{type(self.code)}'.",
+                    "Invalid type for content 'code'. Expected 'int'. Found '{}'.".format(
+                        type(self.code)
+                    ),
                 )
                 if self.is_set("message"):
                     expected_nb_of_contents += 1
                     message = cast(str, self.message)
                     enforce(
                         isinstance(message, str),
-                        f"Invalid type for content 'message'. Expected 'str'. Found '{type(message)}'.",
+                        "Invalid type for content 'message'. Expected 'str'. Found '{}'.".format(
+                            type(message)
+                        ),
                     )
                 if self.is_set("data"):
                     expected_nb_of_contents += 1
                     data = cast(bytes, self.data)
                     enforce(
                         isinstance(data, bytes),
-                        f"Invalid type for content 'data'. Expected 'bytes'. Found '{type(data)}'.",
+                        "Invalid type for content 'data'. Expected 'bytes'. Found '{}'.".format(
+                            type(data)
+                        ),
                     )
 
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
+                "Incorrect number of contents. Expected {}. Found {}".format(
+                    expected_nb_of_contents, actual_nb_of_contents
+                ),
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
+                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
+                        self.target
+                    ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

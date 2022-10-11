@@ -12,7 +12,7 @@ fingerprint:
   custom_types.py: bafybeicwf62cvvnn3izbkvbkag7clz45kw6ihvg7lh3cwgckwfw24gtui4
   dialogues.py: bafybeichi2yny2utfyada7dgddsrik3qaqtbumzylnduagr4utx63e5mju
   message.py: bafybeihxfmjymu56pgegposajtpfmbm3frbhlsmdjenz7da6atb5tmiaq4
-  serialization.py: bafybeic2fci2s2ojkjn23licj2pzshbsg7zgjihvnjgiyt6fwq77gih72m
+  serialization.py: bafybeih52lryfacxdjrjtg47g35jdis46zz5tmat7run4rq2i4amvys7me
   t_protocol.proto: bafybeihsbutc6dfokbgn5zuub6qnm3gqrivvaymt3gp42fbfnamebrfvce
   t_protocol_pb2.py: bafybeig7n2qvngwpdjpuqewgoklii42bkfxyfkzq24gnkzrb32o5e4kdem
 fingerprint_ignore_patterns: []

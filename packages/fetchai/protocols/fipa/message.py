@@ -166,30 +166,42 @@ class FipaMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
+                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
+                    type(self.dialogue_reference)
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
+                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[0])
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
+                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[1])
+                ),
             )
             enforce(
                 type(self.message_id) is int,
-                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
+                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
+                    type(self.message_id)
+                ),
             )
             enforce(
                 type(self.target) is int,
-                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
+                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
+                    type(self.target)
+                ),
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, FipaMessage.Performative),
-                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
+                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
+                    self.valid_performatives, self.performative
+                ),
             )
 
             # Check correct contents
@@ -199,58 +211,80 @@ class FipaMessage(Message):
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.query, CustomQuery),
-                    f"Invalid type for content 'query'. Expected 'Query'. Found '{type(self.query)}'.",
+                    "Invalid type for content 'query'. Expected 'Query'. Found '{}'.".format(
+                        type(self.query)
+                    ),
                 )
             elif self.performative == FipaMessage.Performative.PROPOSE:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.proposal, CustomDescription),
-                    f"Invalid type for content 'proposal'. Expected 'Description'. Found '{type(self.proposal)}'.",
+                    "Invalid type for content 'proposal'. Expected 'Description'. Found '{}'.".format(
+                        type(self.proposal)
+                    ),
                 )
             elif self.performative == FipaMessage.Performative.ACCEPT_W_INFORM:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.info, dict),
-                    f"Invalid type for content 'info'. Expected 'dict'. Found '{type(self.info)}'.",
+                    "Invalid type for content 'info'. Expected 'dict'. Found '{}'.".format(
+                        type(self.info)
+                    ),
                 )
                 for key_of_info, value_of_info in self.info.items():
                     enforce(
                         isinstance(key_of_info, str),
-                        f"Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{type(key_of_info)}'.",
+                        "Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_info)
+                        ),
                     )
                     enforce(
                         isinstance(value_of_info, str),
-                        f"Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{type(value_of_info)}'.",
+                        "Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(value_of_info)
+                        ),
                     )
             elif self.performative == FipaMessage.Performative.MATCH_ACCEPT_W_INFORM:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.info, dict),
-                    f"Invalid type for content 'info'. Expected 'dict'. Found '{type(self.info)}'.",
+                    "Invalid type for content 'info'. Expected 'dict'. Found '{}'.".format(
+                        type(self.info)
+                    ),
                 )
                 for key_of_info, value_of_info in self.info.items():
                     enforce(
                         isinstance(key_of_info, str),
-                        f"Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{type(key_of_info)}'.",
+                        "Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_info)
+                        ),
                     )
                     enforce(
                         isinstance(value_of_info, str),
-                        f"Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{type(value_of_info)}'.",
+                        "Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(value_of_info)
+                        ),
                     )
             elif self.performative == FipaMessage.Performative.INFORM:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.info, dict),
-                    f"Invalid type for content 'info'. Expected 'dict'. Found '{type(self.info)}'.",
+                    "Invalid type for content 'info'. Expected 'dict'. Found '{}'.".format(
+                        type(self.info)
+                    ),
                 )
                 for key_of_info, value_of_info in self.info.items():
                     enforce(
                         isinstance(key_of_info, str),
-                        f"Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{type(key_of_info)}'.",
+                        "Invalid type for dictionary keys in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_info)
+                        ),
                     )
                     enforce(
                         isinstance(value_of_info, str),
-                        f"Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{type(value_of_info)}'.",
+                        "Invalid type for dictionary values in content 'info'. Expected 'str'. Found '{}'.".format(
+                            type(value_of_info)
+                        ),
                     )
             elif self.performative == FipaMessage.Performative.ACCEPT:
                 expected_nb_of_contents = 0
@@ -264,14 +298,18 @@ class FipaMessage(Message):
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
+                "Incorrect number of contents. Expected {}. Found {}".format(
+                    expected_nb_of_contents, actual_nb_of_contents
+                ),
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
+                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
+                        self.target
+                    ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

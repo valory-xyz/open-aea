@@ -181,7 +181,7 @@ def download_file(url: str, cwd: str, timeout: float = FILE_DOWNLOAD_TIMEOUT) ->
     # NOTE the stream=True parameter below
     response = requests.get(url, stream=True, timeout=timeout)
     if response.status_code == 200:
-        with open(filepath, "wb", encoding="utf-8") as f:
+        with open(filepath, "wb") as f:
             f.write(response.raw.read())
     else:
         raise click.ClickException(

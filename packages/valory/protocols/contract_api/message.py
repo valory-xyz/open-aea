@@ -230,30 +230,42 @@ class ContractApiMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
+                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
+                    type(self.dialogue_reference)
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
+                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[0])
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
+                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[1])
+                ),
             )
             enforce(
                 type(self.message_id) is int,
-                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
+                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
+                    type(self.message_id)
+                ),
             )
             enforce(
                 type(self.target) is int,
-                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
+                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
+                    type(self.target)
+                ),
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, ContractApiMessage.Performative),
-                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
+                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
+                    self.valid_performatives, self.performative
+                ),
             )
 
             # Check correct contents
@@ -266,19 +278,27 @@ class ContractApiMessage(Message):
                 expected_nb_of_contents = 4
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_id, str),
-                    f"Invalid type for content 'contract_id'. Expected 'str'. Found '{type(self.contract_id)}'.",
+                    "Invalid type for content 'contract_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.callable, str),
-                    f"Invalid type for content 'callable'. Expected 'str'. Found '{type(self.callable)}'.",
+                    "Invalid type for content 'callable'. Expected 'str'. Found '{}'.".format(
+                        type(self.callable)
+                    ),
                 )
                 enforce(
                     isinstance(self.kwargs, CustomKwargs),
-                    f"Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{type(self.kwargs)}'.",
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
+                    ),
                 )
             elif (
                 self.performative == ContractApiMessage.Performative.GET_RAW_TRANSACTION
@@ -286,85 +306,121 @@ class ContractApiMessage(Message):
                 expected_nb_of_contents = 5
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_id, str),
-                    f"Invalid type for content 'contract_id'. Expected 'str'. Found '{type(self.contract_id)}'.",
+                    "Invalid type for content 'contract_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_address, str),
-                    f"Invalid type for content 'contract_address'. Expected 'str'. Found '{type(self.contract_address)}'.",
+                    "Invalid type for content 'contract_address'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_address)
+                    ),
                 )
                 enforce(
                     isinstance(self.callable, str),
-                    f"Invalid type for content 'callable'. Expected 'str'. Found '{type(self.callable)}'.",
+                    "Invalid type for content 'callable'. Expected 'str'. Found '{}'.".format(
+                        type(self.callable)
+                    ),
                 )
                 enforce(
                     isinstance(self.kwargs, CustomKwargs),
-                    f"Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{type(self.kwargs)}'.",
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.GET_RAW_MESSAGE:
                 expected_nb_of_contents = 5
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_id, str),
-                    f"Invalid type for content 'contract_id'. Expected 'str'. Found '{type(self.contract_id)}'.",
+                    "Invalid type for content 'contract_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_address, str),
-                    f"Invalid type for content 'contract_address'. Expected 'str'. Found '{type(self.contract_address)}'.",
+                    "Invalid type for content 'contract_address'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_address)
+                    ),
                 )
                 enforce(
                     isinstance(self.callable, str),
-                    f"Invalid type for content 'callable'. Expected 'str'. Found '{type(self.callable)}'.",
+                    "Invalid type for content 'callable'. Expected 'str'. Found '{}'.".format(
+                        type(self.callable)
+                    ),
                 )
                 enforce(
                     isinstance(self.kwargs, CustomKwargs),
-                    f"Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{type(self.kwargs)}'.",
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.GET_STATE:
                 expected_nb_of_contents = 5
                 enforce(
                     isinstance(self.ledger_id, str),
-                    f"Invalid type for content 'ledger_id'. Expected 'str'. Found '{type(self.ledger_id)}'.",
+                    "Invalid type for content 'ledger_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.ledger_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_id, str),
-                    f"Invalid type for content 'contract_id'. Expected 'str'. Found '{type(self.contract_id)}'.",
+                    "Invalid type for content 'contract_id'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_id)
+                    ),
                 )
                 enforce(
                     isinstance(self.contract_address, str),
-                    f"Invalid type for content 'contract_address'. Expected 'str'. Found '{type(self.contract_address)}'.",
+                    "Invalid type for content 'contract_address'. Expected 'str'. Found '{}'.".format(
+                        type(self.contract_address)
+                    ),
                 )
                 enforce(
                     isinstance(self.callable, str),
-                    f"Invalid type for content 'callable'. Expected 'str'. Found '{type(self.callable)}'.",
+                    "Invalid type for content 'callable'. Expected 'str'. Found '{}'.".format(
+                        type(self.callable)
+                    ),
                 )
                 enforce(
                     isinstance(self.kwargs, CustomKwargs),
-                    f"Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{type(self.kwargs)}'.",
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.STATE:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.state, CustomState),
-                    f"Invalid type for content 'state'. Expected 'State'. Found '{type(self.state)}'.",
+                    "Invalid type for content 'state'. Expected 'State'. Found '{}'.".format(
+                        type(self.state)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.RAW_TRANSACTION:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.raw_transaction, CustomRawTransaction),
-                    f"Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{type(self.raw_transaction)}'.",
+                    "Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{}'.".format(
+                        type(self.raw_transaction)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.RAW_MESSAGE:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.raw_message, CustomRawMessage),
-                    f"Invalid type for content 'raw_message'. Expected 'RawMessage'. Found '{type(self.raw_message)}'.",
+                    "Invalid type for content 'raw_message'. Expected 'RawMessage'. Found '{}'.".format(
+                        type(self.raw_message)
+                    ),
                 )
             elif self.performative == ContractApiMessage.Performative.ERROR:
                 expected_nb_of_contents = 1
@@ -373,31 +429,41 @@ class ContractApiMessage(Message):
                     code = cast(int, self.code)
                     enforce(
                         type(code) is int,
-                        f"Invalid type for content 'code'. Expected 'int'. Found '{type(code)}'.",
+                        "Invalid type for content 'code'. Expected 'int'. Found '{}'.".format(
+                            type(code)
+                        ),
                     )
                 if self.is_set("message"):
                     expected_nb_of_contents += 1
                     message = cast(str, self.message)
                     enforce(
                         isinstance(message, str),
-                        f"Invalid type for content 'message'. Expected 'str'. Found '{type(message)}'.",
+                        "Invalid type for content 'message'. Expected 'str'. Found '{}'.".format(
+                            type(message)
+                        ),
                     )
                 enforce(
                     isinstance(self.data, bytes),
-                    f"Invalid type for content 'data'. Expected 'bytes'. Found '{type(self.data)}'.",
+                    "Invalid type for content 'data'. Expected 'bytes'. Found '{}'.".format(
+                        type(self.data)
+                    ),
                 )
 
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
+                "Incorrect number of contents. Expected {}. Found {}".format(
+                    expected_nb_of_contents, actual_nb_of_contents
+                ),
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
+                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
+                        self.target
+                    ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

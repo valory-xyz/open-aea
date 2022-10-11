@@ -162,30 +162,42 @@ class StateUpdateMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
+                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
+                    type(self.dialogue_reference)
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
+                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[0])
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
+                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[1])
+                ),
             )
             enforce(
                 type(self.message_id) is int,
-                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
+                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
+                    type(self.message_id)
+                ),
             )
             enforce(
                 type(self.target) is int,
-                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
+                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
+                    type(self.target)
+                ),
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, StateUpdateMessage.Performative),
-                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
+                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
+                    self.valid_performatives, self.performative
+                ),
             )
 
             # Check correct contents
@@ -195,7 +207,9 @@ class StateUpdateMessage(Message):
                 expected_nb_of_contents = 4
                 enforce(
                     isinstance(self.exchange_params_by_currency_id, dict),
-                    f"Invalid type for content 'exchange_params_by_currency_id'. Expected 'dict'. Found '{type(self.exchange_params_by_currency_id)}'.",
+                    "Invalid type for content 'exchange_params_by_currency_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.exchange_params_by_currency_id)
+                    ),
                 )
                 for (
                     key_of_exchange_params_by_currency_id,
@@ -203,15 +217,21 @@ class StateUpdateMessage(Message):
                 ) in self.exchange_params_by_currency_id.items():
                     enforce(
                         isinstance(key_of_exchange_params_by_currency_id, str),
-                        f"Invalid type for dictionary keys in content 'exchange_params_by_currency_id'. Expected 'str'. Found '{type(key_of_exchange_params_by_currency_id)}'.",
+                        "Invalid type for dictionary keys in content 'exchange_params_by_currency_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_exchange_params_by_currency_id)
+                        ),
                     )
                     enforce(
                         isinstance(value_of_exchange_params_by_currency_id, float),
-                        f"Invalid type for dictionary values in content 'exchange_params_by_currency_id'. Expected 'float'. Found '{type(value_of_exchange_params_by_currency_id)}'.",
+                        "Invalid type for dictionary values in content 'exchange_params_by_currency_id'. Expected 'float'. Found '{}'.".format(
+                            type(value_of_exchange_params_by_currency_id)
+                        ),
                     )
                 enforce(
                     isinstance(self.utility_params_by_good_id, dict),
-                    f"Invalid type for content 'utility_params_by_good_id'. Expected 'dict'. Found '{type(self.utility_params_by_good_id)}'.",
+                    "Invalid type for content 'utility_params_by_good_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.utility_params_by_good_id)
+                    ),
                 )
                 for (
                     key_of_utility_params_by_good_id,
@@ -219,15 +239,21 @@ class StateUpdateMessage(Message):
                 ) in self.utility_params_by_good_id.items():
                     enforce(
                         isinstance(key_of_utility_params_by_good_id, str),
-                        f"Invalid type for dictionary keys in content 'utility_params_by_good_id'. Expected 'str'. Found '{type(key_of_utility_params_by_good_id)}'.",
+                        "Invalid type for dictionary keys in content 'utility_params_by_good_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_utility_params_by_good_id)
+                        ),
                     )
                     enforce(
                         isinstance(value_of_utility_params_by_good_id, float),
-                        f"Invalid type for dictionary values in content 'utility_params_by_good_id'. Expected 'float'. Found '{type(value_of_utility_params_by_good_id)}'.",
+                        "Invalid type for dictionary values in content 'utility_params_by_good_id'. Expected 'float'. Found '{}'.".format(
+                            type(value_of_utility_params_by_good_id)
+                        ),
                     )
                 enforce(
                     isinstance(self.amount_by_currency_id, dict),
-                    f"Invalid type for content 'amount_by_currency_id'. Expected 'dict'. Found '{type(self.amount_by_currency_id)}'.",
+                    "Invalid type for content 'amount_by_currency_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.amount_by_currency_id)
+                    ),
                 )
                 for (
                     key_of_amount_by_currency_id,
@@ -235,15 +261,21 @@ class StateUpdateMessage(Message):
                 ) in self.amount_by_currency_id.items():
                     enforce(
                         isinstance(key_of_amount_by_currency_id, str),
-                        f"Invalid type for dictionary keys in content 'amount_by_currency_id'. Expected 'str'. Found '{type(key_of_amount_by_currency_id)}'.",
+                        "Invalid type for dictionary keys in content 'amount_by_currency_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_amount_by_currency_id)
+                        ),
                     )
                     enforce(
                         type(value_of_amount_by_currency_id) is int,
-                        f"Invalid type for dictionary values in content 'amount_by_currency_id'. Expected 'int'. Found '{type(value_of_amount_by_currency_id)}'.",
+                        "Invalid type for dictionary values in content 'amount_by_currency_id'. Expected 'int'. Found '{}'.".format(
+                            type(value_of_amount_by_currency_id)
+                        ),
                     )
                 enforce(
                     isinstance(self.quantities_by_good_id, dict),
-                    f"Invalid type for content 'quantities_by_good_id'. Expected 'dict'. Found '{type(self.quantities_by_good_id)}'.",
+                    "Invalid type for content 'quantities_by_good_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.quantities_by_good_id)
+                    ),
                 )
                 for (
                     key_of_quantities_by_good_id,
@@ -251,17 +283,23 @@ class StateUpdateMessage(Message):
                 ) in self.quantities_by_good_id.items():
                     enforce(
                         isinstance(key_of_quantities_by_good_id, str),
-                        f"Invalid type for dictionary keys in content 'quantities_by_good_id'. Expected 'str'. Found '{type(key_of_quantities_by_good_id)}'.",
+                        "Invalid type for dictionary keys in content 'quantities_by_good_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_quantities_by_good_id)
+                        ),
                     )
                     enforce(
                         type(value_of_quantities_by_good_id) is int,
-                        f"Invalid type for dictionary values in content 'quantities_by_good_id'. Expected 'int'. Found '{type(value_of_quantities_by_good_id)}'.",
+                        "Invalid type for dictionary values in content 'quantities_by_good_id'. Expected 'int'. Found '{}'.".format(
+                            type(value_of_quantities_by_good_id)
+                        ),
                     )
             elif self.performative == StateUpdateMessage.Performative.APPLY:
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.amount_by_currency_id, dict),
-                    f"Invalid type for content 'amount_by_currency_id'. Expected 'dict'. Found '{type(self.amount_by_currency_id)}'.",
+                    "Invalid type for content 'amount_by_currency_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.amount_by_currency_id)
+                    ),
                 )
                 for (
                     key_of_amount_by_currency_id,
@@ -269,15 +307,21 @@ class StateUpdateMessage(Message):
                 ) in self.amount_by_currency_id.items():
                     enforce(
                         isinstance(key_of_amount_by_currency_id, str),
-                        f"Invalid type for dictionary keys in content 'amount_by_currency_id'. Expected 'str'. Found '{type(key_of_amount_by_currency_id)}'.",
+                        "Invalid type for dictionary keys in content 'amount_by_currency_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_amount_by_currency_id)
+                        ),
                     )
                     enforce(
                         type(value_of_amount_by_currency_id) is int,
-                        f"Invalid type for dictionary values in content 'amount_by_currency_id'. Expected 'int'. Found '{type(value_of_amount_by_currency_id)}'.",
+                        "Invalid type for dictionary values in content 'amount_by_currency_id'. Expected 'int'. Found '{}'.".format(
+                            type(value_of_amount_by_currency_id)
+                        ),
                     )
                 enforce(
                     isinstance(self.quantities_by_good_id, dict),
-                    f"Invalid type for content 'quantities_by_good_id'. Expected 'dict'. Found '{type(self.quantities_by_good_id)}'.",
+                    "Invalid type for content 'quantities_by_good_id'. Expected 'dict'. Found '{}'.".format(
+                        type(self.quantities_by_good_id)
+                    ),
                 )
                 for (
                     key_of_quantities_by_good_id,
@@ -285,11 +329,15 @@ class StateUpdateMessage(Message):
                 ) in self.quantities_by_good_id.items():
                     enforce(
                         isinstance(key_of_quantities_by_good_id, str),
-                        f"Invalid type for dictionary keys in content 'quantities_by_good_id'. Expected 'str'. Found '{type(key_of_quantities_by_good_id)}'.",
+                        "Invalid type for dictionary keys in content 'quantities_by_good_id'. Expected 'str'. Found '{}'.".format(
+                            type(key_of_quantities_by_good_id)
+                        ),
                     )
                     enforce(
                         type(value_of_quantities_by_good_id) is int,
-                        f"Invalid type for dictionary values in content 'quantities_by_good_id'. Expected 'int'. Found '{type(value_of_quantities_by_good_id)}'.",
+                        "Invalid type for dictionary values in content 'quantities_by_good_id'. Expected 'int'. Found '{}'.".format(
+                            type(value_of_quantities_by_good_id)
+                        ),
                     )
             elif self.performative == StateUpdateMessage.Performative.END:
                 expected_nb_of_contents = 0
@@ -297,14 +345,18 @@ class StateUpdateMessage(Message):
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
+                "Incorrect number of contents. Expected {}. Found {}".format(
+                    expected_nb_of_contents, actual_nb_of_contents
+                ),
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
+                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
+                        self.target
+                    ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

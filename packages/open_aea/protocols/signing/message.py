@@ -202,30 +202,42 @@ class SigningMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
+                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
+                    type(self.dialogue_reference)
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
+                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[0])
+                ),
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
+                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
+                    type(self.dialogue_reference[1])
+                ),
             )
             enforce(
                 type(self.message_id) is int,
-                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
+                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
+                    type(self.message_id)
+                ),
             )
             enforce(
                 type(self.target) is int,
-                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
+                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
+                    type(self.target)
+                ),
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, SigningMessage.Performative),
-                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
+                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
+                    self.valid_performatives, self.performative
+                ),
             )
 
             # Check correct contents
@@ -235,52 +247,70 @@ class SigningMessage(Message):
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.terms, CustomTerms),
-                    f"Invalid type for content 'terms'. Expected 'Terms'. Found '{type(self.terms)}'.",
+                    "Invalid type for content 'terms'. Expected 'Terms'. Found '{}'.".format(
+                        type(self.terms)
+                    ),
                 )
                 enforce(
                     isinstance(self.raw_transaction, CustomRawTransaction),
-                    f"Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{type(self.raw_transaction)}'.",
+                    "Invalid type for content 'raw_transaction'. Expected 'RawTransaction'. Found '{}'.".format(
+                        type(self.raw_transaction)
+                    ),
                 )
             elif self.performative == SigningMessage.Performative.SIGN_MESSAGE:
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.terms, CustomTerms),
-                    f"Invalid type for content 'terms'. Expected 'Terms'. Found '{type(self.terms)}'.",
+                    "Invalid type for content 'terms'. Expected 'Terms'. Found '{}'.".format(
+                        type(self.terms)
+                    ),
                 )
                 enforce(
                     isinstance(self.raw_message, CustomRawMessage),
-                    f"Invalid type for content 'raw_message'. Expected 'RawMessage'. Found '{type(self.raw_message)}'.",
+                    "Invalid type for content 'raw_message'. Expected 'RawMessage'. Found '{}'.".format(
+                        type(self.raw_message)
+                    ),
                 )
             elif self.performative == SigningMessage.Performative.SIGNED_TRANSACTION:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.signed_transaction, CustomSignedTransaction),
-                    f"Invalid type for content 'signed_transaction'. Expected 'SignedTransaction'. Found '{type(self.signed_transaction)}'.",
+                    "Invalid type for content 'signed_transaction'. Expected 'SignedTransaction'. Found '{}'.".format(
+                        type(self.signed_transaction)
+                    ),
                 )
             elif self.performative == SigningMessage.Performative.SIGNED_MESSAGE:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.signed_message, CustomSignedMessage),
-                    f"Invalid type for content 'signed_message'. Expected 'SignedMessage'. Found '{type(self.signed_message)}'.",
+                    "Invalid type for content 'signed_message'. Expected 'SignedMessage'. Found '{}'.".format(
+                        type(self.signed_message)
+                    ),
                 )
             elif self.performative == SigningMessage.Performative.ERROR:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.error_code, CustomErrorCode),
-                    f"Invalid type for content 'error_code'. Expected 'ErrorCode'. Found '{type(self.error_code)}'.",
+                    "Invalid type for content 'error_code'. Expected 'ErrorCode'. Found '{}'.".format(
+                        type(self.error_code)
+                    ),
                 )
 
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
+                "Incorrect number of contents. Expected {}. Found {}".format(
+                    expected_nb_of_contents, actual_nb_of_contents
+                ),
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
+                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
+                        self.target
+                    ),
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

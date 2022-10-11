@@ -210,7 +210,7 @@ Remove agent alias from project.
 
 ```python
 @property
-def {} -> Dict[str, Any]
+def dict() -> Dict[str, Any]
 ```
 
 Convert AgentAlias to dict.
