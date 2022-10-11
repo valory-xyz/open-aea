@@ -440,7 +440,7 @@ class Behaviour(AbstractBehaviour, ABC):
             )
 
     @classmethod
-    def parse_module(  # pylint: disable=arguments-differ
+    def parse_module(  # pylint: disable=arguments-differ,arguments-renamed
         cls,
         path: str,
         behaviour_configs: Dict[str, SkillComponentConfiguration],
@@ -499,7 +499,7 @@ class Handler(SkillComponent, ABC):
             )
 
     @classmethod
-    def parse_module(  # pylint: disable=arguments-differ
+    def parse_module(  # pylint: disable=arguments-differ,arguments-renamed
         cls,
         path: str,
         handler_configs: Dict[str, SkillComponentConfiguration],
@@ -575,7 +575,7 @@ class Model(SkillComponent, ABC):
             super_obj.teardown()  # type: ignore  # pylint: disable=no-member
 
     @classmethod
-    def parse_module(  # pylint: disable=arguments-differ
+    def parse_module(  # pylint: disable=arguments-differ,arguments-renamed
         cls,
         path: str,
         model_configs: Dict[str, SkillComponentConfiguration],
