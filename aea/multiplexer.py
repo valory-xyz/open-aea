@@ -381,7 +381,9 @@ class AsyncMultiplexer(Runnable, WithLogger):
 
     def _check_and_set_disconnected_state(self) -> None:
         """Check every connection is disconnected and set disconnected state."""
-        if all([c.is_disconnected for c in self.connections]):
+        if all(  # pylint: disable=use-a-generator
+            [c.is_disconnected for c in self.connections]
+        ):
             self.connection_status.set(ConnectionStates.disconnected)
         else:
             connections_left = [

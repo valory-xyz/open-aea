@@ -558,7 +558,7 @@ class Terms:
         )
         enforce(
             isinstance(self._amount_by_currency_id, dict)
-            and all(
+            and all(  # pylint: disable=use-a-generator
                 [
                     isinstance(key, str) and isinstance(value, int)
                     for key, value in self._amount_by_currency_id.items()
@@ -568,7 +568,7 @@ class Terms:
         )
         enforce(
             isinstance(self._quantities_by_good_id, dict)
-            and all(
+            and all(  # pylint: disable=use-a-generator
                 [
                     isinstance(key, str) and isinstance(value, int)
                     for key, value in self._quantities_by_good_id.items()
@@ -585,7 +585,7 @@ class Terms:
             self._fee_by_currency_id is None
             or (
                 isinstance(self._fee_by_currency_id, dict)
-                and all(
+                and all(  # pylint: disable=use-a-generator
                     [
                         isinstance(key, str) and isinstance(value, int) and value >= 0
                         for key, value in self._fee_by_currency_id.items()
@@ -595,7 +595,7 @@ class Terms:
             "fee must be None or Dict[str, int] with positive fees only.",
         )
         enforce(
-            all(
+            all(  # pylint: disable=use-a-generator
                 [
                     key in self._amount_by_currency_id
                     for key in self._fee_by_currency_id.keys()
@@ -604,16 +604,16 @@ class Terms:
             "Fee dictionary has keys which are not present in amount dictionary.",
         )
         if self._is_strict:
-            is_pos_amounts = all(
+            is_pos_amounts = all(  # pylint: disable=use-a-generator
                 [amount >= 0 for amount in self._amount_by_currency_id.values()]
             )
-            is_neg_amounts = all(
+            is_neg_amounts = all(  # pylint: disable=use-a-generator
                 [amount <= 0 for amount in self._amount_by_currency_id.values()]
             )
-            is_pos_quantities = all(
+            is_pos_quantities = all(  # pylint: disable=use-a-generator
                 [quantity >= 0 for quantity in self._quantities_by_good_id.values()]
             )
-            is_neg_quantities = all(
+            is_neg_quantities = all(  # pylint: disable=use-a-generator
                 [quantity <= 0 for quantity in self._quantities_by_good_id.values()]
             )
             enforce(

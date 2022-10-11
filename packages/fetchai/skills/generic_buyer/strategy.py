@@ -186,7 +186,7 @@ class GenericStrategy(Model):
         :return: whether it is acceptable
         """
         result = (
-            all(
+            all(  # pylint: disable=use-a-generator
                 [
                     key in proposal.values
                     for key in [

@@ -204,7 +204,9 @@ def find_all_configuration_files(packages_dir: Path) -> List:
     config_files = [
         path
         for path in packages_dir.glob("*/*/*/*.yaml")
-        if any([file in str(path) for file in CONFIG_FILE_NAMES])
+        if any(  # pylint: disable=use-a-generator
+            [file in str(path) for file in CONFIG_FILE_NAMES]
+        )
     ]
     return config_files
 

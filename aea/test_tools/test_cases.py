@@ -341,10 +341,10 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
                 "dependencies",
                 "required_ledgers",
             ]
-            result = all(
+            result = all(  # pylint: disable=use-a-generator
                 [key in allowed_diff_keys for key in content1_agentconfig.keys()]
             )
-            result = result and all(
+            result = result and all(  # pylint: disable=use-a-generator
                 [key in allowed_diff_keys for key in content2_agentconfig.keys()]
             )
             if not result:

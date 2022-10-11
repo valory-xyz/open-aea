@@ -406,7 +406,7 @@ def test_package_collection(
     failures = []
 
     for package_type, package_dir in available_packages:
-        if authors != () and not any(
+        if authors != () and not any(  # pylint: disable=use-a-generator
             [author in str(package_dir) for author in authors]
         ):
             continue
