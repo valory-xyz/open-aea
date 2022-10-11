@@ -630,7 +630,7 @@
 #                 return_value=(
 #                     set([PackageId("connection", PublicId("test", "test", "0.0.1"))]),
 #                     set(),
-#                     dict(),
+#                     {},
 #                 ),
 #             ), pytest.raises(
 #                 ClickException,

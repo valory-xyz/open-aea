@@ -54,7 +54,7 @@ class Context:
 
     def __init__(self, cwd: str, verbosity: str, registry_path: Optional[str]) -> None:
         """Init the context."""
-        self.config = dict()  # type: Dict
+        self.config = {}  # type: Dict
         self.cwd = cwd
         self.verbosity = verbosity
         self.clean_paths: List = []

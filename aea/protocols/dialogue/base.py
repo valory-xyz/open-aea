@@ -59,13 +59,13 @@ if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] 
         rename=False,
         module="aea.protocols.dialogues.base",
     )
-    DialogueMessage.__new__.__defaults__ = (dict(), None, None)  # pragma: no cover
+    DialogueMessage.__new__.__defaults__ = ({}, None, None)  # pragma: no cover
 else:
     DialogueMessage = namedtuple(  # pylint: disable=unexpected-keyword-arg
         "DialogueMessage",
         ["performative", "contents", "is_incoming", "target"],
         rename=False,
-        defaults=[dict(), None, None],
+        defaults=[{}, None, None],
         module="aea.protocols.dialogues.base",
     )
 
@@ -247,7 +247,7 @@ class Dialogue(
     INITIAL_PERFORMATIVES = frozenset()  # type: FrozenSet[Message.Performative]
     TERMINAL_PERFORMATIVES = frozenset()  # type: FrozenSet[Message.Performative]
     VALID_REPLIES = (
-        dict()
+        {}
     )  # type: Dict[Message.Performative, FrozenSet[Message.Performative]]
 
     __slots__ = (

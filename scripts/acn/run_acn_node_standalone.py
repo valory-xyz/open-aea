@@ -70,7 +70,7 @@ class AcnNodeConfig:
         :param log_file: path to log file, opened in append mode
         :param enable_checks: to check if provided configuration is valid
         """
-        self.config: Dict[str, str] = dict()
+        self.config: Dict[str, str] = {}
 
         self.config[AcnNodeConfig.KEY] = key
         self.config[AcnNodeConfig.URI] = uri
@@ -121,7 +121,7 @@ class AcnNodeConfig:
         with open(file_path, "r") as f:
             lines = f.readlines()
 
-        config = dict()
+        config = {}
         for nbr, line in enumerate(lines):
             parts = line.strip().split("=")
             if len(parts) != 2:

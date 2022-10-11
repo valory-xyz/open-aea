@@ -818,7 +818,7 @@ def test_component_configuration_check_fingerprint_different_fingerprints_vendor
     )
     package_dir = Path("path", "to", "dir")
     error_regex = (
-        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {dict()}\nActual: {dict(foo='bar')}\n"
+        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {{}}\nActual: {dict(foo='bar')}\n"
         + "Vendorized projects should not be tampered with, please revert any changes to protocol author/name:0.1.0"
     )
 
@@ -836,7 +836,7 @@ def test_component_configuration_check_fingerprint_different_fingerprints_no_ven
     )
     package_dir = Path("path", "to", "dir")
     error_regex = (
-        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {dict()}\nActual: {dict(foo='bar')}\n"
+        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {{}}\nActual: {dict(foo='bar')}\n"
         + "Please fingerprint the package before continuing: 'aea fingerprint protocol author/name:0.1.0"
     )
 
@@ -853,7 +853,7 @@ def test_agent_fingerprint_different_fingerprints():
     config.fingerprint = {}
     package_dir = Path("path", "to", "dir")
     error_regex = (
-        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {dict()}\nActual: {dict(foo='bar')}\n"
+        f"Fingerprints for package {re.escape(str(package_dir))} do not match:\nExpected: {{}}\nActual: {dict(foo='bar')}\n"
         + "Please fingerprint the package before continuing: 'aea fingerprint"
     )
 

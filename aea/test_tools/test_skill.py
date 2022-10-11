@@ -181,7 +181,7 @@ class BaseSkillTestCase:
                 if is_agent_to_agent_messages
                 else COUNTERPARTY_SKILL_ADDRESS
             )
-        message_attributes = dict()  # type: Dict[str, Any]
+        message_attributes = {}  # type: Dict[str, Any]
 
         default_dialogue_reference = Dialogues.new_self_initiated_dialogue_reference()
         dialogue_reference = (
@@ -488,9 +488,7 @@ class BaseSkillTestCase:
         _skill_config_overrides = cast(
             Optional[Dict[str, Any]], kwargs.pop("config_overrides", None)
         )
-        _dm_context_kwargs = cast(
-            Dict[str, Any], kwargs.pop("dm_context_kwargs", dict())
-        )
+        _dm_context_kwargs = cast(Dict[str, Any], kwargs.pop("dm_context_kwargs", {}))
 
         agent_context = AgentContext(
             identity=identity,
