@@ -137,7 +137,7 @@ class LogParser:
 
     def process(self) -> None:
         """Process the log"""
-        with open(self.log_file_path, "r") as log_file:
+        with open(self.log_file_path, "r", encoding="utf-8") as log_file:
             content = log_file.readlines()
 
             # Guess log type
@@ -291,7 +291,7 @@ class LogParser:
 def extract_gc_objects_set(log_file_path):
     """Extract a set of all objects that appeared in the garbage collector count section"""
     objs = set()
-    with open(log_file_path, "r") as log:
+    with open(log_file_path, "r", encoding="utf-8") as log:
         for line in log.readlines():
             match = re.match(r".*\* (?P<name>.*) \(gc\):  (?P<value>\d+).*", line)
             if match:

@@ -88,7 +88,7 @@ BenchmarkCase = namedtuple("BenchmarkCase", ["command", "params", "name"])
 def run(file: Optional[str]):
     """Run benchmarks."""
     if file is not None:
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             cases = _make_cases_from_dicts(yaml_load_all(f))
     else:
         cases = _enlist_cases()
@@ -147,7 +147,7 @@ def make_config(file: Optional[str]):
     configs = [make_section(case) for case in _enlist_cases().values()]
 
     if file is not None:
-        with open(file, "w") as f:
+        with open(file, "w", encoding="utf-8") as f:
             yaml_dump_all(configs, stream=f)
     else:
         yaml_dump_all(

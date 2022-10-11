@@ -66,7 +66,7 @@ def extract_code_blocks(filepath, filter_=None):
 def extract_python_code(filepath):
     """Removes the license part from the scripts"""
     python_str = ""
-    with open(filepath, "r") as python_file:
+    with open(filepath, "r", encoding="utf-8") as python_file:
         read_python_file = python_file.readlines()
     for i in range(21, len(read_python_file)):
         python_str += read_python_file[i]

@@ -652,7 +652,7 @@ class TestConfigNestedGetSet:
     def load_agent_config(self) -> AgentConfig:
         """Load agent config for current dir."""
         agent_loader = ConfigLoader.from_configuration_type(PackageType.AGENT)
-        with open(DEFAULT_AEA_CONFIG_FILE, "r") as fp:
+        with open(DEFAULT_AEA_CONFIG_FILE, "r", encoding="utf-8") as fp:
             agent_config = agent_loader.load(fp)
         return agent_config
 
@@ -661,7 +661,7 @@ class TestConfigNestedGetSet:
         package_type, package_name, *path = self.PATH.split(".")
         file_path = Path(f"{package_type}") / package_name / f"{package_type[:-1]}.yaml"
 
-        with open(file_path, "r") as fp:
+        with open(file_path, "r", encoding="utf-8") as fp:
             data = yaml_load(fp)
 
         value = data

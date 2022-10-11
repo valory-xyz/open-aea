@@ -169,7 +169,7 @@ class Crypto(Generic[EntityClass], ABC):
         :param password: the password to encrypt/decrypt the private key.
         """
         if password is None:
-            with open(private_key_file, "wb") as fpb:
+            with open(private_key_file, "wb", encoding="utf-8") as fpb:
                 fpb.write(self.private_key.encode("utf-8"))
         else:
             with open_file(private_key_file, "w") as fp:

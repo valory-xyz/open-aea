@@ -73,6 +73,6 @@ class TestAgentVsAEA(AEATestCaseManyFlaky):
 
         message_text = b"other_agent,my_agent,fetchai/default:1.0.0,\x12\r\x08\x01*\t*\x07\n\x05hello,"
         path = os.path.join(self.t, "output_file")
-        with open(path, "rb") as file:
+        with open(path, "rb", encoding="utf-8") as file:
             msg = file.read()
         assert msg == message_text, "The messages must be identical."

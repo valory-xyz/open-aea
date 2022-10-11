@@ -103,7 +103,7 @@ class AcnNodeConfig:
 
     def dump(self, file_path: str) -> None:
         """Write current configuration to file."""
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             for key, value in self.config.items():
                 f.write(f"{key}={value}\n")
 
@@ -118,7 +118,7 @@ class AcnNodeConfig:
         """
 
         lines: List[str] = list()
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         config = {}
@@ -225,7 +225,10 @@ class AcnNodeStandalone:
                 bufsize=1,
             )
             with open(
-                self.config.config[AcnNodeConfig.ACN_LOG_FILE], "ab", 1
+                self.config.config[AcnNodeConfig.ACN_LOG_FILE],
+                "ab",
+                1,
+                encoding="utf-8",
             ) as log_file:
                 for line in self._proc.stdout:
                     sys.stdout.buffer.write(line)
@@ -368,7 +371,7 @@ if __name__ == "__main__":
         node_config = AcnNodeConfig.from_file(run_args.config_from_file)
 
     else:
-        with open(run_args.key, "r") as file:
+        with open(run_args.key, "r", encoding="utf-8") as file:
             run_key = file.read().strip()
         node_config = AcnNodeConfig(
             run_key,

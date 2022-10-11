@@ -473,7 +473,7 @@ def run(ledger_id: str, running_time: float) -> List[Tuple[str, Union[int, float
                     "gas_price_api_key": GAS_PRICE_API_KEY,
                 }
             }
-            with open(private_key_path, "w") as f:
+            with open(private_key_path, "w", encoding="utf-8") as f:
                 f.write(FUNDED_ETH_PRIVATE_KEY_1)
             private_keys = {"ethereum": private_key_path}
         else:

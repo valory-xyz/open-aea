@@ -253,15 +253,15 @@ class TestGenericCases(AEATestCaseEmpty):
         file1 = "file1.txt"
         file2 = "file2.txt"
 
-        with open(file1, "w") as f:
+        with open(file1, "w", encoding="utf-8") as f:
             f.write("hi")
 
-        with open(file2, "w") as f:
+        with open(file2, "w", encoding="utf-8") as f:
             f.write("world")
 
         self.replace_file_content(Path(file1), Path(file2))
 
-        with open(file2, "r") as f:
+        with open(file2, "r", encoding="utf-8") as f:
             assert f.read() == "hi"
 
 

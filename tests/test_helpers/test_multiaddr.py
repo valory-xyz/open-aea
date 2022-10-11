@@ -60,7 +60,7 @@ def test_multiaddr_correctness():
     """Test multiaddress correctness."""
     tmpdir = tempfile.mkdtemp()
     key_file = tmpdir + "/key"
-    with open(key_file, "w+") as k:
+    with open(key_file, "w+", encoding="utf-8") as k:
         k.write(PRIV_KEY)
 
     key = make_crypto(_FETCHAI_IDENTIFIER, private_key_path=key_file)

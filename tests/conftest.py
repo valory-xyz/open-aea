@@ -344,7 +344,9 @@ def match_files(fname1: str, fname2: str) -> Tuple[bool, str]:
 
     :return: whether files match (True) or not (False) and a string of their difference ("" if they match)
     """
-    with open(fname1, "r") as f1, open(fname2, "r") as f2:
+    with open(fname1, "r", encoding="utf-8") as f1, open(
+        fname2, "r", encoding="utf-8"
+    ) as f2:
         difference = set(f1).difference(f2)
     are_identical = difference == set()
 
@@ -357,7 +359,7 @@ def match_files(fname1: str, fname2: str) -> Tuple[bool, str]:
 def find_difference(fname1: str, fname2: str) -> str:
     """Find the difference between two text files."""
     diff = ""
-    with open(fname1) as f1, open(fname2) as f2:
+    with open(fname1, encoding="utf-8") as f1, open(fname2, encoding="utf-8") as f2:
         differ = difflib.Differ()
 
         for line in differ.compare(f1.readlines(), f2.readlines()):

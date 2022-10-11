@@ -154,7 +154,7 @@ def get_hashes_from_last_release() -> Dict[str, str]:
     )
     svn_call.wait()
     hashes = {}  # Dict[str, str]
-    with open(HASHES_CSV) as f:
+    with open(HASHES_CSV, encoding="utf-8") as f:
         for line in f:
             split = line.split(",")
             hashes[split[0]] = split[1].rstrip()
@@ -165,7 +165,7 @@ def get_hashes_from_last_release() -> Dict[str, str]:
 def get_hashes_from_current_release() -> Dict[str, str]:
     """Get hashes from last release."""
     hashes = {}  # Dict[str, str]
-    with open(os.path.join("packages", HASHES_CSV)) as f:
+    with open(os.path.join("packages", HASHES_CSV), encoding="utf-8") as f:
         for line in f:
             split = line.split(",")
             hashes[split[0]] = split[1].rstrip()

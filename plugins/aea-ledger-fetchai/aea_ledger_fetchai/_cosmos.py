@@ -420,7 +420,7 @@ class CosmosHelper(Helper):
         :param file_path: the file path to the interface
         :return: the interface
         """
-        with open(file_path, "rb") as interface_file_cosmos:
+        with open(file_path, "rb", encoding="utf-8") as interface_file_cosmos:
             contract_interface = {
                 _BYTECODE: str(
                     base64.b64encode(

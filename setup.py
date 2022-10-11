@@ -79,12 +79,12 @@ if os.name == "nt" or os.getenv("WIN_BUILD_WHEEL", None) == "1":
 
 here = os.path.abspath(os.path.dirname(__file__))
 about: Dict[str, str] = {}
-with open(os.path.join(here, PACKAGE_NAME, "__version__.py"), "r") as f:
+with open(os.path.join(here, PACKAGE_NAME, "__version__.py"), "r", encoding="utf-8") as f:
     exec(f.read(), about)
 
 
 def parse_readme():
-    with open("README.md", "r") as f:
+    with open("README.md", "r", encoding="utf-8") as f:
         readme = f.read()
 
     # replace relative links of images

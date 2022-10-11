@@ -59,7 +59,7 @@ class TestThreadLauncherMode(AEATestCaseMany):
             Path(cls.t, cls.failing_agent, "skills", "exception"),
         )
         config_path = Path(cls.t, cls.failing_agent, DEFAULT_AEA_CONFIG_FILE)
-        with open(config_path) as fp:
+        with open(config_path, encoding="utf-8") as fp:
             config = yaml.safe_load(fp)
         config.setdefault("skills", []).append("fetchai/exception:0.1.0")
         yaml.safe_dump(config, open(config_path, "w"))
@@ -76,10 +76,10 @@ class TestThreadLauncherMode(AEATestCaseMany):
     def set_runtime_mode_to_async(cls, agent_name: str) -> None:
         """Set runtime mode of the agent to async."""
         config_path = Path(cls.t, agent_name, DEFAULT_AEA_CONFIG_FILE)
-        with open(config_path) as fp:
+        with open(config_path, encoding="utf-8") as fp:
             config = yaml.safe_load(fp)
         config.setdefault("runtime_mode", "async")
-        with open(config_path, "w") as fp:
+        with open(config_path, "w", encoding="utf-8") as fp:
             yaml.safe_dump(config, fp)
 
     def test_start_stop(self, capfd, caplog) -> None:

@@ -52,7 +52,7 @@ def libp2p_log_on_failure(fn: Callable) -> Callable:
             for log_file in getattr(self, "log_files", []):
                 print(f"libp2p log file ======================= {log_file}")
                 try:
-                    with open(log_file, "r") as f:
+                    with open(log_file, "r", encoding="utf-8") as f:
                         print(f.read())
                 except FileNotFoundError:
                     print("FileNotFoundError")

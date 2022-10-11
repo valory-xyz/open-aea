@@ -66,7 +66,7 @@ class TestSlowQueue(BaseP2PLibp2pTest):
             await self.conn._node_client.send_envelope(envelope)
 
         def _check():
-            with open(self.conn.node.log_file) as f:
+            with open(self.conn.node.log_file, encoding="utf-8") as f:
                 return "while sending slow envelope:" in f.read()
 
         wait_for_condition(_check, timeout=30, period=1)

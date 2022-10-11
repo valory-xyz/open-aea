@@ -80,7 +80,7 @@ def check_header_in_file(header: str, file: Path) -> None:
     :param header: the header
     :param file: the file path
     """
-    with open(file) as f:
+    with open(file, encoding="utf-8") as f:
         s = f.read()
         if header not in s:
             raise ValueError(f"Header={header} not found in file={str(file)}!")

@@ -414,7 +414,9 @@ class Libp2pNode:
 
         config += f"AEA_P2P_MAILBOX_URI={self.mailbox_uri}\n"
 
-        with open(self.env_file, "w") as env_file:  # overwrite if exists
+        with open(
+            self.env_file, "w", encoding="utf-8"
+        ) as env_file:  # overwrite if exists
             env_file.write(config)
 
         return config
@@ -493,7 +495,7 @@ class Libp2pNode:
             self.logger.error(f"Couldn't connect to libp2p process: {err_msg}")
             self.logger.error(f"Libp2p process configuration:\n{env_file_data.strip()}")
             if err_msg == "":
-                with open(self.log_file, "r") as f:
+                with open(self.log_file, "r", encoding="utf-8") as f:
                     self.logger.error(
                         f"Libp2p process log file {self.log_file}:\n{f.read()}"
                     )
@@ -544,7 +546,7 @@ class Libp2pNode:
 
         multiaddrs: List[MultiAddr] = []
 
-        with open(self.log_file, "r") as f:
+        with open(self.log_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         found = False
@@ -574,7 +576,7 @@ class Libp2pNode:
         error_msg = ""
         panic_msg = ""
 
-        with open(self.log_file, "r") as f:
+        with open(self.log_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         for line in lines:  # pragma: nocover

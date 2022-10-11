@@ -220,5 +220,7 @@ class Context:
 
     def dump_agent_config(self) -> None:
         """Dump the current agent configuration."""
-        with open(os.path.join(self.cwd, DEFAULT_AEA_CONFIG_FILE), "w") as f:
+        with open(
+            os.path.join(self.cwd, DEFAULT_AEA_CONFIG_FILE), "w", encoding="utf-8"
+        ) as f:
             self.agent_loader.dump(self.agent_config, f)

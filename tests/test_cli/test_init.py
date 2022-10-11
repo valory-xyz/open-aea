@@ -68,7 +68,7 @@ class TestDoInit:
 
         :return: dict
         """
-        with open(self.cli_config_file, "r") as f:
+        with open(self.cli_config_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         return data
 

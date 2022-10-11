@@ -29,7 +29,7 @@ if args.o:
     binary_target = args.o
     # only for testing
     if binary_target.endswith('.test') or binary_target.endswith('_test_go'):
-        with open(os.devnull, 'wb') as DEVNULL:
+        with open(os.devnull, 'wb', encoding="utf-8") as DEVNULL:
             try:
                 subprocess.check_call(["printf '\x07' | dd of=%s bs=1 seek=160 count=1 conv=notrunc" % binary_target], shell=True, stdout=DEVNULL, stderr=DEVNULL)
             except subprocess.CalledProcessError as e:

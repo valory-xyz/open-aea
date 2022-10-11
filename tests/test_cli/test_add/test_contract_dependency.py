@@ -47,7 +47,9 @@ class TestCreate:
     def _load_agent_config(self) -> AgentConfig:
         """Load agent config for current dir."""
         agent_loader = ConfigLoader.from_configuration_type(PackageType.AGENT)
-        with open(str(self.agent_dir / DEFAULT_AEA_CONFIG_FILE), "r") as fp:
+        with open(
+            str(self.agent_dir / DEFAULT_AEA_CONFIG_FILE), "r", encoding="utf-8"
+        ) as fp:
             agent_config = agent_loader.load(fp)
         return agent_config
 

@@ -95,7 +95,7 @@ def to_csv(data: Dict[str, str], path: Path) -> None:
     """Outputs a dictionary to CSV."""
     try:
         ordered = collections.OrderedDict(sorted(data.items()))
-        with open(path, "w", newline="") as csv_file:
+        with open(path, "w", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
             writer.writerows(ordered.items())
     except IOError:
@@ -105,7 +105,7 @@ def to_csv(data: Dict[str, str], path: Path) -> None:
 def from_csv(path: Path) -> Dict[str, str]:
     """Load a CSV into a dictionary."""
     result = collections.OrderedDict({})  # type: Dict[str, str]
-    with open(path, "r") as csv_file:
+    with open(path, "r", encoding="utf-8") as csv_file:
         reader = csv.reader(csv_file)
         for row in reader:
             if len(row) != 2:

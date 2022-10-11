@@ -431,7 +431,7 @@ def test_ensure_dir():
         ensure_dir(full_path)
         assert os.path.exists(full_path)
         file_path = os.path.join(full_path, "file_name")
-        with open(file_path, "w"):
+        with open(file_path, "w", encoding="utf-8"):
             pass
 
         with pytest.raises(AEAEnforceError):

@@ -527,7 +527,7 @@ def test_run_unknown_private_key():
         f.write(whole_file)
 
     # Private key needs to exist otherwise doesn't get to code path we are interested in testing
-    with open(FETCHAI_PRIVATE_KEY_FILE, "w") as f:
+    with open(FETCHAI_PRIVATE_KEY_FILE, "w", encoding="utf-8") as f:
         f.write("3801d3703a1fcef18f6bf393fba89245f36b175f4989d8d6e026300dad21e05d")
 
     result = runner.invoke(
@@ -591,7 +591,7 @@ def test_run_fet_private_key_config():
     # close the file
     file.close()
 
-    with open("aea-config.yaml", "w") as f:
+    with open("aea-config.yaml", "w", encoding="utf-8") as f:
         f.write(whole_file)
 
     error_msg = ""
@@ -651,7 +651,7 @@ def test_run_ethereum_private_key_config():
     # close the file
     file.close()
 
-    with open("aea-config.yaml", "w") as f:
+    with open("aea-config.yaml", "w", encoding="utf-8") as f:
         f.write(whole_file)
 
     error_msg = ""
