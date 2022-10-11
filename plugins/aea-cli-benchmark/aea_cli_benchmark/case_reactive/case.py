@@ -46,8 +46,8 @@ class TestConnectionMixIn:
     def __init__(self, *args: Any, **kwargs: Any):
         """Init connection."""
         super().__init__(*args, **kwargs)  # type: ignore
-        self.sends: List[float] = list()
-        self.recvs: List[float] = list()
+        self.sends: List[float] = []
+        self.recvs: List[float] = []
 
     async def send(self, envelope: Envelope) -> None:
         """Handle incoming envelope."""

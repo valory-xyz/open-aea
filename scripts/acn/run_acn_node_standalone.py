@@ -117,7 +117,7 @@ class AcnNodeConfig:
         :return: newly created AcnNodeConfig object, if successful
         """
 
-        lines: List[str] = list()
+        lines: List[str] = []
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 

@@ -54,7 +54,7 @@ LIBP2P_NODE_LOG_FILE = "libp2p_node.log"
 
 LIBP2P_NODE_ENV_FILE = ".env.libp2p"
 
-LIBP2P_NODE_CLARGS = list()  # type: List[str]
+LIBP2P_NODE_CLARGS = []  # type: List[str]
 
 
 PIPE_CONN_TIMEOUT = 10.0
