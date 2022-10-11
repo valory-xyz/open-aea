@@ -263,7 +263,7 @@ class AsyncAgentLoop(BaseAgentLoop):
         """
         self._exceptions.append(exc)
 
-    def _execution_control(
+    def _execution_control(  # pylint: disable=inconsistent-return-statements
         self,
         fn: Callable,
         args: Optional[Sequence] = None,
