@@ -1837,9 +1837,8 @@ class Dialogues:
         """
         complete_dialogue_reference = message.dialogue_reference
         enforce(
-            complete_dialogue_reference[0] != Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
-            and complete_dialogue_reference[1]
-            != Dialogue.UNASSIGNED_DIALOGUE_REFERENCE,
+            Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
+            not in complete_dialogue_reference[:2],
             "Only complete dialogue references allowed.",
         )
 
