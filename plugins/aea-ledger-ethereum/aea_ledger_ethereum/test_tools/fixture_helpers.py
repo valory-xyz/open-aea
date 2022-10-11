@@ -46,7 +46,10 @@ GANACHE_CONFIGURATION = dict(
         (FUNDED_ETH_PRIVATE_KEY_1, DEFAULT_AMOUNT),
         (FUNDED_ETH_PRIVATE_KEY_2, DEFAULT_AMOUNT),
         (FUNDED_ETH_PRIVATE_KEY_3, DEFAULT_AMOUNT),
-        (Path(ETHEREUM_PRIVATE_KEY_PATH).read_text().strip(), DEFAULT_AMOUNT),
+        (
+            Path(ETHEREUM_PRIVATE_KEY_PATH).read_text(encoding="utf-8").strip(),
+            DEFAULT_AMOUNT,
+        ),
     ],
 )
 

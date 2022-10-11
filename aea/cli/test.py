@@ -541,7 +541,9 @@ class CoveragercFile:
     ) -> Path:
         """Enter context."""
 
-        self.file.write_text(COVERAGERC_CONFIG.format(root_dir=self.root_dir))
+        self.file.write_text(
+            COVERAGERC_CONFIG.format(root_dir=self.root_dir), encoding="utf-8"
+        )
         return self.file
 
     def __exit__(self, *args: Any, **kwargs: Any) -> None:

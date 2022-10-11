@@ -459,7 +459,7 @@ class Libp2pNode:
         if self._loop is None:
             self._loop = asyncio.get_event_loop()
 
-        self._log_file_desc = open(self.log_file, "a", 1)
+        self._log_file_desc = open(self.log_file, "a", 1, encoding="utf-8")
 
         # tcp socket on every platform
         self.pipe = TCPSocketChannel(logger=self.logger)
@@ -501,7 +501,7 @@ class Libp2pNode:
                         f"Libp2p process log file {self.log_file}:\n{f.read()}"
                     )
             else:  # pragma: nocover
-                log_data = Path(self.log_file).read_text()
+                log_data = Path(self.log_file).read_text(encoding="utf-8")
                 self.logger.error(f"Failure to connect to Libp2pNode:\n{log_data}")
 
             await self.stop()

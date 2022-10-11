@@ -588,7 +588,7 @@ def bump_version_in_yaml(
     loader = ConfigLoader.from_configuration_type(type_[:-1])
     config = loader.load(configuration_file_path.open())
     config.version = version
-    loader.dump(config, open(configuration_file_path, "w"))
+    loader.dump(config, open(configuration_file_path, "w", encoding="utf-8"))
 
 
 class Updater:

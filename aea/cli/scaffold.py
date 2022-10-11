@@ -270,7 +270,12 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
                 continue
             py_file = Path(file_path)
             py_file.write_text(
-                re.sub(SCAFFOLD_PUBLIC_ID, str(new_public_id), py_file.read_text())
+                re.sub(
+                    SCAFFOLD_PUBLIC_ID,
+                    str(new_public_id),
+                    py_file.read_text(encoding="utf-8"),
+                ),
+                encoding="utf-8",
             )
 
         # fingerprint item.
@@ -402,7 +407,7 @@ def add_contract_abi(ctx: Context, contract_name: str, contract_abi_path: Path) 
     # Load configuration (contract.yaml)
     config_file = Path(contract_dir / DEFAULT_CONTRACT_CONFIG_FILE)
     config_loader = ConfigLoader.from_configuration_type(PackageType.CONTRACT)
-    contract_config = config_loader.load(config_file.open("r"))
+    contract_config = config_loader.load(config_file.open("r", encoding="utf-8"))
 
     # Add ABI to the configuration
     # Can't use contract_config.update() here. Since contract_interface_paths is empty during instantiation,
@@ -412,7 +417,7 @@ def add_contract_abi(ctx: Context, contract_name: str, contract_abi_path: Path) 
     }
 
     # Write the new configuration
-    config_loader.dump(contract_config, config_file.open("w+"))
+    config_loader.dump(contract_config, config_file.open("w+", encoding="utf-8"))
 
     # Fingerprint again
     new_public_id = PublicId(author_name, contract_name, DEFAULT_VERSION)

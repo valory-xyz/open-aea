@@ -210,7 +210,7 @@ def _profiling_context(period: int) -> Generator:
         import os  # pylint: disable=import-outside-toplevel
         import sys  # pylint: disable=import-outside-toplevel
 
-        sys.stderr = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w", encoding="utf-8")
 
 
 def print_table(rows: Sequence) -> None:
