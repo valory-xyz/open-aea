@@ -169,18 +169,42 @@ class LogParser:
                     match = re.match(tracker_data["regex"], line_data)
                     if match:
                         if tracker_data["type"] == "event":
-                            self.line_trackers[tracker_name]["var_data"]["event"][
+                            self.line_trackers[  # pylint: disable=unnecessary-dict-index-lookup
+                                tracker_name
+                            ][
+                                "var_data"
+                            ][
+                                "event"
+                            ][
                                 "times"
-                            ].append(line_time)
+                            ].append(
+                                line_time
+                            )
                             continue
 
                         for var_name, var_value in match.groupdict().items():
-                            self.line_trackers[tracker_name]["var_data"][var_name][
+                            self.line_trackers[  # pylint: disable=unnecessary-dict-index-lookup
+                                tracker_name
+                            ][
+                                "var_data"
+                            ][
+                                var_name
+                            ][
                                 "times"
-                            ].append(line_time)
-                            self.line_trackers[tracker_name]["var_data"][var_name][
+                            ].append(
+                                line_time
+                            )
+                            self.line_trackers[  # pylint: disable=unnecessary-dict-index-lookup
+                                tracker_name
+                            ][
+                                "var_data"
+                            ][
+                                var_name
+                            ][
                                 "values"
-                            ].append(float(var_value))
+                            ].append(
+                                float(var_value)
+                            )
                         continue
 
             if self.time_format == TimeFormat.RELATIVE:
@@ -190,9 +214,17 @@ class LogParser:
         """Convert time variables to time from the first time in the log"""
         for tracker_name, tracker_data in self.line_trackers.items():
             for var_name in tracker_data["var_data"]:
-                self.line_trackers[tracker_name]["var_data"][var_name]["times"] = [
+                self.line_trackers[  # pylint: disable=unnecessary-dict-index-lookup
+                    tracker_name
+                ]["var_data"][var_name]["times"] = [
                     (t - self.time_origin).seconds / 60
-                    for t in self.line_trackers[tracker_name]["var_data"][var_name][
+                    for t in self.line_trackers[  # pylint: disable=unnecessary-dict-index-lookup
+                        tracker_name
+                    ][
+                        "var_data"
+                    ][
+                        var_name
+                    ][
                         "times"
                     ]
                 ]
