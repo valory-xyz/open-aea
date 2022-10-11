@@ -29,11 +29,11 @@ Add the http server connection package:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection fetchai/http_server:0.22.0:bafybeicxapvwbbac3n7voyemgubpylyssdvyqyuut74jzo4zfmpg7uxmr4 --remote
+aea add connection fetchai/http_server:0.22.0:bafybeidp77lg7ksotkbj3naimkix5fbgyw4qteuftwxmlla3yshtf2m3tm --remote
 aea push connection fetchai/http_server --local
-aea add protocol fetchai/default:1.0.0:bafybeihbqto4eagboyeff4ujxvqsjoyxmd5fegzg4pohiy6dhspbpdx6si --remote
+aea add protocol fetchai/default:1.0.0:bafybeidxskwqtj5nhmg5opkmn2u5xlcspvwbge6jtcqdgc76qhusgnm7xm --remote
 aea push protocol fetchai/default --local
-aea add protocol valory/http:1.0.0:bafybeidg7paxhexl55jbnf4aremzwzxfenxnjd5typgnbn6qll264vdfwu --remote
+aea add protocol valory/http:1.0.0:bafybeigmenlxpyxwjmxhqjxftgnpvgbh76ocqcihrzsy7jtgcdj4hupzc4 --remote
 aea push protocol valory/http --local
 cd ..
 aea delete my_aea
