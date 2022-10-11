@@ -265,16 +265,12 @@ class ERC1155Contract(Contract):
                 2,
             ]:
                 raise ValueError(
-                    "The token type must be 1 or 2. Found type={} for token_id={}".format(
-                        decoded_type, token_id
-                    )
+                    f"The token type must be 1 or 2. Found type={decoded_type} for token_id={token_id}"
                 )
             if decoded_type == 1:
                 if mint_quantity != 1:
                     raise ValueError(
-                        "Cannot mint NFT (token_id={}) with mint_quantity more than 1 (found={})".format(
-                            token_id, mint_quantity
-                        )
+                        f"Cannot mint NFT (token_id={token_id}) with mint_quantity more than 1 (found={mint_quantity})"
                     )
 
     @staticmethod

@@ -238,14 +238,10 @@ class ProxyEnv(gym.Env):
                 ):
                     return gym_msg
                 raise ValueError(
-                    "Unexpected performative or no step_id: {}".format(
-                        gym_msg.performative
-                    )
+                    f"Unexpected performative or no step_id: {gym_msg.performative}"
                 )
             raise ValueError(
-                "Unknown protocol_specification_id: {}".format(
-                    envelope.protocol_specification_id
-                )
+                f"Unknown protocol_specification_id: {envelope.protocol_specification_id}"
             )
         raise ValueError("Missing envelope.")
 
@@ -276,12 +272,10 @@ class ProxyEnv(gym.Env):
 
                     return None
                 raise ValueError(
-                    "Unexpected performative or no step_id: {}".format(
-                        gym_msg.performative
-                    )
+                    f"Unexpected performative or no step_id: {gym_msg.performative}"
                 )
             raise ValueError(
-                "Unknown protocol_id: {}".format(envelope.protocol_specification_id)
+                f"Unknown protocol_id: {envelope.protocol_specification_id}"
             )
         raise ValueError("Missing envelope.")
 

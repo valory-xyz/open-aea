@@ -78,9 +78,7 @@ def _try_generate_wealth(
         faucet_api_cls = make_faucet_api_cls(type_)
         testnet = faucet_api_cls.network_name
         click.echo(
-            "Requesting funds for address {} on test network '{}'".format(
-                address, testnet
-            )
+            f"Requesting funds for address {address} on test network '{testnet}'"
         )
         try_generate_testnet_wealth(type_, address, url, sync)
 

@@ -116,7 +116,7 @@ def _validate_config(ctx: Context) -> None:
     try:
         validate_item_config(AGENT, Path(ctx.cwd))
     except AEAConfigException as e:  # pragma: no cover
-        raise click.ClickException("Failed to validate agent config. {}".format(str(e)))
+        raise click.ClickException(f"Failed to validate agent config. {str(e)}")
 
 
 def _validate_pkp(private_key_paths: CRUDCollection) -> None:

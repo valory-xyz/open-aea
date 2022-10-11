@@ -64,9 +64,9 @@ def _pct_specification_type_to_python_type(specification_type: str) -> str:
     element_type = _get_sub_types_of_compositional_types(specification_type)[0]
     element_type_in_python = _specification_type_to_python_type(element_type)
     if specification_type.startswith("pt:set"):
-        python_type = "FrozenSet[{}]".format(element_type_in_python)
+        python_type = f"FrozenSet[{element_type_in_python}]"
     else:
-        python_type = "Tuple[{}, ...]".format(element_type_in_python)
+        python_type = f"Tuple[{element_type_in_python}, ...]"
     return python_type
 
 
@@ -80,9 +80,7 @@ def _pmt_specification_type_to_python_type(specification_type: str) -> str:
     element_types = _get_sub_types_of_compositional_types(specification_type)
     element1_type_in_python = _specification_type_to_python_type(element_types[0])
     element2_type_in_python = _specification_type_to_python_type(element_types[1])
-    python_type = "Dict[{}, {}]".format(
-        element1_type_in_python, element2_type_in_python
-    )
+    python_type = f"Dict[{element1_type_in_python}, {element2_type_in_python}]"
     return python_type
 
 
@@ -96,7 +94,7 @@ def _mt_specification_type_to_python_type(specification_type: str) -> str:
     sub_types = _get_sub_types_of_compositional_types(specification_type)
     python_type = "Union["
     for sub_type in sub_types:
-        python_type += "{}, ".format(_specification_type_to_python_type(sub_type))
+        python_type += f"{_specification_type_to_python_type(sub_type)}, "
     python_type = python_type[:-2]
     python_type += "]"
     return python_type
@@ -111,7 +109,7 @@ def _optional_specification_type_to_python_type(specification_type: str) -> str:
     """
     element_type = _get_sub_types_of_compositional_types(specification_type)[0]
     element_type_in_python = _specification_type_to_python_type(element_type)
-    python_type = "Optional[{}]".format(element_type_in_python)
+    python_type = f"Optional[{element_type_in_python}]"
     return python_type
 
 
@@ -138,7 +136,7 @@ def _specification_type_to_python_type(specification_type: str) -> str:
         python_type = _pmt_specification_type_to_python_type(specification_type)
     else:
         raise ProtocolSpecificationParseError(
-            "Unsupported type: '{}'".format(specification_type)
+            f"Unsupported type: '{specification_type}'"
         )
     return python_type
 

@@ -351,9 +351,7 @@ class TestScaffoldProtocolFailsWhenProtocolAlreadyExists:
 
         The expected message is: 'A protocol with name '{protocol_name}' already exists. Aborting...'
         """
-        s = "A protocol with name '{}' already exists. Aborting...".format(
-            self.resource_name
-        )
+        s = f"A protocol with name '{self.resource_name}' already exists. Aborting..."
         assert s in self.result.exception.message
 
     def test_resource_directory_exists(self):

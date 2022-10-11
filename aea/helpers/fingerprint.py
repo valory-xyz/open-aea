@@ -118,8 +118,6 @@ def check_fingerprint(configuration: PackageConfiguration) -> bool:
     result = expected_fingerprint == actual_fingerprint
     if not result:
         print(
-            "Fingerprints do not match for {} in {}".format(
-                configuration.name, configuration.directory
-            )
+            f"Fingerprints do not match for {configuration.name} in {configuration.directory}"
         )
     return result

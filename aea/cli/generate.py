@@ -106,7 +106,7 @@ def _generate_protocol(ctx: Context, protocol_specification_path: str) -> None:
 
     # helpers
     language = ctx.config.get("language")
-    existing_protocol_ids_list = getattr(ctx.agent_config, "{}s".format(PROTOCOL))
+    existing_protocol_ids_list = getattr(ctx.agent_config, f"{PROTOCOL}s")
     existing_protocol_name_list = [
         public_id.name for public_id in existing_protocol_ids_list
     ]
@@ -131,9 +131,7 @@ def _generate_protocol(ctx: Context, protocol_specification_path: str) -> None:
     ctx.clean_paths.append(protocol_directory_path)
     agent_name = ctx.agent_config.agent_name
     click.echo(
-        "Generating {} '{}' and adding it to the agent '{}'...".format(
-            PROTOCOL, protocol_spec.name, agent_name
-        )
+        f"Generating {PROTOCOL} '{protocol_spec.name}' and adding it to the agent '{agent_name}'..."
     )
 
     if language == PROTOCOL_LANGUAGE_PYTHON:
@@ -161,9 +159,7 @@ def _generate_full_mode(
             click.echo(warning_message)
 
         # Add the item to the configurations
-        logger.debug(
-            "Registering the {} into {}".format(PROTOCOL, DEFAULT_AEA_CONFIG_FILE)
-        )
+        logger.debug(f"Registering the {PROTOCOL} into {DEFAULT_AEA_CONFIG_FILE}")
         existing_id_list.add(
             PublicId(protocol_spec.author, protocol_spec.name, protocol_spec.version)
         )
@@ -173,9 +169,7 @@ def _generate_full_mode(
         )
     except FileExistsError:
         raise click.ClickException(  # pragma: no cover
-            "A {} with this name already exists. Please choose a different name and try again.".format(
-                PROTOCOL
-            )
+            f"A {PROTOCOL} with this name already exists. Please choose a different name and try again."
         )
     except Exception as e:
         raise click.ClickException(

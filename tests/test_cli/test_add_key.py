@@ -284,9 +284,7 @@ def test_add_key_fails_bad_key():
             assert result.exit_code == 1
             error_message = "Invalid length of private key, received 0, expected 32"
             mock_logger_error.assert_called_with(
-                "This is not a valid private key file: '{}'\n Exception: '{}'".format(
-                    pvk_file, error_message
-                ),
+                f"This is not a valid private key file: '{pvk_file}'\n Exception: '{error_message}'",
             )
 
             # check that no key has been added.

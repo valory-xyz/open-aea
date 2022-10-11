@@ -196,12 +196,7 @@ class DialogueLabel:
 
     def __str__(self) -> str:
         """Get the string representation."""
-        return "{}_{}_{}_{}".format(
-            self.dialogue_starter_reference,
-            self.dialogue_responder_reference,
-            self.dialogue_opponent_addr,
-            self.dialogue_starter_addr,
-        )
+        return f"{self.dialogue_starter_reference}_{self.dialogue_responder_reference}_{self.dialogue_opponent_addr}_{self.dialogue_starter_addr}"
 
     @classmethod
     def from_str(cls, obj: str) -> "DialogueLabel":
@@ -327,7 +322,7 @@ class Dialogue(
             """
             enforce(
                 performative in self.valid_replies,
-                "this performative '{}' is not supported".format(performative),
+                f"this performative '{performative}' is not supported",
             )
             return self.valid_replies[performative]
 
@@ -620,22 +615,14 @@ class Dialogue(
 
         if not self._is_belonging_to_dialogue(message):
             raise InvalidDialogueMessage(
-                "The message {} does not belong to this dialogue."
-                "The dialogue reference of the message is {}, while the dialogue reference of the dialogue is {}".format(
-                    message.message_id,
-                    message.dialogue_reference,
-                    self.dialogue_label.dialogue_reference,
-                )
+                f"The message {message.message_id} does not belong to this dialogue.The dialogue reference of the message is {message.dialogue_reference}, while the dialogue reference of the dialogue is {self.dialogue_label.dialogue_reference}"
             )
 
         is_valid_result, validation_message = self._validate_next_message(message)
 
         if not is_valid_result:
             raise InvalidDialogueMessage(
-                "Message {} is invalid with respect to this dialogue. Error: {}".format(
-                    message.message_id,
-                    validation_message,
-                )
+                f"Message {message.message_id} is invalid with respect to this dialogue. Error: {validation_message}"
             )
 
         if self._is_message_by_self(message):
@@ -792,17 +779,13 @@ class Dialogue(
         if dialogue_reference[0] != self.dialogue_label.dialogue_reference[0]:
             return (
                 False,
-                "Invalid dialogue_reference[0]. Expected {}. Found {}.".format(
-                    self.dialogue_label.dialogue_reference[0], dialogue_reference[0]
-                ),
+                f"Invalid dialogue_reference[0]. Expected {self.dialogue_label.dialogue_reference[0]}. Found {dialogue_reference[0]}.",
             )
 
         if message_id != Dialogue.STARTING_MESSAGE_ID:
             return (
                 False,
-                "Invalid message_id. Expected {}. Found {}.".format(
-                    Dialogue.STARTING_MESSAGE_ID, message_id
-                ),
+                f"Invalid message_id. Expected {Dialogue.STARTING_MESSAGE_ID}. Found {message_id}.",
             )
 
         err = self._validate_message_target(message)
@@ -812,9 +795,7 @@ class Dialogue(
         if performative not in self.rules.initial_performatives:
             return (
                 False,
-                "Invalid initial performative. Expected one of {}. Found {}.".format(
-                    self.rules.initial_performatives, performative
-                ),
+                f"Invalid initial performative. Expected one of {self.rules.initial_performatives}. Found {performative}.",
             )
 
         return True, "The initial message passes basic validation."
@@ -839,9 +820,7 @@ class Dialogue(
         if dialogue_reference[0] != self.dialogue_label.dialogue_reference[0]:
             return (
                 False,
-                "Invalid dialogue_reference[0]. Expected {}. Found {}.".format(
-                    self.dialogue_label.dialogue_reference[0], dialogue_reference[0]
-                ),
+                f"Invalid dialogue_reference[0]. Expected {self.dialogue_label.dialogue_reference[0]}. Found {dialogue_reference[0]}.",
             )
 
         err = self._validate_message_id(message)
@@ -864,15 +843,13 @@ class Dialogue(
             if target == self.STARTING_TARGET:
                 # no need to check in details
                 return None
-            return "Invalid target. Expected 0. Found {}.".format(target)
+            return f"Invalid target. Expected 0. Found {target}."
 
         if (
             message.message_id != self.STARTING_MESSAGE_ID
             and target == self.STARTING_TARGET
         ):
-            return "Invalid target. Expected a non-zero integer. Found {}.".format(
-                target
-            )
+            return f"Invalid target. Expected a non-zero integer. Found {target}."
 
         # quick target check.
         latest_ids: List[int] = []
@@ -884,23 +861,17 @@ class Dialogue(
             latest_ids.append(abs(self.last_outgoing_message.message_id))
 
         if abs(target) > max(latest_ids):
-            return "Invalid target. Expected a value less than or equal to abs({}). Found abs({}).".format(
-                max(latest_ids), abs(target)
-            )
+            return f"Invalid target. Expected a value less than or equal to abs({max(latest_ids)}). Found abs({abs(target)})."
 
         # detailed target check
         target_message = self.get_message_by_id(target)
 
         if not target_message:
-            return "Invalid target {}. target_message can not be found.".format(
-                target
-            )  # pragma: nocover
+            return f"Invalid target {target}. target_message can not be found."  # pragma: nocover
 
         target_performative = target_message.performative
         if performative not in self.rules.get_valid_replies(target_performative):
-            return "Invalid performative. Expected one of {}. Found {}.".format(
-                self.rules.get_valid_replies(target_performative), performative
-            )
+            return f"Invalid performative. Expected one of {self.rules.get_valid_replies(target_performative)}. Found {performative}."
 
         return None
 
@@ -916,9 +887,7 @@ class Dialogue(
 
         # we know what is the next message id for incoming and outgoing!
         if message.message_id != next_message_id:
-            return "Invalid message_id. Expected {}. Found {}.".format(
-                next_message_id, message.message_id
-            )
+            return f"Invalid message_id. Expected {next_message_id}. Found {message.message_id}."
 
         return None
 
@@ -1599,30 +1568,22 @@ class Dialogues:
         parameter_length = len(sig.parameters.keys())
         enforce(
             parameter_length == 2,
-            "Invalid number of parameters for role_from_first_message. Expected 2. Found {}.".format(
-                parameter_length
-            ),
+            f"Invalid number of parameters for role_from_first_message. Expected 2. Found {parameter_length}.",
         )
         parameter_1_type = list(sig.parameters.values())[0].annotation
         enforce(
             parameter_1_type == Message,
-            "Invalid type for the first parameter of role_from_first_message. Expected 'Message'. Found {}.".format(
-                parameter_1_type
-            ),
+            f"Invalid type for the first parameter of role_from_first_message. Expected 'Message'. Found {parameter_1_type}.",
         )
         parameter_2_type = list(sig.parameters.values())[1].annotation
         enforce(
             parameter_2_type == Address,
-            "Invalid type for the second parameter of role_from_first_message. Expected 'Address'. Found {}.".format(
-                parameter_2_type
-            ),
+            f"Invalid type for the second parameter of role_from_first_message. Expected 'Address'. Found {parameter_2_type}.",
         )
         return_type = sig.return_annotation
         enforce(
             return_type == Dialogue.Role,
-            "Invalid return type for role_from_first_message. Expected 'Dialogue.Role'. Found {}.".format(
-                return_type
-            ),
+            f"Invalid return type for role_from_first_message. Expected 'Dialogue.Role'. Found {return_type}.",
         )
         self._role_from_first_message = role_from_first_message
 
@@ -1758,11 +1719,11 @@ class Dialogues:
         """
         enforce(
             not initial_message.has_sender,
-            "The message's 'sender' field is already set {}".format(initial_message),
+            f"The message's 'sender' field is already set {initial_message}",
         )
         enforce(
             not initial_message.has_to,
-            "The message's 'to' field is already set {}".format(initial_message),
+            f"The message's 'to' field is already set {initial_message}",
         )
         initial_message.sender = self.self_address
         initial_message.to = counterparty
@@ -1812,9 +1773,7 @@ class Dialogues:
             message.has_sender and self._is_message_by_other(message),
             "Invalid 'update' usage. Update must only be used with a message by another agent.",
         )
-        enforce(
-            message.has_to, "The message's 'to' field is not set {}".format(message)
-        )
+        enforce(message.has_to, f"The message's 'to' field is not set {message}")
         enforce(
             message.to == self.self_address,
             f"Message to and dialogue self address do not match. Got 'to={message.to}' expected 'to={self.self_address}'.",

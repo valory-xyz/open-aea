@@ -183,11 +183,9 @@ class TestDialogueLabel:
         )
         assert self.dialogue_label.dialogue_opponent_addr == self.opponent_address
         assert self.dialogue_label.dialogue_starter_addr == self.agent_address
-        assert str(self.dialogue_label) == "{}_{}_{}_{}".format(
-            self.dialogue_label.dialogue_starter_reference,
-            self.dialogue_label.dialogue_responder_reference,
-            self.dialogue_label.dialogue_opponent_addr,
-            self.dialogue_label.dialogue_starter_addr,
+        assert (
+            str(self.dialogue_label)
+            == f"{self.dialogue_label.dialogue_starter_reference}_{self.dialogue_label.dialogue_responder_reference}_{self.dialogue_label.dialogue_opponent_addr}_{self.dialogue_label.dialogue_starter_addr}"
         )
 
         dialogue_label_eq = DialogueLabel(
@@ -460,11 +458,7 @@ class TestDialogueBase:
         with pytest.raises(InvalidDialogueMessage) as cm:
             self.dialogue._update(invalid_message_1_by_self)
         assert str(cm.value) == (
-            "The message 1 does not belong to this dialogue."
-            "The dialogue reference of the message is {}, while the dialogue reference of the dialogue is {}".format(
-                invalid_message_1_by_self.dialogue_reference,
-                self.dialogue.dialogue_label.dialogue_reference,
-            )
+            f"The message 1 does not belong to this dialogue.The dialogue reference of the message is {invalid_message_1_by_self.dialogue_reference}, while the dialogue reference of the dialogue is {self.dialogue.dialogue_label.dialogue_reference}"
         )
         assert self.dialogue.is_empty
 
@@ -740,9 +734,7 @@ class TestDialogueBase:
         assert result is False
         assert (
             msg
-            == "Invalid initial performative. Expected one of {}. Found error.".format(
-                self.dialogue.rules.initial_performatives
-            )
+            == f"Invalid initial performative. Expected one of {self.dialogue.rules.initial_performatives}. Found error."
         )
 
     def test_basic_validation_non_initial_message_positive(self):
@@ -862,11 +854,9 @@ class TestDialogueBase:
             invalid_message_2_by_other
         )
         assert result is False
-        assert msg == "Invalid performative. Expected one of {}. Found {}.".format(
-            self.dialogue.rules.get_valid_replies(
-                self.valid_message_1_by_self.performative
-            ),
-            invalid_message_2_by_other.performative,
+        assert (
+            msg
+            == f"Invalid performative. Expected one of {self.dialogue.rules.get_valid_replies(self.valid_message_1_by_self.performative)}. Found {invalid_message_2_by_other.performative}."
         )
 
     def test_update_dialogue_label_positive(self):
@@ -1268,8 +1258,9 @@ class TestDialoguesBase:
 
         with pytest.raises(AEAEnforceError) as cm:
             self.own_dialogues.update(invalid_message_1_by_other)
-        assert str(cm.value) == "The message's 'to' field is not set {}".format(
-            invalid_message_1_by_other
+        assert (
+            str(cm.value)
+            == f"The message's 'to' field is not set {invalid_message_1_by_other}"
         )
 
         assert (

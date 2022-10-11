@@ -125,8 +125,8 @@ def create_aea(
     if Path(agent_name).exists():
         raise click.ClickException("Directory already exist. Aborting...")
 
-    click.echo("Initializing AEA project '{}'".format(agent_name))
-    click.echo("Creating project directory './{}'".format(agent_name))
+    click.echo(f"Initializing AEA project '{agent_name}'")
+    click.echo(f"Creating project directory './{agent_name}'")
     path = Path(agent_name)
     ctx.clean_paths.append(str(path))
 
@@ -145,7 +145,7 @@ def create_aea(
         Path(agent_name, VENDOR, "__init__.py").touch(exist_ok=False)
 
         # create a config file inside it
-        click.echo("Creating config file {}".format(DEFAULT_AEA_CONFIG_FILE))
+        click.echo(f"Creating config file {DEFAULT_AEA_CONFIG_FILE}")
         agent_config = _create_agent_config(ctx, agent_name, set_author)
 
         # next commands must be done from the agent's directory -> overwrite ctx.cwd
@@ -203,7 +203,7 @@ def _check_is_parent_folders_are_aea_projects_recursively() -> None:
         files = set(map(lambda x: x.name, current.iterdir()))
         if DEFAULT_AEA_CONFIG_FILE in files:
             raise ValueError(
-                "Folder {} has file named {}".format(current, DEFAULT_AEA_CONFIG_FILE)
+                f"Folder {current} has file named {DEFAULT_AEA_CONFIG_FILE}"
             )
         current = current.parent.resolve()
 
@@ -212,5 +212,5 @@ def _setup_package_folder(path: Path) -> None:
     """Set a package folder up."""
     path.mkdir(exist_ok=False)
     init_module = path / "__init__.py"
-    logger.debug("Creating {}".format(init_module))
+    logger.debug(f"Creating {init_module}")
     Path(init_module).touch(exist_ok=False)

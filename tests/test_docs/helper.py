@@ -88,9 +88,7 @@ def compile_and_exec(code: str, locals_dict: Dict = None) -> Dict:
         exec(code_obj, locals_dict)  # nosec
     except Exception:
         pytest.fail(
-            "The execution of the following code:\n{}\nfailed with error:\n{}".format(
-                code, traceback.format_exc()
-            )
+            f"The execution of the following code:\n{code}\nfailed with error:\n{traceback.format_exc()}"
         )
     return locals_dict
 
@@ -101,14 +99,10 @@ def compare_enum_classes(expected_enum_class, actual_enum_class):
         # do some pre-processing
         expected_pairs = sorted(map(lambda x: (x.name, x.value), expected_enum_class))
         actual_pairs = sorted(map(lambda x: (x.name, x.value), actual_enum_class))
-        assert expected_pairs == actual_pairs, "{} != {}".format(
-            expected_pairs, actual_pairs
-        )
+        assert expected_pairs == actual_pairs, f"{expected_pairs} != {actual_pairs}"
     except AssertionError:
         pytest.fail(
-            "Actual enum {} is different from the actual one {}".format(
-                expected_enum_class, actual_enum_class
-            )
+            f"Actual enum {expected_enum_class} is different from the actual one {actual_enum_class}"
         )
 
 

@@ -72,9 +72,7 @@ def load_component_from_config(  # type: ignore
         raise e
     except AEAComponentLoadException as e:
         raise AEAPackageLoadingError(
-            "Package loading error: An error occurred while loading {} {}: {}".format(
-                str(configuration.component_type), configuration.public_id, e
-            )
+            f"Package loading error: An error occurred while loading {str(configuration.component_type)} {configuration.public_id}: {e}"
         )
     except ModuleNotFoundError as e:
         _handle_error_while_loading_component_module_not_found(configuration, e)
@@ -124,20 +122,18 @@ def _handle_error_while_loading_component_module_not_found(
         """Create a new error message in case the package is not found."""
         enforce(nb_parts <= 4, "More than 4 parts!")
         author = parts[1]
-        new_message = "No AEA package found with author name '{}'".format(author)
+        new_message = f"No AEA package found with author name '{author}'"
 
         if nb_parts >= 3:
             pkg_type = parts[2]
             try:
                 ComponentType(pkg_type[:-1])
             except ValueError:
-                return "'{}' is not a valid type name, choose one of {}".format(
-                    pkg_type, list(map(lambda x: x.to_plural(), ComponentType))
-                )
-            new_message += ", type '{}'".format(pkg_type)
+                return f"'{pkg_type}' is not a valid type name, choose one of {list(map(lambda x: x.to_plural(), ComponentType))}"
+            new_message += f", type '{pkg_type}'"
         if nb_parts == 4:
             pkg_name = parts[3]
-            new_message += ", name '{}'".format(pkg_name)
+            new_message += f", name '{pkg_name}'"
         return new_message
 
     def get_new_error_message_with_package_found() -> str:
@@ -145,9 +141,7 @@ def _handle_error_while_loading_component_module_not_found(
         enforce(nb_parts >= 5, "Less than 5 parts!")
         author, pkg_name, pkg_type = parts[:3]
         the_rest = ".".join(parts[4:])
-        return "The package '{}/{}' of type '{}' exists, but cannot find module '{}'".format(
-            author, pkg_name, pkg_type, the_rest
-        )
+        return f"The package '{author}/{pkg_name}' of type '{pkg_type}' exists, but cannot find module '{the_rest}'"
 
     if nb_parts < 5:
         new_message = get_new_error_message_no_package_found()
@@ -158,11 +152,7 @@ def _handle_error_while_loading_component_module_not_found(
     new_exc.__traceback__ = e.__traceback__
     e_str = parse_exception(new_exc)
     raise AEAPackageLoadingError(
-        "Package loading error: An error occurred while loading {} {}:\n{}".format(
-            str(configuration.component_type),
-            configuration.public_id,
-            e_str,
-        )
+        f"Package loading error: An error occurred while loading {str(configuration.component_type)} {configuration.public_id}:\n{e_str}"
     )
 
 
@@ -178,7 +168,5 @@ def _handle_error_while_loading_component_generic_error(
     """
     e_str = parse_exception(e)
     raise AEAPackageLoadingError(
-        "Package loading error: An error occurred while loading {} {}: {}".format(
-            str(configuration.component_type), configuration.public_id, e_str
-        )
+        f"Package loading error: An error occurred while loading {str(configuration.component_type)} {configuration.public_id}: {e_str}"
     ) from e

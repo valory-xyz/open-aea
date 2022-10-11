@@ -56,9 +56,7 @@ def all_command(ctx: Context) -> None:
         details = list_agent_items(ctx, item_type)
         if not details:
             continue
-        output = "{}:\n{}".format(
-            item_type.title() + "s", format_items(sort_items(details))
-        )
+        output = f"{item_type.title() + 's'}:\n{format_items(sort_items(details))}"
         click.echo(output)
 
 

@@ -357,7 +357,7 @@ class DecisionMaker(WithLogger):
         with self._lock:
             if not self._stopped:  # pragma: no cover
                 self.logger.debug(
-                    "[{}]: Decision maker already started.".format(self.agent_name)
+                    f"[{self.agent_name}]: Decision maker already started."
                 )
                 return
 
@@ -372,7 +372,7 @@ class DecisionMaker(WithLogger):
             self.message_in_queue.put(None)
             if self._thread is not None:
                 self._thread.join()
-            self.logger.debug("[{}]: Decision Maker stopped.".format(self.agent_name))
+            self.logger.debug(f"[{self.agent_name}]: Decision Maker stopped.")
             self._thread = None
 
     def execute(self) -> None:
@@ -390,9 +390,7 @@ class DecisionMaker(WithLogger):
 
             if message is None:
                 self.logger.debug(
-                    "[{}]: Received empty message. Quitting the processing loop...".format(
-                        self.agent_name
-                    )
+                    f"[{self.agent_name}]: Received empty message. Quitting the processing loop..."
                 )
                 continue
 

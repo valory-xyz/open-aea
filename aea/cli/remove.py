@@ -328,7 +328,7 @@ class RemoveItem:
         self.item_type = item_type
         self.item_id = item_id
         self.with_dependencies = with_dependencies
-        self.item_type_plural = "{}s".format(item_type)
+        self.item_type_plural = f"{item_type}s"
         self.item_name = item_id.name
 
         self.current_item = self.get_current_item()
@@ -357,7 +357,7 @@ class RemoveItem:
         )
         if not current_item:  # pragma: nocover # actually checked in check_item_present
             raise click.ClickException(
-                "The {} '{}' is not supported.".format(self.item_type, self.item_id)
+                f"The {self.item_type} '{self.item_id}' is not supported."
             )
         return current_item
 
@@ -429,9 +429,7 @@ class RemoveItem:
     def _remove_from_config(self) -> None:
         """Remove item from agent config."""
         current_item = self.get_current_item()
-        logger.debug(
-            "Removing the {} from {}".format(self.item_type, DEFAULT_AEA_CONFIG_FILE)
-        )
+        logger.debug(f"Removing the {self.item_type} from {DEFAULT_AEA_CONFIG_FILE}")
         self.agent_items.remove(current_item)
         self.agent_config.component_configurations.pop(
             ComponentId(self.item_type, current_item), None

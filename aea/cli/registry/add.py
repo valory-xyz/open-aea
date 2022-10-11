@@ -40,33 +40,17 @@ def fetch_package(obj_type: str, public_id: PublicId, cwd: str, dest: str) -> Pa
 
     :return: package path
     """
-    logger.debug(
-        "Fetching {obj_type} {public_id} from Registry...".format(
-            public_id=public_id, obj_type=obj_type
-        )
-    )
+    logger.debug(f"Fetching {obj_type} {public_id} from Registry...")
 
-    logger.debug(
-        "Downloading {obj_type} {public_id}...".format(
-            public_id=public_id, obj_type=obj_type
-        )
-    )
+    logger.debug(f"Downloading {obj_type} {public_id}...")
     package_meta = get_package_meta(obj_type, public_id)
     file_url = cast(str, package_meta["file"])
     filepath = download_file(file_url, cwd)
 
     # next code line is needed because the items are stored in tarball packages as folders
     dest = os.path.split(dest)[0]
-    logger.debug(
-        "Extracting {obj_type} {public_id}...".format(
-            public_id=public_id, obj_type=obj_type
-        )
-    )
+    logger.debug(f"Extracting {obj_type} {public_id}...")
     extract(filepath, dest)
-    logger.debug(
-        "Successfully fetched {obj_type} '{public_id}'.".format(
-            public_id=public_id, obj_type=obj_type
-        )
-    )
+    logger.debug(f"Successfully fetched {obj_type} '{public_id}'.")
     package_path = os.path.join(dest, public_id.name)
     return Path(package_path)

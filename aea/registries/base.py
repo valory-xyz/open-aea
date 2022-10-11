@@ -217,13 +217,11 @@ class AgentComponentRegistry(Registry[ComponentId, Component]):
         """
         if component_id in self._registered_keys:
             raise ValueError(
-                "Component already registered with item id '{}'".format(component_id)
+                f"Component already registered with item id '{component_id}'"
             )
         if component.component_id != component_id:
             raise ValueError(
-                "Component id '{}' is different to the id '{}' specified.".format(
-                    component.component_id, component_id
-                )
+                f"Component id '{component.component_id}' is different to the id '{component_id}' specified."
             )
         self._register(component_id, component)
 
@@ -251,9 +249,7 @@ class AgentComponentRegistry(Registry[ComponentId, Component]):
         )
         self._registered_keys.discard(component_id)
         if item is not None:
-            self.logger.debug(
-                "Component '{}' has been removed.".format(item.component_id)
-            )
+            self.logger.debug(f"Component '{item.component_id}' has been removed.")
         return item
 
     def unregister(  # pylint: disable=arguments-differ
@@ -266,9 +262,7 @@ class AgentComponentRegistry(Registry[ComponentId, Component]):
         :return: the item
         """
         if component_id not in self._registered_keys:
-            raise ValueError(
-                "No item registered with item id '{}'".format(component_id)
-            )
+            raise ValueError(f"No item registered with item id '{component_id}'")
         return self._unregister(component_id)
 
     def fetch(  # pylint: disable=arguments-differ
@@ -390,10 +384,8 @@ class ComponentRegistry(
         item_name = item_id[1]
         name_to_item = self._items.fetch(skill_id)
         if name_to_item is None or item_name not in name_to_item:
-            raise ValueError(
-                "No item registered with component id '{}'".format(item_id)
-            )
-        self.logger.debug("Unregistering item with id {}".format(item_id))
+            raise ValueError(f"No item registered with component id '{item_id}'")
+        self.logger.debug(f"Unregistering item with id {item_id}")
         item = name_to_item.pop(item_name)
         if len(name_to_item) == 0:
             self._items.unregister(skill_id)
@@ -436,7 +428,7 @@ class ComponentRegistry(
         """Unregister all the components by skill."""
         if skill_id not in self._items.ids():
             raise ValueError(
-                "No component of skill {} present in the registry.".format(skill_id)
+                f"No component of skill {skill_id} present in the registry."
             )
         self._items.unregister(skill_id)
         self._dynamically_added.pop(skill_id, None)
@@ -457,9 +449,7 @@ class ComponentRegistry(
         for item in self.fetch_all():
             if item.context.is_active:
                 self.logger.debug(
-                    "Calling setup() of component {} of skill {}".format(
-                        item.name, item.skill_id
-                    )
+                    f"Calling setup() of component {item.name} of skill {item.skill_id}"
                 )
                 try:
                     item.setup()
@@ -469,9 +459,7 @@ class ComponentRegistry(
                     raise AEASetupError(e_str)
             else:
                 self.logger.debug(
-                    "Ignoring setup() of component {} of skill {}, because the skill is not active.".format(
-                        item.name, item.skill_id
-                    )
+                    f"Ignoring setup() of component {item.name} of skill {item.skill_id}, because the skill is not active."
                 )
 
     def teardown(self) -> None:
@@ -479,9 +467,7 @@ class ComponentRegistry(
         for name_to_items in self._items.fetch_all():
             for _, item in name_to_items.items():
                 self.logger.debug(
-                    "Calling teardown() of component {} of skill {}".format(
-                        item.name, item.skill_id
-                    )
+                    f"Calling teardown() of component {item.name} of skill {item.skill_id}"
                 )
                 try:
                     item.teardown()
@@ -532,9 +518,7 @@ class HandlerRegistry(ComponentRegistry[Handler]):
         protocol_id = item.SUPPORTED_PROTOCOL
         if protocol_id is None:
             raise ValueError(
-                "Please specify a supported protocol for handler class '{}'".format(
-                    item.__class__.__name__
-                )
+                f"Please specify a supported protocol for handler class '{item.__class__.__name__}'"
             )
 
         protocol_handlers_by_skill = self._items_by_protocol_and_skill.fetch(
@@ -545,9 +529,7 @@ class HandlerRegistry(ComponentRegistry[Handler]):
             and skill_id in protocol_handlers_by_skill.ids()
         ):
             raise ValueError(
-                "A handler already registered with pair of protocol id {} and skill id {}".format(
-                    protocol_id, skill_id
-                )
+                f"A handler already registered with pair of protocol id {protocol_id} and skill id {skill_id}"
             )
         if protocol_handlers_by_skill is None:
             # registry from skill ids to handlers.
@@ -582,7 +564,7 @@ class HandlerRegistry(ComponentRegistry[Handler]):
         # unregister from the main index.
         if skill_id not in self._items.ids():
             raise ValueError(
-                "No component of skill {} present in the registry.".format(skill_id)
+                f"No component of skill {skill_id} present in the registry."
             )
 
         self._dynamically_added.pop(skill_id, None)

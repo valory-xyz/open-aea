@@ -95,7 +95,7 @@ def skill(ctx: Context, skill_public_id: PublicId) -> None:
 def by_path(ctx: Context, path: str) -> None:
     """Fingerprint a package by its path."""
     try:
-        click.echo("Fingerprinting component in '{}' ...".format(path))
+        click.echo(f"Fingerprinting component in '{path}' ...")
         full_path = Path(ctx.cwd) / Path(path)
         fingerprint_package_by_path(full_path)
     except Exception as e:
@@ -112,9 +112,7 @@ def fingerprint_item(ctx: Context, item_type: str, item_public_id: PublicId) -> 
     """
     item_type_plural = item_type + "s"
 
-    click.echo(
-        "Fingerprinting {} components of '{}' ...".format(item_type, item_public_id)
-    )
+    click.echo(f"Fingerprinting {item_type} components of '{item_public_id}' ...")
 
     # create fingerprints
     package_dir = Path(ctx.cwd, item_type_plural, item_public_id.name)
@@ -162,7 +160,7 @@ def fingerprint_package(
 
     if not package_dir.exists():
         # we only permit non-vendorized packages to be fingerprinted
-        raise ValueError("Package not found at path {}".format(package_dir))
+        raise ValueError(f"Package not found at path {package_dir}")
 
     fingerprints_dict = _compute_fingerprint(
         package_dir, ignore_patterns=config.fingerprint_ignore_patterns

@@ -111,18 +111,14 @@ class ProxyEnv(gym.Env):
 
         if gym_msg.performative != GymMessage.Performative.PERCEPT:
             raise ValueError(
-                "Unexpected performative. Expected={} got={}".format(
-                    GymMessage.Performative.PERCEPT, gym_msg.performative
-                )
+                f"Unexpected performative. Expected={GymMessage.Performative.PERCEPT} got={gym_msg.performative}"
             )
 
         if gym_msg.step_id == step_id:
             observation, reward, done, info = self._message_to_percept(gym_msg)
         else:
             raise ValueError(
-                "Unexpected step id! expected={}, actual={}".format(
-                    step_id, gym_msg.step_id
-                )
+                f"Unexpected step id! expected={step_id}, actual={gym_msg.step_id}"
             )
 
         return observation, reward, done, info
@@ -151,9 +147,7 @@ class ProxyEnv(gym.Env):
 
         if response_msg.performative != GymMessage.Performative.STATUS:
             raise ValueError(
-                "Unexpected performative. Expected={} got={}".format(
-                    GymMessage.Performative.STATUS, response_msg.performative
-                )
+                f"Unexpected performative. Expected={GymMessage.Performative.STATUS} got={response_msg.performative}"
             )
 
     def close(self) -> None:

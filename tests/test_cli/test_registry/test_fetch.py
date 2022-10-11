@@ -71,9 +71,7 @@ class TestFetchAgent(TestCase):
         fetch_agent(ContextMock(), public_id_mock, alias="alias")
         request_api_mock.assert_called_with(
             "GET",
-            "/agents/{}/{}/{}".format(
-                public_id_mock.author, public_id_mock.name, public_id_mock.version
-            ),
+            f"/agents/{public_id_mock.author}/{public_id_mock.name}/{public_id_mock.version}",
         )
         download_file_mock.assert_called_once_with("url", "cwd")
         extract_mock.assert_called_once_with("filepath", "cwd")
@@ -83,10 +81,10 @@ class TestFetchAgent(TestCase):
         "aea.cli.registry.fetch.request_api",
         return_value={
             "file": "url",
-            "connections": ["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)],
-            "contracts": ["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)],
-            "protocols": ["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)],
-            "skills": ["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)],
+            "connections": [f"public/id:{PublicIdMock.DEFAULT_VERSION}"],
+            "contracts": [f"public/id:{PublicIdMock.DEFAULT_VERSION}"],
+            "protocols": [f"public/id:{PublicIdMock.DEFAULT_VERSION}"],
+            "skills": [f"public/id:{PublicIdMock.DEFAULT_VERSION}"],
         },
     )
     def test_fetch_agent_with_dependencies_positive(
@@ -95,14 +93,12 @@ class TestFetchAgent(TestCase):
         """Test for fetch_agent method with dependencies positive result."""
         public_id_mock = PublicIdMock()
         ctx_mock = ContextMock(
-            connections=["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)]
+            connections=[f"public/id:{PublicIdMock.DEFAULT_VERSION}"]
         )
         fetch_agent(ctx_mock, public_id_mock)
         request_api_mock.assert_called_with(
             "GET",
-            "/agents/{}/{}/{}".format(
-                public_id_mock.author, public_id_mock.name, public_id_mock.version
-            ),
+            f"/agents/{public_id_mock.author}/{public_id_mock.name}/{public_id_mock.version}",
         )
         download_file_mock.assert_called_once_with("url", "cwd")
         extract_mock.assert_called_once_with("filepath", "cwd")
@@ -113,7 +109,7 @@ class TestFetchAgent(TestCase):
         "aea.cli.registry.fetch.request_api",
         return_value={
             "file": "url",
-            "connections": ["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)],
+            "connections": [f"public/id:{PublicIdMock.DEFAULT_VERSION}"],
             "contracts": [],
             "protocols": [],
             "skills": [],
@@ -122,7 +118,7 @@ class TestFetchAgent(TestCase):
     def test_fetch_agent_with_dependencies_unable_to_fetch(self, *mocks):
         """Test for fetch_agent method unable to fetch."""
         ctx_mock = ContextMock(
-            connections=["public/id:{}".format(PublicIdMock.DEFAULT_VERSION)]
+            connections=[f"public/id:{PublicIdMock.DEFAULT_VERSION}"]
         )
         with self.assertRaises(ClickException):
             fetch_agent(ctx_mock, PublicIdMock())

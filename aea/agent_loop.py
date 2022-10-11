@@ -287,9 +287,7 @@ class AsyncAgentLoop(BaseAgentLoop):
                 return fn(*(args or []), **(kwargs or {}))
         except TimeoutException:  # pragma: nocover
             self.logger.warning(
-                "`{}` was terminated as its execution exceeded the timeout of {} seconds. Please refactor your code!".format(
-                    fn, execution_timeout
-                )
+                f"`{fn}` was terminated as its execution exceeded the timeout of {execution_timeout} seconds. Please refactor your code!"
             )
         except Exception as e:  # pylint: disable=broad-except
             try:

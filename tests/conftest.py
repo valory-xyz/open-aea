@@ -508,7 +508,7 @@ def wait_for_localhost_ports_to_close(
             time.sleep(sleep_time)
             elapsed += sleep_time
     if open_ports != []:
-        raise ValueError("Some ports are open: {}!".format(open_ports))
+        raise ValueError(f"Some ports are open: {open_ports}!")
 
 
 def pytest_addoption(parser) -> None:

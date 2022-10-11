@@ -140,9 +140,7 @@ def _get_default_configuration_file_name_from_type(
         return DEFAULT_CONTRACT_CONFIG_FILE
     if item_type == PackageType.SERVICE:
         return DEFAULT_SERVICE_CONFIG_FILE
-    raise ValueError(  # pragma: no cover
-        "Item type not valid: {}".format(str(item_type))
-    )
+    raise ValueError(f"Item type not valid: {str(item_type)}")  # pragma: no cover
 
 
 class ProtocolSpecificationParseError(Exception):
@@ -519,9 +517,7 @@ class ComponentConfiguration(PackageConfiguration, ABC):
     @property
     def prefix_import_path(self) -> str:
         """Get the prefix import path for this component."""
-        return "packages.{}.{}.{}".format(
-            self.public_id.author, self.component_type.to_plural(), self.public_id.name
-        )
+        return f"packages.{self.public_id.author}.{self.component_type.to_plural()}.{self.public_id.name}"
 
     @property
     def is_abstract_component(self) -> bool:
@@ -544,7 +540,7 @@ class ComponentConfiguration(PackageConfiguration, ABC):
             - the fingerprints do not match.
         """
         if not directory.exists() or not directory.is_dir():
-            raise ValueError("Directory {} is not valid.".format(directory))
+            raise ValueError(f"Directory {directory} is not valid.")
         _compare_fingerprints(
             self, directory, False, self.component_type.to_package_type()
         )
@@ -559,7 +555,7 @@ class ComponentConfiguration(PackageConfiguration, ABC):
             - the public ids do not match.
         """
         if not directory.exists() or not directory.is_dir():
-            raise ValueError("Directory {} is not valid.".format(directory))
+            raise ValueError(f"Directory {directory} is not valid.")
         _compare_public_ids(self, directory)
 
 

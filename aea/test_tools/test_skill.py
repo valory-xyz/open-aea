@@ -131,9 +131,7 @@ class BaseSkillTestCase:
         ):
             return (
                 False,
-                "The message types do not match. Actual type: {}. Expected type: {}".format(
-                    type(actual_message), message_type
-                ),
+                f"The message types do not match. Actual type: {type(actual_message)}. Expected type: {message_type}",
             )
 
         for attribute_name, expected_value in kwargs.items():
@@ -408,9 +406,7 @@ class BaseSkillTestCase:
             dialogue = cast(Dialogue, dialogues.update(message))
             if dialogue is None:
                 raise AEAEnforceError(
-                    "Cannot update the dialogue with message number {}".format(
-                        message_id
-                    )
+                    f"Cannot update the dialogue with message number {message_id}"
                 )
         else:  # first message from self
             _, dialogue = dialogues.create(
@@ -448,9 +444,7 @@ class BaseSkillTestCase:
                 dialogue = cast(Dialogue, dialogues.update(message))
                 if dialogue is None:
                     raise AEAEnforceError(
-                        "Cannot update the dialogue with message number {}".format(
-                            message_id
-                        )
+                        f"Cannot update the dialogue with message number {message_id}"
                     )
             else:  # messages from self
                 dialogue.reply(performative=performative, target=target, **contents)

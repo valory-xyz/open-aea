@@ -207,7 +207,7 @@ def test_multiplexer_connect_one_raises_error_many_connections():
     try:
         shutil.rmtree(tmpdir)
     except OSError as e:
-        logger.warning("Couldn't delete {}".format(tmpdir))
+        logger.warning(f"Couldn't delete {tmpdir}")
         logger.exception(e)
 
 
@@ -289,7 +289,7 @@ async def test_multiplexer_disconnect_one_raises_error_many_connections():
         try:
             shutil.rmtree(tmpdir)
         except OSError as e:
-            logger.warning("Couldn't delete {}".format(tmpdir))
+            logger.warning(f"Couldn't delete {tmpdir}")
             logger.exception(e)
 
 
@@ -405,7 +405,7 @@ def test_send_envelope_error_is_logged_by_send_loop():
         multiplexer.put(envelope)
         time.sleep(0.1)
         mock_logger_error.assert_called_with(
-            "No connection registered with id: {}".format(fake_connection_id)
+            f"No connection registered with id: {fake_connection_id}"
         )
 
     multiplexer.disconnect()
@@ -449,9 +449,7 @@ def test_send_message_no_supported_protocol():
             multiplexer.put(envelope)
             time.sleep(0.5)
             mock_logger_warning.assert_called_with(
-                "Connection {} does not support protocol {}. It is explicitly excluded.".format(
-                    connection_1.connection_id, FipaMessage.protocol_id
-                )
+                f"Connection {connection_1.connection_id} does not support protocol {FipaMessage.protocol_id}. It is explicitly excluded."
             )
 
         with mock.patch.object(multiplexer.logger, "warning") as mock_logger_warning:
@@ -464,11 +462,7 @@ def test_send_message_no_supported_protocol():
             multiplexer.put(envelope)
             time.sleep(0.5)
             mock_logger_warning.assert_called_with(
-                "Connection {} does not support protocol {}. The connection is restricted to protocols in {}.".format(
-                    connection_1.connection_id,
-                    UnknownProtocolMock.protocol_id,
-                    connection_1.restricted_to_protocols,
-                )
+                f"Connection {connection_1.connection_id} does not support protocol {UnknownProtocolMock.protocol_id}. The connection is restricted to protocols in {connection_1.restricted_to_protocols}."
             )
 
         multiplexer.disconnect()

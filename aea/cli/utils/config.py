@@ -89,9 +89,7 @@ def try_to_load_agent_config(
     except FileNotFoundError:
         if is_exit_on_except:
             raise click.ClickException(
-                "Agent configuration file '{}' not found in the current directory.".format(
-                    DEFAULT_AEA_CONFIG_FILE
-                )
+                f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' not found in the current directory."
             )
     except (
         jsonschema.exceptions.ValidationError,
@@ -100,9 +98,7 @@ def try_to_load_agent_config(
     ) as e:
         if is_exit_on_except:
             raise click.ClickException(
-                "Agent configuration file '{}' is invalid: `{}`. Please check the documentation.".format(
-                    DEFAULT_AEA_CONFIG_FILE, str(e)
-                )
+                f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' is invalid: `{str(e)}`. Please check the documentation."
             )
     except AEAEnforceError as e:
         raise click.ClickException(str(e))  # pragma: nocover
@@ -279,7 +275,7 @@ def update_item_config(
     item_type: str,
     package_path: Path,
     package_type_config_class: Optional[Dict] = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None:
     """
     Update item config and item config file.
@@ -328,9 +324,7 @@ def validate_item_config(
             getattr(item_config, field_name)
         except AttributeError:
             raise AEAConfigException(
-                "Parameter '{}' is missing from {} config.".format(
-                    field_name, item_type
-                )
+                f"Parameter '{field_name}' is missing from {item_type} config."
             )
 
 

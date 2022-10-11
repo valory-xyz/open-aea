@@ -202,9 +202,7 @@ def update_hashes(
         for tree_level in packages:
             for package_id, package_path in tree_level:
                 click.echo(
-                    "Processing package {} of type {}".format(
-                        package_path.name, package_id.package_type
-                    )
+                    f"Processing package {package_path.name} of type {package_id.package_type}"
                 )
 
                 config_file = package_path / cast(

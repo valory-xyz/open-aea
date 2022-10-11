@@ -49,7 +49,7 @@ PUBLIC_ID_REGEX = PublicId.PUBLIC_ID_REGEX[1:-1]
 """This regex removes the '^' and '$' respectively, at the beginning and at the end."""
 
 ADD_COMMAND_IN_DOCS = re.compile(
-    "aea +add +({}) +({})".format("|".join(map(str, ComponentType)), PUBLIC_ID_REGEX)
+    f"aea +add +({'|'.join(map(str, ComponentType))}) +({PUBLIC_ID_REGEX})"
 )
 """
 This regex matches strings of the form:
@@ -59,7 +59,7 @@ This regex matches strings of the form:
 """
 
 
-FETCH_COMMAND_IN_DOCS = re.compile("aea +fetch +({})".format(PUBLIC_ID_REGEX))
+FETCH_COMMAND_IN_DOCS = re.compile(f"aea +fetch +({PUBLIC_ID_REGEX})")
 """
 This regex matches strings of the form:
 
@@ -178,7 +178,7 @@ def _checks(
         package_id = extract_package_id_from_match(match)
         if package_id.without_hash() not in ALL_PACKAGE_IDS:
             raise PackageIdNotFound(
-                file, package_id, match, "Package {} not found.".format(package_id)
+                file, package_id, match, f"Package {package_id} not found."
             )
         print(str(package_id), "OK!")
 
@@ -226,7 +226,7 @@ def check_file(file: Path) -> None:
 def handle_package_not_found(e: PackageIdNotFound) -> None:
     """Handle PackageIdNotFound errors."""
     print("=" * 50)
-    print("Package {} not found.".format(e.package_id))
+    print(f"Package {e.package_id} not found.")
     print("Path to file: ", e.file)
     print("Span: ", e.match_obj.span(0))
     print("Full Match: ", e.match_obj.group(0))

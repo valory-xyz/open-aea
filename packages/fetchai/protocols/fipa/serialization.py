@@ -92,7 +92,7 @@ class FipaSerializer(Serializer):
             performative = fipa_pb2.FipaMessage.End_Performative()  # type: ignore
             fipa_msg.end.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = fipa_msg.SerializeToString()
 
@@ -151,12 +151,12 @@ class FipaSerializer(Serializer):
         elif performative_id == FipaMessage.Performative.END:
             pass
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return FipaMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

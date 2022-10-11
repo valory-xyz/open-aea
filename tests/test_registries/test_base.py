@@ -428,9 +428,7 @@ class TestResources:
         # this should raise an error, since the 'dummy" skill already has a behaviour named "dummy"
         with pytest.raises(
             ValueError,
-            match="Item already registered with skill id '{}' and name '{}'".format(
-                self.dummy_skill_public_id, "dummy"
-            ),
+            match=f"Item already registered with skill id '{self.dummy_skill_public_id}' and name 'dummy'",
         ):
             self.resources._behaviour_registry.register(
                 (self.dummy_skill_public_id, "dummy"), None

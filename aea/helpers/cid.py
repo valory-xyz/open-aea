@@ -151,9 +151,7 @@ class CIDv1(BaseCID):
         """Get an equivalent `CIDv0` object."""
 
         if self.codec != CIDv0.CODEC:
-            raise ValueError(
-                "CIDv1 can only be converted for codec {}".format(CIDv0.CODEC)
-            )
+            raise ValueError(f"CIDv1 can only be converted for codec {CIDv0.CODEC}")
 
         return CIDv0(self.multihash)
 
@@ -174,12 +172,10 @@ class CID:
         """Make CID from given arguments."""
 
         if version not in (0, 1):
-            raise ValueError(
-                "version should be 0 or 1, {} was provided".format(version)
-            )
+            raise ValueError(f"version should be 0 or 1, {version} was provided")
 
         if not multicodec.is_codec(codec):
-            raise ValueError("invalid codec {} provided, please check".format(codec))
+            raise ValueError(f"invalid codec {codec} provided, please check")
 
         if not isinstance(multihash, bytes):
             raise ValueError("invalid type for multihash provided, should be bytes")
@@ -189,9 +185,7 @@ class CID:
 
         if codec != CIDv0.CODEC:
             raise ValueError(
-                "codec for version 0 can only be {}, found: {}".format(
-                    CIDv0.CODEC, codec
-                )
+                f"codec for version 0 can only be {CIDv0.CODEC}, found: {codec}"
             )
         return CIDv0(multihash)
 

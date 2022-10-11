@@ -131,9 +131,7 @@ class Location:
 
     def __str__(self) -> str:
         """Get the string representation of the data model."""
-        return "Location(latitude={},longitude={})".format(
-            self.latitude, self.longitude
-        )
+        return f"Location(latitude={self.latitude},longitude={self.longitude})"
 
     def encode(self) -> models_pb2.Query.Location:  # type: ignore
         """
@@ -219,9 +217,7 @@ class Attribute:
 
     def __str__(self) -> str:
         """Get the string representation of the data model."""
-        return "Attribute(name={},type={},is_required={})".format(
-            self.name, self.type, self.is_required
-        )
+        return f"Attribute(name={self.name},type={self.type},is_required={self.is_required})"
 
     def encode(self) -> models_pb2.Query.Attribute:  # type: ignore
         """
@@ -286,9 +282,7 @@ class DataModel:
         attribute_names = [attribute.name for attribute in self.attributes]
         if len(attribute_names) != len(set(attribute_names)):
             raise ValueError(
-                "Invalid input value for type '{}': duplicated attribute name.".format(
-                    type(self).__name__
-                )
+                f"Invalid input value for type '{type(self).__name__}': duplicated attribute name."
             )
 
     def __eq__(self, other: Any) -> bool:
@@ -434,29 +428,21 @@ class Description:
             )
             if attribute is None:  # pragma: nocover
                 # looks like this check is redundant, cause checks done above for all attributes
-                raise ValueError("Attribute {} not found!".format(key))
+                raise ValueError(f"Attribute {key} not found!")
             if not isinstance(value, attribute.type):
                 # values does not match type in data model
                 raise AttributeInconsistencyException(
-                    "Attribute {} has incorrect type: {}".format(
-                        attribute.name, attribute.type
-                    )
+                    f"Attribute {attribute.name} has incorrect type: {attribute.type}"
                 )
             if not type(value) in ALLOWED_ATTRIBUTE_TYPES:
                 # value type matches data model, but it is not an allowed type
                 raise AttributeInconsistencyException(
-                    "Attribute {} has unallowed type: {}. Allowed types: {}".format(
-                        attribute.name,
-                        type(value),
-                        ALLOWED_ATTRIBUTE_TYPES,
-                    )
+                    f"Attribute {attribute.name} has unallowed type: {type(value)}. Allowed types: {ALLOWED_ATTRIBUTE_TYPES}"
                 )
 
     def __str__(self) -> str:
         """Get the string representation of the description."""
-        return "Description(values={},data_model={})".format(
-            self._values, self.data_model
-        )
+        return f"Description(values={self._values},data_model={self.data_model})"
 
     @staticmethod
     def _to_key_value_pb(key: str, value: ATTRIBUTE_TYPES) -> models_pb2.Query.KeyValue:  # type: ignore
@@ -824,7 +810,7 @@ class ConstraintType:
 
     def __str__(self) -> str:
         """Get the string representation of the constraint type."""
-        return "ConstraintType(value={},type={})".format(self.value, self.type)
+        return f"ConstraintType(value={self.value},type={self.type})"
 
     def encode(self) -> Optional[Any]:
         """
@@ -1170,8 +1156,7 @@ class And(ConstraintExpr):
         """
         if len(self.constraints) < 2:  # pragma: nocover
             raise ValueError(
-                "Invalid input value for type '{}': number of "
-                "subexpression must be at least 2.".format(type(self).__name__)
+                f"Invalid input value for type '{type(self).__name__}': number of subexpression must be at least 2."
             )
         for constraint in self.constraints:
             constraint.check_validity()
@@ -1245,8 +1230,7 @@ class Or(ConstraintExpr):
         """
         if len(self.constraints) < 2:  # pragma: nocover
             raise ValueError(
-                "Invalid input value for type '{}': number of "
-                "subexpression must be at least 2.".format(type(self).__name__)
+                f"Invalid input value for type '{type(self).__name__}': number of subexpression must be at least 2."
             )
         for constraint in self.constraints:
             constraint.check_validity()
@@ -1445,9 +1429,7 @@ class Constraint(ConstraintExpr):
 
     def __str__(self) -> str:
         """Get the string representation of the constraint."""
-        return "Constraint(attribute_name={},constraint_type={})".format(
-            self.attribute_name, self.constraint_type
-        )
+        return f"Constraint(attribute_name={self.attribute_name},constraint_type={self.constraint_type})"
 
     def encode(self) -> models_pb2.Query.ConstraintExpr.Constraint:  # type: ignore
         """
@@ -1556,20 +1538,15 @@ class Query:
         """
         if not isinstance(self.constraints, list):
             raise ValueError(
-                "Constraints must be a list (`List[Constraint]`). Instead is of type '{}'.".format(
-                    type(self.constraints).__name__
-                )
+                f"Constraints must be a list (`List[Constraint]`). Instead is of type '{type(self.constraints).__name__}'."
             )
         if len(self.constraints) < 1:
             _default_logger.warning(
-                "DEPRECATION WARNING: "
-                "Invalid input value for type '{}': empty list of constraints. The number of "
-                "constraints must be at least 1.".format(type(self).__name__)
+                f"DEPRECATION WARNING: Invalid input value for type '{type(self).__name__}': empty list of constraints. The number of constraints must be at least 1."
             )
         if not self.is_valid(self.model):
             raise ValueError(
-                "Invalid input value for type '{}': the query is not valid "
-                "for the given data model.".format(type(self).__name__)
+                f"Invalid input value for type '{type(self).__name__}': the query is not valid for the given data model."
             )
 
     def __eq__(self, other: Any) -> bool:
@@ -1582,9 +1559,7 @@ class Query:
 
     def __str__(self) -> str:
         """Get the string representation of the constraint."""
-        return "Query(constraints={},model={})".format(
-            [str(c) for c in self.constraints], self.model
-        )
+        return f"Query(constraints={[str(c) for c in self.constraints]},model={self.model})"
 
     def _encode(self) -> models_pb2.Query.Model:  # type: ignore
         """

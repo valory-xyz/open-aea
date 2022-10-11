@@ -105,7 +105,7 @@ class AcnNodeConfig:
         """Write current configuration to file."""
         with open(file_path, "w") as f:
             for key, value in self.config.items():
-                f.write("{}={}\n".format(key, value))
+                f.write(f"{key}={value}\n")
 
     @classmethod
     def from_file(cls, file_path: str, enable_checks: bool = True) -> "AcnNodeConfig":
@@ -125,9 +125,7 @@ class AcnNodeConfig:
         for nbr, line in enumerate(lines):
             parts = line.strip().split("=")
             if len(parts) != 2:
-                raise ValueError(
-                    "Malformed configuration line {}: {}".format(nbr + 1, line)
-                )
+                raise ValueError(f"Malformed configuration line {nbr + 1}: {line}")
             config[parts[0]] = parts[1]
 
         key = config[AcnNodeConfig.KEY]
@@ -182,7 +180,7 @@ class AcnNodeConfig:
             return
         parts = uri.split(":")
         if len(parts) != 2:
-            raise ValueError("Malformed uri '{}'".format(uri))
+            raise ValueError(f"Malformed uri '{uri}'")
         int(parts[1])
 
     @staticmethod
@@ -192,7 +190,7 @@ class AcnNodeConfig:
             return
         parts = maddr.split("/")
         if len(parts) != 7:
-            raise ValueError("Malformed multiaddress '{}'".format(maddr))
+            raise ValueError(f"Malformed multiaddress '{maddr}'")
         multihashdecode(b58decode(parts[-1]))
 
 

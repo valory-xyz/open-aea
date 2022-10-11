@@ -168,42 +168,30 @@ class HttpMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
-                    type(self.dialogue_reference)
-                ),
+                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[0])
-                ),
+                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[1])
-                ),
+                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
             )
             enforce(
                 type(self.message_id) is int,
-                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
-                    type(self.message_id)
-                ),
+                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
             )
             enforce(
                 type(self.target) is int,
-                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
-                    type(self.target)
-                ),
+                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, HttpMessage.Performative),
-                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
-                    self.valid_performatives, self.performative
-                ),
+                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
             )
 
             # Check correct contents
@@ -213,82 +201,58 @@ class HttpMessage(Message):
                 expected_nb_of_contents = 5
                 enforce(
                     isinstance(self.method, str),
-                    "Invalid type for content 'method'. Expected 'str'. Found '{}'.".format(
-                        type(self.method)
-                    ),
+                    f"Invalid type for content 'method'. Expected 'str'. Found '{type(self.method)}'.",
                 )
                 enforce(
                     isinstance(self.url, str),
-                    "Invalid type for content 'url'. Expected 'str'. Found '{}'.".format(
-                        type(self.url)
-                    ),
+                    f"Invalid type for content 'url'. Expected 'str'. Found '{type(self.url)}'.",
                 )
                 enforce(
                     isinstance(self.version, str),
-                    "Invalid type for content 'version'. Expected 'str'. Found '{}'.".format(
-                        type(self.version)
-                    ),
+                    f"Invalid type for content 'version'. Expected 'str'. Found '{type(self.version)}'.",
                 )
                 enforce(
                     isinstance(self.headers, str),
-                    "Invalid type for content 'headers'. Expected 'str'. Found '{}'.".format(
-                        type(self.headers)
-                    ),
+                    f"Invalid type for content 'headers'. Expected 'str'. Found '{type(self.headers)}'.",
                 )
                 enforce(
                     isinstance(self.body, bytes),
-                    "Invalid type for content 'body'. Expected 'bytes'. Found '{}'.".format(
-                        type(self.body)
-                    ),
+                    f"Invalid type for content 'body'. Expected 'bytes'. Found '{type(self.body)}'.",
                 )
             elif self.performative == HttpMessage.Performative.RESPONSE:
                 expected_nb_of_contents = 5
                 enforce(
                     isinstance(self.version, str),
-                    "Invalid type for content 'version'. Expected 'str'. Found '{}'.".format(
-                        type(self.version)
-                    ),
+                    f"Invalid type for content 'version'. Expected 'str'. Found '{type(self.version)}'.",
                 )
                 enforce(
                     type(self.status_code) is int,
-                    "Invalid type for content 'status_code'. Expected 'int'. Found '{}'.".format(
-                        type(self.status_code)
-                    ),
+                    f"Invalid type for content 'status_code'. Expected 'int'. Found '{type(self.status_code)}'.",
                 )
                 enforce(
                     isinstance(self.status_text, str),
-                    "Invalid type for content 'status_text'. Expected 'str'. Found '{}'.".format(
-                        type(self.status_text)
-                    ),
+                    f"Invalid type for content 'status_text'. Expected 'str'. Found '{type(self.status_text)}'.",
                 )
                 enforce(
                     isinstance(self.headers, str),
-                    "Invalid type for content 'headers'. Expected 'str'. Found '{}'.".format(
-                        type(self.headers)
-                    ),
+                    f"Invalid type for content 'headers'. Expected 'str'. Found '{type(self.headers)}'.",
                 )
                 enforce(
                     isinstance(self.body, bytes),
-                    "Invalid type for content 'body'. Expected 'bytes'. Found '{}'.".format(
-                        type(self.body)
-                    ),
+                    f"Invalid type for content 'body'. Expected 'bytes'. Found '{type(self.body)}'.",
                 )
 
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                "Incorrect number of contents. Expected {}. Found {}".format(
-                    expected_nb_of_contents, actual_nb_of_contents
-                ),
+                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
-                        self.target
-                    ),
+                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

@@ -63,7 +63,7 @@ def publish_agent(ctx: Context) -> None:
     name = ctx.agent_config.agent_name
     config_file_source_path = os.path.join(ctx.cwd, DEFAULT_AEA_CONFIG_FILE)
     readme_source_path = os.path.join(ctx.cwd, DEFAULT_README_FILE)
-    output_tar = os.path.join(ctx.cwd, "{}.tar.gz".format(name))
+    output_tar = os.path.join(ctx.cwd, f"{name}.tar.gz")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         package_dir = os.path.join(temp_dir, name)
@@ -92,7 +92,7 @@ def publish_agent(ctx: Context) -> None:
         if is_readme_present(readme_source_path):
             files["readme"] = open(readme_source_path, "rb")
         path = "/agents/create"
-        logger.debug("Publishing agent {} to Registry ...".format(name))
+        logger.debug(f"Publishing agent {name} to Registry ...")
         resp = cast(
             JSONLike, request_api("POST", path, data=data, is_auth=True, files=files)
         )
@@ -100,7 +100,5 @@ def publish_agent(ctx: Context) -> None:
         for fd in files.values():
             fd.close()
     click.echo(
-        "Successfully published agent {} to the Registry. Public ID: {}".format(
-            name, resp["public_id"]
-        )
+        f"Successfully published agent {name} to the Registry. Public ID: {resp['public_id']}"
     )

@@ -82,7 +82,7 @@ class AcnSerializer(Serializer):
             StatusBody.encode(performative.body, body)
             acn_msg.status.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = acn_msg.SerializeToString()
 
@@ -134,12 +134,12 @@ class AcnSerializer(Serializer):
             body = StatusBody.decode(pb2_body)
             performative_content["body"] = body
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return AcnMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

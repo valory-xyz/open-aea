@@ -57,9 +57,9 @@ def make_jsonschema_base_uri(base_uri_path: Path) -> str:
     :return: the string in URI form.
     """
     if os.name == "nt":  # pragma: nocover  # cause platform depended
-        root_path = "file:///{}/".format("/".join(base_uri_path.absolute().parts))
+        root_path = f"file:///{'/'.join(base_uri_path.absolute().parts)}/"
     else:  # pragma: nocover  # cause platform depended
-        root_path = "file://{}/".format(base_uri_path.absolute())
+        root_path = f"file://{base_uri_path.absolute()}/"
     return root_path
 
 

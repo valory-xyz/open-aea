@@ -187,7 +187,7 @@ class LocalNode:
             if envelope is None:
                 self.logger.debug("Receiving loop terminated.")
                 return
-            self.logger.debug("Handling envelope: {}".format(envelope))
+            self.logger.debug(f"Handling envelope: {envelope}")
             await self._handle_envelope(envelope)
 
     async def _handle_envelope(self, envelope: Envelope) -> None:
@@ -216,9 +216,7 @@ class LocalNode:
         oef_message, dialogue = self._get_message_and_dialogue(envelope)
 
         if dialogue is None:
-            self.logger.warning(
-                "Could not create dialogue for message={}".format(oef_message)
-            )
+            self.logger.warning(f"Could not create dialogue for message={oef_message}")
             return
 
         if oef_message.performative == OefSearchMessage.Performative.REGISTER_SERVICE:
@@ -364,7 +362,7 @@ class LocalNode:
         destination = envelope.to
         destination_queue = self._out_queues[destination]
         destination_queue._loop.call_soon_threadsafe(destination_queue.put_nowait, envelope)  # type: ignore  # pylint: disable=protected-access
-        self.logger.debug("Send envelope {}".format(envelope))
+        self.logger.debug(f"Send envelope {envelope}")
 
     async def disconnect(self, address: Address) -> None:
         """
@@ -452,7 +450,7 @@ class OEFLocalConnection(Connection):
             if envelope is None:  # pragma: no cover
                 self.logger.debug("Receiving task terminated.")
                 return None
-            self.logger.debug("Received envelope {}".format(envelope))
+            self.logger.debug(f"Received envelope {envelope}")
             return envelope
         except Exception:  # pragma: nocover # pylint: disable=broad-except
             return None

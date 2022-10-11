@@ -116,7 +116,7 @@ async def test_erc1155_get_deploy_transaction(erc1155_contract, ledger_apis_conn
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_TRANSACTION
-    ), "Error: {}".format(response_message.message)
+    ), f"Error: {response_message.message}"
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
     assert type(response_message.raw_transaction) == RawTransaction
@@ -166,7 +166,7 @@ async def test_erc1155_get_raw_transaction(
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_TRANSACTION
-    ), "Error: {}".format(response_message.message)
+    ), f"Error: {response_message.message}"
 
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
@@ -217,7 +217,7 @@ async def test_erc1155_get_raw_message(erc1155_contract, ledger_apis_connection)
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_MESSAGE
-    ), "Error: {}".format(response_message.message)
+    ), f"Error: {response_message.message}"
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
     assert type(response_message.raw_message) == RawMessage
@@ -259,7 +259,7 @@ async def test_erc1155_get_state(erc1155_contract, ledger_apis_connection):
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.STATE
-    ), "Error: {}".format(response_message.message)
+    ), f"Error: {response_message.message}"
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
     assert type(response_message.state) == State

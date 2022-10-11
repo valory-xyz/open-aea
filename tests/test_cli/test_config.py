@@ -111,9 +111,7 @@ class TestConfigGet:
         assert result.exit_code == 1
         assert (
             result.exception.message
-            == "The root of the dotted path must be one of: {}".format(
-                ALLOWED_PATH_ROOTS
-            )
+            == f"The root of the dotted path must be one of: {ALLOWED_PATH_ROOTS}"
         )
 
     def test_too_short_path_but_root_correct(self):
@@ -475,9 +473,7 @@ class TestConfigSet:
         assert result.exit_code == 1
         assert (
             result.exception.message
-            == "The root of the dotted path must be one of: {}".format(
-                ALLOWED_PATH_ROOTS
-            )
+            == f"The root of the dotted path must be one of: {ALLOWED_PATH_ROOTS}"
         )
 
     def test_too_short_path_but_root_correct(self):

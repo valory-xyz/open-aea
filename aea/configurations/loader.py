@@ -490,9 +490,7 @@ def load_configuration_object(
             configuration_object = configuration_loader.load(fp)
     except FileNotFoundError:
         raise FileNotFoundError(
-            "{} configuration not found: {}".format(
-                package_type.value.capitalize(), configuration_filepath
-            )
+            f"{package_type.value.capitalize()} configuration not found: {configuration_filepath}"
         )
     return configuration_object
 

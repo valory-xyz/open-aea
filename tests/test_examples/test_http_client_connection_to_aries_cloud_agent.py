@@ -123,9 +123,7 @@ class TestAEAToACA:
             message_id=1,
             performative=HttpMessage.Performative.REQUEST,
             method="GET",
-            url="http://{}:{}/status".format(
-                self.aca_admin_address, self.aca_admin_port
-            ),
+            url=f"http://{self.aca_admin_address}:{self.aca_admin_port}/status",
             headers="",
             version="",
             body=b"",
@@ -221,9 +219,7 @@ class TestAEAToACA:
             message_id=1,
             performative=HttpMessage.Performative.REQUEST,
             method="GET",
-            url="http://{}:{}/status".format(
-                self.aca_admin_address, self.aca_admin_port
-            ),
+            url=f"http://{self.aca_admin_address}:{self.aca_admin_port}/status",
             headers="",
             version="",
             body=b"",

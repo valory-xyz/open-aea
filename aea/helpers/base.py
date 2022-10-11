@@ -95,12 +95,12 @@ def locate(path: str) -> Any:
         spec_name = ".".join(parts[: n + 1])
         module_location = os.path.join(file_location, "__init__.py")
         spec = importlib.util.spec_from_file_location(spec_name, module_location)
-        _default_logger.debug("Trying to import {}".format(module_location))
+        _default_logger.debug(f"Trying to import {module_location}")
         nextmodule = _get_module(cast(ModuleSpec, spec))
         if nextmodule is None:
             module_location = file_location + ".py"
             spec = importlib.util.spec_from_file_location(spec_name, module_location)
-            _default_logger.debug("Trying to import {}".format(module_location))
+            _default_logger.debug(f"Trying to import {module_location}")
             nextmodule = _get_module(cast(ModuleSpec, spec))
 
         if nextmodule:
@@ -225,9 +225,7 @@ class RegexConstrainedString(UserString):
 
     def _handle_no_match(self) -> None:
         raise ValueError(
-            "Value {data} does not match the regular expression {regex}".format(
-                data=self.data, regex=self.REGEX
-            )
+            f"Value {self.data} does not match the regular expression {self.REGEX}"
         )
 
 

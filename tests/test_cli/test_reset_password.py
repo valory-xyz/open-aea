@@ -58,5 +58,5 @@ class DoPasswordResetTestCase(TestCase):
         _do_password_reset(email)
         registry_reset_password_mock.assert_called_once_with(email)
         echo_mock.assert_called_once_with(
-            "An email with a password reset link was sent to {}".format(email)
+            f"An email with a password reset link was sent to {email}"
         )

@@ -994,9 +994,7 @@ class TestRunFailsWhenConfigurationFileNotFound:
 
     def test_log_error_message(self):
         """Test that the log error message is fixed."""
-        s = "Agent configuration file '{}' not found in the current directory.".format(
-            DEFAULT_AEA_CONFIG_FILE
-        )
+        s = f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' not found in the current directory."
         assert self.result.exception.message == s
 
     @classmethod
@@ -1106,12 +1104,7 @@ class TestRunFailsWhenConfigurationFileInvalid:
 
     def test_log_error_message(self):
         """Test that the log error message is fixed."""
-        s = (
-            "Agent configuration file '{}' is invalid: `ExtraPropertiesError: properties not expected: "
-            "invalid_attribute`. Please check the documentation.".format(
-                DEFAULT_AEA_CONFIG_FILE
-            )
-        )
+        s = f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' is invalid: `ExtraPropertiesError: properties not expected: invalid_attribute`. Please check the documentation."
         assert self.result.exception.message == s
 
     @classmethod
@@ -1233,9 +1226,7 @@ class TestRunFailsWhenConnectionConfigFileNotFound:
 
     def test_log_error_message(self):
         """Test that the log error message is fixed."""
-        s = "Connection configuration not found: {}".format(
-            self.relative_connection_configuration_path
-        )
+        s = f"Connection configuration not found: {self.relative_connection_configuration_path}"
         assert self.result.exception.message == s
 
     @classmethod
@@ -1287,12 +1278,7 @@ class TestRunFailsWhenConnectionNotComplete(AEATestCaseEmpty):
 
     def test_run(self):
         """Run the test."""
-        expected_message = (
-            "Package loading error: An error occurred while loading connection {}: Connection module "
-            "'{}' not found.".format(
-                self.connection_id, self.relative_connection_module_path
-            )
-        )
+        expected_message = f"Package loading error: An error occurred while loading connection {self.connection_id}: Connection module '{self.relative_connection_module_path}' not found."
         with pytest.raises(ClickException, match=re.escape(expected_message)):
             self.run_cli_command(
                 "--skip-consistency-check",
@@ -1338,10 +1324,7 @@ class TestRunFailsWhenConnectionClassNotPresent(AEATestCaseEmpty):
 
     def test_run(self):
         """Run the test."""
-        expected_message = (
-            "Package loading error: An error occurred while loading connection {}: Connection class '{"
-            "}' not found.".format(self.connection_id, "HTTPClientConnection")
-        )
+        expected_message = f"Package loading error: An error occurred while loading connection {self.connection_id}: Connection class 'HTTPClientConnection' not found."
         with pytest.raises(ClickException, match=expected_message):
             self.run_cli_command(
                 "--skip-consistency-check",
@@ -1416,9 +1399,7 @@ class TestRunFailsWhenProtocolConfigFileNotFound:
 
     def test_log_error_message(self):
         """Test that the log error message is fixed."""
-        s = "Protocol configuration not found: {}".format(
-            self.relative_configuration_file_path
-        )
+        s = f"Protocol configuration not found: {self.relative_configuration_file_path}"
         assert self.result.exception.message == s
 
     @classmethod
@@ -1500,9 +1481,7 @@ class TestRunFailsWhenProtocolNotComplete:
 
     def test_log_error_message(self):
         """Test that the log error message is fixed."""
-        s = "Protocol configuration not found: {}".format(
-            self.relative_configuration_file_path
-        )
+        s = f"Protocol configuration not found: {self.relative_configuration_file_path}"
         assert self.result.exception.message == s
 
     @classmethod

@@ -150,7 +150,7 @@ class TestRemoveConnectionFailsWhenConnectionDoesNotExist:
 
         The expected message is: 'Connection '{connection_name}' not found.'
         """
-        s = "The connection '{}' is not supported.".format(self.connection_id)
+        s = f"The connection '{self.connection_id}' is not supported."
         assert self.result.exception.message == s
 
     @classmethod

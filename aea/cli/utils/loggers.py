@@ -51,7 +51,7 @@ class ColorFormatter(logging.Formatter):
             level = record.levelname.lower()
             msg = record.getMessage()
             if level in self.colors:
-                prefix = click.style("{}: ".format(level), **self.colors[level])  # type: ignore
+                prefix = click.style(f"{level}: ", **self.colors[level])  # type: ignore
                 msg = "\n".join(prefix + x for x in msg.splitlines())
             return msg
         return logging.Formatter.format(self, record)  # pragma: no cover
@@ -77,7 +77,7 @@ def simple_verbosity_option(
     kwargs.setdefault("type", click.Choice(LOG_LEVELS, case_sensitive=False))
     kwargs.setdefault("metavar", "LVL")
     kwargs.setdefault("expose_value", False)
-    kwargs.setdefault("help", "One of {}".format(", ".join(LOG_LEVELS)))
+    kwargs.setdefault("help", f"One of {', '.join(LOG_LEVELS)}")
     kwargs.setdefault("is_eager", True)
 
     def decorator(f: Callable) -> Callable:

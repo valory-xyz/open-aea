@@ -377,9 +377,7 @@ class Agent2Handler(Handler):
         self.handled_message = message
         assert (
             dialogue is not None
-        ), "Agent 2 didn't update dialogue with incoming message {}".format(
-            str(message)
-        )
+        ), f"Agent 2 didn't update dialogue with incoming message {str(message)}"
         dialogue.reply(
             target_message=message,
             performative=self.message_2.performative,

@@ -147,9 +147,7 @@ class SkillContext:
         """Set the status of the skill (active/not active)."""
         self._is_active = value
         self.logger.debug(
-            "New status of skill {}: is_active={}".format(
-                self.skill_id, self._is_active
-            )
+            f"New status of skill {self.skill_id}: is_active={self._is_active}"
         )
 
     @property
@@ -326,7 +324,7 @@ class SkillComponent(ABC):
         self._context = skill_context
         if len(kwargs) != 0:
             self.context.logger.warning(
-                "The kwargs={} passed to {} have not been set!".format(kwargs, name)
+                f"The kwargs={kwargs} passed to {name} have not been set!"
             )
 
     @property
@@ -827,9 +825,7 @@ def _print_warning_message_for_non_declared_skill_components(
     """Print a warning message if a skill component is not declared in the config files."""
     for class_name in classes.difference(config_components):
         skill_context.logger.warning(
-            "Class {} of type {} found in skill module {} but not declared in the configuration file.".format(
-                class_name, item_type, module_path
-            )
+            f"Class {class_name} of type {item_type} found in skill module {module_path} but not declared in the configuration file."
         )
 
 

@@ -207,16 +207,12 @@ class _DependenciesManager:
         """
         if component_id not in self.all_dependencies:
             raise ValueError(
-                "Component {} of type {} not present.".format(
-                    component_id.public_id, component_id.component_type
-                )
+                f"Component {component_id.public_id} of type {component_id.component_type} not present."
             )
         dependencies = self._inverse_dependency_graph.get(component_id, set())
         if len(dependencies) != 0:
             raise ValueError(
-                "Cannot remove component {} of type {}. Other components depends on it: {}".format(
-                    component_id.public_id, component_id.component_type, dependencies
-                )
+                f"Cannot remove component {component_id.public_id} of type {component_id.component_type}. Other components depends on it: {dependencies}"
             )
 
         # remove from the index of all dependencies
@@ -504,9 +500,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
                 )
         except Exception as e:  # pragma: nocover
             self.logger.error(
-                "Could not locate decision maker handler for dotted path '{}' and file path '{}'. Error message: {}".format(
-                    dotted_path, self._decision_maker_handler_file_path, e
-                )
+                f"Could not locate decision maker handler for dotted path '{dotted_path}' and file path '{self._decision_maker_handler_file_path}'. Error message: {e}"
             )
             raise  # log and re-raise because we should not build an agent from an invalid configuration
 
@@ -514,9 +508,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             _class = getattr(module, class_name)
         except Exception as e:  # pragma: nocover
             self.logger.error(
-                "Could not locate decision maker handler for dotted path '{}', class name '{}' and file path '{}'. Error message: {}".format(
-                    dotted_path, class_name, self._decision_maker_handler_file_path, e
-                )
+                f"Could not locate decision maker handler for dotted path '{dotted_path}', class name '{class_name}' and file path '{self._decision_maker_handler_file_path}'. Error message: {e}"
             )
             raise  # log and re-raise because we should not build an agent from an invalid configuration
 
@@ -549,9 +541,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
                 module = load_module(dotted_path, Path(self._error_handler_file_path))
         except Exception as e:  # pragma: nocover
             self.logger.error(
-                "Could not locate error handler for dotted path '{}' and file path '{}'. Error message: {}".format(
-                    dotted_path, self._error_handler_file_path, e
-                )
+                f"Could not locate error handler for dotted path '{dotted_path}' and file path '{self._error_handler_file_path}'. Error message: {e}"
             )
             raise  # log and re-raise because we should not build an agent from an invalid configuration
 
@@ -559,9 +549,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             _class = getattr(module, class_name)
         except Exception as e:  # pragma: nocover
             self.logger.error(
-                "Could not locate error handler for dotted path '{}', class name '{}' and file path '{}'. Error message: {}".format(
-                    dotted_path, class_name, self._error_handler_file_path, e
-                )
+                f"Could not locate error handler for dotted path '{dotted_path}', class name '{class_name}' and file path '{self._error_handler_file_path}'. Error message: {e}"
             )
             raise  # log and re-raise because we should not build an agent from an invalid configuration
 
@@ -749,9 +737,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         """
         if component_id not in self._package_dependency_manager.all_dependencies:
             raise ValueError(
-                "Component {} of type {} not present.".format(
-                    component_id.public_id, component_id.component_type
-                )
+                f"Component {component_id.public_id} of type {component_id.component_type} not present."
             )
 
     def _check_can_add(self, configuration: ComponentConfiguration) -> None:
@@ -1268,9 +1254,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             )
             if len(non_supported_connections) > 0:
                 raise ValueError(
-                    "Connection ids {} not declared in the configuration file.".format(
-                        sorted(map(str, non_supported_connections))
-                    )
+                    f"Connection ids {sorted(map(str, non_supported_connections))} not declared in the configuration file."
                 )
             selected_connections_ids = [
                 component_id.public_id
@@ -1597,9 +1581,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             in self._package_dependency_manager.all_dependencies
         ):
             raise AEAException(
-                "Component '{}' of type '{}' already added.".format(
-                    configuration.public_id, configuration.component_type
-                )
+                f"Component '{configuration.public_id}' of type '{configuration.component_type}' already added."
             )
 
     def _check_package_dependencies(
@@ -1620,11 +1602,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         has_all_dependencies = len(not_supported_packages) == 0
         if not has_all_dependencies:
             raise AEAException(
-                "Package '{}' of type '{}' cannot be added. Missing dependencies: {}".format(
-                    configuration.public_id,
-                    configuration.component_type.value,
-                    pprint.pformat(sorted(map(str, not_supported_packages))),
-                )
+                f"Package '{configuration.public_id}' of type '{configuration.component_type.value}' cannot be added. Missing dependencies: {pprint.pformat(sorted(map(str, not_supported_packages)))}"
             )
 
     def _check_pypi_dependencies(self, configuration: ComponentConfiguration) -> None:
@@ -1693,9 +1671,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
                 return agent_configuration
         except FileNotFoundError:  # pragma: nocover
             raise ValueError(
-                "Agent configuration file '{}' not found in the current directory.".format(
-                    DEFAULT_AEA_CONFIG_FILE
-                )
+                f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' not found in the current directory."
             )
         except (
             AEAValidationError,
@@ -1703,9 +1679,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             ExtraPropertiesError,
         ) as e:  # pragma: nocover
             raise AEAValidationError(
-                "Agent configuration file '{}' is invalid: `{}`. Please check the documentation.".format(
-                    DEFAULT_AEA_CONFIG_FILE, str(e)
-                )
+                f"Agent configuration file '{DEFAULT_AEA_CONFIG_FILE}' is invalid: `{str(e)}`. Please check the documentation."
             )
 
     @staticmethod

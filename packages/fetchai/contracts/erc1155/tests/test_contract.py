@@ -384,7 +384,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
         assert len(data) > 0 and data.startswith("0x")
         assert all(
             [key in tx for key in ["value", "from", "gas", "gasPrice", "nonce"]]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
         tx = self.contract.get_create_batch_transaction(
             ledger_api=self.ledger_api,
             contract_address=ETHEREUM_ADDRESS_ONE,
@@ -399,7 +399,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                 key in tx
                 for key in ["value", "chainId", "gas", "gasPrice", "nonce", "to"]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
         tx = self.contract.get_create_single_transaction(
             ledger_api=self.ledger_api,
             contract_address=ETHEREUM_ADDRESS_ONE,
@@ -414,7 +414,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                 key in tx
                 for key in ["value", "chainId", "gas", "gasPrice", "nonce", "to"]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
         mint_quantities = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         tx = self.contract.get_mint_batch_transaction(
             ledger_api=self.ledger_api,
@@ -432,7 +432,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                 key in tx
                 for key in ["value", "chainId", "gas", "gasPrice", "nonce", "to"]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
         mint_quantity = 1
         tx = self.contract.get_mint_single_transaction(
             ledger_api=self.ledger_api,
@@ -450,7 +450,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                 key in tx
                 for key in ["value", "chainId", "gas", "gasPrice", "nonce", "to"]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
 
     @pytest.mark.integration
     def test_get_single_atomic_swap(self) -> None:
@@ -503,7 +503,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                     "from",
                 ]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
 
     @pytest.mark.integration
     def test_get_batch_atomic_swap(self) -> None:
@@ -556,7 +556,7 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
                     "from",
                 ]
             ]
-        ), "Error, found: {}".format(tx)
+        ), f"Error, found: {tx}"
 
     @pytest.mark.integration
     def test_full(self) -> None:

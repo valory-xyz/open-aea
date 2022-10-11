@@ -234,9 +234,7 @@ class SigningHandler(Handler):
         :param msg: the message
         """
         self.context.logger.info(
-            "received invalid signing message={}, unidentified dialogue.".format(
-                signing_msg
-            )
+            f"received invalid signing message={signing_msg}, unidentified dialogue."
         )
 
     def _handle_signed_transaction(
@@ -263,9 +261,7 @@ class SigningHandler(Handler):
         :return: None
         """
         self.context.logger.info(
-            "transaction signing was not successful. Error_code={} in dialogue={}".format(
-                signing_msg.error_code, signing_dialogue
-            )
+            f"transaction signing was not successful. Error_code={signing_msg.error_code} in dialogue={signing_dialogue}"
         )
 
     def _handle_invalid(
@@ -279,9 +275,7 @@ class SigningHandler(Handler):
         :return: None
         """
         self.context.logger.warning(
-            "cannot handle signing message of performative={} in dialogue={}.".format(
-                signing_msg.performative, signing_dialogue
-            )
+            f"cannot handle signing message of performative={signing_msg.performative} in dialogue={signing_dialogue}."
         )
 
 

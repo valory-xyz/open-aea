@@ -102,9 +102,7 @@ class TestGenerateProtocolFullMode:
 
     def test_exit_code_equal_to_0(self):
         """Test that the exit code is equal to 0 when generating a protocol."""
-        assert self.result.exit_code == 0, "Failed with stdout='{}'".format(
-            self.result.stdout
-        )
+        assert self.result.exit_code == 0, f"Failed with stdout='{self.result.stdout}'"
 
     def test_resource_folder_contains_configuration_file(self):
         """Test that the protocol folder contains a structurally valid configuration file."""
@@ -190,9 +188,7 @@ class TestGenerateProtocolProtobufOnlyMode:
 
     def test_exit_code_equal_to_0(self):
         """Test that the exit code is equal to 0 when generating a protocol."""
-        assert self.result.exit_code == 0, "Failed with stdout='{}'".format(
-            self.result.stdout
-        )
+        assert self.result.exit_code == 0, f"Failed with stdout='{self.result.stdout}'"
 
     def test_resource_folder_contains_protobuf_schema_file(self):
         """Test that the protocol folder contains a structurally valid configuration file."""
@@ -295,9 +291,7 @@ class TestGenerateProtocolFailsWhenDirectoryAlreadyExists:
         """
         s = (
             "Protocol is NOT generated. The following error happened while generating the protocol:\n"
-            + "A directory with name '{}' already exists. Aborting...".format(
-                self.protocol_name
-            )
+            + f"A directory with name '{self.protocol_name}' already exists. Aborting..."
         )
         assert self.result.exception.message == s
 

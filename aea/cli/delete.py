@@ -39,7 +39,7 @@ from aea.cli.utils.context import Context
 @click.pass_context
 def delete(click_context: click.Context, agent_name: str) -> None:
     """Delete an agent."""
-    click.echo("Deleting AEA project directory './{}'...".format(agent_name))
+    click.echo(f"Deleting AEA project directory './{agent_name}'...")
     ctx = cast(Context, click_context.obj)
     delete_aea(ctx, agent_name)
 

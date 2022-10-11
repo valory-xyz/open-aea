@@ -270,9 +270,7 @@ def test_item(
     :param pytest_arguments: arguments to forward to Pytest
     """
     click.echo(
-        "Executing tests of component of type {}, {}' ...".format(
-            item_type, item_public_id
-        )
+        f"Executing tests of component of type {item_type}, {item_public_id}' ..."
     )
     package_dirpath = Path(
         get_package_path(ctx.cwd, item_type, item_public_id, is_vendor=False)
@@ -488,7 +486,7 @@ def find_component_directory_from_component_id_in_registry(
     if package_path.exists() and package_path.is_dir():
         return package_path
 
-    raise ValueError("Package {} not found.".format(component_id))
+    raise ValueError(f"Package {component_id} not found.")
 
 
 def aggregate_coverage(coverage_data: List[str], covrc_file: Path) -> None:

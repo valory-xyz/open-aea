@@ -116,9 +116,7 @@ def _golang_module_run(
             shell=False,
         )
     except Exception as e:
-        logger.error(
-            "While executing go run . {} at {} : {}".format(path, args, str(e))
-        )
+        logger.error(f"While executing go run . {path} at {args} : {str(e)}")
         raise e
 
     return proc
@@ -388,9 +386,9 @@ class Libp2pNode:
             os.remove(self.env_file)  # pragma: nocover
 
         config = ""
-        config += "AEA_AGENT_ADDR={}\n".format(self.address)
-        config += "AEA_P2P_ID={}\n".format(self.key)
-        config += "AEA_P2P_URI={}\n".format(str(self.uri))
+        config += f"AEA_AGENT_ADDR={self.address}\n"
+        config += f"AEA_P2P_ID={self.key}\n"
+        config += f"AEA_P2P_URI={str(self.uri)}\n"
         config += "AEA_P2P_ENTRY_URIS={}\n".format(
             ",".join(
                 [
@@ -400,35 +398,21 @@ class Libp2pNode:
                 ]
             )
         )
-        config += "NODE_TO_AEA={}\n".format(pipe_in_path)
-        config += "AEA_TO_NODE={}\n".format(pipe_out_path)
-        config += "AEA_P2P_URI_PUBLIC={}\n".format(
-            str(self.public_uri) if self.public_uri is not None else ""
-        )
-        config += "AEA_P2P_DELEGATE_URI={}\n".format(
-            str(self.delegate_uri) if self.delegate_uri is not None else ""
-        )
-        config += "AEA_P2P_URI_MONITORING={}\n".format(
-            str(self.monitoring_uri) if self.monitoring_uri is not None else ""
-        )
-        config += "AEA_P2P_POR_ADDRESS={}\n".format(self.record.address)
-        config += "AEA_P2P_POR_PUBKEY={}\n".format(self.record.public_key)
-        config += "AEA_P2P_POR_PEER_PUBKEY={}\n".format(
-            self.record.representative_public_key
-        )
-        config += "AEA_P2P_POR_SIGNATURE={}\n".format(self.record.signature)
-        config += "AEA_P2P_POR_SERVICE_ID={}\n".format(POR_DEFAULT_SERVICE_ID)
-        config += "AEA_P2P_POR_LEDGER_ID={}\n".format(self.record.ledger_id)
-        config += "AEA_P2P_CFG_REGISTRATION_DELAY={}\n".format(
-            str(self.peer_registration_delay)
-            if self.peer_registration_delay is not None
-            else str(0.0)
-        )
-        config += "AEA_P2P_CFG_STORAGE_PATH={}\n".format(
-            self.records_storage_path if self.records_storage_path is not None else ""
-        )
+        config += f"NODE_TO_AEA={pipe_in_path}\n"
+        config += f"AEA_TO_NODE={pipe_out_path}\n"
+        config += f"AEA_P2P_URI_PUBLIC={str(self.public_uri) if self.public_uri is not None else ''}\n"
+        config += f"AEA_P2P_DELEGATE_URI={str(self.delegate_uri) if self.delegate_uri is not None else ''}\n"
+        config += f"AEA_P2P_URI_MONITORING={str(self.monitoring_uri) if self.monitoring_uri is not None else ''}\n"
+        config += f"AEA_P2P_POR_ADDRESS={self.record.address}\n"
+        config += f"AEA_P2P_POR_PUBKEY={self.record.public_key}\n"
+        config += f"AEA_P2P_POR_PEER_PUBKEY={self.record.representative_public_key}\n"
+        config += f"AEA_P2P_POR_SIGNATURE={self.record.signature}\n"
+        config += f"AEA_P2P_POR_SERVICE_ID={POR_DEFAULT_SERVICE_ID}\n"
+        config += f"AEA_P2P_POR_LEDGER_ID={self.record.ledger_id}\n"
+        config += f"AEA_P2P_CFG_REGISTRATION_DELAY={str(self.peer_registration_delay) if self.peer_registration_delay is not None else str(0.0)}\n"
+        config += f"AEA_P2P_CFG_STORAGE_PATH={self.records_storage_path if self.records_storage_path is not None else ''}\n"
 
-        config += "AEA_P2P_MAILBOX_URI={}\n".format(self.mailbox_uri)
+        config += f"AEA_P2P_MAILBOX_URI={self.mailbox_uri}\n"
 
         with open(self.env_file, "w") as env_file:  # overwrite if exists
             env_file.write(config)
@@ -506,16 +490,12 @@ class Libp2pNode:
                 raise Exception("Couldn't connect to libp2p process within timeout")
         except Exception as e:
             err_msg = self.get_libp2p_node_error()
-            self.logger.error("Couldn't connect to libp2p process: {}".format(err_msg))
-            self.logger.error(
-                "Libp2p process configuration:\n{}".format(env_file_data.strip())
-            )
+            self.logger.error(f"Couldn't connect to libp2p process: {err_msg}")
+            self.logger.error(f"Libp2p process configuration:\n{env_file_data.strip()}")
             if err_msg == "":
                 with open(self.log_file, "r") as f:
                     self.logger.error(
-                        "Libp2p process log file {}:\n{}".format(
-                            self.log_file, f.read()
-                        )
+                        f"Libp2p process log file {self.log_file}:\n{f.read()}"
                     )
             else:  # pragma: nocover
                 log_data = Path(self.log_file).read_text()
@@ -543,13 +523,11 @@ class Libp2pNode:
         if self.public_uri is not None:
             msg += "full DHT mode with "
             if self.delegate_uri is not None:  # pragma: nocover
-                msg += "delegate service reachable at '{}:{}' and relay service enabled. ".format(
-                    self.public_uri.host, self.delegate_uri.port
-                )
+                msg += f"delegate service reachable at '{self.public_uri.host}:{self.delegate_uri.port}' and relay service enabled. "
             else:
                 msg += "relay service enabled. "
 
-            msg += "To join its network use multiaddr '{}'.".format(self.multiaddrs[0])
+            msg += f"To join its network use multiaddr '{self.multiaddrs[0]}'."
         else:
             msg += "relayed mode and cannot be used as entry peer."
 
@@ -612,12 +590,12 @@ class Libp2pNode:
     async def stop(self) -> None:
         """Stop the node."""
         if self.proc is not None:
-            self.logger.debug("Terminating node process {}...".format(self.proc.pid))
+            self.logger.debug(f"Terminating node process {self.proc.pid}...")
             self._is_on_stop = True
             self.proc.poll()
             self.proc.terminate()
             self.logger.debug(
-                "Waiting for node process {} to terminate...".format(self.proc.pid)
+                f"Waiting for node process {self.proc.pid} to terminate..."
             )
             self.proc.wait()
             if self._log_file_desc is None:
@@ -651,9 +629,7 @@ class P2PLibp2pConnection(Connection):
         ledger_id = self.configuration.config.get("ledger_id", DEFAULT_LEDGER)
         if ledger_id not in SUPPORTED_LEDGER_IDS:
             raise ValueError(  # pragma: nocover
-                "Ledger id '{}' is not supported. Supported ids: '{}'".format(
-                    ledger_id, SUPPORTED_LEDGER_IDS
-                )
+                f"Ledger id '{ledger_id}' is not supported. Supported ids: '{SUPPORTED_LEDGER_IDS}'"
             )
         libp2p_local_uri: Optional[str] = self.configuration.config.get("local_uri")
         libp2p_public_uri: Optional[str] = self.configuration.config.get("public_uri")
@@ -757,7 +733,7 @@ class P2PLibp2pConnection(Connection):
         )
 
         # libp2p local node
-        self.logger.debug("Public key used by libp2p node: {}".format(key.public_key))
+        self.logger.debug(f"Public key used by libp2p node: {key.public_key}")
 
         if self.configuration.config.get("mailbox_uri"):
             mailbox_uri = str(self.configuration.config.get("mailbox_uri"))

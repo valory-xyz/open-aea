@@ -123,9 +123,9 @@ class TestAddSkillFailsWhenSkillAlreadyExists:
     def test_add_skill_from_registry_positive(self, fetch_package_mock, *mocks):
         """Test add from registry positive result."""
         fetch_package_mock.return_value = Path(
-            "vendor/{}/skills/{}".format(self.skill_author, self.skill_name)
+            f"vendor/{self.skill_author}/skills/{self.skill_name}"
         )
-        public_id = "{}/{}:{}".format(AUTHOR, self.skill_name, self.skill_version)
+        public_id = f"{AUTHOR}/{self.skill_name}:{self.skill_version}"
         obj_type = "skill"
         result = self.runner.invoke(
             cli,
@@ -274,7 +274,7 @@ class TestAddSkillFailsWhenSkillNotInRegistry:
 
         The expected message is: 'Cannot find skill: '{skill_name}''
         """
-        s = "Cannot find skill: '{}'.".format(self.skill_id)
+        s = f"Cannot find skill: '{self.skill_id}'."
         assert self.result.exception.message == s
 
     @classmethod
@@ -329,7 +329,7 @@ class TestAddSkillFailsWhenDifferentPublicId:
 
     def test_error_message_skill_wrong_public_id(self):
         """Test that the log error message is fixed."""
-        s = "Cannot find skill: '{}'.".format(self.skill_id)
+        s = f"Cannot find skill: '{self.skill_id}'."
         assert self.result.exception.message == s
 
     @classmethod

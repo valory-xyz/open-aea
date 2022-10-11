@@ -163,42 +163,30 @@ class AcnMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
-                    type(self.dialogue_reference)
-                ),
+                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[0])
-                ),
+                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[1])
-                ),
+                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
             )
             enforce(
                 type(self.message_id) is int,
-                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
-                    type(self.message_id)
-                ),
+                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
             )
             enforce(
                 type(self.target) is int,
-                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
-                    type(self.target)
-                ),
+                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, AcnMessage.Performative),
-                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
-                    self.valid_performatives, self.performative
-                ),
+                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
             )
 
             # Check correct contents
@@ -208,64 +196,48 @@ class AcnMessage(Message):
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.record, CustomAgentRecord),
-                    "Invalid type for content 'record'. Expected 'AgentRecord'. Found '{}'.".format(
-                        type(self.record)
-                    ),
+                    f"Invalid type for content 'record'. Expected 'AgentRecord'. Found '{type(self.record)}'.",
                 )
             elif self.performative == AcnMessage.Performative.LOOKUP_REQUEST:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.agent_address, str),
-                    "Invalid type for content 'agent_address'. Expected 'str'. Found '{}'.".format(
-                        type(self.agent_address)
-                    ),
+                    f"Invalid type for content 'agent_address'. Expected 'str'. Found '{type(self.agent_address)}'.",
                 )
             elif self.performative == AcnMessage.Performative.LOOKUP_RESPONSE:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.record, CustomAgentRecord),
-                    "Invalid type for content 'record'. Expected 'AgentRecord'. Found '{}'.".format(
-                        type(self.record)
-                    ),
+                    f"Invalid type for content 'record'. Expected 'AgentRecord'. Found '{type(self.record)}'.",
                 )
             elif self.performative == AcnMessage.Performative.AEA_ENVELOPE:
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.envelope, bytes),
-                    "Invalid type for content 'envelope'. Expected 'bytes'. Found '{}'.".format(
-                        type(self.envelope)
-                    ),
+                    f"Invalid type for content 'envelope'. Expected 'bytes'. Found '{type(self.envelope)}'.",
                 )
                 enforce(
                     isinstance(self.record, CustomAgentRecord),
-                    "Invalid type for content 'record'. Expected 'AgentRecord'. Found '{}'.".format(
-                        type(self.record)
-                    ),
+                    f"Invalid type for content 'record'. Expected 'AgentRecord'. Found '{type(self.record)}'.",
                 )
             elif self.performative == AcnMessage.Performative.STATUS:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.body, CustomStatusBody),
-                    "Invalid type for content 'body'. Expected 'StatusBody'. Found '{}'.".format(
-                        type(self.body)
-                    ),
+                    f"Invalid type for content 'body'. Expected 'StatusBody'. Found '{type(self.body)}'.",
                 )
 
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                "Incorrect number of contents. Expected {}. Found {}".format(
-                    expected_nb_of_contents, actual_nb_of_contents
-                ),
+                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
-                        self.target
-                    ),
+                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

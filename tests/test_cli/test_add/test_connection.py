@@ -105,13 +105,9 @@ class TestAddConnectionFailsWhenConnectionAlreadyExists:
     def test_add_connection_from_registry_positive(self, fetch_package_mock, *mocks):
         """Test add from registry positive result."""
         fetch_package_mock.return_value = Path(
-            "vendor/{}/connections/{}".format(
-                self.connection_author, self.connection_name
-            )
+            f"vendor/{self.connection_author}/connections/{self.connection_name}"
         )
-        public_id = "{}/{}:{}".format(
-            AUTHOR, self.connection_name, self.connection_version
-        )
+        public_id = f"{AUTHOR}/{self.connection_name}:{self.connection_version}"
         obj_type = "connection"
         result = self.runner.invoke(
             cli,
@@ -274,7 +270,7 @@ class TestAddConnectionFailsWhenConnectionNotInRegistry:
 
         The expected message is: 'Cannot find connection: '{connection_name}''
         """
-        s = "Cannot find connection: '{}'.".format(self.connection_id)
+        s = f"Cannot find connection: '{self.connection_id}'."
         assert self.result.exception.message == s
 
     @classmethod
@@ -329,7 +325,7 @@ class TestAddConnectionFailsWhenDifferentPublicId:
 
     def test_error_message_connection_wrong_public_id(self):
         """Test that the log error message is fixed."""
-        s = "Cannot find connection: '{}'.".format(self.connection_id)
+        s = f"Cannot find connection: '{self.connection_id}'."
         assert self.result.exception.message == s
 
     @classmethod

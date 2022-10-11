@@ -53,7 +53,7 @@ class TestListProtocols:
         """Set the test up."""
         cls.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         cls.resolver = jsonschema.RefResolver(
-            "file://{}/".format(Path(CONFIGURATION_SCHEMA_DIR).absolute()), cls.schema
+            f"file://{Path(CONFIGURATION_SCHEMA_DIR).absolute()}/", cls.schema
         )
         cls.validator = Draft4Validator(cls.schema, resolver=cls.resolver)
         cls.cwd = os.getcwd()
@@ -78,7 +78,7 @@ class TestListProtocols:
 
     def test_correct_output(self):
         """Test that the command has printed the correct output."""
-        compare_text = "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+        compare_text = f"{FORMAT_ITEMS_SAMPLE_OUTPUT}\n"
         assert self.result.output == compare_text, self.result.output
 
     @classmethod
@@ -99,7 +99,7 @@ class TestListConnections:
         """Set the test up."""
         cls.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         cls.resolver = jsonschema.RefResolver(
-            "file://{}/".format(Path(CONFIGURATION_SCHEMA_DIR).absolute()), cls.schema
+            f"file://{Path(CONFIGURATION_SCHEMA_DIR).absolute()}/", cls.schema
         )
         cls.validator = Draft4Validator(cls.schema, resolver=cls.resolver)
         cls.cwd = os.getcwd()
@@ -122,7 +122,7 @@ class TestListConnections:
 
     def test_correct_output(self):
         """Test that the command has printed the correct output."""
-        compare_text = "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+        compare_text = f"{FORMAT_ITEMS_SAMPLE_OUTPUT}\n"
         assert self.result.output == compare_text, self.result.output
 
     @classmethod
@@ -143,7 +143,7 @@ class TestListSkills:
         """Set the test up."""
         cls.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         cls.resolver = jsonschema.RefResolver(
-            "file://{}/".format(Path(CONFIGURATION_SCHEMA_DIR).absolute()), cls.schema
+            f"file://{Path(CONFIGURATION_SCHEMA_DIR).absolute()}/", cls.schema
         )
         cls.validator = Draft4Validator(cls.schema, resolver=cls.resolver)
         cls.cwd = os.getcwd()
@@ -167,7 +167,7 @@ class TestListSkills:
 
     def test_correct_output(self):
         """Test that the command has printed the correct output."""
-        compare_text = "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+        compare_text = f"{FORMAT_ITEMS_SAMPLE_OUTPUT}\n"
         assert self.result.output == compare_text, self.result.output
 
     @classmethod
@@ -188,7 +188,7 @@ class ListContractsCommandTestCase(TestCase):
         self.runner = CliRunner()
         self.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         self.resolver = jsonschema.RefResolver(
-            "file://{}/".format(Path(CONFIGURATION_SCHEMA_DIR).absolute()), self.schema
+            f"file://{Path(CONFIGURATION_SCHEMA_DIR).absolute()}/", self.schema
         )
         self.validator = Draft4Validator(self.schema, resolver=self.resolver)
         self.cwd = os.getcwd()

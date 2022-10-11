@@ -701,7 +701,7 @@ class _CosmosApi(LedgerApi):
         if response.status_code == 200:
             result = response.json()
         else:  # pragma: nocover
-            raise ValueError("Cannot get state: {}".format(response.json()))
+            raise ValueError(f"Cannot get state: {response.json()}")
         return result
 
     def get_deploy_transaction(
@@ -1640,10 +1640,10 @@ class CosmosFaucetApi(FaucetApi):
                 uid = response.json()["uuid"]
             except KeyError:  # pragma: nocover
                 ValueError(f"key `uid` not found in response_json={response.json()}")
-            _default_logger.info("Wealth claim generated, uid: {}".format(uid))
+            _default_logger.info(f"Wealth claim generated, uid: {uid}")
         else:  # pragma: no cover
             _default_logger.warning(
-                "Response: {}, Text: {}".format(response.status_code, response.text)
+                f"Response: {response.status_code}, Text: {response.text}"
             )
 
         return uid
@@ -1666,7 +1666,7 @@ class CosmosFaucetApi(FaucetApi):
         response = requests.get(cls._faucet_status_uri(uid, url))
         if response.status_code != 200:  # pragma: nocover
             _default_logger.warning(
-                "Response: {}, Text: {}".format(response.status_code, response.text)
+                f"Response: {response.status_code}, Text: {response.text}"
             )
             return None
 

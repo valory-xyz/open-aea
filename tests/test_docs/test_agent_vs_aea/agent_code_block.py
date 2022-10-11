@@ -51,7 +51,7 @@ class MyAgent(Agent):
 
     def act(self):
         """Act implementation."""
-        print("Act called for tick {}".format(self.tick))
+        print(f"Act called for tick {self.tick}")
 
     def handle_envelope(self, envelope: Envelope) -> None:
         """
@@ -60,7 +60,7 @@ class MyAgent(Agent):
         :param envelope: the envelope received
         :return: None
         """
-        print("React called for tick {}".format(self.tick))
+        print(f"React called for tick {self.tick}")
         if (
             envelope is not None
             and envelope.protocol_specification_id
@@ -74,9 +74,7 @@ class MyAgent(Agent):
             envelope.message.sender = receiver
             envelope.message.to = sender
             print(
-                "Received envelope from {} with protocol_specification_id={}".format(
-                    sender, envelope.protocol_specification_id
-                )
+                f"Received envelope from {sender} with protocol_specification_id={envelope.protocol_specification_id}"
             )
             self.outbox.put(envelope)
 

@@ -84,7 +84,7 @@ def _make_libp2p_connection(
 ) -> P2PLibp2pConnection:
     if not os.path.isdir(data_dir) or not os.path.exists(data_dir):
         raise ValueError("Data dir must be directory and exist!")
-    log_file = os.path.join(data_dir, "libp2p_node_{}.log".format(port))
+    log_file = os.path.join(data_dir, f"libp2p_node_{port}.log")
     if os.path.exists(log_file):
         os.remove(log_file)
     key = agent_key
@@ -114,11 +114,11 @@ def _make_libp2p_connection(
     if relay and delegate:
         configuration = ConnectionConfig(
             node_key_file=node_key_file,
-            local_uri="{}:{}".format(host, port),
-            public_uri="{}:{}".format(host, port),
+            local_uri=f"{host}:{port}",
+            public_uri=f"{host}:{port}",
             entry_peers=entry_peers,
             log_file=log_file,
-            delegate_uri="{}:{}".format(delegate_host, delegate_port),
+            delegate_uri=f"{delegate_host}:{delegate_port}",
             peer_registration_delay=peer_registration_delay,
             connection_id=P2PLibp2pConnection.connection_id,
             build_directory=build_directory,
@@ -127,8 +127,8 @@ def _make_libp2p_connection(
     elif relay and not delegate:
         configuration = ConnectionConfig(
             node_key_file=node_key_file,
-            local_uri="{}:{}".format(host, port),
-            public_uri="{}:{}".format(host, port),
+            local_uri=f"{host}:{port}",
+            public_uri=f"{host}:{port}",
             entry_peers=entry_peers,
             log_file=log_file,
             peer_registration_delay=peer_registration_delay,
@@ -139,7 +139,7 @@ def _make_libp2p_connection(
     else:
         configuration = ConnectionConfig(
             node_key_file=node_key_file,
-            local_uri="{}:{}".format(host, port),
+            local_uri=f"{host}:{port}",
             entry_peers=entry_peers,
             log_file=log_file,
             peer_registration_delay=peer_registration_delay,
@@ -193,9 +193,7 @@ def _make_libp2p_client_connection(
         tcp_key_file=None,
         nodes=[
             {
-                "uri": str(uri)
-                if uri is not None
-                else "{}:{}".format(node_host, node_port),
+                "uri": str(uri) if uri is not None else f"{node_host}:{node_port}",
                 "public_key": peer_public_key,
             },
         ],
@@ -235,9 +233,7 @@ def _make_libp2p_mailbox_connection(
         tcp_key_file=None,
         nodes=[
             {
-                "uri": str(uri)
-                if uri is not None
-                else "{}:{}".format(node_host, node_port),
+                "uri": str(uri) if uri is not None else f"{node_host}:{node_port}",
                 "public_key": peer_public_key,
             },
         ],

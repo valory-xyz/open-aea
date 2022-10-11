@@ -442,9 +442,7 @@ class TestScaffoldConnectionFailsWhenConnectionAlreadyExists:
 
         The expected message is: 'A connection with name '{connection_name}' already exists. Aborting...'
         """
-        s = "A connection with name '{}' already exists. Aborting...".format(
-            self.resource_name
-        )
+        s = f"A connection with name '{self.resource_name}' already exists. Aborting..."
         assert self.result.exception.message == s
 
     def test_resource_directory_exists(self):

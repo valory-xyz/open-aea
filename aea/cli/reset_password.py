@@ -41,4 +41,4 @@ def _do_password_reset(email: str) -> None:
     :param email: str email.
     """
     registry_reset_password(email)
-    click.echo("An email with a password reset link was sent to {}".format(email))
+    click.echo(f"An email with a password reset link was sent to {email}")

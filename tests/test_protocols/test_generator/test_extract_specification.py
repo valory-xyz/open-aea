@@ -327,21 +327,21 @@ class TestExtractSpecification(TestCase):
         with self.assertRaises(ProtocolSpecificationParseError) as cm:
             _specification_type_to_python_type(specification_type_8)
         self.assertEqual(
-            str(cm.exception), "Unsupported type: '{}'".format(specification_type_8)
+            str(cm.exception), f"Unsupported type: '{specification_type_8}'"
         )
 
         specification_type_9 = "pt:integer"
         with self.assertRaises(ProtocolSpecificationParseError) as cm:
             _specification_type_to_python_type(specification_type_9)
         self.assertEqual(
-            str(cm.exception), "Unsupported type: '{}'".format(specification_type_9)
+            str(cm.exception), f"Unsupported type: '{specification_type_9}'"
         )
 
         specification_type_10 = "pt: list"
         with self.assertRaises(ProtocolSpecificationParseError) as cm:
             _specification_type_to_python_type(specification_type_10)
         self.assertEqual(
-            str(cm.exception), "Unsupported type: '{}'".format(specification_type_10)
+            str(cm.exception), f"Unsupported type: '{specification_type_10}'"
         )
 
         specification_type_11 = "pt:list[wrong_sub_type]"

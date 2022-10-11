@@ -56,9 +56,7 @@ def _decode(e: bytes, separator: bytes = SEPARATOR) -> Envelope:
 
     if len(split) < 5 or split[-1] not in [b"", b"\n"]:
         raise ValueError(
-            "Expected at least 5 values separated by commas and last value being empty or new line, got {}".format(
-                len(split)
-            )
+            f"Expected at least 5 values separated by commas and last value being empty or new line, got {len(split)}"
         )
 
     to = split[0].decode("utf-8").strip().lstrip("\x00")
@@ -109,7 +107,7 @@ def write_envelope(
 ) -> None:
     """Write envelope to file."""
     encoded_envelope = _encode(envelope, separator=separator)
-    logger.debug("write {!r}: to {}".format(encoded_envelope, file_pointer.name))
+    logger.debug(f"write {encoded_envelope!r}: to {file_pointer.name}")
     write_with_lock(file_pointer, encoded_envelope, logger)
 
 
@@ -133,12 +131,12 @@ def envelope_from_bytes(
     :param logger: the logger
     :return: Envelope
     """
-    logger.debug("processing: {!r}".format(bytes_))
+    logger.debug(f"processing: {bytes_!r}")
     envelope = None  # type: Optional[Envelope]
     try:
         envelope = _decode(bytes_, separator=separator)
     except ValueError as e:
-        logger.error("Bad formatted input: {!r}. {}".format(bytes_, e))
+        logger.error(f"Bad formatted input: {bytes_!r}. {e}")
     except Exception as e:  # pragma: nocover # pylint: disable=broad-except
-        logger.exception("Error when processing a input. Message: {}".format(str(e)))
+        logger.exception(f"Error when processing a input. Message: {str(e)}")
     return envelope

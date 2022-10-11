@@ -419,9 +419,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
             except Exception as e:  # pylint: disable=broad-except
                 if not isinstance(e, (asyncio.CancelledError, CancelledError)):
                     self.logger.exception(
-                        "Error while connecting {}: {}".format(
-                            str(type(connection)), repr(e)
-                        )
+                        f"Error while connecting {str(type(connection))}: {repr(e)}"
                     )
                 raise
         self.logger.debug("Multiplexer connections are set.")
@@ -433,17 +431,15 @@ class AsyncMultiplexer(Runnable, WithLogger):
         :param connection_id: the id of the connection.
         """
         connection = self._id_to_connection[connection_id]
-        self.logger.debug("Processing connection {}".format(connection.connection_id))
+        self.logger.debug(f"Processing connection {connection.connection_id}")
         if connection.is_connected:
             self.logger.debug(
-                "Connection {} already established.".format(connection.connection_id)
+                f"Connection {connection.connection_id} already established."
             )
         else:
             await connection.connect()
             self.logger.debug(
-                "Connection {} has been set up successfully.".format(
-                    connection.connection_id
-                )
+                f"Connection {connection.connection_id} has been set up successfully."
             )
 
     async def _disconnect_all(self) -> None:
@@ -460,9 +456,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
                 )
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.exception(
-                    "Error while disconnecting {}: {}".format(
-                        str(type(connection)), str(e)
-                    )
+                    f"Error while disconnecting {str(type(connection))}: {str(e)}"
                 )
 
     async def _disconnect_one(self, connection_id: PublicId) -> None:
@@ -472,17 +466,15 @@ class AsyncMultiplexer(Runnable, WithLogger):
         :param connection_id: the id of the connection.
         """
         connection = self._id_to_connection[connection_id]
-        self.logger.debug("Processing connection {}".format(connection.connection_id))
+        self.logger.debug(f"Processing connection {connection.connection_id}")
         if not connection.is_connected:
             self.logger.debug(
-                "Connection {} already disconnected.".format(connection.connection_id)
+                f"Connection {connection.connection_id} already disconnected."
             )
         else:
             await connection.disconnect()
             self.logger.debug(
-                "Connection {} has been disconnected successfully.".format(
-                    connection.connection_id
-                )
+                f"Connection {connection.connection_id} has been disconnected successfully."
             )
 
     async def _send_loop(self) -> None:
@@ -502,14 +494,14 @@ class AsyncMultiplexer(Runnable, WithLogger):
                         "Received empty envelope. Quitting the sending loop..."
                     )
                     return None
-                self.logger.debug("Sending envelope {}".format(str(envelope)))
+                self.logger.debug(f"Sending envelope {str(envelope)}")
                 await self._send(envelope)
 
         except asyncio.CancelledError:
             self.logger.debug("Sending loop cancelled.")
             raise
         except Exception as e:  # pylint: disable=broad-except  # pragma: nocover
-            self.logger.exception("Error in the sending loop: {}".format(str(e)))
+            self.logger.exception(f"Error in the sending loop: {str(e)}")
             raise
 
     async def _receiving_loop(self) -> None:
@@ -542,7 +534,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
             self.logger.debug("Receiving loop cancelled.")
             raise
         except Exception as e:  # pylint: disable=broad-except
-            self.logger.exception("Error in the receiving loop: {}".format(str(e)))
+            self.logger.exception(f"Error in the receiving loop: {str(e)}")
             raise
         finally:
             # cancel all the receiving tasks.
@@ -603,7 +595,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
         if envelope.is_component_to_component_message:
             connection_id = envelope.to_as_public_id
             self.logger.debug(
-                "Using envelope `to` field as connection_id: {}".format(connection_id)
+                f"Using envelope `to` field as connection_id: {connection_id}"
             )
             enforce(
                 connection_id is not None,
@@ -615,23 +607,21 @@ class AsyncMultiplexer(Runnable, WithLogger):
         # first, try to route by envelope context connection id
         if envelope.context is not None and envelope.context.connection_id is not None:
             connection_id = envelope.context.connection_id
-            self.logger.debug(
-                "Using envelope context connection_id: {}".format(connection_id)
-            )
+            self.logger.debug(f"Using envelope context connection_id: {connection_id}")
             return connection_id
 
         # second, try to route by routing helper
         if envelope.to in self._routing_helper:
             connection_id = self._routing_helper[envelope.to]
             self.logger.debug(
-                "Using routing helper with connection_id: {}".format(connection_id)
+                f"Using routing helper with connection_id: {connection_id}"
             )
             return connection_id
 
         # third, try to route by default routing
         if envelope_protocol_id in self.default_routing:
             connection_id = self.default_routing[envelope_protocol_id]
-            self.logger.debug("Using default routing: {}".format(connection_id))
+            self.logger.debug(f"Using default routing: {connection_id}")
             return connection_id
 
         # forth, using default connection
@@ -640,7 +630,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
             if self.default_connection is not None
             else None
         )
-        self.logger.debug("Using default connection: {}".format(connection_id))
+        self.logger.debug(f"Using default connection: {connection_id}")
         return connection_id
 
     def _get_connection(self, connection_id: PublicId) -> Optional[Connection]:

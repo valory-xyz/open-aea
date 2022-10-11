@@ -94,7 +94,7 @@ class OefSearchSerializer(Serializer):
             )
             oef_search_msg.oef_error.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = oef_search_msg.SerializeToString()
 
@@ -154,12 +154,12 @@ class OefSearchSerializer(Serializer):
             oef_error_operation = OefErrorOperation.decode(pb2_oef_error_operation)
             performative_content["oef_error_operation"] = oef_error_operation
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return OefSearchMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

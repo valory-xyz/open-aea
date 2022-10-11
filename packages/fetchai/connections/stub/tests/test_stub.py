@@ -135,16 +135,7 @@ class TestStubConnectionReception:
         # a message containing delimiters and newline characters
         msg = b"\x08\x02\x12\x011\x1a\x011 \x01:,\n*0x32468d\n,\nB8Ab795\n\n49B49C88DC991990E7910891,,dbd\n"
         protocol_specification_id = PublicId.from_str("some_author/some_name:0.1.0")
-        encoded_envelope = "{}{}{}{}{}{}{}{}".format(
-            "any",
-            SEPARATOR,
-            "any",
-            SEPARATOR,
-            protocol_specification_id,
-            SEPARATOR,
-            msg.decode("utf-8"),
-            SEPARATOR,
-        )
+        encoded_envelope = f"any{SEPARATOR}any{SEPARATOR}{protocol_specification_id}{SEPARATOR}{msg.decode('utf-8')}{SEPARATOR}"
         encoded_envelope = encoded_envelope.encode("utf-8")
 
         with open(self.input_file_path, "ab+") as f:
@@ -211,16 +202,7 @@ class TestStubConnectionSending:
             performative=DefaultMessage.Performative.BYTES,
             content=b"hello",
         )
-        encoded_envelope = "{}{}{}{}{}{}{}{}".format(
-            "any",
-            SEPARATOR,
-            "any",
-            SEPARATOR,
-            DefaultMessage.protocol_specification_id,
-            SEPARATOR,
-            DefaultMessage.serializer.encode(msg).decode("utf-8"),
-            SEPARATOR,
-        )
+        encoded_envelope = f"any{SEPARATOR}any{SEPARATOR}{DefaultMessage.protocol_specification_id}{SEPARATOR}{DefaultMessage.serializer.encode(msg).decode('utf-8')}{SEPARATOR}"
         encoded_envelope = base64.b64encode(encoded_envelope.encode("utf-8"))
         envelope = envelope_from_bytes(encoded_envelope)
         if envelope is not None:
@@ -254,7 +236,7 @@ class TestStubConnectionSending:
         assert len(lines) == 2
         line = lines[0] + lines[1]
         to, sender, protocol_specification_id, message, end = line.strip().split(
-            "{}".format(SEPARATOR).encode("utf-8"), maxsplit=4
+            f"{SEPARATOR}".encode("utf-8"), maxsplit=4
         )
         to = to.decode("utf-8")
         sender = sender.decode("utf-8")

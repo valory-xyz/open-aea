@@ -98,9 +98,7 @@ class TestSkillError:
 
         self.my_aea._inbox = InboxWithHistory(self.my_aea.runtime.multiplexer)
         self.skill_context = SkillContext(self.my_aea._context)
-        logger_name = "aea.{}.skills.{}.{}".format(
-            self.my_aea._context.agent_name, "fetchai", "error"
-        )
+        logger_name = f"aea.{self.my_aea._context.agent_name}.skills.fetchai.error"
         self.skill_context._logger = logging.getLogger(logger_name)
         self.my_error_handler = ErrorHandler(
             name="error", skill_context=self.skill_context

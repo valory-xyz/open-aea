@@ -37,7 +37,7 @@ def test_flag_version():
     """Test that the flag '--version' works correctly."""
     runner = CliRunner()
     result = runner.invoke(cli, ["--version"])
-    assert result.stdout == "aea, version {}\n".format(aea.__version__)
+    assert result.stdout == f"aea, version {aea.__version__}\n"
 
 
 def test_flag_help():

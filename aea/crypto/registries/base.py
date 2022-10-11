@@ -38,9 +38,7 @@ ItemType = TypeVar("ItemType")
 
 def _handle_malformed_string(class_name: str, malformed_id: str) -> None:
     raise AEAException(
-        "Malformed {}: '{}'. It must be of the form '{}'.".format(
-            class_name, malformed_id, ItemId.REGEX.pattern
-        )
+        f"Malformed {class_name}: '{malformed_id}'. It must be of the form '{ItemId.REGEX.pattern}'."
     )
 
 
@@ -189,7 +187,7 @@ class Registry(Generic[ItemType]):
         item_id = ItemId(id_)
         entry_point = EntryPoint[ItemType](entry_point)
         if item_id in self.specs:
-            raise AEAException("Cannot re-register id: '{}'".format(item_id))
+            raise AEAException(f"Cannot re-register id: '{item_id}'")
         self.specs[item_id] = ItemSpec[ItemType](
             item_id, entry_point, class_kwargs, **kwargs
         )
@@ -259,12 +257,9 @@ class Registry(Generic[ItemType]):
                 importlib.import_module(module)
             except ImportError:
                 raise AEAException(
-                    "A module ({}) was specified for the item but was not found, "
-                    "make sure the package is installed with `pip install` before calling `aea.crypto.make()`".format(
-                        module
-                    )
+                    f"A module ({module}) was specified for the item but was not found, make sure the package is installed with `pip install` before calling `aea.crypto.make()`"
                 )
 
         if item_id not in self.specs:
-            raise AEAException("Item not registered with id '{}'.".format(item_id))
+            raise AEAException(f"Item not registered with id '{item_id}'.")
         return self.specs[item_id]

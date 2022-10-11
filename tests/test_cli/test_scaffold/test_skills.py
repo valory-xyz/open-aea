@@ -376,9 +376,7 @@ class TestScaffoldSkillFailsWhenSkillAlreadyExists:
 
         The expected message is: 'A skill with name '{skill_name}' already exists. Aborting...'
         """
-        s = "A skill with name '{}' already exists. Aborting...".format(
-            self.resource_name
-        )
+        s = f"A skill with name '{self.resource_name}' already exists. Aborting..."
         assert self.result.exception.message == s
 
     def test_resource_directory_exists(self):

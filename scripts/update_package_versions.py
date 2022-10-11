@@ -149,9 +149,7 @@ def get_hashes_from_last_release() -> Dict[str, str]:
         [
             "svn",
             "export",
-            "https://github.com/fetchai/agents-aea.git/trunk/packages/{}".format(
-                HASHES_CSV
-            ),
+            f"https://github.com/fetchai/agents-aea.git/trunk/packages/{HASHES_CSV}",
         ]
     )
     svn_call.wait()
@@ -207,7 +205,7 @@ def get_configuration_file_path(type_: str, name: str) -> Path:
     if os.path.isfile(fp):
         return Path(fp)
 
-    print("Cannot find folder for package `{}` of type `{}`".format(name, type_))
+    print(f"Cannot find folder for package `{name}` of type `{type_}`")
     sys.exit(1)
 
 
@@ -264,7 +262,7 @@ def public_id_in_registry(type_: str, name: str) -> PublicId:
         result.output,
     )
     p_ids = []
-    highest = PublicId.from_str("fetchai/{}:0.1.0".format(name))
+    highest = PublicId.from_str(f"fetchai/{name}:0.1.0")
     for id_ in ids:
         p_id = PublicId.from_str(id_[0])
         p_ids.append(p_id)
@@ -332,18 +330,16 @@ def get_public_ids_to_update() -> Set[PackageId]:
         for key, value in last_by_type[type_].items():
             # if the package is a "scaffold" package, skip;
             if key == "scaffold":
-                print("Package `{}` of type `{}` is never bumped!".format(key, type_))
+                print(f"Package `{key}` of type `{type_}` is never bumped!")
                 continue
             # if the package is no longer present, skip;
             if key not in now_by_type[type_]:
-                print("Package `{}` of type `{}` no longer present!".format(key, type_))
+                print(f"Package `{key}` of type `{type_}` no longer present!")
                 continue
             # if the package hasn't change since the last release, skip;
             if now_by_type[type_][key] == value:
                 print(
-                    "Package `{}` of type `{}` has not changed since last release!".format(
-                        key, type_
-                    )
+                    f"Package `{key}` of type `{type_}` has not changed since last release!"
                 )
                 continue
             # load public id in the registry if any

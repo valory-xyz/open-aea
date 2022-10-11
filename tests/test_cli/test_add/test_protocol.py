@@ -197,9 +197,9 @@ class TestAddProtocolFailsWhenProtocolWithSameAuthorAndNameButDifferentVersion:
     def test_add_protocol_from_registry_positive(self, fetch_package_mock, *mocks):
         """Test add from registry positive result."""
         fetch_package_mock.return_value = Path(
-            "vendor/{}/protocols/{}".format(self.protocol_author, self.protocol_name)
+            f"vendor/{self.protocol_author}/protocols/{self.protocol_name}"
         )
-        public_id = "{}/{}:{}".format(AUTHOR, self.protocol_name, self.protocol_version)
+        public_id = f"{AUTHOR}/{self.protocol_name}:{self.protocol_version}"
         obj_type = "protocol"
         result = self.runner.invoke(
             cli,
@@ -264,7 +264,7 @@ class TestAddProtocolFailsWhenProtocolNotInRegistry:
 
         The expected message is: 'Cannot find protocol: '{protocol_name}''
         """
-        s = "Cannot find protocol: '{}'.".format(self.protocol_id)
+        s = f"Cannot find protocol: '{self.protocol_id}'."
         assert self.result.exception.message == s
 
     @classmethod
@@ -318,7 +318,7 @@ class TestAddProtocolFailsWhenDifferentPublicId:
 
     def test_error_message_protocol_wrong_public_id(self):
         """Test that the log error message is fixed."""
-        s = "Cannot find protocol: '{}'.".format(self.protocol_id)
+        s = f"Cannot find protocol: '{self.protocol_id}'."
         assert self.result.exception.message == s
 
     @classmethod

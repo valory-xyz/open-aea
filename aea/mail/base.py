@@ -467,11 +467,4 @@ class Envelope:
 
     def __str__(self) -> str:
         """Get the string representation of an envelope."""
-        return "Envelope(to={to}, sender={sender}, protocol_specification_id={protocol_specification_id}, message={message})".format(
-            to=self.to,
-            sender=self.sender,
-            protocol_specification_id=self.protocol_specification_id,
-            message="{!r}".format(self.message)
-            if isinstance(self.message, bytes)
-            else self.message,
-        )
+        return f"Envelope(to={self.to}, sender={self.sender}, protocol_specification_id={self.protocol_specification_id}, message={f'{self.message!r}' if isinstance(self.message, bytes) else self.message})"

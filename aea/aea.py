@@ -349,7 +349,7 @@ class AEA(Agent):
         :param envelope: the envelope to handle.
         :return: None
         """
-        self.logger.debug("Handling envelope: {}".format(envelope))
+        self.logger.debug(f"Handling envelope: {envelope}")
         msg, handlers = self._get_msg_and_handlers_for_envelope(envelope)
 
         if msg is None:

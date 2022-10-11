@@ -112,7 +112,7 @@ def _generate_private_key(
 def _can_write(path: str) -> bool:
     if Path(path).exists():
         value = click.confirm(
-            "The file {} already exists. Do you want to overwrite it?".format(path),
+            f"The file {path} already exists. Do you want to overwrite it?",
             default=False,
         )
         return value

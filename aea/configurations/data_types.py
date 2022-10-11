@@ -351,9 +351,7 @@ class PublicId(JSONSerializable):
         """
         match = re.match(cls.PUBLIC_ID_REGEX, public_id_string)
         if match is None:
-            raise ValueError(
-                "Input '{}' is not well formatted.".format(public_id_string)
-            )
+            raise ValueError(f"Input '{public_id_string}' is not well formatted.")
 
         username = match.group(1)
         package_name = match.group(2)
@@ -400,9 +398,7 @@ class PublicId(JSONSerializable):
         :raises ValueError: if the string in input is not well formatted.
         """
         if not re.match(cls.PUBLIC_ID_URI_REGEX, public_id_uri_path):
-            raise ValueError(
-                "Input '{}' is not well formatted.".format(public_id_uri_path)
-            )
+            raise ValueError(f"Input '{public_id_uri_path}' is not well formatted.")
         username, package_name, version = re.findall(
             cls.PUBLIC_ID_URI_REGEX, public_id_uri_path
         )[0][:3]
@@ -415,9 +411,7 @@ class PublicId(JSONSerializable):
 
         :return: uri path string
         """
-        return "{author}/{name}/{version}".format(
-            author=self.author, name=self.name, version=self.version
-        )
+        return f"{self.author}/{self.name}/{self.version}"
 
     @property
     def json(self) -> Dict:
@@ -487,9 +481,7 @@ class PublicId(JSONSerializable):
         ):
             return self.package_version < other.package_version
         raise ValueError(
-            "The public IDs {} and {} cannot be compared. Their author or name attributes are different.".format(
-                self, other
-            )
+            f"The public IDs {self} and {other} cannot be compared. Their author or name attributes are different."
         )
 
     def without_hash(
@@ -505,16 +497,9 @@ class PublicId(JSONSerializable):
     def __str__(self) -> str:
         """Get the string representation."""
         if self._package_hash is None:
-            return "{author}/{name}:{version}".format(
-                author=self.author, name=self.name, version=self.version
-            )
+            return f"{self.author}/{self.name}:{self.version}"
 
-        return "{author}/{name}:{version}:{package_hash}".format(
-            author=self.author,
-            name=self.name,
-            version=self.version,
-            package_hash=self.hash,
-        )
+        return f"{self.author}/{self.name}:{self.version}:{self.hash}"
 
 
 class PackageId:
@@ -600,9 +585,7 @@ class PackageId:
         :raises ValueError: if the string in input is not well formatted.
         """
         if not re.match(cls.PACKAGE_ID_URI_REGEX, package_id_uri_path):
-            raise ValueError(
-                "Input '{}' is not well formatted.".format(package_id_uri_path)
-            )
+            raise ValueError(f"Input '{package_id_uri_path}' is not well formatted.")
         package_type_str, username, package_name, version = re.findall(
             cls.PACKAGE_ID_URI_REGEX, package_id_uri_path
         )[0][:4]
@@ -637,10 +620,7 @@ class PackageId:
 
     def __str__(self) -> str:
         """Get the string representation."""
-        return "({package_type}, {public_id})".format(
-            package_type=self.package_type.value,
-            public_id=self.public_id,
-        )
+        return f"({self.package_type.value}, {self.public_id})"
 
     def __repr__(self) -> str:
         """Get the object representation in string."""
@@ -708,9 +688,7 @@ class ComponentId(PackageId):
     @property
     def prefix_import_path(self) -> str:
         """Get the prefix import path for this component."""
-        return "packages.{}.{}.{}".format(
-            self.public_id.author, self.component_type.to_plural(), self.public_id.name
-        )
+        return f"packages.{self.public_id.author}.{self.component_type.to_plural()}.{self.public_id.name}"
 
     @property
     def json(self) -> Dict:
@@ -913,7 +891,7 @@ class CRUDCollection(Generic[T]):
         :raises ValueError: if the item with the same id is already in the collection.
         """
         if item_id in self._items_by_id:
-            raise ValueError("Item with name {} already present!".format(item_id))
+            raise ValueError(f"Item with name {item_id} already present!")
         self._items_by_id[item_id] = item
 
     def read(self, item_id: str) -> Optional[T]:

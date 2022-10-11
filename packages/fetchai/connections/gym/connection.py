@@ -133,7 +133,7 @@ class GymChannel:
         :param envelope: the envelope
         """
         sender = envelope.sender
-        self.logger.debug("Processing message from {}: {}".format(sender, envelope))
+        self.logger.debug(f"Processing message from {sender}: {envelope}")
         if envelope.protocol_specification_id != GymMessage.protocol_specification_id:
             raise ValueError("This protocol is not valid for gym.")
         await self.handle_gym_message(envelope)
@@ -157,9 +157,7 @@ class GymChannel:
         gym_message, dialogue = self._get_message_and_dialogue(envelope)
 
         if dialogue is None:
-            self.logger.warning(
-                "Could not create dialogue from message={}".format(gym_message)
-            )
+            self.logger.warning(f"Could not create dialogue from message={gym_message}")
             return
 
         if gym_message.performative == GymMessage.Performative.ACT:

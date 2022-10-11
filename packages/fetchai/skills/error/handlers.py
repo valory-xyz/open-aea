@@ -56,9 +56,7 @@ class ErrorHandler(Handler):
         :param envelope: the envelope
         """
         self.context.logger.warning(
-            "Unsupported protocol: {}. You might want to add a handler for this protocol.".format(
-                envelope.protocol_specification_id
-            )
+            f"Unsupported protocol: {envelope.protocol_specification_id}. You might want to add a handler for this protocol."
         )
         encoded_protocol_specification_id = base64.b85encode(
             str.encode(str(envelope.protocol_specification_id))
@@ -87,9 +85,7 @@ class ErrorHandler(Handler):
         :param envelope: the envelope
         """
         self.context.logger.warning(
-            "Decoding error for envelope: {}. protocol_specification_id='{}' and message='{!r}' are inconsistent.".format(
-                envelope, envelope.protocol_specification_id, envelope.message
-            )
+            f"Decoding error for envelope: {envelope}. protocol_specification_id='{envelope.protocol_specification_id}' and message='{envelope.message!r}' are inconsistent."
         )
         encoded_envelope = base64.b85encode(envelope.encode())
         reply = DefaultMessage(
@@ -112,9 +108,7 @@ class ErrorHandler(Handler):
         :param envelope: the envelope
         """
         self.context.logger.warning(
-            "Cannot handle envelope: no active handler registered for the protocol_specification_id='{}'.".format(
-                envelope.protocol_specification_id
-            )
+            f"Cannot handle envelope: no active handler registered for the protocol_specification_id='{envelope.protocol_specification_id}'."
         )
         encoded_envelope = base64.b85encode(envelope.encode())
         reply = DefaultMessage(

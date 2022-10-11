@@ -60,7 +60,7 @@ def do_install(ctx: Context, requirement: Optional[str] = None) -> None:
     """
     try:
         if requirement:
-            logger.debug("Installing the dependencies in '{}'...".format(requirement))
+            logger.debug(f"Installing the dependencies in '{requirement}'...")
             _install_from_requirement(requirement)
         else:
             logger.debug("Installing all the dependencies...")
@@ -114,7 +114,5 @@ def _install_from_requirement(file: str, install_timeout: float = 300) -> None:
         call_pip(["install", "-r", file], timeout=install_timeout)
     except Exception:
         raise AEAException(
-            "An error occurred while installing requirement file {}. Stopping...".format(
-                file
-            )
+            f"An error occurred while installing requirement file {file}. Stopping..."
         )

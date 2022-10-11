@@ -429,7 +429,7 @@ def test_kwargs():
     """Test the kwargs custom type."""
     body = {"key_1": 1, "key_2": 2}
     kwargs = ContractApiMessage.Kwargs(body)
-    assert str(kwargs) == "Kwargs: body={}".format(body)
+    assert str(kwargs) == f"Kwargs: body={body}"
 
 
 class BaseTestMessageConstruction:

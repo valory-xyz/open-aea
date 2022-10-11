@@ -282,7 +282,7 @@ class Connection(Component, ABC):
         connection_module_path = directory / "connection.py"
         if not (connection_module_path.exists() and connection_module_path.is_file()):
             raise AEAComponentLoadException(
-                "Connection module '{}' not found.".format(connection_module_path)
+                f"Connection module '{connection_module_path}' not found."
             )
         load_aea_package(configuration)
         connection_module = load_module(
@@ -295,11 +295,11 @@ class Connection(Component, ABC):
         )
         name_to_class = dict(connection_classes)
         logger = get_logger(__name__, identity.name)
-        logger.debug("Processing connection {}".format(connection_class_name))
+        logger.debug(f"Processing connection {connection_class_name}")
         connection_class = name_to_class.get(connection_class_name, None)
         if connection_class is None:
             raise AEAComponentLoadException(
-                "Connection class '{}' not found.".format(connection_class_name)
+                f"Connection class '{connection_class_name}' not found."
             )
         try:
             connection = connection_class(

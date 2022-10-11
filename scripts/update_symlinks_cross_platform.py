@@ -155,7 +155,7 @@ def main() -> None:
     """Run main script."""
     failed = False
     for link_name, target in SYMLINKS:
-        print("Linking {} to {}".format(link_name, target))
+        print(f"Linking {link_name} to {target}")
         try:
             link_name.unlink()
         except FileNotFoundError:
@@ -167,9 +167,7 @@ def main() -> None:
             return_code = 1
             traceback.print_exc()
             print(
-                "Last command failed with return code {} and exception {}".format(
-                    return_code, exception
-                )
+                f"Last command failed with return code {return_code} and exception {exception}"
             )
             failed = True
 

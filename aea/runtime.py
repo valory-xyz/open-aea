@@ -240,13 +240,13 @@ class BaseRuntime(Runnable, WithLogger):
 
     def _teardown(self) -> None:
         """Tear down runtime."""
-        self.logger.debug("[{}]: Runtime teardown...".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}]: Runtime teardown...")
         if self._decision_maker is not None:  # pragma: nocover
             self.decision_maker.stop()
         self.task_manager.stop()
-        self.logger.debug("[{}]: Calling teardown method...".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}]: Calling teardown method...")
         self._agent.teardown()
-        self.logger.debug("[{}]: Runtime teardown completed".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}]: Runtime teardown completed")
 
     def set_loop(self, loop: AbstractEventLoop) -> None:
         """
@@ -366,20 +366,20 @@ class AsyncRuntime(BaseRuntime):
 
     async def _start_agent_loop(self) -> None:
         """Start agent main loop asynchronous way."""
-        self.logger.debug("[{}] Runtime started".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}] Runtime started")
 
         await self.multiplexer.connection_status.wait(ConnectionStates.connected)
-        self.logger.debug("[{}] Multiplexer connected.".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}] Multiplexer connected.")
         if self.storage:
             await self.storage.wait_connected()
-            self.logger.debug("[{}] Storage connected.".format(self._agent.name))
+            self.logger.debug(f"[{self._agent.name}] Storage connected.")
 
         self.task_manager.start()
         if self._decision_maker is not None:  # pragma: nocover
             self.decision_maker.start()
-        self.logger.debug("[{}] Calling setup method...".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}] Calling setup method...")
         self._agent.setup()
-        self.logger.debug("[{}] Run main loop...".format(self._agent.name))
+        self.logger.debug(f"[{self._agent.name}] Run main loop...")
 
         self.agent_loop.start()
 

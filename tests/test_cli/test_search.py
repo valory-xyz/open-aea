@@ -65,9 +65,7 @@ class TestSearchProtocolsLocal:
             standalone_mode=False,
         )
         assert self.result.output == (
-            'Searching for ""...\n'
-            "Protocols found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for ""...\nProtocols found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
 
 
@@ -88,9 +86,7 @@ class TestSearchContractsLocal(TestCase):
             standalone_mode=False,
         )
         assert result.output == (
-            'Searching for ""...\n'
-            "Contracts found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for ""...\nContracts found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
 
     @mock.patch("aea.cli.search.format_items", return_value=FORMAT_ITEMS_SAMPLE_OUTPUT)
@@ -105,9 +101,7 @@ class TestSearchContractsLocal(TestCase):
             standalone_mode=False,
         )
         assert result.output == (
-            'Searching for ""...\n'
-            "Contracts found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for ""...\nContracts found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
 
 
@@ -128,9 +122,7 @@ class TestSearchConnectionsLocal:
             standalone_mode=False,
         )
         assert self.result.output == (
-            'Searching for ""...\n'
-            "Connections found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for ""...\nConnections found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
 
 
@@ -150,9 +142,7 @@ class TestSearchSkillsLocal:
             cli, [*CLI_LOG_OPTION, "search", "--local", "skills"], standalone_mode=False
         )
         assert self.result.output == (
-            'Searching for ""...\n'
-            "Skills found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for ""...\nSkills found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
 
 
@@ -164,7 +154,7 @@ class TestSearchAgentsLocal:
         """Set the test up."""
         cls.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         cls.resolver = jsonschema.RefResolver(
-            "file://{}/".format(Path(CONFIGURATION_SCHEMA_DIR).absolute()), cls.schema
+            f"file://{Path(CONFIGURATION_SCHEMA_DIR).absolute()}/", cls.schema
         )
         cls.validator = Draft4Validator(cls.schema, resolver=cls.resolver)
 
@@ -262,11 +252,7 @@ class RegistrySearchTestCase(TestCase):
             [*CLI_LOG_OPTION, "search", "connections", "--query=some"],
             standalone_mode=False,
         )
-        expected_output = (
-            'Searching for "some"...\n'
-            "Connections found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
-        )
+        expected_output = f'Searching for "some"...\nConnections found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         self.assertEqual(result.output, expected_output)
         request_api_mock.assert_called_once_with(
             "GET", "/connections", params={"search": "some", "page": 1}
@@ -281,9 +267,7 @@ class RegistrySearchTestCase(TestCase):
             standalone_mode=False,
         )
         expected_output = (
-            'Searching for "some"...\n'
-            "Agents found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for "some"...\nAgents found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
         self.assertEqual(result.output, expected_output)
         request_api_mock.assert_called_once_with(
@@ -298,11 +282,7 @@ class RegistrySearchTestCase(TestCase):
             [*CLI_LOG_OPTION, "search", "protocols", "--query=some"],
             standalone_mode=False,
         )
-        expected_output = (
-            'Searching for "some"...\n'
-            "Protocols found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
-        )
+        expected_output = f'Searching for "some"...\nProtocols found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         self.assertEqual(result.output, expected_output)
         request_api_mock.assert_called_once_with(
             "GET", "/protocols", params={"search": "some", "page": 1}
@@ -317,9 +297,7 @@ class RegistrySearchTestCase(TestCase):
             standalone_mode=False,
         )
         expected_output = (
-            'Searching for "some"...\n'
-            "Skills found:\n\n"
-            "{}\n".format(FORMAT_ITEMS_SAMPLE_OUTPUT)
+            f'Searching for "some"...\nSkills found:\n\n{FORMAT_ITEMS_SAMPLE_OUTPUT}\n'
         )
         self.assertEqual(result.output, expected_output)
         request_api_mock.assert_called_once_with(

@@ -138,7 +138,7 @@ class ContractApiSerializer(Serializer):
             performative.data = data
             contract_api_msg.error.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = contract_api_msg.SerializeToString()
 
@@ -236,12 +236,12 @@ class ContractApiSerializer(Serializer):
             data = contract_api_pb.error.data
             performative_content["data"] = data
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return ContractApiMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

@@ -109,9 +109,7 @@ def add_item(ctx: Context, item_type: str, item_public_id: PublicId) -> None:
 
     if present_item_id is not None:
         raise click.ClickException(
-            "A {} with id '{}' already exists. Aborting...".format(
-                item_type, present_item_id.without_hash()
-            )
+            f"A {item_type} with id '{present_item_id.without_hash()}' already exists. Aborting..."
         )
 
     dest_path = get_package_path(ctx.cwd, item_type, item_public_id)

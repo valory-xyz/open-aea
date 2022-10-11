@@ -389,9 +389,9 @@ class HTTPChannel(BaseAsyncChannel):
         self.ssl_key_path = ssl_key_path
         self.target_skill_id = target_skill_id
         if self.ssl_cert_path and self.ssl_key_path:
-            self.server_address = "https://{}:{}".format(self.host, self.port)
+            self.server_address = f"https://{self.host}:{self.port}"
         else:
-            self.server_address = "http://{}:{}".format(self.host, self.port)
+            self.server_address = f"http://{self.host}:{self.port}"
 
         self._api_spec = APISpec(api_spec_path, self.server_address, logger)
         self.timeout_window = timeout_window
@@ -418,14 +418,12 @@ class HTTPChannel(BaseAsyncChannel):
 
             try:
                 await self._start_http_server()
-                self.logger.info(
-                    "HTTP Server has connected to port: {}.".format(self.port)
-                )
+                self.logger.info(f"HTTP Server has connected to port: {self.port}.")
             except Exception:  # pragma: nocover # pylint: disable=broad-except
                 self.is_stopped = True
                 self._in_queue = None
                 self.logger.exception(
-                    "Failed to start server on {}:{}.".format(self.host, self.port)
+                    f"Failed to start server on {self.host}:{self.port}."
                 )
 
     async def _http_handler(self, http_request: BaseRequest) -> Response:
@@ -509,18 +507,14 @@ class HTTPChannel(BaseAsyncChannel):
         dialogue = self._dialogues.update(message)
 
         if dialogue is None:
-            self.logger.warning(
-                "Could not create dialogue for message={}".format(message)
-            )
+            self.logger.warning(f"Could not create dialogue for message={message}")
             return
 
         future = self.pending_requests.pop(dialogue.incomplete_dialogue_label, None)
 
         if not future:
             self.logger.warning(
-                "Dropping message={} for incomplete_dialogue_label={} which has timed out.".format(
-                    message, dialogue.incomplete_dialogue_label
-                )
+                f"Dropping message={message} for incomplete_dialogue_label={dialogue.incomplete_dialogue_label} which has timed out."
             )
             return
         if not future.done():
@@ -537,7 +531,7 @@ class HTTPChannel(BaseAsyncChannel):
 
         if not self.is_stopped:
             await self.http_server.stop()
-            self.logger.info("HTTP Server has shutdown on port: {}.".format(self.port))
+            self.logger.info(f"HTTP Server has shutdown on port: {self.port}.")
             self.is_stopped = True
             self._in_queue = None
 

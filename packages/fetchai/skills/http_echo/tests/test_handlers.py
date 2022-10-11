@@ -155,9 +155,7 @@ class TestHttpHandler(BaseSkillTestCase):
 
         mock_logger.assert_any_call(
             logging.INFO,
-            "received http request with method={}, url={} and body={!r}".format(
-                incoming_message.method, incoming_message.url, incoming_message.body
-            ),
+            f"received http request with method={incoming_message.method}, url={incoming_message.url} and body={incoming_message.body!r}",
         )
 
         # _handle_get
@@ -208,9 +206,7 @@ class TestHttpHandler(BaseSkillTestCase):
 
         mock_logger.assert_any_call(
             logging.INFO,
-            "received http request with method={}, url={} and body={!r}".format(
-                incoming_message.method, incoming_message.url, incoming_message.body
-            ),
+            f"received http request with method={incoming_message.method}, url={incoming_message.url} and body={incoming_message.body!r}",
         )
 
         # _handle_post

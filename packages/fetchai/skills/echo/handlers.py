@@ -72,9 +72,7 @@ class EchoHandler(Handler):
         :param message: the message.
         """
         self.context.logger.info(
-            "received invalid default message={}, unidentified dialogue.".format(
-                message
-            )
+            f"received invalid default message={message}, unidentified dialogue."
         )
         default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
         reply, _ = default_dialogues.create(
@@ -94,9 +92,7 @@ class EchoHandler(Handler):
         :param dialogue: the dialogue.
         """
         self.context.logger.info(
-            "received default error message={} in dialogue={}.".format(
-                message, dialogue
-            )
+            f"received default error message={message} in dialogue={dialogue}."
         )
 
     def _handle_bytes(self, message: DefaultMessage, dialogue: DefaultDialogue) -> None:
@@ -107,7 +103,7 @@ class EchoHandler(Handler):
         :param dialogue: the default dialogue.
         """
         self.context.logger.info(
-            "Echo Handler: message={}, sender={}".format(message, message.sender)
+            f"Echo Handler: message={message}, sender={message.sender}"
         )
         reply = dialogue.reply(
             performative=DefaultMessage.Performative.BYTES,
@@ -126,5 +122,5 @@ class EchoHandler(Handler):
         :param dialogue: the dialogue.
         """
         self.context.logger.info(
-            "received invalid message={} in dialogue={}.".format(message, dialogue)
+            f"received invalid message={message} in dialogue={dialogue}."
         )

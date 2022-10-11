@@ -366,9 +366,7 @@ def _try_to_register_contract(configuration: ContractConfig) -> None:
         )
     except AEAException as e:  # pragma: nocover
         if "Cannot re-register id:" in str(e):
-            _default_logger.warning(
-                "Already registered: {}".format(configuration.class_name)
-            )
+            _default_logger.warning(f"Already registered: {configuration.class_name}")
         else:
             raise e
 
@@ -384,7 +382,7 @@ def _load_contract_interfaces(
         full_path = Path(configuration.directory, path)
         if identifier not in ledger_apis_registry.supported_ids:
             raise ValueError(  # pragma: nocover
-                "No ledger api registered for identifier {}.".format(identifier)
+                f"No ledger api registered for identifier {identifier}."
             )
         ledger_api = make_ledger_api_cls(identifier)
         contract_interface = ledger_api.load_contract_interface(full_path)

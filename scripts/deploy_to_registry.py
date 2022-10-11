@@ -149,9 +149,7 @@ def push_package(package_id: PackageId, runner: CliRunner) -> None:
     :param runner: the cli runner
     """
     print(
-        "Trying to push {}: {}".format(
-            package_id.package_type.value, str(package_id.public_id)
-        )
+        f"Trying to push {package_id.package_type.value}: {str(package_id.public_id)}"
     )
     try:
         cwd = os.getcwd()
@@ -197,11 +195,9 @@ def push_package(package_id: PackageId, runner: CliRunner) -> None:
         )
         assert (
             result.exit_code == 0
-        ), "Publishing {} with public_id '{}' failed with: {}".format(
-            package_id.package_type, package_id.public_id, result.output
-        )
+        ), f"Publishing {package_id.package_type} with public_id '{package_id.public_id}' failed with: {result.output}"
     except Exception as e:  # pylint: disable=broad-except
-        print("\n\nAn exception occured: {}\n\n".format(e))
+        print(f"\n\nAn exception occured: {e}\n\n")
     finally:
         os.chdir(cwd)
         result = runner.invoke(
@@ -211,9 +207,7 @@ def push_package(package_id: PackageId, runner: CliRunner) -> None:
         )
         assert result.exit_code == 0
     print(
-        "Successfully pushed {}: {}".format(
-            package_id.package_type.value, str(package_id.public_id)
-        )
+        f"Successfully pushed {package_id.package_type.value}: {str(package_id.public_id)}"
     )
 
 
@@ -235,9 +229,7 @@ def publish_agent(package_id: PackageId, runner: CliRunner) -> None:
         )
         return
     print(
-        "Trying to push {}: {}".format(
-            package_id.package_type.value, str(package_id.public_id)
-        )
+        f"Trying to push {package_id.package_type.value}: {str(package_id.public_id)}"
     )
     try:
         cwd = os.getcwd()
@@ -255,16 +247,12 @@ def publish_agent(package_id: PackageId, runner: CliRunner) -> None:
         )
         assert (
             result.exit_code == 0
-        ), "Pushing {} with public_id '{}' failed with: {}".format(
-            package_id.package_type, package_id.public_id, str(result.exception)
-        )
+        ), f"Pushing {package_id.package_type} with public_id '{package_id.public_id}' failed with: {str(result.exception)}"
         print(
-            "Successfully pushed {}: {}".format(
-                package_id.package_type.value, str(package_id.public_id)
-            )
+            f"Successfully pushed {package_id.package_type.value}: {str(package_id.public_id)}"
         )
     except Exception as e:  # pylint: disable=broad-except
-        print("\n\nAn exception occured: {}\n\n".format(e))
+        print(f"\n\nAn exception occured: {e}\n\n")
     finally:
         os.chdir(cwd)
         result = runner.invoke(
@@ -273,7 +261,7 @@ def publish_agent(package_id: PackageId, runner: CliRunner) -> None:
             standalone_mode=False,
         )
         if result.exit_code != 0:
-            print("Unsuccessful delete code: {}".format(str(result.exception)))
+            print(f"Unsuccessful delete code: {str(result.exception)}")
     time.sleep(1.0)
 
 
@@ -304,9 +292,7 @@ def check_and_upload(package_id: PackageId, runner: CliRunner) -> None:
             push_package(package_id, runner)
     else:
         print(
-            "The {} '{}' is already in the registry".format(
-                package_id.package_type.value, str(package_id.public_id)
-            )
+            f"The {package_id.package_type.value} '{str(package_id.public_id)}' is already in the registry"
         )
 
 

@@ -186,8 +186,6 @@ class MyRLAgent(RLAgent):
             action_counter += 1
             if action_counter % 10 == 0:
                 self.logger.info(
-                    "Action: step_id='{}' action='{}' reward='{}'".format(
-                        action_counter, action, reward
-                    )
+                    f"Action: step_id='{action_counter}' action='{action}' reward='{reward}'"
                 )
         proxy_env.close()

@@ -93,7 +93,7 @@ class SigningSerializer(Serializer):
             ErrorCode.encode(performative.error_code, error_code)
             signing_msg.error.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = signing_msg.SerializeToString()
 
@@ -150,12 +150,12 @@ class SigningSerializer(Serializer):
             error_code = ErrorCode.decode(pb2_error_code)
             performative_content["error_code"] = error_code
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return SigningMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

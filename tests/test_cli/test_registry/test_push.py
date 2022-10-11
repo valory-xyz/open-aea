@@ -70,13 +70,13 @@ class PushItemTestCase(TestCase):
         getcwd_mock,
         rm_tarfiles_mock,
         check_is_author_logged_in_mock,
-        *_
+        *_,
     ):
         """Test for push_item positive result."""
         public_id = PublicIdMock(
             name="some_name",
             author="some_author",
-            version="{}".format(PublicIdMock.DEFAULT_VERSION),
+            version=f"{PublicIdMock.DEFAULT_VERSION}",
         )
         push_item(ContextMock(), "some-type", public_id)
         request_api_mock.assert_called_once_with(
@@ -104,13 +104,13 @@ class PushItemTestCase(TestCase):
         getcwd_mock,
         rm_tarfiles_mock,
         check_is_author_logged_in_mock,
-        *_
+        *_,
     ):
         """Test for push_item fails cause dependencies check."""
         public_id = PublicIdMock(
             name="some_name",
             author="some_author",
-            version="{}".format(PublicIdMock.DEFAULT_VERSION),
+            version=f"{PublicIdMock.DEFAULT_VERSION}",
         )
 
         with patch(
@@ -131,7 +131,7 @@ class PushItemTestCase(TestCase):
         public_id = PublicIdMock(
             name="some_name",
             author="some_author",
-            version="{}".format(PublicIdMock.DEFAULT_VERSION),
+            version=f"{PublicIdMock.DEFAULT_VERSION}",
         )
         push_item(ContextMock(), "some-type", public_id)
         request_api_mock.assert_called_once_with(
@@ -157,7 +157,7 @@ class PushItemTestCase(TestCase):
         getcwd_mock,
         rm_tarfiles_mock,
         check_is_author_logged_in_mock,
-        *_
+        *_,
     ):
         """Test for push_item - item not found."""
         with self.assertRaises(ClickException):

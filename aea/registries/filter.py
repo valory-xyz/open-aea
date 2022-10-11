@@ -119,7 +119,7 @@ class Filter(WithLogger):
                     )
                 except ValueError as e:
                     self.logger.warning(
-                        "Error when trying to add a new behaviour: {}".format(str(e))
+                        f"Error when trying to add a new behaviour: {str(e)}"
                     )
 
     def _handle_new_handlers(self) -> None:
@@ -135,7 +135,7 @@ class Filter(WithLogger):
                     )
                 except ValueError as e:
                     self.logger.warning(
-                        "Error when trying to add a new handler: {}".format(str(e))
+                        f"Error when trying to add a new handler: {str(e)}"
                     )
 
     def _handle_internal_message(self, message: Message) -> None:
@@ -143,20 +143,14 @@ class Filter(WithLogger):
         try:
             skill_id = PublicId.from_str(message.to)
         except ValueError:
-            self.logger.warning(
-                "Invalid public id as destination={}".format(message.to)
-            )
+            self.logger.warning(f"Invalid public id as destination={message.to}")
             return
         handler = self.resources.handler_registry.fetch_by_protocol_and_skill(
             message.protocol_id,
             skill_id,
         )
         if handler is not None:
-            self.logger.debug(
-                "Calling handler {} of skill {}".format(type(handler), skill_id)
-            )
+            self.logger.debug(f"Calling handler {type(handler)} of skill {skill_id}")
             handler.handle(message)
         else:
-            self.logger.warning(
-                "No internal handler fetched for skill_id={}".format(skill_id)
-            )
+            self.logger.warning(f"No internal handler fetched for skill_id={skill_id}")

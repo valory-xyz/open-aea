@@ -297,21 +297,17 @@ def _validate_performatives(performative: str) -> Tuple[bool, str]:
     if _is_reserved_name(performative):
         return (
             False,
-            "Invalid name for performative '{}'. This name is reserved.".format(
-                performative,
-            ),
+            f"Invalid name for performative '{performative}'. This name is reserved.",
         )
 
     # check performative's format
     if not _is_valid_regex(PERFORMATIVE_REGEX_PATTERN, performative):
         return (
             False,
-            "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                performative, PERFORMATIVE_REGEX_PATTERN
-            ),
+            f"Invalid name for performative '{performative}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} ",
         )
 
-    return True, "Performative '{}' is valid.".format(performative)
+    return True, f"Performative '{performative}' is valid."
 
 
 def _validate_content_name(content_name: str, performative: str) -> Tuple[bool, str]:
@@ -327,26 +323,19 @@ def _validate_content_name(content_name: str, performative: str) -> Tuple[bool, 
     if not _is_valid_regex(CONTENT_NAME_REGEX_PATTERN, content_name):
         return (
             False,
-            "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                content_name, performative, CONTENT_NAME_REGEX_PATTERN
-            ),
+            f"Invalid name for content '{content_name}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} ",
         )
 
     # check content name is not a reserved name
     if _is_reserved_name(content_name):
         return (
             False,
-            "Invalid name for content '{}' of performative '{}'. This name is reserved.".format(
-                content_name,
-                performative,
-            ),
+            f"Invalid name for content '{content_name}' of performative '{performative}'. This name is reserved.",
         )
 
     return (
         True,
-        "Content name '{}' of performative '{}' is valid.".format(
-            content_name, performative
-        ),
+        f"Content name '{content_name}' of performative '{performative}' is valid.",
     )
 
 
@@ -365,17 +354,12 @@ def _validate_content_type(
     if not _is_valid_content_type_format(content_type):
         return (
             False,
-            "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-                content_name,
-                performative,
-            ),
+            f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types.",
         )
 
     return (
         True,
-        "Type of content '{}' of performative '{}' is valid.".format(
-            content_name, performative
-        ),
+        f"Type of content '{content_name}' of performative '{performative}' is valid.",
     )
 
 
@@ -441,9 +425,7 @@ def _validate_speech_acts_section(
             if not isinstance(content_type, str):
                 return (
                     False,
-                    "Invalid type for '{}'. Expected str. Found {}.".format(
-                        content_name, type(content_type)
-                    ),
+                    f"Invalid type for '{content_name}'. Expected str. Found {type(content_type)}.",
                     None,
                     None,
                 )
@@ -468,13 +450,7 @@ def _validate_speech_acts_section(
                 if last_content_type != content_type:
                     return (
                         False,
-                        "Content '{}' with type '{}' under performative '{}' is already defined under performative '{}' with a different type ('{}').".format(
-                            content_name,
-                            content_type,
-                            performative,
-                            last_performative,
-                            last_content_type,
-                        ),
+                        f"Content '{content_name}' with type '{content_type}' under performative '{performative}' is already defined under performative '{last_performative}' with a different type ('{last_content_type}').",
                         None,
                         None,
                     )
@@ -507,9 +483,7 @@ def _validate_protocol_buffer_schema_code_snippets(
             if custom_type not in custom_types_set:
                 return (
                     False,
-                    "Extra protobuf code snippet provided. Type '{}' is not used anywhere in your protocol definition.".format(
-                        custom_type,
-                    ),
+                    f"Extra protobuf code snippet provided. Type '{custom_type}' is not used anywhere in your protocol definition.",
                 )
             custom_types_set.remove(custom_type)
 
@@ -517,9 +491,7 @@ def _validate_protocol_buffer_schema_code_snippets(
         if len(custom_types_set) != 0:
             return (
                 False,
-                "No protobuf code snippet is provided for the following custom types: {}".format(
-                    custom_types_set,
-                ),
+                f"No protobuf code snippet is provided for the following custom types: {custom_types_set}",
             )
 
     return True, "Protobuf code snippet section is valid."
@@ -538,9 +510,7 @@ def _validate_field_existence(dialogue_config: List[str]) -> Tuple[bool, str]:
         if required_field not in dialogue_config:
             return (
                 False,
-                "Missing required field '{}' in the dialogue section of the protocol specification.".format(
-                    required_field
-                ),
+                f"Missing required field '{required_field}' in the dialogue section of the protocol specification.",
             )
 
     return True, "Dialogue section has all the required fields."
@@ -561,9 +531,7 @@ def _validate_initiation(
     if not isinstance(initiation, list):
         return (
             False,
-            "Invalid type for initiation. Expected list. Found '{}'.".format(
-                type(initiation)
-            ),
+            f"Invalid type for initiation. Expected list. Found '{type(initiation)}'.",
         )
 
     # check initiation is not empty/None
@@ -578,9 +546,7 @@ def _validate_initiation(
         if performative not in performatives_set:
             return (
                 False,
-                "Performative '{}' specified in \"initiation\" is not defined in the protocol's speech-acts.".format(
-                    performative,
-                ),
+                f"Performative '{performative}' specified in \"initiation\" is not defined in the protocol's speech-acts.",
             )
 
     return True, "Initial messages are valid."
@@ -601,9 +567,7 @@ def _validate_reply(
     if not isinstance(reply_definition, dict):
         return (
             False,
-            "Invalid type for the reply definition. Expected dict. Found '{}'.".format(
-                type(reply_definition)
-            ),
+            f"Invalid type for the reply definition. Expected dict. Found '{type(reply_definition)}'.",
             None,
         )
 
@@ -615,9 +579,7 @@ def _validate_reply(
         if performative not in performatives_set_2:
             return (
                 False,
-                "Performative '{}' specified in \"reply\" is not defined in the protocol's speech-acts.".format(
-                    performative,
-                ),
+                f"Performative '{performative}' specified in \"reply\" is not defined in the protocol's speech-acts.",
                 None,
             )
 
@@ -625,9 +587,7 @@ def _validate_reply(
         if not isinstance(replies, list):
             return (
                 False,
-                "Invalid type for replies of performative {}. Expected list. Found '{}'.".format(
-                    performative, type(replies)
-                ),
+                f"Invalid type for replies of performative {performative}. Expected list. Found '{type(replies)}'.",
                 None,
             )
 
@@ -636,9 +596,7 @@ def _validate_reply(
             if reply not in performatives_set:
                 return (
                     False,
-                    "Performative '{}' in the list of replies for '{}' is not defined in speech-acts.".format(
-                        reply, performative
-                    ),
+                    f"Performative '{reply}' in the list of replies for '{performative}' is not defined in speech-acts.",
                     None,
                 )
 
@@ -651,9 +609,7 @@ def _validate_reply(
     if len(performatives_set_2) != 0:
         return (
             False,
-            "No reply is provided for the following performatives: {}".format(
-                performatives_set_2,
-            ),
+            f"No reply is provided for the following performatives: {performatives_set_2}",
             None,
         )
 
@@ -678,9 +634,7 @@ def _validate_termination(
     if not isinstance(termination, list):
         return (
             False,
-            "Invalid type for termination. Expected list. Found '{}'.".format(
-                type(termination)
-            ),
+            f"Invalid type for termination. Expected list. Found '{type(termination)}'.",
         )
 
     # check termination is not empty/None
@@ -695,9 +649,7 @@ def _validate_termination(
         if performative not in performatives_set:
             return (
                 False,
-                "Performative '{}' specified in \"termination\" is not defined in the protocol's speech-acts.".format(
-                    performative,
-                ),
+                f"Performative '{performative}' specified in \"termination\" is not defined in the protocol's speech-acts.",
             )
 
     # check that there are no repetitive performatives in termination
@@ -705,9 +657,7 @@ def _validate_termination(
     if number_of_duplicates > 0:
         return (
             False,
-            'There are {} duplicate performatives in "termination".'.format(
-                number_of_duplicates,
-            ),
+            f'There are {number_of_duplicates} duplicate performatives in "termination".',
         )
 
     # check terminal performatives have no replies
@@ -715,9 +665,7 @@ def _validate_termination(
         if performative not in terminal_performatives_from_reply:
             return (
                 False,
-                'The terminal performative \'{}\' specified in "termination" is assigned replies in "reply".'.format(
-                    performative,
-                ),
+                f'The terminal performative \'{performative}\' specified in "termination" is assigned replies in "reply".',
             )
 
     # check performatives with no replies are specified as terminal performatives
@@ -725,9 +673,7 @@ def _validate_termination(
         if performative not in termination:
             return (
                 False,
-                "The performative '{}' has no replies but is not listed as a terminal performative in \"termination\".".format(
-                    performative,
-                ),
+                f"The performative '{performative}' has no replies but is not listed as a terminal performative in \"termination\".",
             )
 
     return True, "Terminal messages are valid."
@@ -744,16 +690,14 @@ def _validate_roles(roles: Dict[str, Any]) -> Tuple[bool, str]:
     if not isinstance(roles, dict):
         return (
             False,
-            "Invalid type for roles. Expected dict. Found '{}'.".format(type(roles)),
+            f"Invalid type for roles. Expected dict. Found '{type(roles)}'.",
         )
 
     # check number of roles
     if not 1 <= len(roles) <= 2:
         return (
             False,
-            "There must be either 1 or 2 roles defined in this dialogue. Found {}".format(
-                len(roles)
-            ),
+            f"There must be either 1 or 2 roles defined in this dialogue. Found {len(roles)}",
         )
 
     # check each role's format
@@ -761,9 +705,7 @@ def _validate_roles(roles: Dict[str, Any]) -> Tuple[bool, str]:
         if not _is_valid_regex(ROLE_REGEX_PATTERN, role):
             return (
                 False,
-                "Invalid name for role '{}'. Role names must match the following regular expression: {} ".format(
-                    role, ROLE_REGEX_PATTERN
-                ),
+                f"Invalid name for role '{role}'. Role names must match the following regular expression: {ROLE_REGEX_PATTERN} ",
             )
 
     return True, "Dialogue roles are valid."
@@ -780,9 +722,7 @@ def _validate_end_states(end_states: List[str]) -> Tuple[bool, str]:
     if not isinstance(end_states, list):
         return (
             False,
-            "Invalid type for roles. Expected list. Found '{}'.".format(
-                type(end_states)
-            ),
+            f"Invalid type for roles. Expected list. Found '{type(end_states)}'.",
         )
 
     # check each end_state's format
@@ -790,9 +730,7 @@ def _validate_end_states(end_states: List[str]) -> Tuple[bool, str]:
         if not _is_valid_regex(END_STATE_REGEX_PATTERN, end_state):
             return (
                 False,
-                "Invalid name for end_state '{}'. End_state names must match the following regular expression: {} ".format(
-                    end_state, END_STATE_REGEX_PATTERN
-                ),
+                f"Invalid name for end_state '{end_state}'. End_state names must match the following regular expression: {END_STATE_REGEX_PATTERN} ",
             )
 
     return True, "Dialogue end_states are valid."
@@ -812,9 +750,7 @@ def _validate_keep_terminal(keep_terminal_state_dialogues: bool) -> Tuple[bool, 
     ):
         return (
             False,
-            "Invalid type for keep_terminal_state_dialogues. Expected bool. Found {}.".format(
-                type(keep_terminal_state_dialogues)
-            ),
+            f"Invalid type for keep_terminal_state_dialogues. Expected bool. Found {type(keep_terminal_state_dialogues)}.",
         )
 
     return True, "Dialogue keep_terminal_state_dialogues is valid."

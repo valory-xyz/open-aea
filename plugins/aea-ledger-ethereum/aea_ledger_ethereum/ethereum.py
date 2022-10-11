@@ -341,7 +341,7 @@ def get_gas_price_strategy(
                 f"Gas station API response: {response.status_code}, {response.text}"
             )
         response_dict = response.json()
-        _default_logger.debug("Gas station API response: {}".format(response_dict))
+        _default_logger.debug(f"Gas station API response: {response_dict}")
         result = response_dict.get(gas_price_strategy, None)
         if type(result) not in [int, float]:  # pragma: nocover
             raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")
@@ -1150,9 +1150,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             signed_transaction.rawTransaction
         )
         tx_digest = hex_value.hex()
-        _default_logger.debug(
-            "Successfully sent transaction with digest: {}".format(tx_digest)
-        )
+        _default_logger.debug(f"Successfully sent transaction with digest: {tx_digest}")
         return tx_digest
 
     def get_transaction_receipt(
@@ -1540,20 +1538,16 @@ class EthereumFaucetApi(FaucetApi):
             )
         response = requests.get(url + address)
         if response.status_code // 100 == 5:  # pragma: no cover
-            _default_logger.error("Response: {}".format(response.status_code))
+            _default_logger.error(f"Response: {response.status_code}")
         elif response.status_code // 100 in [3, 4]:  # pragma: nocover
             response_dict = json.loads(response.text)
             _default_logger.warning(
-                "Response: {}\nMessage: {}".format(
-                    response.status_code, response_dict.get("message")
-                )
+                f"Response: {response.status_code}\nMessage: {response_dict.get('message')}"
             )
         elif response.status_code // 100 == 2:  # pragma: no cover
             response_dict = json.loads(response.text)
             _default_logger.info(
-                "Response: {}\nMessage: {}".format(
-                    response.status_code, response_dict.get("message")
-                )
+                f"Response: {response.status_code}\nMessage: {response_dict.get('message')}"
             )
 
 

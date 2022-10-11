@@ -122,10 +122,7 @@ class TestCommon(TestCase):
             _match_brackets(text_2, index_2)
         self.assertEqual(
             str(cm.exception),
-            "Index {} in 'text' is not an open bracket '['. It is {}".format(
-                index_2,
-                text_2[index_2],
-            ),
+            f"Index {index_2} in 'text' is not an open bracket '['. It is {text_2[index_2]}",
         )
 
         index_3 = 2
@@ -133,10 +130,7 @@ class TestCommon(TestCase):
             _match_brackets(text_2, index_3)
         self.assertEqual(
             str(cm.exception),
-            "Index {} in 'text' is not an open bracket '['. It is {}".format(
-                index_3,
-                text_2[index_3],
-            ),
+            f"Index {index_3} in 'text' is not an open bracket '['. It is {text_2[index_3]}",
         )
 
         index_4 = 10
@@ -261,7 +255,7 @@ class TestCommon(TestCase):
             _get_sub_types_of_compositional_types(composition_type_1)
         self.assertEqual(
             str(cm.exception),
-            "{} is not a valid compositional type.".format(composition_type_1),
+            f"{composition_type_1} is not a valid compositional type.",
         )
 
         composition_type_2 = "pt:int[pt:DataModel]"
@@ -269,7 +263,7 @@ class TestCommon(TestCase):
             _get_sub_types_of_compositional_types(composition_type_2)
         self.assertEqual(
             str(cm.exception),
-            "{} is not a valid compositional type.".format(composition_type_2),
+            f"{composition_type_2} is not a valid compositional type.",
         )
 
         composition_type_3 = "pt:dict[pt:set[int, pt:list[pt:bool]]"

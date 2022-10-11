@@ -99,4 +99,4 @@ class Kwargs:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "Kwargs: body={}".format(self.body)
+        return f"Kwargs: body={self.body}"

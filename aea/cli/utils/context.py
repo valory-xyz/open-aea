@@ -160,7 +160,7 @@ class Context:
         :param value: the value associated with the key.
         """
         self.config[key] = value
-        logger.debug("  config[{}] = {}".format(key, value))
+        logger.debug(f"  config[{key}] = {value}")
 
     @staticmethod
     def _get_item_dependencies(item_type: str, public_id: PublicId) -> Dependencies:

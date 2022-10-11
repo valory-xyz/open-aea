@@ -40,7 +40,7 @@ class LoginTestCase(TestCase):
         username, password = ("Username", "Password")
         result = self.runner.invoke(
             cli,
-            [*CLI_LOG_OPTION, "login", username, "--password={}".format(password)],
+            [*CLI_LOG_OPTION, "login", username, f"--password={password}"],
             standalone_mode=False,
         )
         expected_output = (

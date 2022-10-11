@@ -128,7 +128,7 @@ class LedgerApiHandler(Handler):
         :param ledger_api_msg: the ledger api message
         :param ledger_api_dialogue: the ledger api dialogue
         """
-        self.context.logger.info("received raw transaction={}".format(ledger_api_msg))
+        self.context.logger.info(f"received raw transaction={ledger_api_msg}")
         signing_dialogues = cast(SigningDialogues, self.context.signing_dialogues)
         signing_msg, signing_dialogue = signing_dialogues.create(
             counterparty=self.context.decision_maker_address,
@@ -153,9 +153,7 @@ class LedgerApiHandler(Handler):
         :param ledger_api_dialogue: the ledger api dialogue
         """
         self.context.logger.info(
-            "transaction was successfully submitted. Transaction digest={}".format(
-                ledger_api_msg.transaction_digest
-            )
+            f"transaction was successfully submitted. Transaction digest={ledger_api_msg.transaction_digest}"
         )
         ledger_api_msg_ = ledger_api_dialogue.reply(
             performative=LedgerApiMessage.Performative.GET_TRANSACTION_RECEIPT,
@@ -227,9 +225,7 @@ class GenericSigningHandler(Handler):
         :param signing_msg: the message
         """
         self.context.logger.info(
-            "received invalid signing message={}, unidentified dialogue.".format(
-                signing_msg
-            )
+            f"received invalid signing message={signing_msg}, unidentified dialogue."
         )
 
     def _handle_signed_transaction(
@@ -264,9 +260,7 @@ class GenericSigningHandler(Handler):
         :param signing_dialogue: the dialogue
         """
         self.context.logger.info(
-            "transaction signing was not successful. Error_code={} in dialogue={}".format(
-                signing_msg.error_code, signing_dialogue
-            )
+            f"transaction signing was not successful. Error_code={signing_msg.error_code} in dialogue={signing_dialogue}"
         )
 
     def _handle_invalid(
@@ -279,9 +273,7 @@ class GenericSigningHandler(Handler):
         :param signing_dialogue: the dialogue
         """
         self.context.logger.warning(
-            "cannot handle signing message of performative={} in dialogue={}.".format(
-                signing_msg.performative, signing_dialogue
-            )
+            f"cannot handle signing message of performative={signing_msg.performative} in dialogue={signing_dialogue}."
         )
 
 

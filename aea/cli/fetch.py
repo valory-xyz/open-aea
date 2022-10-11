@@ -167,7 +167,7 @@ def fetch_agent_ipfs(
 
     try_to_load_agent_config(ctx)
     _fetch_agent_deps(ctx)
-    click.echo("Agent {} successfully fetched.".format(ctx.agent_config.agent_name))
+    click.echo(f"Agent {ctx.agent_config.agent_name} successfully fetched.")
 
 
 @clean_after
@@ -200,9 +200,7 @@ def fetch_agent_locally(
     try_to_load_agent_config(ctx, agent_src_path=source_path)
     if not _is_version_correct(ctx, public_id):
         raise click.ClickException(
-            "Wrong agent version in public ID: specified {}, found {}.".format(
-                public_id.version, ctx.agent_config.version
-            )
+            f"Wrong agent version in public ID: specified {public_id.version}, found {ctx.agent_config.version}."
         )
 
     folder_name = target_dir or (public_id.name if alias is None else alias)
@@ -229,7 +227,7 @@ def fetch_agent_locally(
         )
 
     _fetch_agent_deps(ctx)
-    click.echo("Agent {} successfully fetched.".format(public_id.name))
+    click.echo(f"Agent {public_id.name} successfully fetched.")
 
 
 def _fetch_agent_deps(ctx: Context) -> None:
@@ -239,7 +237,7 @@ def _fetch_agent_deps(ctx: Context) -> None:
     :param ctx: context object.
     """
     for item_type in (PROTOCOL, CONTRACT, CONNECTION, SKILL):
-        item_type_plural = "{}s".format(item_type)
+        item_type_plural = f"{item_type}s"
         required_items = getattr(ctx.agent_config, item_type_plural)
         for item_id in required_items:
             add_item(ctx, item_type, item_id)

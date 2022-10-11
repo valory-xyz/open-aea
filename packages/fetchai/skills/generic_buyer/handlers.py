@@ -99,7 +99,7 @@ class GenericFipaHandler(Handler):
         :param fipa_msg: the message
         """
         self.context.logger.info(
-            "received invalid fipa message={}, unidentified dialogue.".format(fipa_msg)
+            f"received invalid fipa message={fipa_msg}, unidentified dialogue."
         )
         default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
         default_msg, _ = default_dialogues.create(
@@ -121,17 +121,14 @@ class GenericFipaHandler(Handler):
         :param fipa_dialogue: the dialogue object
         """
         self.context.logger.info(
-            "received proposal={} from sender={}".format(
-                fipa_msg.proposal.values,
-                fipa_msg.sender[-5:],
-            )
+            f"received proposal={fipa_msg.proposal.values} from sender={fipa_msg.sender[-5:]}"
         )
         strategy = cast(GenericStrategy, self.context.strategy)
         acceptable = strategy.is_acceptable_proposal(fipa_msg.proposal)
         affordable = strategy.is_affordable_proposal(fipa_msg.proposal)
         if acceptable and affordable:
             self.context.logger.info(
-                "accepting the proposal from sender={}".format(fipa_msg.sender[-5:])
+                f"accepting the proposal from sender={fipa_msg.sender[-5:]}"
             )
             terms = strategy.terms_from_proposal(fipa_msg.proposal, fipa_msg.sender)
             fipa_dialogue.terms = terms
@@ -142,7 +139,7 @@ class GenericFipaHandler(Handler):
             self.context.outbox.put_message(message=accept_msg)
         else:
             self.context.logger.info(
-                "declining the proposal from sender={}".format(fipa_msg.sender[-5:])
+                f"declining the proposal from sender={fipa_msg.sender[-5:]}"
             )
             decline_msg = fipa_dialogue.reply(
                 performative=FipaMessage.Performative.DECLINE,
@@ -163,9 +160,7 @@ class GenericFipaHandler(Handler):
         :param fipa_dialogue: the fipa dialogue
         :param fipa_dialogues: the fipa dialogues
         """
-        self.context.logger.info(
-            "received DECLINE from sender={}".format(fipa_msg.sender[-5:])
-        )
+        self.context.logger.info(f"received DECLINE from sender={fipa_msg.sender[-5:]}")
         target_message = fipa_dialogue.get_message_by_id(fipa_msg.target)
 
         if not target_message:
@@ -192,9 +187,7 @@ class GenericFipaHandler(Handler):
         :param fipa_dialogue: the dialogue object
         """
         self.context.logger.info(
-            "received MATCH_ACCEPT_W_INFORM from sender={} with info={}".format(
-                fipa_msg.sender[-5:], fipa_msg.info
-            )
+            f"received MATCH_ACCEPT_W_INFORM from sender={fipa_msg.sender[-5:]} with info={fipa_msg.info}"
         )
         strategy = cast(GenericStrategy, self.context.strategy)
         if strategy.is_ledger_tx:
@@ -216,7 +209,7 @@ class GenericFipaHandler(Handler):
             )
             self.context.outbox.put_message(message=inform_msg)
             self.context.logger.info(
-                "informing counterparty={} of payment.".format(fipa_msg.sender[-5:])
+                f"informing counterparty={fipa_msg.sender[-5:]} of payment."
             )
 
     def _handle_inform(
@@ -232,9 +225,7 @@ class GenericFipaHandler(Handler):
         :param fipa_dialogue: the fipa dialogue
         :param fipa_dialogues: the fipa dialogues
         """
-        self.context.logger.info(
-            "received INFORM from sender={}".format(fipa_msg.sender[-5:])
-        )
+        self.context.logger.info(f"received INFORM from sender={fipa_msg.sender[-5:]}")
         if len(fipa_msg.info.keys()) >= 1:
             data = fipa_msg.info
             data_string = pprint.pformat(data)[:1000]
@@ -246,7 +237,7 @@ class GenericFipaHandler(Handler):
             strategy.successful_trade_with_counterparty(fipa_msg.sender, data)
         else:
             self.context.logger.info(
-                "received no data from sender={}".format(fipa_msg.sender[-5:])
+                f"received no data from sender={fipa_msg.sender[-5:]}"
             )
 
     def _handle_invalid(
@@ -259,9 +250,7 @@ class GenericFipaHandler(Handler):
         :param fipa_dialogue: the fipa dialogue
         """
         self.context.logger.warning(
-            "cannot handle fipa message of performative={} in dialogue={}.".format(
-                fipa_msg.performative, fipa_dialogue
-            )
+            f"cannot handle fipa message of performative={fipa_msg.performative} in dialogue={fipa_dialogue}."
         )
 
 
@@ -310,9 +299,7 @@ class GenericOefSearchHandler(Handler):
         :param oef_search_msg: the message
         """
         self.context.logger.info(
-            "received invalid oef_search message={}, unidentified dialogue.".format(
-                oef_search_msg
-            )
+            f"received invalid oef_search message={oef_search_msg}, unidentified dialogue."
         )
 
     def _handle_error(
@@ -325,9 +312,7 @@ class GenericOefSearchHandler(Handler):
         :param oef_search_dialogue: the dialogue
         """
         self.context.logger.info(
-            "received oef_search error message={} in dialogue={}.".format(
-                oef_search_msg, oef_search_dialogue
-            )
+            f"received oef_search error message={oef_search_msg} in dialogue={oef_search_dialogue}."
         )
 
     def _handle_search(
@@ -347,16 +332,12 @@ class GenericOefSearchHandler(Handler):
         strategy = cast(GenericStrategy, self.context.strategy)
         if strategy.is_stop_searching_on_result:
             self.context.logger.info(
-                "found agents={}, stopping search.".format(
-                    list(map(lambda x: x[-5:], oef_search_msg.agents)),
-                )
+                f"found agents={list(map(lambda x: x[-5:], oef_search_msg.agents))}, stopping search."
             )
             strategy.is_searching = False  # stopping search
         else:
             self.context.logger.info(
-                "found agents={}.".format(
-                    list(map(lambda x: x[-5:], oef_search_msg.agents)),
-                )
+                f"found agents={list(map(lambda x: x[-5:], oef_search_msg.agents))}."
             )
         query = strategy.get_service_query()
         fipa_dialogues = cast(FipaDialogues, self.context.fipa_dialogues)
@@ -368,9 +349,7 @@ class GenericOefSearchHandler(Handler):
                 query=query,
             )
             self.context.outbox.put_message(message=cfp_msg)
-            self.context.logger.info(
-                "sending CFP to agent={}".format(counterparty[-5:])
-            )
+            self.context.logger.info(f"sending CFP to agent={counterparty[-5:]}")
 
     def _handle_invalid(
         self, oef_search_msg: OefSearchMessage, oef_search_dialogue: OefSearchDialogue
@@ -382,10 +361,7 @@ class GenericOefSearchHandler(Handler):
         :param oef_search_dialogue: the dialogue
         """
         self.context.logger.warning(
-            "cannot handle oef_search message of performative={} in dialogue={}.".format(
-                oef_search_msg.performative,
-                oef_search_dialogue,
-            )
+            f"cannot handle oef_search message of performative={oef_search_msg.performative} in dialogue={oef_search_dialogue}."
         )
 
 
@@ -432,9 +408,7 @@ class GenericSigningHandler(Handler):
         :param signing_msg: the message
         """
         self.context.logger.info(
-            "received invalid signing message={}, unidentified dialogue.".format(
-                signing_msg
-            )
+            f"received invalid signing message={signing_msg}, unidentified dialogue."
         )
 
     def _handle_signed_transaction(
@@ -469,9 +443,7 @@ class GenericSigningHandler(Handler):
         :param signing_dialogue: the dialogue
         """
         self.context.logger.info(
-            "transaction signing was not successful. Error_code={} in dialogue={}".format(
-                signing_msg.error_code, signing_dialogue
-            )
+            f"transaction signing was not successful. Error_code={signing_msg.error_code} in dialogue={signing_dialogue}"
         )
         signing_msg_ = cast(
             Optional[SigningMessage], signing_dialogue.last_outgoing_message
@@ -497,9 +469,7 @@ class GenericSigningHandler(Handler):
         :param signing_dialogue: the dialogue
         """
         self.context.logger.warning(
-            "cannot handle signing message of performative={} in dialogue={}.".format(
-                signing_msg.performative, signing_dialogue
-            )
+            f"cannot handle signing message of performative={signing_msg.performative} in dialogue={signing_dialogue}."
         )
 
 
@@ -562,9 +532,7 @@ class GenericLedgerApiHandler(Handler):
         :param ledger_api_msg: the message
         """
         self.context.logger.info(
-            "received invalid ledger_api message={}, unidentified dialogue.".format(
-                ledger_api_msg
-            )
+            f"received invalid ledger_api message={ledger_api_msg}, unidentified dialogue."
         )
 
     def _handle_balance(self, ledger_api_msg: LedgerApiMessage) -> None:
@@ -576,10 +544,7 @@ class GenericLedgerApiHandler(Handler):
         strategy = cast(GenericStrategy, self.context.strategy)
         if ledger_api_msg.balance > 0:
             self.context.logger.info(
-                "starting balance on {} ledger={}.".format(
-                    strategy.ledger_id,
-                    ledger_api_msg.balance,
-                )
+                f"starting balance on {strategy.ledger_id} ledger={ledger_api_msg.balance}."
             )
             strategy.balance = ledger_api_msg.balance
             strategy.is_searching = True
@@ -598,7 +563,7 @@ class GenericLedgerApiHandler(Handler):
         :param ledger_api_msg: the ledger api message
         :param ledger_api_dialogue: the ledger api dialogue
         """
-        self.context.logger.info("received raw transaction={}".format(ledger_api_msg))
+        self.context.logger.info(f"received raw transaction={ledger_api_msg}")
         signing_dialogues = cast(SigningDialogues, self.context.signing_dialogues)
         signing_msg, signing_dialogue = signing_dialogues.create(
             counterparty=self.context.decision_maker_address,
@@ -623,9 +588,7 @@ class GenericLedgerApiHandler(Handler):
         :param ledger_api_dialogue: the ledger api dialogue
         """
         self.context.logger.info(
-            "transaction was successfully submitted. Transaction digest={}".format(
-                ledger_api_msg.transaction_digest
-            )
+            f"transaction was successfully submitted. Transaction digest={ledger_api_msg.transaction_digest}"
         )
         ledger_api_msg_ = ledger_api_dialogue.reply(
             performative=LedgerApiMessage.Performative.GET_TRANSACTION_RECEIPT,
@@ -670,16 +633,12 @@ class GenericLedgerApiHandler(Handler):
             )
             self.context.outbox.put_message(message=inform_msg)
             self.context.logger.info(
-                "transaction confirmed, informing counterparty={} of transaction digest.".format(
-                    fipa_dialogue.dialogue_label.dialogue_opponent_addr[-5:],
-                )
+                f"transaction confirmed, informing counterparty={fipa_dialogue.dialogue_label.dialogue_opponent_addr[-5:]} of transaction digest."
             )
         else:
             tx_behaviour.failed_processing(ledger_api_dialogue)
             self.context.logger.info(
-                "transaction_receipt={} not settled or not valid, aborting".format(
-                    ledger_api_msg.transaction_receipt
-                )
+                f"transaction_receipt={ledger_api_msg.transaction_receipt} not settled or not valid, aborting"
             )
 
     def _handle_error(
@@ -692,9 +651,7 @@ class GenericLedgerApiHandler(Handler):
         :param ledger_api_dialogue: the ledger api dialogue
         """
         self.context.logger.info(
-            "received ledger_api error message={} in dialogue={}.".format(
-                ledger_api_msg, ledger_api_dialogue
-            )
+            f"received ledger_api error message={ledger_api_msg} in dialogue={ledger_api_dialogue}."
         )
         ledger_api_msg_ = cast(
             Optional[LedgerApiMessage], ledger_api_dialogue.last_outgoing_message
@@ -719,8 +676,5 @@ class GenericLedgerApiHandler(Handler):
         :param ledger_api_dialogue: the ledger api dialogue
         """
         self.context.logger.warning(
-            "cannot handle ledger_api message of performative={} in dialogue={}.".format(
-                ledger_api_msg.performative,
-                ledger_api_dialogue,
-            )
+            f"cannot handle ledger_api message of performative={ledger_api_msg.performative} in dialogue={ledger_api_dialogue}."
         )

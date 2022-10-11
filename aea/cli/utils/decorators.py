@@ -103,7 +103,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
                 "Configuration file path does not exist!",
             )
         except Exception:
-            raise ValueError("Cannot find {}: '{}'".format(item_type.value, public_id))
+            raise ValueError(f"Cannot find {item_type.value}: '{public_id}'")
 
         # load the configuration file.
         try:
@@ -111,9 +111,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
                 package_configuration = loader.load(fp)
         except (AEAValidationError, ValidationError) as e:
             raise ValueError(
-                "{} configuration file '{}' not valid: {}".format(
-                    item_type.value.capitalize(), configuration_file_path, str(e)
-                )
+                f"{item_type.value.capitalize()} configuration file '{configuration_file_path}' not valid: {str(e)}"
             )
 
         if check_aea_version:

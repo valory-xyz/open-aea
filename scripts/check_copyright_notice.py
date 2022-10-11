@@ -317,47 +317,27 @@ def fix_header(check_info: Dict) -> bool:
             ErrorTypes.END_YEAR_WRONG,
             ErrorTypes.END_YEAR_MISSING,
         ):
-            copyright_string = "#   Copyright {start_year}-{end_year} Valory AG".format(
-                start_year=check_info["start_year"],
-                end_year=check_info["last_modification"].year,
-            )
+            copyright_string = f"#   Copyright {check_info['start_year']}-{check_info['last_modification'].year} Valory AG"
             is_update_needed = True
 
         elif check_info["error_code"] == ErrorTypes.START_YEAR_GT_END_YEAR:
-            copyright_string = "#   Copyright {end_year}-{start_year} Valory AG".format(
-                start_year=check_info["start_year"],
-                end_year=check_info["last_modification"].year,
-            )
+            copyright_string = f"#   Copyright {check_info['last_modification'].year}-{check_info['start_year']} Valory AG"
             is_update_needed = True
 
     elif check_info["header"] == FETCHAI:
         if check_info["last_modification"] > VALORY_FORK_DATE:
             # modified after fork
-            copyright_string = "#   Copyright {start_year} Valory AG".format(
-                start_year=check_info["last_modification"].year,
+            copyright_string = (
+                f"#   Copyright {check_info['last_modification'].year} Valory AG"
             )
-            copyright_string += (
-                "\n#   Copyright {start_year}{end_year} Fetch.AI Limited".format(
-                    start_year=check_info["start_year"],
-                    end_year=(
-                        "-" + str(check_info["end_year"])
-                        if check_info["end_year"] is not None
-                        else ""
-                    ),
-                )
-            )
+            copyright_string += f"\n#   Copyright {check_info['start_year']}{'-' + str(check_info['end_year']) if check_info['end_year'] is not None else ''} Fetch.AI Limited"
             is_update_needed = True
         else:
             # haven't been modified after fork
             # this probably will be used only once
 
             copyright_string = f"#   Copyright {CURRENT_YEAR} Valory AG"
-            copyright_string += (
-                "\n#   Copyright {start_year}-{end_year} Fetch.AI Limited".format(
-                    start_year=check_info["start_year"],
-                    end_year=check_info["last_modification"].year,
-                )
-            )
+            copyright_string += f"\n#   Copyright {check_info['start_year']}-{check_info['last_modification'].year} Fetch.AI Limited"
             is_update_needed = True
 
     elif check_info["header"] == MIXED:
@@ -365,20 +345,8 @@ def fix_header(check_info: Dict) -> bool:
             ErrorTypes.END_YEAR_WRONG,
             ErrorTypes.END_YEAR_MISSING,
         ):
-            copyright_string = "#   Copyright {start_year}-{end_year} Valory AG".format(
-                start_year=check_info["start_year"],
-                end_year=check_info["last_modification"].year,
-            )
-            copyright_string += (
-                "\n#   Copyright {start_year}{end_year} Fetch.AI Limited".format(
-                    start_year=check_info["fetchai_year_data"][0],
-                    end_year=(
-                        "-" + str(check_info["fetchai_year_data"][1])
-                        if check_info["fetchai_year_data"][1] is not None
-                        else ""
-                    ),
-                )
-            )
+            copyright_string = f"#   Copyright {check_info['start_year']}-{check_info['last_modification'].year} Valory AG"
+            copyright_string += f"\n#   Copyright {check_info['fetchai_year_data'][0]}{'-' + str(check_info['fetchai_year_data'][1]) if check_info['fetchai_year_data'][1] is not None else ''} Fetch.AI Limited"
             is_update_needed = True
 
     if is_update_needed:
@@ -399,7 +367,7 @@ def update_headers(files: Iterator[Path]) -> None:
     needs_update = []
 
     for path in files:
-        print("Checking {}".format(path))
+        print(f"Checking {path}")
         check_data, header, regex = check_copyright(path)
         if not check_data["check"]:
             check_data["path"] = path
@@ -411,7 +379,7 @@ def update_headers(files: Iterator[Path]) -> None:
         print("\n\nUpdating headers.\n")
         cannot_update = []
         for check_data in needs_update:
-            print("Updating {}".format(check_data["path"]))
+            print(f"Updating {check_data['path']}")
             if not fix_header(check_data):
                 cannot_update.append(check_data)
 
@@ -426,7 +394,7 @@ def run_check(files: Iterator[Path]) -> None:
     """Run copyright check."""
     bad_files = set()
     for path in files:
-        print("Processing {}".format(path))
+        print(f"Processing {path}")
         check_data, header, _ = check_copyright(path)
         if not check_data["check"]:
             bad_files.add((path, check_data["message"], header))

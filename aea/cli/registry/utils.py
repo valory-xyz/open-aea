@@ -92,7 +92,7 @@ def request_api(
                 "Unable to read authentication config. "
                 'Please sign in with "aea login" command.'
             )
-        headers.update({"Authorization": "Token {}".format(token)})
+        headers.update({"Authorization": f"Token {token}"})
     try:
         resp = _perform_registry_request(method, path, params, data, files, headers)
         resp_json = resp.json()
@@ -111,28 +111,22 @@ def request_api(
         )
     elif resp.status_code == 500:
         raise click.ClickException(
-            "Registry internal server error: {}".format(resp_json["detail"])
+            f"Registry internal server error: {resp_json['detail']}"
         )
     elif resp.status_code == 404:
         raise click.ClickException("Not found in Registry.")
     elif resp.status_code == 409:
-        raise click.ClickException(
-            "Conflict in Registry. {}".format(resp_json["detail"])
-        )
+        raise click.ClickException(f"Conflict in Registry. {resp_json['detail']}")
     elif resp.status_code == 400:
         if handle_400:
             raise click.ClickException(resp_json)
     elif resp_json is None:
         raise click.ClickException(
-            "Wrong server response. Status code: {}: Response text: {}".format(
-                resp.status_code, resp.text
-            )
+            f"Wrong server response. Status code: {resp.status_code}: Response text: {resp.text}"
         )
     else:
         raise click.ClickException(
-            "Wrong server response. Status code: {}: Error detail: {}".format(
-                resp.status_code, resp_json.get("detail", resp_json)
-            )
+            f"Wrong server response. Status code: {resp.status_code}: Error detail: {resp_json.get('detail', resp_json)}"
         )
 
     if return_code:
@@ -162,7 +156,7 @@ def _perform_registry_request(
         )
     request_kwargs = dict(
         method=method,
-        url="{}{}".format(registry_api_url, path),
+        url=f"{registry_api_url}{path}",
         params=params,
         files=files,
         data=data,
@@ -208,7 +202,7 @@ def extract(source: str, target: str) -> None:
         tar.extractall(path=target)
         tar.close()
     else:
-        raise ValueError("Unknown file type: {}".format(source))
+        raise ValueError(f"Unknown file type: {source}")
 
     os.remove(source)
 
@@ -248,10 +242,7 @@ def check_is_author_logged_in(author_name: str) -> None:
     resp = cast(JSONLike, request_api("GET", "/rest-auth/user/", is_auth=True))
     if not author_name == resp["username"]:
         raise click.ClickException(
-            "Author username is not equal to current logged in username "
-            "(logged in: {}, author: {}). Please logout and then login correctly.".format(
-                resp["username"], author_name
-            )
+            f"Author username is not equal to current logged in username (logged in: {resp['username']}, author: {author_name}). Please logout and then login correctly."
         )
 
 

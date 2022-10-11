@@ -92,7 +92,7 @@ class TestFilter:
         ) as mock_logger_warning:
             self.filter.handle_internal_message(msg)
             mock_logger_warning.assert_called_with(
-                "No internal handler fetched for skill_id={}".format(msg.to)
+                f"No internal handler fetched for skill_id={msg.to}"
             )
         assert self.decision_make_queue.empty()
 
@@ -105,7 +105,7 @@ class TestFilter:
         ) as mock_logger_warning:
             self.filter.handle_internal_message(msg)
             mock_logger_warning.assert_called_with(
-                "Invalid public id as destination={}".format(msg.to)
+                f"Invalid public id as destination={msg.to}"
             )
         assert self.decision_make_queue.empty()
 

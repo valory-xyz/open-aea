@@ -175,42 +175,30 @@ class GymMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
-                    type(self.dialogue_reference)
-                ),
+                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[0])
-                ),
+                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[1])
-                ),
+                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
             )
             enforce(
                 type(self.message_id) is int,
-                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
-                    type(self.message_id)
-                ),
+                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
             )
             enforce(
                 type(self.target) is int,
-                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
-                    type(self.target)
-                ),
+                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, GymMessage.Performative),
-                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
-                    self.valid_performatives, self.performative
-                ),
+                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
             )
 
             # Check correct contents
@@ -220,68 +208,48 @@ class GymMessage(Message):
                 expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.action, CustomAnyObject),
-                    "Invalid type for content 'action'. Expected 'AnyObject'. Found '{}'.".format(
-                        type(self.action)
-                    ),
+                    f"Invalid type for content 'action'. Expected 'AnyObject'. Found '{type(self.action)}'.",
                 )
                 enforce(
                     type(self.step_id) is int,
-                    "Invalid type for content 'step_id'. Expected 'int'. Found '{}'.".format(
-                        type(self.step_id)
-                    ),
+                    f"Invalid type for content 'step_id'. Expected 'int'. Found '{type(self.step_id)}'.",
                 )
             elif self.performative == GymMessage.Performative.PERCEPT:
                 expected_nb_of_contents = 5
                 enforce(
                     type(self.step_id) is int,
-                    "Invalid type for content 'step_id'. Expected 'int'. Found '{}'.".format(
-                        type(self.step_id)
-                    ),
+                    f"Invalid type for content 'step_id'. Expected 'int'. Found '{type(self.step_id)}'.",
                 )
                 enforce(
                     isinstance(self.observation, CustomAnyObject),
-                    "Invalid type for content 'observation'. Expected 'AnyObject'. Found '{}'.".format(
-                        type(self.observation)
-                    ),
+                    f"Invalid type for content 'observation'. Expected 'AnyObject'. Found '{type(self.observation)}'.",
                 )
                 enforce(
                     isinstance(self.reward, float),
-                    "Invalid type for content 'reward'. Expected 'float'. Found '{}'.".format(
-                        type(self.reward)
-                    ),
+                    f"Invalid type for content 'reward'. Expected 'float'. Found '{type(self.reward)}'.",
                 )
                 enforce(
                     isinstance(self.done, bool),
-                    "Invalid type for content 'done'. Expected 'bool'. Found '{}'.".format(
-                        type(self.done)
-                    ),
+                    f"Invalid type for content 'done'. Expected 'bool'. Found '{type(self.done)}'.",
                 )
                 enforce(
                     isinstance(self.info, CustomAnyObject),
-                    "Invalid type for content 'info'. Expected 'AnyObject'. Found '{}'.".format(
-                        type(self.info)
-                    ),
+                    f"Invalid type for content 'info'. Expected 'AnyObject'. Found '{type(self.info)}'.",
                 )
             elif self.performative == GymMessage.Performative.STATUS:
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.content, dict),
-                    "Invalid type for content 'content'. Expected 'dict'. Found '{}'.".format(
-                        type(self.content)
-                    ),
+                    f"Invalid type for content 'content'. Expected 'dict'. Found '{type(self.content)}'.",
                 )
                 for key_of_content, value_of_content in self.content.items():
                     enforce(
                         isinstance(key_of_content, str),
-                        "Invalid type for dictionary keys in content 'content'. Expected 'str'. Found '{}'.".format(
-                            type(key_of_content)
-                        ),
+                        f"Invalid type for dictionary keys in content 'content'. Expected 'str'. Found '{type(key_of_content)}'.",
                     )
                     enforce(
                         isinstance(value_of_content, str),
-                        "Invalid type for dictionary values in content 'content'. Expected 'str'. Found '{}'.".format(
-                            type(value_of_content)
-                        ),
+                        f"Invalid type for dictionary values in content 'content'. Expected 'str'. Found '{type(value_of_content)}'.",
                     )
             elif self.performative == GymMessage.Performative.RESET:
                 expected_nb_of_contents = 0
@@ -291,18 +259,14 @@ class GymMessage(Message):
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                "Incorrect number of contents. Expected {}. Found {}".format(
-                    expected_nb_of_contents, actual_nb_of_contents
-                ),
+                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
-                        self.target
-                    ),
+                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

@@ -110,10 +110,7 @@ class RawTransaction:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "RawTransaction: ledger_id={}, body={}".format(
-            self.ledger_id,
-            self.body,
-        )
+        return f"RawTransaction: ledger_id={self.ledger_id}, body={self.body}"
 
 
 class RawMessage:
@@ -209,11 +206,7 @@ class RawMessage:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "RawMessage: ledger_id={}, body={!r}, is_deprecated_mode={}".format(
-            self.ledger_id,
-            self.body,
-            self.is_deprecated_mode,
-        )
+        return f"RawMessage: ledger_id={self.ledger_id}, body={self.body!r}, is_deprecated_mode={self.is_deprecated_mode}"
 
 
 class SignedTransaction:
@@ -295,10 +288,7 @@ class SignedTransaction:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "SignedTransaction: ledger_id={}, body={}".format(
-            self.ledger_id,
-            self.body,
-        )
+        return f"SignedTransaction: ledger_id={self.ledger_id}, body={self.body}"
 
 
 class SignedMessage:
@@ -394,11 +384,7 @@ class SignedMessage:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "SignedMessage: ledger_id={}, body={}, is_deprecated_mode={}".format(
-            self.ledger_id,
-            self.body,
-            self.is_deprecated_mode,
-        )
+        return f"SignedMessage: ledger_id={self.ledger_id}, body={self.body}, is_deprecated_mode={self.is_deprecated_mode}"
 
 
 class State:
@@ -467,7 +453,7 @@ class State:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "State: ledger_id={}, body={}".format(self.ledger_id, self.body)
+        return f"State: ledger_id={self.ledger_id}, body={self.body}"
 
 
 class Terms:
@@ -971,17 +957,7 @@ class Terms:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "Terms: ledger_id={}, sender_address={}, counterparty_address={}, amount_by_currency_id={}, quantities_by_good_id={}, is_sender_payable_tx_fee={}, nonce={}, fee_by_currency_id={}, kwargs={}".format(
-            self.ledger_id,
-            self.sender_address,
-            self.counterparty_address,
-            self.amount_by_currency_id,
-            self.quantities_by_good_id,
-            self.is_sender_payable_tx_fee,
-            self.nonce,
-            self._fee_by_currency_id,
-            self.kwargs,
-        )
+        return f"Terms: ledger_id={self.ledger_id}, sender_address={self.sender_address}, counterparty_address={self.counterparty_address}, amount_by_currency_id={self.amount_by_currency_id}, quantities_by_good_id={self.quantities_by_good_id}, is_sender_payable_tx_fee={self.is_sender_payable_tx_fee}, nonce={self.nonce}, fee_by_currency_id={self._fee_by_currency_id}, kwargs={self.kwargs}"
 
 
 class TransactionDigest:
@@ -1060,9 +1036,7 @@ class TransactionDigest:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "TransactionDigest: ledger_id={}, body={}".format(
-            self.ledger_id, self.body
-        )
+        return f"TransactionDigest: ledger_id={self.ledger_id}, body={self.body}"
 
 
 class TransactionReceipt:
@@ -1153,6 +1127,4 @@ class TransactionReceipt:
 
     def __str__(self) -> str:
         """Get string representation."""
-        return "TransactionReceipt: ledger_id={}, receipt={}, transaction={}".format(
-            self.ledger_id, self.receipt, self.transaction
-        )
+        return f"TransactionReceipt: ledger_id={self.ledger_id}, receipt={self.receipt}, transaction={self.transaction}"

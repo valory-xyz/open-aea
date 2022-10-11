@@ -118,9 +118,7 @@ class MultiAddr:
                     _hex_to_bytes(public_key), curves.SECP256k1
                 )
             except keys.MalformedPointError as e:  # pragma: no cover
-                raise ValueError(
-                    "Malformed public key '{}': {}".format(public_key, str(e))
-                )
+                raise ValueError(f"Malformed public key '{public_key}': {str(e)}")
 
             self._public_key = public_key
             self._peerid = self.compute_peerid(self._public_key)
@@ -128,9 +126,7 @@ class MultiAddr:
             try:
                 multihash.decode(base58.b58decode(multihash_id))
             except Exception as e:  # pylint: disable=broad-except
-                raise ValueError(
-                    "Malformed multihash '{}': {}".format(multihash_id, str(e))
-                )
+                raise ValueError(f"Malformed multihash '{multihash_id}': {str(e)}")
 
             self._public_key = ""
             self._peerid = multihash_id
@@ -170,7 +166,7 @@ class MultiAddr:
         """
         parts = maddr.split("/")
         if len(parts) != 7 or not parts[4].isdigit():
-            raise ValueError("Malformed multiaddress '{}'".format(maddr))
+            raise ValueError(f"Malformed multiaddress '{maddr}'")
 
         return cls(host=parts[2], port=int(parts[4]), multihash_id=parts[6])
 

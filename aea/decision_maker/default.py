@@ -117,9 +117,7 @@ class DecisionMakerHandler(BaseDecisionMakerHandler):
             self._handle_signing_message(message)
         else:  # pragma: no cover
             self.logger.error(
-                "[{}]: cannot handle message={} of type={}".format(
-                    self.agent_name, message, type(message)
-                )
+                f"[{self.agent_name}]: cannot handle message={message} of type={type(message)}"
             )
 
     def _handle_signing_message(self, signing_msg: SigningMessage) -> None:
@@ -133,9 +131,7 @@ class DecisionMakerHandler(BaseDecisionMakerHandler):
             signing_dialogue, self.signing_dialogue_class
         ):  # pragma: no cover
             self.logger.error(
-                "[{}]: Could not construct signing dialogue. Aborting!".format(
-                    self.agent_name
-                )
+                f"[{self.agent_name}]: Could not construct signing dialogue. Aborting!"
             )
             return
 
@@ -148,9 +144,7 @@ class DecisionMakerHandler(BaseDecisionMakerHandler):
             self._handle_transaction_signing(signing_msg, signing_dialogue)
         else:  # pragma: no cover
             self.logger.error(
-                "[{}]: Unexpected transaction message performative".format(
-                    self.agent_name
-                )
+                f"[{self.agent_name}]: Unexpected transaction message performative"
             )
 
     def _handle_message_signing(

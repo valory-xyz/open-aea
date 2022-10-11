@@ -128,10 +128,7 @@ def _match_brackets(text: str, index_of_open_bracket: int) -> int:
     """
     if text[index_of_open_bracket] != "[":
         raise SyntaxError(
-            "Index {} in 'text' is not an open bracket '['. It is {}".format(
-                index_of_open_bracket,
-                text[index_of_open_bracket],
-            )
+            f"Index {index_of_open_bracket} in 'text' is not an open bracket '['. It is {text[index_of_open_bracket]}"
         )
 
     open_bracket_stack = []
@@ -212,11 +209,7 @@ def _get_sub_types_of_compositional_types(compositional_type: str) -> Tuple[str,
                             )
                         except SyntaxError:
                             raise SyntaxError(
-                                "Bad formatting. No matching close bracket ']' for the open bracket at {}".format(
-                                    inside_string[
-                                        : inside_string.index("[") + 1
-                                    ].strip()
-                                )
+                                f"Bad formatting. No matching close bracket ']' for the open bracket at {inside_string[:inside_string.index('[') + 1].strip()}"
                             )
                         sub_type = inside_string[: closing_bracket_index + 1].strip()
                         the_rest_of_inside_string = inside_string[
@@ -233,9 +226,7 @@ def _get_sub_types_of_compositional_types(compositional_type: str) -> Tuple[str,
                 if not do_not_add:
                     sub_types_list.append(sub_type)
             return tuple(sub_types_list)
-    raise SyntaxError(
-        "{} is not a valid compositional type.".format(compositional_type)
-    )
+    raise SyntaxError(f"{compositional_type} is not a valid compositional type.")
 
 
 def _union_sub_type_to_protobuf_variable_name(
@@ -251,18 +242,18 @@ def _union_sub_type_to_protobuf_variable_name(
     """
     if content_type.startswith("FrozenSet"):
         sub_type = _get_sub_types_of_compositional_types(content_type)[0]
-        expanded_type_str = "set_of_{}".format(sub_type)
+        expanded_type_str = f"set_of_{sub_type}"
     elif content_type.startswith("Tuple"):
         sub_type = _get_sub_types_of_compositional_types(content_type)[0]
-        expanded_type_str = "list_of_{}".format(sub_type)
+        expanded_type_str = f"list_of_{sub_type}"
     elif content_type.startswith("Dict"):
         sub_type_1 = _get_sub_types_of_compositional_types(content_type)[0]
         sub_type_2 = _get_sub_types_of_compositional_types(content_type)[1]
-        expanded_type_str = "dict_of_{}_{}".format(sub_type_1, sub_type_2)
+        expanded_type_str = f"dict_of_{sub_type_1}_{sub_type_2}"
     else:
         expanded_type_str = content_type
 
-    protobuf_variable_name = "{}_type_{}".format(content_name, expanded_type_str)
+    protobuf_variable_name = f"{content_name}_type_{expanded_type_str}"
 
     return protobuf_variable_name
 

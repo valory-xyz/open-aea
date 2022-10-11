@@ -152,42 +152,30 @@ class DefaultMessage(Message):
         try:
             enforce(
                 isinstance(self.dialogue_reference, tuple),
-                "Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{}'.".format(
-                    type(self.dialogue_reference)
-                ),
+                f"Invalid type for 'dialogue_reference'. Expected 'tuple'. Found '{type(self.dialogue_reference)}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[0], str),
-                "Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[0])
-                ),
+                f"Invalid type for 'dialogue_reference[0]'. Expected 'str'. Found '{type(self.dialogue_reference[0])}'.",
             )
             enforce(
                 isinstance(self.dialogue_reference[1], str),
-                "Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{}'.".format(
-                    type(self.dialogue_reference[1])
-                ),
+                f"Invalid type for 'dialogue_reference[1]'. Expected 'str'. Found '{type(self.dialogue_reference[1])}'.",
             )
             enforce(
                 type(self.message_id) is int,
-                "Invalid type for 'message_id'. Expected 'int'. Found '{}'.".format(
-                    type(self.message_id)
-                ),
+                f"Invalid type for 'message_id'. Expected 'int'. Found '{type(self.message_id)}'.",
             )
             enforce(
                 type(self.target) is int,
-                "Invalid type for 'target'. Expected 'int'. Found '{}'.".format(
-                    type(self.target)
-                ),
+                f"Invalid type for 'target'. Expected 'int'. Found '{type(self.target)}'.",
             )
 
             # Light Protocol Rule 2
             # Check correct performative
             enforce(
                 isinstance(self.performative, DefaultMessage.Performative),
-                "Invalid 'performative'. Expected either of '{}'. Found '{}'.".format(
-                    self.valid_performatives, self.performative
-                ),
+                f"Invalid 'performative'. Expected either of '{self.valid_performatives}'. Found '{self.performative}'.",
             )
 
             # Check correct contents
@@ -197,42 +185,30 @@ class DefaultMessage(Message):
                 expected_nb_of_contents = 1
                 enforce(
                     isinstance(self.content, bytes),
-                    "Invalid type for content 'content'. Expected 'bytes'. Found '{}'.".format(
-                        type(self.content)
-                    ),
+                    f"Invalid type for content 'content'. Expected 'bytes'. Found '{type(self.content)}'.",
                 )
             elif self.performative == DefaultMessage.Performative.ERROR:
                 expected_nb_of_contents = 3
                 enforce(
                     isinstance(self.error_code, CustomErrorCode),
-                    "Invalid type for content 'error_code'. Expected 'ErrorCode'. Found '{}'.".format(
-                        type(self.error_code)
-                    ),
+                    f"Invalid type for content 'error_code'. Expected 'ErrorCode'. Found '{type(self.error_code)}'.",
                 )
                 enforce(
                     isinstance(self.error_msg, str),
-                    "Invalid type for content 'error_msg'. Expected 'str'. Found '{}'.".format(
-                        type(self.error_msg)
-                    ),
+                    f"Invalid type for content 'error_msg'. Expected 'str'. Found '{type(self.error_msg)}'.",
                 )
                 enforce(
                     isinstance(self.error_data, dict),
-                    "Invalid type for content 'error_data'. Expected 'dict'. Found '{}'.".format(
-                        type(self.error_data)
-                    ),
+                    f"Invalid type for content 'error_data'. Expected 'dict'. Found '{type(self.error_data)}'.",
                 )
                 for key_of_error_data, value_of_error_data in self.error_data.items():
                     enforce(
                         isinstance(key_of_error_data, str),
-                        "Invalid type for dictionary keys in content 'error_data'. Expected 'str'. Found '{}'.".format(
-                            type(key_of_error_data)
-                        ),
+                        f"Invalid type for dictionary keys in content 'error_data'. Expected 'str'. Found '{type(key_of_error_data)}'.",
                     )
                     enforce(
                         isinstance(value_of_error_data, bytes),
-                        "Invalid type for dictionary values in content 'error_data'. Expected 'bytes'. Found '{}'.".format(
-                            type(value_of_error_data)
-                        ),
+                        f"Invalid type for dictionary values in content 'error_data'. Expected 'bytes'. Found '{type(value_of_error_data)}'.",
                     )
             elif self.performative == DefaultMessage.Performative.END:
                 expected_nb_of_contents = 0
@@ -240,18 +216,14 @@ class DefaultMessage(Message):
             # Check correct content count
             enforce(
                 expected_nb_of_contents == actual_nb_of_contents,
-                "Incorrect number of contents. Expected {}. Found {}".format(
-                    expected_nb_of_contents, actual_nb_of_contents
-                ),
+                f"Incorrect number of contents. Expected {expected_nb_of_contents}. Found {actual_nb_of_contents}",
             )
 
             # Light Protocol Rule 3
             if self.message_id == 1:
                 enforce(
                     self.target == 0,
-                    "Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {}.".format(
-                        self.target
-                    ),
+                    f"Invalid 'target'. Expected 0 (because 'message_id' is 1). Found {self.target}.",
                 )
         except (AEAEnforceError, ValueError, KeyError) as e:
             _default_logger.error(str(e))

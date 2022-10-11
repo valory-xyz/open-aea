@@ -212,7 +212,7 @@ class TestClientServer:
     async def test_get_with_query(self):
         """Test client and server with url query."""
         query = {"key": "value"}
-        path = "/test?{}".format(urllib.parse.urlencode(query))
+        path = f"/test?{urllib.parse.urlencode(query)}"
         initial_request = self._make_request(path, "GET")
         await self.client.send(initial_request)
         request = await asyncio.wait_for(self.server.receive(), timeout=5)

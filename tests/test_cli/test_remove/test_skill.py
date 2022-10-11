@@ -158,7 +158,7 @@ class TestRemoveSkillFailsWhenSkillIsNotSupported:
 
         The expected message is: 'The skill '{skill_name}' is not supported.'
         """
-        s = "The skill '{}' is not supported.".format(self.skill_id)
+        s = f"The skill '{self.skill_id}' is not supported."
         assert self.result.exception.message == s
 
     @classmethod

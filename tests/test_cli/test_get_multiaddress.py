@@ -260,9 +260,7 @@ class TestGetMultiAddressCommandNegativeMissingKey(AEATestCaseEmpty):
         # this will cause exception because no key is added to the AEA project.
         with pytest.raises(
             Exception,
-            match="Cannot find '{}'. Please check private_key_path.".format(
-                FetchAICrypto.identifier
-            ),
+            match=f"Cannot find '{FetchAICrypto.identifier}'. Please check private_key_path.",
         ):
             password_options = _get_password_option_args(password_or_none)
             self.run_cli_command(

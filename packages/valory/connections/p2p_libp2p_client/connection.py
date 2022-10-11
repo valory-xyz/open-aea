@@ -295,9 +295,7 @@ class P2PLibp2pClientConnection(Connection):
         ledger_id = self.configuration.config.get("ledger_id", DEFAULT_LEDGER)
         if ledger_id not in SUPPORTED_LEDGER_IDS:
             raise ValueError(  # pragma: nocover
-                "Ledger id '{}' is not supported. Supported ids: '{}'".format(
-                    ledger_id, SUPPORTED_LEDGER_IDS
-                )
+                f"Ledger id '{ledger_id}' is not supported. Supported ids: '{SUPPORTED_LEDGER_IDS}'"
             )
 
         key_file: Optional[str] = self.configuration.config.get("tcp_key_file")
@@ -342,7 +340,7 @@ class P2PLibp2pClientConnection(Connection):
 
         # client connection id
         self.key = key
-        self.logger.debug("Public key used for TCP: {}".format(key.public_key))
+        self.logger.debug(f"Public key used for TCP: {key.public_key}")
 
         # delegate uris
         self.delegate_uris = [Uri(node_uri) for node_uri in nodes_uris]
@@ -359,7 +357,7 @@ class P2PLibp2pClientConnection(Connection):
         index = random.randint(0, len(self.delegate_uris) - 1)  # nosec
         self.node_uri = self.delegate_uris[index]
         self.node_por = self.delegate_pors[index]
-        self.logger.debug("Node to use as delegate: {}".format(self.node_uri))
+        self.logger.debug(f"Node to use as delegate: {self.node_uri}")
 
         self._in_queue = None  # type: Optional[asyncio.Queue]
         self._process_messages_task = None  # type: Optional[asyncio.Future]
@@ -429,9 +427,7 @@ class P2PLibp2pClientConnection(Connection):
                 return  # pragma: nocover
             try:
                 self.logger.info(
-                    "Connecting to libp2p node {}. Attempt {}".format(
-                        str(self.node_uri), attempt + 1
-                    )
+                    f"Connecting to libp2p node {str(self.node_uri)}. Attempt {attempt + 1}"
                 )
                 pipe = TCPSocketChannelClientTLS(
                     f"{self.node_uri.host}:{self.node_uri._port}",  # pylint: disable=protected-access
@@ -448,25 +444,19 @@ class P2PLibp2pClientConnection(Connection):
                 await self._setup_connection()
 
                 self.logger.info(
-                    "Successfully connected to libp2p node {}".format(
-                        str(self.node_uri)
-                    )
+                    f"Successfully connected to libp2p node {str(self.node_uri)}"
                 )
                 return
             except Exception as e:  # pylint: disable=broad-except
                 if attempt == self.connect_retries - 1:
                     self.logger.error(
-                        "Connection to  libp2p node {} failed: error: {}. It was the last attempt, exception will be raised".format(
-                            str(self.node_uri), str(e)
-                        )
+                        f"Connection to  libp2p node {str(self.node_uri)} failed: error: {str(e)}. It was the last attempt, exception will be raised"
                     )
                     self.state = ConnectionStates.disconnected
                     raise
                 sleep_time = attempt * 2 + 1
                 self.logger.error(
-                    "Connection to  libp2p node {} failed: error: {}. Another attempt will be performed in {} seconds".format(
-                        str(self.node_uri), str(e), sleep_time
-                    )
+                    f"Connection to  libp2p node {str(self.node_uri)} failed: error: {str(e)}. Another attempt will be performed in {sleep_time} seconds"
                 )
                 await asyncio.sleep(sleep_time)
 
@@ -525,7 +515,7 @@ class P2PLibp2pClientConnection(Connection):
             if envelope is None:  # pragma: no cover
                 self.logger.debug("Received None.")
                 return None
-            self.logger.debug("Received envelope: {}".format(envelope))
+            self.logger.debug(f"Received envelope: {envelope}")
             return envelope
         except CancelledError:  # pragma: no cover
             self.logger.debug("Receive cancelled.")
@@ -559,9 +549,7 @@ class P2PLibp2pClientConnection(Connection):
             self.logger.error(f"Connection error: {e}. Try to reconnect and read again")
         except IncompleteReadError as e:  # pragma: no cover
             self.logger.error(
-                "Connection disconnected while reading from node ({}/{})".format(
-                    len(e.partial), e.expected
-                )
+                f"Connection disconnected while reading from node ({len(e.partial)}/{e.expected})"
             )
         except Exception as e:  # pylint: disable=broad-except  # pragma: nocover
             self.logger.exception(f"On envelope read: {e}")

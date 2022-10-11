@@ -588,22 +588,22 @@ class TestValidate(TestCase):
         valid_content_type_1 = "offer"
         valid_result_1, valid_msg_1 = _validate_performatives(valid_content_type_1)
         assert valid_result_1 is True
-        assert valid_msg_1 == "Performative '{}' is valid.".format(valid_content_type_1)
+        assert valid_msg_1 == f"Performative '{valid_content_type_1}' is valid."
 
         valid_content_type_2 = "send_HTTP_message"
         valid_result_2, valid_msg_2 = _validate_performatives(valid_content_type_2)
         assert valid_result_2 is True
-        assert valid_msg_2 == "Performative '{}' is valid.".format(valid_content_type_2)
+        assert valid_msg_2 == f"Performative '{valid_content_type_2}' is valid."
 
         valid_content_type_3 = "request_2PL"
         valid_result_3, valid_msg_3 = _validate_performatives(valid_content_type_3)
         assert valid_result_3 is True
-        assert valid_msg_3 == "Performative '{}' is valid.".format(valid_content_type_3)
+        assert valid_msg_3 == f"Performative '{valid_content_type_3}' is valid."
 
         valid_content_type_4 = "argue"
         valid_result_4, valid_msg_4 = _validate_performatives(valid_content_type_4)
         assert valid_result_4 is True
-        assert valid_msg_4 == "Performative '{}' is valid.".format(valid_content_type_4)
+        assert valid_msg_4 == f"Performative '{valid_content_type_4}' is valid."
 
         ###################################################
 
@@ -614,9 +614,7 @@ class TestValidate(TestCase):
         assert invalid_result_1 is False
         assert (
             invalid_msg_1
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_content_type_1, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_content_type_1}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
 
         invalid_content_type_2 = "request_"
@@ -626,9 +624,7 @@ class TestValidate(TestCase):
         assert invalid_result_2 is False
         assert (
             invalid_msg_2
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_content_type_2, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_content_type_2}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
 
         invalid_content_type_3 = "_query_"
@@ -638,9 +634,7 @@ class TestValidate(TestCase):
         assert invalid_result_3 is False
         assert (
             invalid_msg_3
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_content_type_3, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_content_type_3}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
 
         invalid_content_type_4 = "$end"
@@ -650,9 +644,7 @@ class TestValidate(TestCase):
         assert invalid_result_4 is False
         assert (
             invalid_msg_4
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_content_type_4, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_content_type_4}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
 
         invalid_content_type_5 = "create()"
@@ -662,9 +654,7 @@ class TestValidate(TestCase):
         assert invalid_result_5 is False
         assert (
             invalid_msg_5
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_content_type_5, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_content_type_5}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
 
         invalid_content_type_6 = "_body"
@@ -674,9 +664,7 @@ class TestValidate(TestCase):
         assert invalid_result_6 is False
         assert (
             invalid_msg_6
-            == "Invalid name for performative '{}'. This name is reserved.".format(
-                invalid_content_type_6,
-            )
+            == f"Invalid name for performative '{invalid_content_type_6}'. This name is reserved."
         )
 
         invalid_content_type_7 = "message_id"
@@ -686,9 +674,7 @@ class TestValidate(TestCase):
         assert invalid_result_7 is False
         assert (
             invalid_msg_6
-            == "Invalid name for performative '{}'. This name is reserved.".format(
-                invalid_content_type_6,
-            )
+            == f"Invalid name for performative '{invalid_content_type_6}'. This name is reserved."
         )
 
     def test_validate_content_name(self):
@@ -700,8 +686,9 @@ class TestValidate(TestCase):
             valid_content_type_1, performative
         )
         assert valid_result_1 is True
-        assert valid_msg_1 == "Content name '{}' of performative '{}' is valid.".format(
-            valid_content_type_1, performative
+        assert (
+            valid_msg_1
+            == f"Content name '{valid_content_type_1}' of performative '{performative}' is valid."
         )
 
         valid_content_type_2 = "HTTP_msg_name"
@@ -709,8 +696,9 @@ class TestValidate(TestCase):
             valid_content_type_2, performative
         )
         assert valid_result_2 is True
-        assert valid_msg_2 == "Content name '{}' of performative '{}' is valid.".format(
-            valid_content_type_2, performative
+        assert (
+            valid_msg_2
+            == f"Content name '{valid_content_type_2}' of performative '{performative}' is valid."
         )
 
         valid_content_type_3 = "number_of_3PLs"
@@ -718,8 +706,9 @@ class TestValidate(TestCase):
             valid_content_type_3, performative
         )
         assert valid_result_3 is True
-        assert valid_msg_3 == "Content name '{}' of performative '{}' is valid.".format(
-            valid_content_type_3, performative
+        assert (
+            valid_msg_3
+            == f"Content name '{valid_content_type_3}' of performative '{performative}' is valid."
         )
 
         valid_content_type_4 = "model"
@@ -727,8 +716,9 @@ class TestValidate(TestCase):
             valid_content_type_4, performative
         )
         assert valid_result_4 is True
-        assert valid_msg_4 == "Content name '{}' of performative '{}' is valid.".format(
-            valid_content_type_4, performative
+        assert (
+            valid_msg_4
+            == f"Content name '{valid_content_type_4}' of performative '{performative}' is valid."
         )
 
         ###################################################
@@ -740,9 +730,7 @@ class TestValidate(TestCase):
         assert invalid_result_1 is False
         assert (
             invalid_msg_1
-            == "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                invalid_content_type_1, performative, CONTENT_NAME_REGEX_PATTERN
-            )
+            == f"Invalid name for content '{invalid_content_type_1}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} "
         )
 
         invalid_content_type_2 = "content_"
@@ -752,9 +740,7 @@ class TestValidate(TestCase):
         assert invalid_result_2 is False
         assert (
             invalid_msg_2
-            == "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                invalid_content_type_2, performative, CONTENT_NAME_REGEX_PATTERN
-            )
+            == f"Invalid name for content '{invalid_content_type_2}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} "
         )
 
         invalid_content_type_3 = "_content_"
@@ -764,9 +750,7 @@ class TestValidate(TestCase):
         assert invalid_result_3 is False
         assert (
             invalid_msg_3
-            == "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                invalid_content_type_3, performative, CONTENT_NAME_REGEX_PATTERN
-            )
+            == f"Invalid name for content '{invalid_content_type_3}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} "
         )
 
         invalid_content_type_4 = "con^en^"
@@ -776,9 +760,7 @@ class TestValidate(TestCase):
         assert invalid_result_4 is False
         assert (
             invalid_msg_4
-            == "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                invalid_content_type_4, performative, CONTENT_NAME_REGEX_PATTERN
-            )
+            == f"Invalid name for content '{invalid_content_type_4}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} "
         )
 
         invalid_content_type_5 = "some_content()"
@@ -788,9 +770,7 @@ class TestValidate(TestCase):
         assert invalid_result_5 is False
         assert (
             invalid_msg_5
-            == "Invalid name for content '{}' of performative '{}'. Content names must match the following regular expression: {} ".format(
-                invalid_content_type_5, performative, CONTENT_NAME_REGEX_PATTERN
-            )
+            == f"Invalid name for content '{invalid_content_type_5}' of performative '{performative}'. Content names must match the following regular expression: {CONTENT_NAME_REGEX_PATTERN} "
         )
 
         invalid_content_type_6 = "target"
@@ -798,9 +778,9 @@ class TestValidate(TestCase):
             invalid_content_type_6, performative
         )
         assert invalid_result_6 is False
-        assert invalid_msg_6 == "Invalid name for content '{}' of performative '{}'. This name is reserved.".format(
-            invalid_content_type_6,
-            performative,
+        assert (
+            invalid_msg_6
+            == f"Invalid name for content '{invalid_content_type_6}' of performative '{performative}'. This name is reserved."
         )
 
         invalid_content_type_7 = "performative"
@@ -808,9 +788,9 @@ class TestValidate(TestCase):
             invalid_content_type_7, performative
         )
         assert invalid_result_7 is False
-        assert invalid_msg_7 == "Invalid name for content '{}' of performative '{}'. This name is reserved.".format(
-            invalid_content_type_7,
-            performative,
+        assert (
+            invalid_msg_7
+            == f"Invalid name for content '{invalid_content_type_7}' of performative '{performative}'. This name is reserved."
         )
 
     def test_validate_content_type(self):
@@ -825,9 +805,7 @@ class TestValidate(TestCase):
         assert valid_result_1 is True
         assert (
             valid_msg_1
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_2 = "pt:int"
@@ -837,9 +815,7 @@ class TestValidate(TestCase):
         assert valid_result_2 is True
         assert (
             valid_msg_2
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_3 = "pt:set[pt:float]"
@@ -849,9 +825,7 @@ class TestValidate(TestCase):
         assert valid_result_3 is True
         assert (
             valid_msg_3
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_4 = "pt:list[pt:bool]"
@@ -861,9 +835,7 @@ class TestValidate(TestCase):
         assert valid_result_4 is True
         assert (
             valid_msg_4
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_5 = "pt:dict[pt:bool,pt:float]"
@@ -873,9 +845,7 @@ class TestValidate(TestCase):
         assert valid_result_5 is True
         assert (
             valid_msg_5
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_6 = (
@@ -894,9 +864,7 @@ class TestValidate(TestCase):
         assert valid_result_6 is True
         assert (
             valid_msg_6
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         valid_content_type_7 = (
@@ -908,9 +876,7 @@ class TestValidate(TestCase):
         assert valid_result_7 is True
         assert (
             valid_msg_7
-            == "Type of content '{}' of performative '{}' is valid.".format(
-                content_name, performative
-            )
+            == f"Type of content '{content_name}' of performative '{performative}' is valid."
         )
 
         ###################################################
@@ -920,9 +886,9 @@ class TestValidate(TestCase):
             invalid_content_type_1, content_name, performative
         )
         assert invalid_result_1 is False
-        assert invalid_msg_1 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_1
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_2 = "bool"
@@ -930,9 +896,9 @@ class TestValidate(TestCase):
             invalid_content_type_2, content_name, performative
         )
         assert invalid_result_2 is False
-        assert invalid_msg_2 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_2
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_3 = "pt: set[pt:int]"
@@ -940,9 +906,9 @@ class TestValidate(TestCase):
             invalid_content_type_3, content_name, performative
         )
         assert invalid_result_3 is False
-        assert invalid_msg_3 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_3
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_4 = "pt:list[string]"
@@ -950,9 +916,9 @@ class TestValidate(TestCase):
             invalid_content_type_4, content_name, performative
         )
         assert invalid_result_4 is False
-        assert invalid_msg_4 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_4
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_5 = "pt:dict[pt:bool, pt:integer]"
@@ -960,9 +926,9 @@ class TestValidate(TestCase):
             invalid_content_type_5, content_name, performative
         )
         assert invalid_result_5 is False
-        assert invalid_msg_5 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_5
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_6 = "pt:union{pt:boolean, pt:int]"
@@ -970,9 +936,9 @@ class TestValidate(TestCase):
             invalid_content_type_6, content_name, performative
         )
         assert invalid_result_6 is False
-        assert invalid_msg_6 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_6
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
         invalid_content_type_7 = "pt:optional[pt:str, pt:int, pt:list[pt:bool]]"
@@ -980,9 +946,9 @@ class TestValidate(TestCase):
             invalid_content_type_7, content_name, performative
         )
         assert invalid_result_7 is False
-        assert invalid_msg_7 == "Invalid type for content '{}' of performative '{}'. See documentation for the correct format of specification types.".format(
-            content_name,
-            performative,
+        assert (
+            invalid_msg_7
+            == f"Invalid type for content '{content_name}' of performative '{performative}'. See documentation for the correct format of specification types."
         )
 
     @mock.patch(
@@ -1033,9 +999,7 @@ class TestValidate(TestCase):
         assert invalid_result_1 is False
         assert (
             invalid_msg_1
-            == "Invalid name for performative '{}'. Performative names must match the following regular expression: {} ".format(
-                invalid_perm, PERFORMATIVE_REGEX_PATTERN
-            )
+            == f"Invalid name for performative '{invalid_perm}'. Performative names must match the following regular expression: {PERFORMATIVE_REGEX_PATTERN} "
         )
         assert invalid_all_per_1 is None
         assert invalid_all_content_1 is None
@@ -1054,9 +1018,9 @@ class TestValidate(TestCase):
             invalid_all_content_2,
         ) = _validate_speech_acts_section(mocked_spec)
         assert invalid_result_2 is False
-        assert invalid_msg_2 == "Invalid name for content '{}' of performative '{}'. This name is reserved.".format(
-            "target",
-            valid_perm,
+        assert (
+            invalid_msg_2
+            == f"Invalid name for content 'target' of performative '{valid_perm}'. This name is reserved."
         )
         assert invalid_all_per_2 is None
         assert invalid_all_content_2 is None
@@ -1076,8 +1040,9 @@ class TestValidate(TestCase):
             invalid_all_content_3,
         ) = _validate_speech_acts_section(mocked_spec)
         assert invalid_result_3 is False
-        assert invalid_msg_3 == "Invalid type for content 'content_name_1' of performative '{}'. See documentation for the correct format of specification types.".format(
-            valid_perm,
+        assert (
+            invalid_msg_3
+            == f"Invalid type for content 'content_name_1' of performative '{valid_perm}'. See documentation for the correct format of specification types."
         )
         assert invalid_all_per_3 is None
         assert invalid_all_content_3 is None
@@ -1562,9 +1527,7 @@ class TestValidate(TestCase):
         assert invalid_result_3 is False
         assert (
             invalid_msg_3
-            == "Invalid name for role '_agent_'. Role names must match the following regular expression: {} ".format(
-                ROLE_REGEX_PATTERN
-            )
+            == f"Invalid name for role '_agent_'. Role names must match the following regular expression: {ROLE_REGEX_PATTERN} "
         )
 
         invalid_roles_4 = {"client"}
@@ -1594,9 +1557,7 @@ class TestValidate(TestCase):
         assert invalid_result_1 is False
         assert (
             invalid_msg_1
-            == "Invalid name for end_state '_end_state_1'. End_state names must match the following regular expression: {} ".format(
-                END_STATE_REGEX_PATTERN
-            )
+            == f"Invalid name for end_state '_end_state_1'. End_state names must match the following regular expression: {END_STATE_REGEX_PATTERN} "
         )
 
         invalid_end_states_2 = ["end_$tate_1"]
@@ -1604,9 +1565,7 @@ class TestValidate(TestCase):
         assert invalid_result_2 is False
         assert (
             invalid_msg_2
-            == "Invalid name for end_state 'end_$tate_1'. End_state names must match the following regular expression: {} ".format(
-                END_STATE_REGEX_PATTERN
-            )
+            == f"Invalid name for end_state 'end_$tate_1'. End_state names must match the following regular expression: {END_STATE_REGEX_PATTERN} "
         )
 
         invalid_end_states_3 = {"end_state_1"}
@@ -1771,9 +1730,7 @@ class TestValidate(TestCase):
         assert invalid_result_5 is False
         assert (
             invalid_msg_5
-            == "Invalid name for end_state 'end_$tate_1'. End_state names must match the following regular expression: {} ".format(
-                END_STATE_REGEX_PATTERN
-            )
+            == f"Invalid name for end_state 'end_$tate_1'. End_state names must match the following regular expression: {END_STATE_REGEX_PATTERN} "
         )
 
         invalid_dialogue_config_6 = valid_dialogue_config_1.copy()

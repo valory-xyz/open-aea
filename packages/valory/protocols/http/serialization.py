@@ -80,7 +80,7 @@ class HttpSerializer(Serializer):
             performative.body = body
             http_msg.response.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = http_msg.SerializeToString()
 
@@ -133,12 +133,12 @@ class HttpSerializer(Serializer):
             body = http_pb.response.body
             performative_content["body"] = body
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return HttpMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

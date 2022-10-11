@@ -319,19 +319,17 @@ def run_aea(
     _print_instantiated_components(aea)
     _print_addresses(aea)
 
-    click.echo(
-        "Starting AEA '{}' in '{}' mode...".format(aea.name, aea.runtime.loop_mode)
-    )
+    click.echo(f"Starting AEA '{aea.name}' in '{aea.runtime.loop_mode}' mode...")
     try:
         aea.start()
     except KeyboardInterrupt:  # pragma: no cover
-        click.echo(" AEA '{}' interrupted!".format(aea.name))  # pragma: no cover
+        click.echo(f" AEA '{aea.name}' interrupted!")  # pragma: no cover
     except Exception as e:  # pragma: no cover
         raise click.ClickException(str(e))
     finally:
-        click.echo("Stopping AEA '{}' ...".format(aea.name))
+        click.echo(f"Stopping AEA '{aea.name}' ...")
         aea.stop()
-        click.echo("AEA '{}' stopped.".format(aea.name))
+        click.echo(f"AEA '{aea.name}' stopped.")
 
 
 def _prepare_environment(ctx: Context, env_file: str, is_install_deps: bool) -> None:

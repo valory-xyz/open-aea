@@ -106,9 +106,7 @@ class Resources:
             self.add_connection(cast(Connection, component))
         else:
             raise ValueError(
-                "Component type {} not supported.".format(
-                    component.component_type.value
-                )
+                f"Component type {component.component_type.value} not supported."
             )
 
     def add_protocol(self, protocol: Protocol) -> None:

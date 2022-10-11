@@ -86,7 +86,7 @@ class GymSerializer(Serializer):
             performative = gym_pb2.GymMessage.Close_Performative()  # type: ignore
             gym_msg.close.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = gym_msg.SerializeToString()
 
@@ -144,12 +144,12 @@ class GymSerializer(Serializer):
         elif performative_id == GymMessage.Performative.CLOSE:
             pass
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return GymMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

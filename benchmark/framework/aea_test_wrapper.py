@@ -96,7 +96,7 @@ class AEATestWrapper:
         handlers = handlers or {}
         context = context or SkillContext()
         config = config or SkillConfig(
-            name="skill_{}".format(uuid.uuid4().hex[0:5]), author="fetchai"
+            name=f"skill_{uuid.uuid4().hex[0:5]}", author="fetchai"
         )
 
         handlers_instances = {

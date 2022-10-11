@@ -199,10 +199,7 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
             cls.last_cli_runner_result = result
             if result.exit_code != 0:  # pragma: nocover
                 raise AEATestingException(
-                    "Failed to execute AEA CLI command with args {}.\n"
-                    "Exit code: {}\nException: {}".format(
-                        args, result.exit_code, result.exception
-                    )
+                    f"Failed to execute AEA CLI command with args {args}.\nExit code: {result.exit_code}\nException: {result.exception}"
                 )
             return result
 
@@ -891,11 +888,11 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
             cls.terminate_agents(process)
         if missing_strings != []:
             _default_logger.info(
-                "Non-empty missing strings, stderr:\n{}".format(cls.stderr[process.pid])
+                f"Non-empty missing strings, stderr:\n{cls.stderr[process.pid]}"
             )
             _default_logger.info("=====================")
             _default_logger.info(
-                "Non-empty missing strings, stdout:\n{}".format(cls.stdout[process.pid])
+                f"Non-empty missing strings, stdout:\n{cls.stdout[process.pid]}"
             )
             _default_logger.info("=====================")
         return missing_strings

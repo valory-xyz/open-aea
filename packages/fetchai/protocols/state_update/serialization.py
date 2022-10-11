@@ -77,7 +77,7 @@ class StateUpdateSerializer(Serializer):
             performative = state_update_pb2.StateUpdateMessage.End_Performative()  # type: ignore
             state_update_msg.end.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = state_update_msg.SerializeToString()
 
@@ -138,12 +138,12 @@ class StateUpdateSerializer(Serializer):
         elif performative_id == StateUpdateMessage.Performative.END:
             pass
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return StateUpdateMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

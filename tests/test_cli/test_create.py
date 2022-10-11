@@ -123,9 +123,7 @@ class TestCreate:
             self.validator.validate(instance=self.agent_config)
         except jsonschema.exceptions.ValidationError as e:
             pytest.fail(
-                "Configuration file is not compliant with the schema. Exception: {}".format(
-                    str(e)
-                )
+                f"Configuration file is not compliant with the schema. Exception: {str(e)}"
             )
 
     def test_aea_version_is_correct(self):

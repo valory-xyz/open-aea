@@ -50,7 +50,7 @@ class DictProtobufStructSerializer:
         """
         if not isinstance(dictionary, dict):
             raise TypeError(  # pragma: nocover
-                "dictionary must be of dict type, got type {}".format(type(dictionary))
+                f"dictionary must be of dict type, got type {type(dictionary)}"
             )
         patched_dict = copy.deepcopy(dictionary)
         cls._patch_dict(patched_dict)
@@ -118,9 +118,7 @@ class DictProtobufStructSerializer:
             return None, False
 
         raise NotImplementedError(
-            "DictProtobufStructSerializer doesn't support dict value type {}".format(
-                type(value)
-            )
+            f"DictProtobufStructSerializer doesn't support dict value type {type(value)}"
         )
 
     @classmethod
@@ -142,9 +140,7 @@ class DictProtobufStructSerializer:
             return [cls._restore_value(v) for v in value]  # type: ignore
 
         raise NotImplementedError(  # pragma: nocover
-            "DictProtobufStructSerializer doesn't support dict value type {}".format(
-                type(value)
-            )
+            f"DictProtobufStructSerializer doesn't support dict value type {type(value)}"
         )
 
     @classmethod

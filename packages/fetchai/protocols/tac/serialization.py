@@ -134,7 +134,7 @@ class TacSerializer(Serializer):
                 performative.info.update(info)
             tac_msg.tac_error.CopyFrom(performative)
         else:
-            raise ValueError("Performative not valid: {}".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}")
 
         dialogue_message_pb.content = tac_msg.SerializeToString()
 
@@ -254,12 +254,12 @@ class TacSerializer(Serializer):
                 info_dict = dict(info)
                 performative_content["info"] = info_dict
         else:
-            raise ValueError("Performative not valid: {}.".format(performative_id))
+            raise ValueError(f"Performative not valid: {performative_id}.")
 
         return TacMessage(
             message_id=message_id,
             dialogue_reference=dialogue_reference,
             target=target,
             performative=performative,
-            **performative_content
+            **performative_content,
         )

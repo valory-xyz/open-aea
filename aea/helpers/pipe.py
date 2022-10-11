@@ -150,9 +150,7 @@ class PosixNamedPipeProtocol:
             return False
         self._connection_attempts -= 1
 
-        self.logger.debug(
-            "Attempt opening pipes {}, {}...".format(self._in_path, self._out_path)
-        )
+        self.logger.debug(f"Attempt opening pipes {self._in_path}, {self._out_path}...")
 
         self._in = os.open(self._in_path, os.O_RDONLY | os.O_NONBLOCK | os.O_SYNC)
 
@@ -160,7 +158,7 @@ class PosixNamedPipeProtocol:
             self._out = os.open(self._out_path, os.O_WRONLY | os.O_NONBLOCK)
         except OSError as e:  # pragma: no cover
             if e.errno == errno.ENXIO:
-                self.logger.debug("Sleeping for {}...".format(self._connection_timeout))
+                self.logger.debug(f"Sleeping for {self._connection_timeout}...")
                 await asyncio.sleep(self._connection_timeout)
                 return await self.connect(timeout)
             raise e
@@ -194,7 +192,7 @@ class PosixNamedPipeProtocol:
 
         :param data: bytes to write to pipe
         """
-        self.logger.debug("writing {}...".format(len(data)))
+        self.logger.debug(f"writing {len(data)}...")
         size = struct.pack("!I", len(data))
         os.write(self._out, size + data)
         await asyncio.sleep(0.0)
@@ -208,7 +206,7 @@ class PosixNamedPipeProtocol:
         if self._stream_reader is None:  # pragma: nocover
             raise ValueError("StreamReader not set, call connect first!")
         try:
-            self.logger.debug("waiting for messages (in={})...".format(self._in_path))
+            self.logger.debug(f"waiting for messages (in={self._in_path})...")
             buf = await self._stream_reader.readexactly(4)
             if not buf:  # pragma: no cover
                 return None
@@ -221,9 +219,7 @@ class PosixNamedPipeProtocol:
             return data
         except asyncio.IncompleteReadError as e:  # pragma: no cover
             self.logger.info(
-                "Connection disconnected while reading from pipe ({}/{})".format(
-                    len(e.partial), e.expected
-                )
+                f"Connection disconnected while reading from pipe ({len(e.partial)}/{e.expected})"
             )
             return None
         except asyncio.CancelledError:  # pragma: no cover
@@ -231,7 +227,7 @@ class PosixNamedPipeProtocol:
 
     async def close(self) -> None:
         """Disconnect pipe."""
-        self.logger.debug("closing pipe (in={})...".format(self._in_path))
+        self.logger.debug(f"closing pipe (in={self._in_path})...")
         if self._fileobj is None:
             raise ValueError("Pipe not connected")  # pragma: nocover
         try:
@@ -283,7 +279,7 @@ class TCPSocketProtocol:
         """
         if self._writer is None:
             raise ValueError("writer not set!")  # pragma: nocover
-        self.logger.debug("writing {}...".format(len(data)))
+        self.logger.debug(f"writing {len(data)}...")
         size = struct.pack("!I", len(data))
         self._writer.write(size + data)
         await self._writer.drain()
@@ -310,9 +306,7 @@ class TCPSocketProtocol:
             return data
         except asyncio.IncompleteReadError as e:  # pragma: no cover
             self.logger.info(
-                "Connection disconnected while reading from pipe ({}/{})".format(
-                    len(e.partial), e.expected
-                )
+                f"Connection disconnected while reading from pipe ({len(e.partial)}/{e.expected})"
             )
             return None
         except asyncio.CancelledError:  # pragma: no cover
@@ -366,7 +360,7 @@ class TCPSocketChannel(IPCChannel):
         if self._server.sockets is None:
             raise ValueError("Server sockets is None!")  # pragma: nocover
         self._port = self._server.sockets[0].getsockname()[1]
-        self.logger.debug("socket pipe rdv point: {}".format(self._port))
+        self.logger.debug(f"socket pipe rdv point: {self._port}")
 
         try:
             await asyncio.wait_for(self._connected.wait(), timeout)
@@ -440,13 +434,11 @@ class PosixNamedPipeChannel(IPCChannel):
         self._loop = loop
 
         self._pipe_dir = tempfile.mkdtemp()
-        self._in_path = "{}/process_to_aea".format(self._pipe_dir)
-        self._out_path = "{}/aea_to_process".format(self._pipe_dir)
+        self._in_path = f"{self._pipe_dir}/process_to_aea"
+        self._out_path = f"{self._pipe_dir}/aea_to_process"
 
         # setup fifos
-        self.logger.debug(
-            "Creating pipes ({}, {})...".format(self._in_path, self._out_path)
-        )
+        self.logger.debug(f"Creating pipes ({self._in_path}, {self._out_path})...")
         if os.path.exists(self._in_path):
             os.remove(self._in_path)  # pragma: no cover
         if os.path.exists(self._out_path):
@@ -548,9 +540,7 @@ class TCPSocketChannelClient(IPCChannelClient):
 
         self._timeout = timeout / TCP_SOCKET_PIPE_CLIENT_CONN_ATTEMPTS
 
-        self.logger.debug(
-            "Attempting to connect to {}:{}.....".format("127.0.0.1", self._port)
-        )
+        self.logger.debug(f"Attempting to connect to 127.0.0.1:{self._port}.....")
 
         connected = False
         while self._attempts > 0:
@@ -689,7 +679,7 @@ def make_ipc_channel(
     if os.name == "nt":  # pragma: nocover
         return TCPSocketChannel(logger=logger, loop=loop)
     raise NotImplementedError(  # pragma: nocover
-        "make ipc channel is not supported on platform {}".format(os.name)
+        f"make ipc channel is not supported on platform {os.name}"
     )
 
 
@@ -713,5 +703,5 @@ def make_ipc_channel_client(
     if os.name == "nt":  # pragma: nocover
         return TCPSocketChannelClient(in_path, out_path, logger=logger, loop=loop)
     raise NotImplementedError(  # pragma: nocover
-        "make ip channel client is not supported on platform {}".format(os.name)
+        f"make ip channel client is not supported on platform {os.name}"
     )

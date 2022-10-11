@@ -42,7 +42,7 @@ def do_login(username: str, password: str) -> None:
     :param username: str username.
     :param password: str password.
     """
-    click.echo("Signing in as {}...".format(username))
+    click.echo(f"Signing in as {username}...")
     token = registry_login(username, password)
     update_cli_config({AUTH_TOKEN_KEY: token})
-    click.echo("Successfully signed in: {}.".format(username))
+    click.echo(f"Successfully signed in: {username}.")

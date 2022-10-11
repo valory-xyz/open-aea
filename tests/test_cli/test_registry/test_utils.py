@@ -225,7 +225,7 @@ class DownloadFileTestCase(TestCase):
     def test_download_file_positive(self, get_mock):
         """Test for download_file method positive result."""
         filename = "filename.tar.gz"
-        url = "url/{}".format(filename)
+        url = f"url/{filename}"
         cwd = "cwd"
         filepath = os.path.join(cwd, filename)
 

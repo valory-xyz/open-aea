@@ -74,18 +74,9 @@ def test_init_terms():
     assert terms.sender_hash == sender_hash
     assert terms.counterparty_hash == counterparty_hash
     assert terms.currency_id == next(iter(amount_by_currency_id.keys()))
-    assert str(
-        terms
-    ) == "Terms: ledger_id={}, sender_address={}, counterparty_address={}, amount_by_currency_id={}, quantities_by_good_id={}, is_sender_payable_tx_fee={}, nonce={}, fee_by_currency_id={}, kwargs={}".format(
-        ledger_id,
-        sender_addr,
-        counterparty_addr,
-        amount_by_currency_id,
-        quantities_by_good_id,
-        is_sender_payable_tx_fee,
-        nonce,
-        fee_by_currency_id,
-        kwargs,
+    assert (
+        str(terms)
+        == f"Terms: ledger_id={ledger_id}, sender_address={sender_addr}, counterparty_address={counterparty_addr}, amount_by_currency_id={amount_by_currency_id}, quantities_by_good_id={quantities_by_good_id}, is_sender_payable_tx_fee={is_sender_payable_tx_fee}, nonce={nonce}, fee_by_currency_id={fee_by_currency_id}, kwargs={kwargs}"
     )
     assert terms == terms
     with pytest.raises(AEAEnforceError):
@@ -453,7 +444,7 @@ def test_init_transaction_digest():
     td = TransactionDigest(ledger_id, body)
     assert td.ledger_id == ledger_id
     assert td.body == body
-    assert str(td) == "TransactionDigest: ledger_id={}, body={}".format(ledger_id, body)
+    assert str(td) == f"TransactionDigest: ledger_id={ledger_id}, body={body}"
     assert td == td
 
 

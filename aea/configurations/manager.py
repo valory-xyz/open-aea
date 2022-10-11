@@ -172,7 +172,7 @@ def handle_dotted_path(
     root = parts[0]
     if root not in ALLOWED_PATH_ROOTS:
         raise AEAException(
-            "The root of the dotted path must be one of: {}".format(ALLOWED_PATH_ROOTS)
+            f"The root of the dotted path must be one of: {ALLOWED_PATH_ROOTS}"
         )
 
     if (
@@ -227,9 +227,7 @@ def handle_dotted_path(
         json_path = parts[4:]
         if not path_to_resource_directory.exists():
             raise AEAException(  # pragma: nocover
-                "Resource vendor/{}/{}/{} does not exist.".format(
-                    resource_author, resource_type_plural, resource_name
-                )
+                f"Resource vendor/{resource_author}/{resource_type_plural}/{resource_name} does not exist."
             )
     else:
         # navigate the resources of the agent to reach the target configuration file.
@@ -255,9 +253,7 @@ def handle_dotted_path(
         json_path = parts[2:]
         if not path_to_resource_directory.exists():
             raise AEAException(
-                "Resource {}/{} does not exist.".format(
-                    resource_type_plural, resource_name
-                )
+                f"Resource {resource_type_plural}/{resource_name} does not exist."
             )
 
     config_loader = ConfigLoader.from_configuration_type(resource_type_plural[:-1])
@@ -288,7 +284,7 @@ def find_component_directory_from_component_id(
     if custom_package_path.exists() and custom_package_path.is_dir():
         return custom_package_path
 
-    raise ValueError("Package {} not found.".format(component_id))
+    raise ValueError(f"Package {component_id} not found.")
 
 
 class AgentConfigManager:

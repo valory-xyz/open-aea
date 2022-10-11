@@ -83,9 +83,7 @@ def check_header_in_file(header: str, file: Path) -> None:
     with open(file) as f:
         s = f.read()
         if header not in s:
-            raise ValueError(
-                "Header={} not found in file={}!".format(header, str(file))
-            )
+            raise ValueError(f"Header={header} not found in file={str(file)}!")
 
 
 def validate_internal_url(file: Path, url: str, all_files: Set[Path]) -> None:
@@ -99,30 +97,26 @@ def validate_internal_url(file: Path, url: str, all_files: Set[Path]) -> None:
     is_index_file = file == INDEX_FILE_PATH
 
     if not url.startswith(RELATIVE_PATH_STR) and not is_index_file:
-        raise ValueError("Invalid relative path={} in file={}!".format(url, str(file)))
+        raise ValueError(f"Invalid relative path={url} in file={str(file)}!")
 
     md_index = url.find(".md")
     if md_index != -1:
-        raise ValueError(
-            "Path={} contains invalid `.md` in file={}!".format(url, str(file))
-        )
+        raise ValueError(f"Path={url} contains invalid `.md` in file={str(file)}!")
 
     hash_index = url.find("#")
     if hash_index == -1:
         n_url = url[RELATIVE_PATH_STR_LEN:] if not is_index_file else url
         n_url = n_url[:-1] if n_url[-1] == "/" else n_url
-        path = Path("docs/{}.md".format(n_url))
+        path = Path(f"docs/{n_url}.md")
         header = ""
     else:
         n_url = url[RELATIVE_PATH_STR_LEN:hash_index] if not is_index_file else url
         n_url = n_url[:-1] if n_url[-1] == "/" else n_url
-        path = Path("docs/{}.md".format(n_url))
+        path = Path(f"docs/{n_url}.md")
         header = url[hash_index:]
 
     if path not in all_files:
-        raise ValueError(
-            "Path={} found in file={} does not exist!".format(str(path), str(file))
-        )
+        raise ValueError(f"Path={str(path)} found in file={str(file)} does not exist!")
 
     if header != "":
         check_header_in_file(header, file)
@@ -137,7 +131,7 @@ def _checks_all_html(file: Path, regex: Pattern = LINK_PATTERN_MD) -> None:
     """
     matches = regex.finditer(file.read_text())
     for _ in matches:
-        raise ValueError("Markdown link found in file={}!".format(str(file)))
+        raise ValueError(f"Markdown link found in file={str(file)}!")
 
 
 def is_external_url(url: str) -> bool:
@@ -158,7 +152,7 @@ def validate_external_url(url: str, file: Path) -> None:
     :param file: the file where the URL is found.
     """
     if not is_url_reachable(url):
-        raise ValueError("Could not reach url={} in file={}!".format(url, str(file)))
+        raise ValueError(f"Could not reach url={url} in file={str(file)}!")
 
 
 def _checks_link(
@@ -197,17 +191,15 @@ def _checks_image(file: Path, regex: Pattern = IMAGE_PATTERN) -> None:
         jpg_index = result.find(".jpg")
         svg_index = result.find(".svg")
         if png_index != -1 or jpg_index != -1 or svg_index != -1:
-            img_path = Path("docs/{}".format(result[RELATIVE_PATH_STR_LEN:]))
+            img_path = Path(f"docs/{result[RELATIVE_PATH_STR_LEN:]}")
             if not img_path.exists():
                 raise ValueError(
-                    "Image path={} in file={} not found!".format(img_path, str(file))
+                    f"Image path={img_path} in file={str(file)} not found!"
                 )
             return
         if result.startswith("https") or result.startswith("http"):
             if not is_url_reachable(result):
-                raise ValueError(
-                    "Could not reach url={} in file={}!".format(result, str(file))
-                )
+                raise ValueError(f"Could not reach url={result} in file={str(file)}!")
         raise ValueError("Image path={} in file={} not `.png` or `.jpg` or `.svg`!")
 
 

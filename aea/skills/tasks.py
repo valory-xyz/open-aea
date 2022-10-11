@@ -62,9 +62,7 @@ class Task(WithLogger):
             self._result = self.execute(*args, **kwargs)
         except Exception as e:  # pylint: disable=broad-except
             self.logger.debug(
-                "Got exception of type {} with message '{}' while executing task.".format(
-                    type(e), str(e)
-                )
+                f"Got exception of type {type(e)} with message '{str(e)}' while executing task."
             )
         finally:
             self._is_executed = True
@@ -230,7 +228,7 @@ class TaskManager(WithLogger):
             task_id, None
         )  # type: Optional[AsyncResult]
         if task_result is None:
-            raise ValueError("Task id {} not present.".format(task_id))
+            raise ValueError(f"Task id {task_id} not present.")
 
         return task_result
 

@@ -120,7 +120,7 @@ def validate_package_name(package_name: str) -> None:
     :param package_name: the package name
     """
     if re.fullmatch(PublicId.PACKAGE_NAME_REGEX, package_name) is None:
-        raise click.BadParameter("{} is not a valid package name.".format(package_name))
+        raise click.BadParameter(f"{package_name} is not a valid package name.")
 
 
 def _is_valid_author_handle(author: str) -> bool:
@@ -290,7 +290,7 @@ def copy_package_directory(src: Path, dst: str) -> Path:
     """
     # copy the item package into the agent's supported packages.
     src_path = str(src.absolute())
-    logger.debug("Copying modules. src={} dst={}".format(src_path, dst))
+    logger.debug(f"Copying modules. src={src_path} dst={dst}")
     try:
         shutil.copytree(src_path, dst)
     except Exception as e:  # pylint: disable=broad-except
@@ -334,9 +334,7 @@ def find_item_locally(
     config_file_name = _get_default_configuration_file_name_from_type(item_type)
     item_configuration_filepath = package_path / config_file_name
     if not item_configuration_filepath.exists():
-        raise click.ClickException(
-            "Cannot find {}: '{}'.".format(item_type, item_public_id)
-        )
+        raise click.ClickException(f"Cannot find {item_type}: '{item_public_id}'.")
 
     # try to load the item configuration file
     try:
@@ -347,7 +345,7 @@ def find_item_locally(
             item_configuration = item_configuration_loader.load(fp)
     except ValidationError as e:
         raise click.ClickException(
-            "{} configuration file not valid: {}".format(item_type.capitalize(), str(e))
+            f"{item_type.capitalize()} configuration file not valid: {str(e)}"
         )
 
     # check that the configuration file of the found package matches the expected author and version.
@@ -358,7 +356,7 @@ def find_item_locally(
         and item_public_id.version != version
     ):
         raise click.ClickException(
-            "Cannot find {} with author and version specified.".format(item_type)
+            f"Cannot find {item_type} with author and version specified."
         )
 
     return package_path, item_configuration
@@ -388,9 +386,7 @@ def find_item_in_distribution(  # pylint: disable=unused-argument
     config_file_name = _get_default_configuration_file_name_from_type(item_type)
     item_configuration_filepath = package_path / config_file_name
     if not item_configuration_filepath.exists():
-        raise click.ClickException(
-            "Cannot find {}: '{}'.".format(item_type, item_public_id)
-        )
+        raise click.ClickException(f"Cannot find {item_type}: '{item_public_id}'.")
 
     # try to load the item configuration file
     try:
@@ -401,7 +397,7 @@ def find_item_in_distribution(  # pylint: disable=unused-argument
             item_configuration = item_configuration_loader.load(fp)
     except ValidationError as e:
         raise click.ClickException(
-            "{} configuration file not valid: {}".format(item_type.capitalize(), str(e))
+            f"{item_type.capitalize()} configuration file not valid: {str(e)}"
         )
 
     # check that the configuration file of the found package matches the expected author and version.
@@ -412,7 +408,7 @@ def find_item_in_distribution(  # pylint: disable=unused-argument
         and item_public_id.version != version
     ):
         raise click.ClickException(
-            "Cannot find {} with author and version specified.".format(item_type)
+            f"Cannot find {item_type} with author and version specified."
         )
 
     return package_path  # pragma: no cover
@@ -445,17 +441,12 @@ def validate_author_name(author: Optional[str] = None) -> str:
         elif not _is_valid_author_handle(author_prompt):
             is_acceptable_author = False
             click.echo(
-                "Not a valid author handle. Please try again. "
-                "Author handles must satisfy the following regex: {}".format(
-                    PublicId.AUTHOR_REGEX
-                )
+                f"Not a valid author handle. Please try again. Author handles must satisfy the following regex: {PublicId.AUTHOR_REGEX}"
             )
         elif not _is_permitted_author_handle(author_prompt):
             is_acceptable_author = False
             click.echo(
-                "Not a permitted author handle. The following author handles are not allowed: {}".format(
-                    NOT_PERMITTED_AUTHORS
-                )
+                f"Not a permitted author handle. The following author handles are not allowed: {NOT_PERMITTED_AUTHORS}"
             )
 
     return valid_author
@@ -485,9 +476,7 @@ def register_item(ctx: Context, item_type: str, item_public_id: PublicId) -> Non
     :param item_type: type of item.
     :param item_public_id: PublicId of item.
     """
-    logger.debug(
-        "Registering the {} into {}".format(item_type, DEFAULT_AEA_CONFIG_FILE)
-    )
+    logger.debug(f"Registering the {item_type} into {DEFAULT_AEA_CONFIG_FILE}")
     supported_items = get_items(ctx.agent_config, item_type)
     supported_items.add(item_public_id)
     with open_file(os.path.join(ctx.cwd, DEFAULT_AEA_CONFIG_FILE), "w") as fp:
@@ -680,10 +669,10 @@ def try_get_balance(  # pylint: disable=unused-argument
     """
     try:
         if not LedgerApis.has_ledger(type_):  # pragma: no cover
-            raise ValueError("No ledger api config for {} available.".format(type_))
+            raise ValueError(f"No ledger api config for {type_} available.")
         address = wallet.addresses.get(type_)
         if address is None:  # pragma: no cover
-            raise ValueError("No key '{}' in wallet.".format(type_))
+            raise ValueError(f"No key '{type_}' in wallet.")
         balance = LedgerApis.get_balance(type_, address)
         if balance is None:  # pragma: no cover
             raise ValueError("No balance returned!")

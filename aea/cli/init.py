@@ -108,12 +108,12 @@ def do_init(
 
         config = get_or_create_cli_config()
         config.pop(REGISTRY_CONFIG_KEY, None)  # for security reasons
-        success_msg = "AEA configurations successfully initialized: {}".format(config)
+        success_msg = f"AEA configurations successfully initialized: {config}"
     else:
         config = get_or_create_cli_config()
         config.pop(REGISTRY_CONFIG_KEY, None)  # for security reasons
-        success_msg = "AEA configurations already initialized: {}. To reset use '--reset'.".format(
-            config
+        success_msg = (
+            f"AEA configurations already initialized: {config}. To reset use '--reset'."
         )
     click.echo(AEA_LOGO + "v" + __version__ + "\n")
     click.echo(success_msg)

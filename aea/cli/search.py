@@ -173,7 +173,7 @@ def _search_items_locally(ctx: Context, item_type_plural: str) -> List[Dict]:
     _get_details_from_dir(
         cast(ConfigLoader, configs[item_type_plural]["loader"]),
         registry_path,
-        "*/{}".format(item_type_plural),
+        f"*/{item_type_plural}",
         cast(str, configs[item_type_plural]["config_file"]),
         result,
     )
@@ -194,7 +194,7 @@ def search_items(
 
     :return: (List of items, int items total count).
     """
-    click.echo('Searching for "{}"...'.format(query))
+    click.echo(f'Searching for "{query}"...')
     item_type_plural = item_type + "s"
     if ctx.config.get("is_local"):
         results = _search_items_locally(ctx, item_type_plural)
@@ -204,7 +204,7 @@ def search_items(
             JSONLike,
             request_api(
                 "GET",
-                "/{}".format(item_type_plural),
+                f"/{item_type_plural}",
                 params={"search": query, "page": page},
             ),
         )
@@ -227,13 +227,11 @@ def _output_search_results(
     item_type_plural = item_type + "s"
     len_results = len(results)
     if len_results == 0:
-        click.echo("No {} found.".format(item_type_plural))  # pragma: no cover
+        click.echo(f"No {item_type_plural} found.")  # pragma: no cover
     else:
-        click.echo("{} found:\n".format(item_type_plural.title()))
+        click.echo(f"{item_type_plural.title()} found:\n")
         click.echo(format_items(results))
         if count > len_results:
             click.echo(
-                "{} {} out of {}.\nPage {}".format(
-                    len_results, item_type_plural, count, page
-                )
+                f"{len_results} {item_type_plural} out of {count}.\nPage {page}"
             )  # pragma: no cover

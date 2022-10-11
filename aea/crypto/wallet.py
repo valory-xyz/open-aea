@@ -161,7 +161,7 @@ class Wallet:
         crypto_object = self.crypto_objects.get(crypto_id, None)
         if crypto_object is None:
             _default_logger.warning(
-                "No crypto object for crypto_id={} in wallet!".format(crypto_id)
+                f"No crypto object for crypto_id={crypto_id} in wallet!"
             )
             signature = None  # type: Optional[str]
         else:
@@ -179,7 +179,7 @@ class Wallet:
         crypto_object = self.crypto_objects.get(crypto_id, None)
         if crypto_object is None:
             _default_logger.warning(
-                "No crypto object for crypto_id={} in wallet!".format(crypto_id)
+                f"No crypto object for crypto_id={crypto_id} in wallet!"
             )
             signed_transaction = None  # type: Optional[Any]
         else:

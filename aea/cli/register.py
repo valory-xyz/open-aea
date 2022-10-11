@@ -69,4 +69,4 @@ def do_register(
             "Please visit `https://aea-registry.fetch.ai/mailing-list` "
             "to subscribe for developer news"
         )
-    click.echo("Successfully registered and logged in: {}".format(username))
+    click.echo(f"Successfully registered and logged in: {username}")

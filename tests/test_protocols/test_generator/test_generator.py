@@ -133,12 +133,10 @@ class TestCompareLatestGeneratorOutputWithTestProtocol:
         assert is_matched, f"Difference Found between dialogues.py files:\n{diff}"
 
         # compare .proto
-        proto_file_generated = Path(
-            self.t, T_PROTOCOL_NAME, "{}.proto".format(T_PROTOCOL_NAME)
-        )
+        proto_file_generated = Path(self.t, T_PROTOCOL_NAME, f"{T_PROTOCOL_NAME}.proto")
         proto_file_original = Path(
             PATH_TO_T_PROTOCOL,
-            "{}.proto".format(T_PROTOCOL_NAME),
+            f"{T_PROTOCOL_NAME}.proto",
         )
         is_matched, diff = match_files(proto_file_generated, proto_file_original)
         assert is_matched, f"Difference Found between .proto files:\n{diff}"
@@ -249,12 +247,10 @@ class TestCompareLatestGeneratorOutputWithTestProtocolWithNoCustomTypes:
         assert is_matched, f"Difference Found between dialogues.py files:\n{diff}"
 
         # compare .proto
-        proto_file_generated = Path(
-            self.t, protocol_name, "{}.proto".format(protocol_name)
-        )
+        proto_file_generated = Path(self.t, protocol_name, f"{protocol_name}.proto")
         proto_file_original = Path(
             path_to_protocol,
-            "{}.proto".format(protocol_name),
+            f"{protocol_name}.proto",
         )
         is_matched, diff = match_files(proto_file_generated, proto_file_original)
         assert is_matched, f"Difference Found between .proto files:\n{diff}"
@@ -1486,9 +1482,7 @@ class ProtocolGeneratorTestCase(TestCase):
             "Protolint warnings:\n"
             + "error line 1\nerror line 2"
             + "The generated protocol is incomplete, because the protocol specification contains the following custom types: "
-            + "{}. Update the generated '{}' file with the appropriate implementations of these custom types.".format(
-                protocol_generator.spec.all_custom_types, CUSTOM_TYPES_DOT_PY_FILE_NAME
-            )
+            + f"{protocol_generator.spec.all_custom_types}. Update the generated '{CUSTOM_TYPES_DOT_PY_FILE_NAME}' file with the appropriate implementations of these custom types."
         )
         assert output == expected_output
 

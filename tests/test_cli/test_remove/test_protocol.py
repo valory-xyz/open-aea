@@ -145,7 +145,7 @@ class TestRemoveProtocolFailsWhenProtocolDoesNotExist:
 
         The expected message is: 'Protocol '{protocol_name}' not found.'
         """
-        s = "The protocol '{}' is not supported.".format(self.protocol_id)
+        s = f"The protocol '{self.protocol_id}' is not supported."
         assert self.result.exception.message == s
 
     @classmethod

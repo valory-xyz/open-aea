@@ -84,7 +84,7 @@ class GymHandler(Handler):
         :param gym_msg: the message
         """
         self.context.logger.info(
-            "received invalid gym message={}, unidentified dialogue.".format(gym_msg)
+            f"received invalid gym message={gym_msg}, unidentified dialogue."
         )
         default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
         default_msg, _ = default_dialogues.create(
@@ -131,9 +131,7 @@ class GymHandler(Handler):
         :param gym_dialogue: the gym dialogue
         """
         self.context.logger.warning(
-            "cannot handle gym message of performative={} in dialogue={}.".format(
-                gym_msg.performative, gym_dialogue
-            )
+            f"cannot handle gym message of performative={gym_msg.performative} in dialogue={gym_dialogue}."
         )
 
     def teardown(self) -> None:
