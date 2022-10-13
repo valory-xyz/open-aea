@@ -193,6 +193,8 @@ jobs:
         run: sudo npm install -g markdown-spellcheck
       - name: Check Docs links and IPFS hashes
         run: tox -e check-doc-links-hashes
+      - name: Check API Docs updated
+        run: tox -e check-api-docs
       - name: Check spelling
         run: tox -e spell-check
 
@@ -323,7 +325,7 @@ jobs:
           wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
           unzip protoc-3.19.4-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
-          
+
           # pull pre-built images
           docker pull valory/open-acn-node:latest
       - name: Framework integration tests
