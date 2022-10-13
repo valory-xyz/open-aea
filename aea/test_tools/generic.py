@@ -48,7 +48,7 @@ def write_envelope_to_file(envelope: Envelope, file_path: str) -> None:
     :param envelope: Envelope.
     :param file_path: the file path
     """
-    with open(Path(file_path), "ab+", encoding="utf-8") as f:
+    with open(Path(file_path), "ab+") as f:
         write_envelope(envelope, f)
 
 
@@ -61,7 +61,7 @@ def read_envelope_from_file(file_path: str) -> Envelope:
     :return: envelope
     """
     lines = []
-    with open(Path(file_path), "rb+", encoding="utf-8") as f:
+    with open(Path(file_path), "rb+") as f:
         lines.extend(f.readlines())
 
     enforce(len(lines) == 2, "Did not find two lines.")
