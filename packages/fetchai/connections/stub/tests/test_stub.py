@@ -115,7 +115,7 @@ class TestStubConnectionReception:
             message=msg,
         )
 
-        with open(self.input_file_path, "ab+", encoding="utf-8") as f:
+        with open(self.input_file_path, "ab+") as f:
             write_envelope(expected_envelope, f)
 
         actual_envelope = self.multiplexer.get(block=True, timeout=3.0)
@@ -138,7 +138,7 @@ class TestStubConnectionReception:
         encoded_envelope = f"any{SEPARATOR}any{SEPARATOR}{protocol_specification_id}{SEPARATOR}{msg.decode('utf-8')}{SEPARATOR}"
         encoded_envelope = encoded_envelope.encode("utf-8")
 
-        with open(self.input_file_path, "ab+", encoding="utf-8") as f:
+        with open(self.input_file_path, "ab+") as f:
             write_with_lock(f, encoded_envelope)
 
         actual_envelope = self.multiplexer.get(block=True, timeout=3.0)
@@ -156,7 +156,7 @@ class TestStubConnectionReception:
             protocol_specification_id=DefaultMessage.protocol_specification_id,
             message=b"\x08\x02\x12\x011\x1a\x011 \x01:,\n*0x32468dB8Ab79549B49C88DC991990E7910891dbd",
         )
-        with open(self.input_file_path, "ab+", encoding="utf-8") as f:
+        with open(self.input_file_path, "ab+") as f:
             write_with_lock(f, encoded_envelope)
 
         actual_envelope = self.multiplexer.get(block=True, timeout=3.0)
@@ -230,7 +230,7 @@ class TestStubConnectionSending:
         self.multiplexer.put(expected_envelope)
         time.sleep(0.1)
 
-        with open(self.output_file_path, "rb+", encoding="utf-8") as f:
+        with open(self.output_file_path, "rb+") as f:
             lines = f.readlines()
 
         assert len(lines) == 2
@@ -345,7 +345,7 @@ async def test_multiple_envelopes():
 
     task = asyncio.get_event_loop().create_task(wait_num(num_envelopes))
 
-    with open(input_file_path, "ab+", encoding="utf-8") as f:
+    with open(input_file_path, "ab+") as f:
         for _ in range(num_envelopes):
             write_envelope(make_test_envelope(), f)
             await asyncio.sleep(0.01)  # spin asyncio loop
@@ -367,7 +367,7 @@ async def test_bad_envelope():
 
     await connection.connect()
 
-    with open(input_file_path, "ab+", encoding="utf-8") as f:
+    with open(input_file_path, "ab+") as f:
         f.write(b"1,2,3,4,5,")
         f.flush()
 
