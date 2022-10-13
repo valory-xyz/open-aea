@@ -47,7 +47,7 @@ def test_open_file(change_directory, path_builder):
     with open_file(path, "r") as file_in:
         assert file_in.read() == expected_string
 
-    with open(path, "rb", encoding="utf-8") as bytes_in:
+    with open(path, "rb") as bytes_in:
         assert bytes_in.read() == bytes(expected_string, encoding="utf-8")
 
 
