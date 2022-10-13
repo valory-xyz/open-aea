@@ -136,7 +136,7 @@ class HttpHandler(Handler):
         :param http_msg: the message
         """
         self.context.logger.info(
-            "received invalid http message={}, unidentified dialogue.".format(http_msg)
+            f"received invalid http message={http_msg}, unidentified dialogue."
         )
         default_dialogues = cast(DefaultDialogues, self.context.default_dialogues)
         default_msg, _ = default_dialogues.create(
@@ -158,11 +158,7 @@ class HttpHandler(Handler):
         :param http_dialogue: the http dialogue
         """
         self.context.logger.info(
-            "received http request with method={}, url={} and body={!r}".format(
-                http_msg.method,
-                http_msg.url,
-                http_msg.body,
-            )
+            f"received http request with method={http_msg.method}, url={http_msg.url} and body={http_msg.body!r}"
         )
         if http_msg.method == "get":
             self._handle_get(http_msg, http_dialogue)
@@ -185,7 +181,7 @@ class HttpHandler(Handler):
             headers=http_msg.headers,
             body=json.dumps({"tom": {"type": "cat", "age": 10}}).encode("utf-8"),
         )
-        self.context.logger.info("responding with: {}".format(http_response))
+        self.context.logger.info(f"responding with: {http_response}")
         self.context.outbox.put_message(message=http_response)
 
     def _handle_post(self, http_msg: HttpMessage, http_dialogue: HttpDialogue) -> None:
@@ -204,7 +200,7 @@ class HttpHandler(Handler):
             headers=http_msg.headers,
             body=http_msg.body,
         )
-        self.context.logger.info("responding with: {}".format(http_response))
+        self.context.logger.info(f"responding with: {http_response}")
         self.context.outbox.put_message(message=http_response)
 
     def _handle_invalid(
@@ -217,9 +213,7 @@ class HttpHandler(Handler):
         :param http_dialogue: the http dialogue
         """
         self.context.logger.warning(
-            "cannot handle http message of performative={} in dialogue={}.".format(
-                http_msg.performative, http_dialogue
-            )
+            f"cannot handle http message of performative={http_msg.performative} in dialogue={http_dialogue}."
         )
 
     def teardown(self) -> None:

@@ -70,7 +70,7 @@ class MyAgent(Agent):
 
     def act(self):
         """Act implementation."""
-        print("Act called for tick {}".format(self.tick))
+        print(f"Act called for tick {self.tick}")
 
     def handle_envelope(self, envelope: Envelope) -> None:
         """
@@ -79,7 +79,7 @@ class MyAgent(Agent):
         :param envelope: the envelope received
         :return: None
         """
-        print("React called for tick {}".format(self.tick))
+        print(f"React called for tick {self.tick}")
         if (
             envelope is not None
             and envelope.protocol_specification_id
@@ -93,9 +93,7 @@ class MyAgent(Agent):
             envelope.message.sender = receiver
             envelope.message.to = sender
             print(
-                "Received envelope from {} with protocol_specification_id={}".format(
-                    sender, envelope.protocol_specification_id
-                )
+                f"Received envelope from {sender} with protocol_specification_id={envelope.protocol_specification_id}"
             )
             self.outbox.put(envelope)
 
@@ -212,7 +210,7 @@ class MyAgent(Agent):
 
     def act(self):
         """Act implementation."""
-        print("Act called for tick {}".format(self.tick))
+        print(f"Act called for tick {self.tick}")
 
     def handle_envelope(self, envelope: Envelope) -> None:
         """
@@ -221,7 +219,7 @@ class MyAgent(Agent):
         :param envelope: the envelope received
         :return: None
         """
-        print("React called for tick {}".format(self.tick))
+        print(f"React called for tick {self.tick}")
         if (
             envelope is not None
             and envelope.protocol_specification_id
@@ -235,9 +233,7 @@ class MyAgent(Agent):
             envelope.message.sender = receiver
             envelope.message.to = sender
             print(
-                "Received envelope from {} with protocol_specification_id={}".format(
-                    sender, envelope.protocol_specification_id
-                )
+                f"Received envelope from {sender} with protocol_specification_id={envelope.protocol_specification_id}"
             )
             self.outbox.put(envelope)
 
@@ -283,7 +279,7 @@ def run():
         # Create a message inside an envelope and get the stub connection to pass it into the agent
         message_text = b"my_agent,other_agent,fetchai/default:1.0.0,\x12\r\x08\x01*\t*\x07\n\x05hello,"
 
-        with open(INPUT_FILE, "wb", encoding="utf-8") as f:
+        with open(INPUT_FILE, "wb") as f:
             write_with_lock(f, message_text)
 
         # Wait for the envelope to get processed

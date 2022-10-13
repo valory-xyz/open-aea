@@ -118,7 +118,7 @@ Also, we can add a component that was instantiated programmatically. :
 
         def handle(self, message: Message) -> None:
             """Handle incoming message."""
-            self.context.logger.info("You got a message: {}".format(str(message)))
+            self.context.logger.info(f"You got a message: {str(message)}")
 
     config = SkillConfig(name="test_skill", author="fetchai")
     skill = Skill(configuration=config)
@@ -255,7 +255,7 @@ def run():
 
         def handle(self, message: Message) -> None:
             """Handle incoming message."""
-            self.context.logger.info("You got a message: {}".format(str(message)))
+            self.context.logger.info(f"You got a message: {str(message)}")
 
     config = SkillConfig(name="test_skill", author="fetchai")
     skill = Skill(configuration=config)

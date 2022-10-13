@@ -84,7 +84,7 @@ Finally, we create a transaction that sends the funds to the `wallet_2`
     )
 
     logger.info("Transaction complete.")
-    logger.info("The transaction digest is {}".format(transaction_digest))
+    logger.info(f"The transaction digest is {transaction_digest}")
 ```
 
 <details><summary>Stand-alone transaction full code</summary>
@@ -126,9 +126,7 @@ def run():
         FetchAICrypto.identifier, wallet_1.addresses[FetchAICrypto.identifier]
     )
 
-    logger.info(
-        "Sending amount to {}".format(wallet_2.addresses.get(FetchAICrypto.identifier))
-    )
+    logger.info(f"Sending amount to {wallet_2.addresses.get(FetchAICrypto.identifier)}")
 
     # Create the transaction and send it to the ledger.
     tx_nonce = LedgerApis.generate_tx_nonce(
@@ -152,7 +150,7 @@ def run():
     )
 
     logger.info("Transaction complete.")
-    logger.info("The transaction digest is {}".format(transaction_digest))
+    logger.info(f"The transaction digest is {transaction_digest}")
 
 
 if __name__ == "__main__":

@@ -104,12 +104,7 @@ We use the input and output text files to send an envelope to our agent and rece
 
         # Inspect its contents
         print(
-            "Envelope received by Multiplexer: sender={}, to={}, protocol_specification_id={}, message={}".format(
-                envelope.sender,
-                envelope.to,
-                envelope.protocol_specification_id,
-                envelope.message,
-            )
+            f"Envelope received by Multiplexer: sender={envelope.sender}, to={envelope.to}, protocol_specification_id={envelope.protocol_specification_id}, message={envelope.message}"
         )
 
         # Create a mirrored response envelope
@@ -220,12 +215,7 @@ def run():
 
         # Inspect its contents
         print(
-            "Envelope received by Multiplexer: sender={}, to={}, protocol_specification_id={}, message={}".format(
-                envelope.sender,
-                envelope.to,
-                envelope.protocol_specification_id,
-                envelope.message,
-            )
+            f"Envelope received by Multiplexer: sender={envelope.sender}, to={envelope.to}, protocol_specification_id={envelope.protocol_specification_id}, message={envelope.message}"
         )
 
         # Create a mirrored response envelope
