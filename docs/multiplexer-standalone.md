@@ -8,7 +8,7 @@ aea create my_aea
 cd my_aea
 aea add protocol fetchai/default:1.0.0:bafybeidxskwqtj5nhmg5opkmn2u5xlcspvwbge6jtcqdgc76qhusgnm7xm --remote
 aea push connection fetchai/default --local
-aea add connection fetchai/stub:0.21.0:bafybeiaf7omiugzuagb5suty2h6vpvtsoxfmnjjm2zjx3rzqtuhwsi6nty --remote
+aea add connection fetchai/stub:0.21.0:bafybeidhuxh6bewogbrnnjk3wejqef4s4qmkybfhxhphqucxwf4djy7fce --remote
 aea push connection fetchai/stub --local
 cd ..
 aea delete my_aea

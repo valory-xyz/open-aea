@@ -29,7 +29,7 @@ Add the http server connection package:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection fetchai/http_server:0.22.0:bafybeiaf2w3jfemqu4zrtfzewexh5ttqytvhv4tqfzcrv6qxsqnxrv7eu4 --remote
+aea add connection fetchai/http_server:0.22.0:bafybeie3l4t7wkdmemb5z66u6a7bzrj3p6323fomyu5kr4hbcnseh6ycxi --remote
 aea push connection fetchai/http_server --local
 aea add protocol fetchai/default:1.0.0:bafybeidxskwqtj5nhmg5opkmn2u5xlcspvwbge6jtcqdgc76qhusgnm7xm --remote
 aea push protocol fetchai/default --local
