@@ -226,7 +226,7 @@ def find_all_configuration_files(
     config_files = [
         path
         for path in packages_dir.glob("*/*/*/*.yaml")
-        if any(  # pylint:disable=use-a-generator
+        if any(  # pylint: disable=use-a-generator
             [file in str(path) for file in CONFIG_FILE_NAMES]
         )
         and path.parent.parent.parent.name == vendor
