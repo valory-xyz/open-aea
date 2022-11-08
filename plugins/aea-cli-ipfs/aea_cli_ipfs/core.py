@@ -21,7 +21,7 @@
 import os
 from glob import glob
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, cast
 
 import click
 from aea_cli_ipfs.ipfs_utils import (
@@ -30,6 +30,8 @@ from aea_cli_ipfs.ipfs_utils import (
     NodeError,
     PublishError,
     RemoveError,
+    WhitelistServerConnectionError,
+    whitelist_hash,
 )
 from aea_cli_ipfs.registry import register_item_to_local_registry
 
@@ -90,6 +92,59 @@ def add(
             click.echo(f"Published to {response['Name']}")
         except PublishError as e:
             raise click.ClickException(f"Publish failed: {str(e)}") from e
+
+
+@ipfs.command()
+@click.argument(
+    "package_hash",
+)
+@click.option("--api-key", type=str, help="API key for whitelist server.")
+@click.option("--whl-server", type=str, help="URL for whitelist server.")
+def whitelist(
+    package_hash: str,
+    api_key: Optional[str],
+    whl_server: Optional[str],
+) -> None:
+    """Add directory to ipfs, if not directory specified the current one will be added."""
+    whitelist_server_url = whl_server or os.environ.get("IPFS_WHITELIST_SERVER_URL")
+    api_key = api_key or os.environ.get("IPFS_WHITELIST_SERVER_API_KEY")
+
+    try:
+        response = whitelist_hash(
+            package_hash=package_hash,
+            whitelist_server_url=whitelist_server_url,
+            api_key=api_key,
+        )
+    except WhitelistServerConnectionError:
+        raise click.ClickException(
+            "Couldn't connect to the whitelist server, please provide valid URL."
+        )
+    except Exception as e:
+        raise click.ClickException(str(e)) from e
+
+    status = response["status"]
+    message = response["message"]
+    if not status:
+        raise click.ClickException(f"Hash whitelisting failed with error `{message}`")
+
+    click.echo(message)
+
+
+@ipfs.command()
+@click.argument(
+    "path",
+    type=click.Path(exists=True, resolve_path=True, readable=True),
+)
+@click.pass_context
+def push(
+    click_context: click.Context,
+    path: str,
+) -> None:
+    """Add directory to ipfs, if not directory specified the current one will be added."""
+    ipfs_tool = cast(IPFSTool, click_context.obj)
+    name, file_hash, *_ = ipfs_tool.add(path)
+
+    click.echo(f"Pushed file: {name}\nWith hash: {file_hash}")
 
 
 @ipfs.command()

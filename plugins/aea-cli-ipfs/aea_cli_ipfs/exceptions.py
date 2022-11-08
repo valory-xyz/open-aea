@@ -46,3 +46,7 @@ class DownloadError(BaseIPFSToolException):
 
 class HashNotProvided(BaseIPFSToolException):
     """Exception when hash is not provided."""
+
+
+class WhitelistServerConnectionError(Exception):
+    """Whitelist server connection error."""
