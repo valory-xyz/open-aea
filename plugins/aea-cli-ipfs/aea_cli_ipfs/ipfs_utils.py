@@ -33,6 +33,7 @@ from aea_cli_ipfs.exceptions import (
     PinError,
     PublishError,
     RemoveError,
+    WhitelistServerConnectionError,
 )
 
 
@@ -45,12 +46,36 @@ MULTIADDR_FORMAT = "/{dns,dns4,dns6,ip4}/<host>/tcp/<port>/protocol"
 IPFS_NODE_CHECK_ENDPOINT = "/api/v0/id"
 IPFS_VERSION = "0.6.0"
 
+IPFS_WHITELIST_SERVER_URL = "http://localhost:8081"
+IPFS_WHITELIST_SERVER_API_KEY = "dummy_authorised_key_for_testing_purposes"
+
 
 def _verify_attr(name: str, attr: str, allowed: Tuple[str, ...]) -> None:
     """Varify various attributes of ipfs address."""
 
     if attr not in allowed:
         raise ValueError(f"{name} should be one of the {allowed}, provided: {attr}")
+
+
+def whitelist_hash(
+    package_hash: str,
+    whitelist_server_url: Optional[str] = None,
+    api_key: Optional[str] = None,
+) -> Dict:
+    """Whitelist hash on the IPFS cluster."""
+
+    whitelist_server_url = whitelist_server_url or IPFS_WHITELIST_SERVER_URL
+    api_key = api_key or IPFS_WHITELIST_SERVER_API_KEY
+
+    try:
+        response = requests.post(
+            whitelist_server_url + "/whitelist",
+            json={"key": api_key, "hash": package_hash},
+        )
+    except requests.exceptions.ConnectionError as e:
+        raise WhitelistServerConnectionError() from e
+
+    return response.json()
 
 
 def resolve_addr(addr: str) -> Tuple[str, ...]:
