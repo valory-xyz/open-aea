@@ -4,6 +4,16 @@
 
 Ipfs utils for `ipfs cli command`.
 
+<a id="plugins.aea-cli-ipfs.aea_cli_ipfs.ipfs_utils.whitelist_hash"></a>
+
+#### whitelist`_`hash
+
+```python
+def whitelist_hash(package_hash: str, whitelist_server_url: Optional[str] = None, api_key: Optional[str] = None) -> Dict
+```
+
+Whitelist hash on the IPFS cluster.
+
 <a id="plugins.aea-cli-ipfs.aea_cli_ipfs.ipfs_utils.resolve_addr"></a>
 
 #### resolve`_`addr

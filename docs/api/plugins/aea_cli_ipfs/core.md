@@ -49,6 +49,38 @@ def add(click_context: click.Context, dir_path: Optional[str], publish: bool = F
 
 Add directory to ipfs, if not directory specified the current one will be added.
 
+<a id="plugins.aea-cli-ipfs.aea_cli_ipfs.core.whitelist"></a>
+
+#### whitelist
+
+```python
+@ipfs.command()
+@click.argument(
+    "package_hash",
+)
+@click.option("--api-key", type=str, help="API key for whitelist server.")
+@click.option("--whl-server", type=str, help="URL for whitelist server.")
+def whitelist(package_hash: str, api_key: Optional[str], whl_server: Optional[str]) -> None
+```
+
+Add directory to ipfs, if not directory specified the current one will be added.
+
+<a id="plugins.aea-cli-ipfs.aea_cli_ipfs.core.push"></a>
+
+#### push
+
+```python
+@ipfs.command()
+@click.argument(
+    "path",
+    type=click.Path(exists=True, resolve_path=True, readable=True),
+)
+@click.pass_context
+def push(click_context: click.Context, path: str) -> None
+```
+
+Add directory to ipfs, if not directory specified the current one will be added.
+
 <a id="plugins.aea-cli-ipfs.aea_cli_ipfs.core.remove"></a>
 
 #### remove

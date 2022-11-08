@@ -74,3 +74,13 @@ class HashNotProvided(BaseIPFSToolException)
 
 Exception when hash is not provided.
 
+<a id="plugins.aea-cli-ipfs.aea_cli_ipfs.exceptions.WhitelistServerConnectionError"></a>
+
+## WhitelistServerConnectionError Objects
+
+```python
+class WhitelistServerConnectionError(Exception)
+```
+
+Whitelist server connection error.
+
