@@ -1,0 +1,21 @@
+name: dummy
+author: fetchai
+version: 0.1.0
+type: contract
+description: A test contract
+license: Apache-2.0
+aea_version: '>=0.9.0, <0.10.0'
+fingerprint:
+  __init__.py: bafybeid2umrx6kquposxcw6md6vd6wd6bwwfmqse5fitgfza5w2pnb3num
+  build/some.json: bafybeifopttvhbk7gsi3iqwewwfhtytrld6o4ooeb7xjmlons3v6m25zna
+  build/some.wasm: bafybeigngszc3dxws47t5ix72byw7wbqqatj6hp4arv2nw4tptme2oynci
+  contract.py: bafybeiezpmwync3mrrigohlh2l5icqiry3eruwqr7pdfc5whe354ssx2di
+fingerprint_ignore_patterns: []
+build_entrypoint: path/to/script.py
+class_name: DummyContract
+contract_interface_paths:
+  cosmos: build/some.wasm
+  ethereum: build/some.json
+  fetchai: build/some.wasm
+dependencies: {}
+contracts: []
