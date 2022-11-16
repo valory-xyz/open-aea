@@ -55,8 +55,8 @@ _default_logger = logging.getLogger(__name__)
 
 _SOLANA = "solana"
 TESTNET_NAME = "devnet"
-DEFAULT_ADDRESS = "http://127.0.0.1:8899"
-DEFAULT_CHAIN_ID = 1337
+DEFAULT_ADDRESS = "https://api.devnet.solana.com"
+DEFAULT_CHAIN_ID = "solana"
 DEFAULT_CURRENCY_DENOM = "lamports"
 _IDL = "idl"
 _BYTECODE = "bytecode"
@@ -160,10 +160,11 @@ class SolanaCrypto(Crypto[Keypair]):
                 signature_dict = self.entity.signHash(message)
             signed_msg = signature_dict["signature"].hex()
         else:
-            signable_message = encode_defunct(primitive=message)
-            signature = self.entity.sign_message(signable_message=signable_message)
-            signed_msg = signature["signature"].hex()
-        return signed_msg
+            # signable_message = encode_defunct(primitive=message)
+            # signature = self.entity.sign_message(signable_message=signable_message)
+            # signed_msg = signature["signature"].hex()
+            pass
+        return None
 
     def sign_transaction(self, transaction: JSONLike) -> JSONLike:
         """
@@ -175,10 +176,10 @@ class SolanaCrypto(Crypto[Keypair]):
         signed_transaction = cast(Account, self.entity).sign_transaction(
             transaction_dict=transaction
         )
-        signed_transaction_dict = SignedTransactionTranslator.to_dict(
-            signed_transaction
-        )
-        return cast(JSONLike, signed_transaction_dict)
+        # signed_transaction_dict = SignedTransactionTranslator.to_dict(
+        #     signed_transaction
+        # )
+        return None
 
     @classmethod
     def generate_private_key(
@@ -228,37 +229,14 @@ class SolanaApi(LedgerApi):
 
     def __init__(self, **kwargs: Any):
         """
-        Initialize the Ethereum ledger APIs.
+        Initialize the Solana ledger APIs.
 
         :param kwargs: keyword arguments
         """
-        self._api = Web3(
-            HTTPProvider(endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS))
+        self._api = Client(
+            endpoint=kwargs.pop("address", DEFAULT_ADDRESS)
         )
         self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
-        self._is_gas_estimation_enabled = kwargs.pop("is_gas_estimation_enabled", False)
-
-        self._default_gas_price_strategy: str = kwargs.pop(
-            "default_gas_price_strategy", EIP1559
-        )
-        if self._default_gas_price_strategy not in AVAILABLE_STRATEGIES:
-            raise ValueError(
-                f"Gas price strategy must be one of {AVAILABLE_STRATEGIES}, provided: {self._default_gas_price_strategy}"
-            )  # pragma: nocover
-
-        self._gas_price_strategies: Dict[str, Dict] = kwargs.pop(
-            "gas_price_strategies", DEFAULT_GAS_PRICE_STRATEGIES
-        )
-
-        self._poa_chain = kwargs.pop("poa_chain", False)
-        if self._poa_chain:
-            # https://web3py.readthedocs.io/en/stable/middleware.html#geth-style-proof-of-authority
-            self._api.middleware_onion.inject(
-                geth_poa_middleware, name="geth_poa_middleware", layer=0
-            )
-            _default_logger.info(
-                "EthereumApi has been configured with Proof of Authority chain support"
-            )
 
     @property
     def api(self) -> Web3:
@@ -274,8 +252,8 @@ class SolanaApi(LedgerApi):
     @try_decorator("Unable to retrieve balance: {}", logger_method="warning")
     def _try_get_balance(self, address: Address, **_kwargs: Any) -> Optional[int]:
         """Get the balance of a given account."""
-        check_address = self._api.toChecksumAddress(address)
-        return self._api.eth.get_balance(check_address)  # pylint: disable=no-member
+        response = self._api.get_balance(address)  # pylint: disable=no-member
+        return response['result']['value']
 
     def get_state(
         self, callable_name: str, *args: Any, raise_on_try: bool = False, **kwargs: Any
@@ -301,16 +279,172 @@ class SolanaApi(LedgerApi):
         function = getattr(self._api.eth, callable_name)
         response = function(*args, **kwargs)
 
-        if isinstance(response, AttributeDict):
-            result = AttributeDictTranslator.to_dict(response)
-            return result
+        # if isinstance(response, AttributeDict):
+        #     result = AttributeDictTranslator.to_dict(response)
+        #     return result
 
-        if type(response) in (int, float, bytes, str, list, dict):  # pragma: nocover
-            # missing full checks for nested objects
-            return {f"{callable_name}_result": response}
+        # if type(response) in (int, float, bytes, str, list, dict):  # pragma: nocover
+        #     # missing full checks for nested objects
+        #     return {f"{callable_name}_result": response}
         raise NotImplementedError(  # pragma: nocover
             f"Response must be of types=int, float, bytes, str, list, dict. Found={type(response)}."
         )
+
+    @classmethod
+    def recover_message(
+        cls, message: bytes, signature: str, is_deprecated_mode: bool = False
+    ) -> Tuple[Address, ...]:
+        """
+        Recover the addresses from the hash.
+
+        :param message: the message we expect
+        :param signature: the transaction signature
+        :param is_deprecated_mode: if the deprecated signing was used
+        :return: the recovered addresses
+        """
+        # if is_deprecated_mode:
+        #     enforce(len(message) == 32, "Message must be hashed to exactly 32 bytes.")
+        #     with warnings.catch_warnings():
+        #         warnings.simplefilter("ignore")
+        #         address = Account.recoverHash(  # pylint: disable=no-value-for-parameter
+        #             message_hash=message, signature=signature
+        #         )
+        # else:
+        #     signable_message = encode_defunct(primitive=message)
+        #     address = Account.recover_message(  # pylint: disable=no-value-for-parameter
+        #         signable_message=signable_message, signature=signature
+        #     )
+        return "(address,)"
+
+    @classmethod
+    def recover_public_keys_from_message(
+        cls, message: bytes, signature: str, is_deprecated_mode: bool = False
+    ) -> Tuple[str, ...]:
+        """
+        Get the public key used to produce the `signature` of the `message`
+
+        :param message: raw bytes used to produce signature
+        :param signature: signature of the message
+        :param is_deprecated_mode: if the deprecated signing was used
+        :return: the recovered public keys
+        """
+        # if not is_deprecated_mode:
+        #     signable_message = encode_defunct(primitive=message)
+        #     message = _hash_eip191_message(signable_message)
+        # hash_bytes = HexBytes(message)
+        # # code taken from https://github.com/ethereum/eth-account/blob/master/eth_account/account.py#L428
+        # if len(hash_bytes) != 32:  # pragma: nocover
+        #     raise ValueError("The message hash must be exactly 32-bytes")
+        # signature_bytes = HexBytes(signature)
+        # signature_bytes_standard = to_standard_signature_bytes(signature_bytes)
+        # signature_obj = keys.Signature(signature_bytes=signature_bytes_standard)
+        # pubkey = signature_obj.recover_public_key_from_msg_hash(hash_bytes)
+        return "(str(pubkey),)"
+
+    @classmethod
+    def load_contract_interface(cls, file_path: Path) -> Dict[str, str]:
+        """
+        Load contract interface.
+
+        :param file_path: the file path to the interface
+        :return: the interface
+        """
+        with open_file(file_path, "r") as interface_file_ethereum:
+            contract_interface = json.load(interface_file_ethereum)
+        for key in [_IDL, _BYTECODE]:
+            if key not in contract_interface:  # pragma: nocover
+                raise ValueError(f"Contract {file_path} missing key {key}.")
+        return contract_interface
+
+    @staticmethod
+    def is_transaction_valid(
+        tx: dict,
+        seller: Address,
+        client: Address,
+        tx_nonce: str,
+        amount: int,
+    ) -> bool:
+        """
+        Check whether a transaction is valid or not.
+
+        :param tx: the transaction.
+        :param seller: the address of the seller.
+        :param client: the address of the client.
+        :param tx_nonce: the transaction nonce.
+        :param amount: the amount we expect to get from the transaction.
+        :return: True if the random_message is equals to tx['input']
+        """
+        is_valid = False
+        if tx is not None:
+            is_valid = (
+                tx.get("input") == tx_nonce
+                and tx.get("value") == amount
+                and tx.get("from") == client
+                and tx.get("to") == seller
+            )
+        return is_valid
+
+    @staticmethod
+    def is_transaction_settled(tx_receipt: JSONLike) -> bool:
+        """
+        Check whether a transaction is settled or not.
+
+        :param tx_receipt: the receipt associated to the transaction.
+        :return: True if the transaction has been settled, False o/w.
+        """
+        is_successful = False
+        if tx_receipt is not None:
+            is_successful = tx_receipt.get("status", 0) == 1
+        return is_successful
+
+    @staticmethod
+    def get_hash(message: bytes) -> str:
+        """
+        Get the hash of a message.
+
+        :param message: the message to be hashed.
+        :return: the hash of the message as a hex string.
+        """
+        digest = Web3.keccak(message).hex()
+        return digest
+
+    @staticmethod
+    def get_contract_address(tx_receipt: JSONLike) -> Optional[str]:
+        """
+        Retrieve the `contract_address` from a transaction receipt.
+
+        :param tx_receipt: the receipt of the transaction.
+        :return: the contract address, if present
+        """
+        contract_address = cast(Optional[str], tx_receipt.get("contractAddress", None))
+        return contract_address
+
+    @classmethod
+    def get_address_from_public_key(cls, public_key: str) -> str:
+        """
+        Get the address from the public key.
+
+        :param public_key: the public key
+        :return: str
+        """
+        keccak_hash = Web3.keccak(hexstr=public_key)
+        raw_address = keccak_hash[-20:].hex()
+        address = Web3.toChecksumAddress(raw_address)
+        return address
+
+    @staticmethod
+    def generate_tx_nonce(seller: Address, client: Address) -> str:
+        """
+        Generate a unique hash to distinguish transactions with the same terms.
+
+        :param seller: the address of the seller.
+        :param client: the address of the client.
+        :return: return the hash in hex.
+        """
+        aggregate_hash = Web3.keccak(
+            b"".join([seller.encode(), client.encode(), uuid4().bytes])
+        )
+        return aggregate_hash.hex()
 
     def get_transfer_transaction(  # pylint: disable=arguments-differ
         self,
@@ -395,101 +529,6 @@ class SolanaApi(LedgerApi):
 
         return transaction
 
-    def _get_gas_price_strategy(
-        self,
-        gas_price_strategy: Optional[str] = None,
-        extra_config: Optional[Dict] = None,
-    ) -> Optional[Tuple[str, Callable]]:
-        """
-        Returns parameters for gas price callable.
-
-        Note: The priority of gas price callable will be
-        `extra_config(Runtime params) > self._gas_price_strategies (Set using config file.) > DEFAULT_GAS_PRICE_STRATEGIES (Default values.)`
-
-        :param gas_price_strategy: name of the gas price strategy.
-        :param extra_config: gas price strategy getter parameters.
-        :return: gas price strategy's name and callable.
-        """
-        gas_price_strategy = (
-            gas_price_strategy
-            if gas_price_strategy is not None
-            else self._default_gas_price_strategy
-        )
-        if gas_price_strategy not in AVAILABLE_STRATEGIES:  # pragma: nocover
-            _default_logger.debug(
-                f"Gas price strategy must be one of {AVAILABLE_STRATEGIES}, provided: {self._default_gas_price_strategy}"
-            )
-            return None
-
-        _default_logger.debug(f"Using strategy: {gas_price_strategy}")
-        gas_price_strategy_getter = self._gas_price_strategy_callables[
-            gas_price_strategy
-        ]
-
-        parameters = cast(dict, DEFAULT_GAS_PRICE_STRATEGIES.get(gas_price_strategy))
-        parameters.update(self._gas_price_strategies.get(gas_price_strategy, {}))
-        parameters.update(extra_config or {})
-        return gas_price_strategy, gas_price_strategy_getter(**parameters)
-
-    @staticmethod
-    def __reprice(old_price: Wei) -> Wei:
-        return Wei(math.ceil(old_price * TIP_INCREASE))
-
-    @try_decorator("Unable to retrieve gas price: {}", logger_method="warning")
-    def try_get_gas_pricing(
-        self,
-        gas_price_strategy: Optional[str] = None,
-        extra_config: Optional[Dict] = None,
-        old_price: Optional[Dict[str, Wei]] = None,
-        **_kwargs: Any,
-    ) -> Optional[Dict[str, Wei]]:
-        """
-        Try get the gas price based on the provided strategy.
-
-        :param gas_price_strategy: the gas price strategy to use, e.g., the EIP-1559 strategy.
-            Can be either `eip1559` or `gas_station`.
-        :param extra_config: gas price strategy getter parameters.
-        :param old_price: the old gas price params in case that we are trying to resubmit a transaction.
-        :param _kwargs: the keyword arguments. Possible kwargs are:
-            `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
-        :return: a dictionary with the gas data.
-        """
-
-        retrieved_strategy = self._get_gas_price_strategy(
-            gas_price_strategy,
-            extra_config,
-        )
-        if retrieved_strategy is None:  # pragma: nocover
-            return None
-        gas_price_strategy, gas_price_strategy_callable = retrieved_strategy
-
-        prior_strategy = self._api.eth.gasPriceStrategy
-        try:
-            self._api.eth.set_gas_price_strategy(gas_price_strategy_callable)
-            gas_price = self._api.eth.generate_gas_price()
-        finally:
-            self._api.eth.set_gas_price_strategy(prior_strategy)  # pragma: nocover
-
-        if gas_price is None or old_price is None:
-            return gas_price
-
-        gas_price = cast(Dict[str, Wei], gas_price)
-        if gas_price_strategy in (EIP1559, EIP1559_POLYGON):
-            updated_max_fee_per_gas = self.__reprice(old_price["maxFeePerGas"])
-            updated_max_priority_fee_per_gas = self.__reprice(
-                old_price["maxPriorityFeePerGas"]
-            )
-
-            if gas_price["maxFeePerGas"] < updated_max_fee_per_gas:
-                gas_price["maxFeePerGas"] = updated_max_fee_per_gas
-                gas_price["maxPriorityFeePerGas"] = updated_max_priority_fee_per_gas
-
-        elif gas_price_strategy == GAS_STATION:
-            updated_gas_price = self.__reprice(old_price["gasPrice"])
-            gas_price["gasPrice"] = max(gas_price["gasPrice"], updated_gas_price)
-
-        return gas_price
-
     @try_decorator("Unable to retrieve transaction count: {}", logger_method="warning")
     def _try_get_transaction_count(
         self, address: Address, **_kwargs: Any
@@ -511,36 +550,6 @@ class SolanaApi(LedgerApi):
         if gas_estimate is not None:
             transaction["gas"] = gas_estimate
         return transaction
-
-    @try_decorator("Unable to retrieve gas estimate: {}", logger_method="warning")
-    def _try_get_gas_estimate(self, transaction: JSONLike) -> Optional[int]:
-        """Try get the gas estimate."""
-        gas_estimate: Optional[int] = None
-        transaction = deepcopy(transaction)
-        del transaction["gas"]
-        try:
-            gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
-                transaction=cast(
-                    TxParams, AttributeDictTranslator.from_dict(transaction)
-                )
-            )
-        except (ContractLogicError, ValueError) as e:
-            _default_logger.warning(
-                f"Unable to estimate gas with default state , "
-                f"{type(e).__name__}: {e.__str__()}"
-            )
-            # gas estimation might fail when repricing txs
-            # to avoid effects of pending txs when estimating gas
-            # we can set the block identifier to "latest" block
-            # this might fail if the node doesn't support the `block_identifier` param
-            gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
-                transaction=cast(
-                    TxParams, AttributeDictTranslator.from_dict(transaction)
-                ),
-                block_identifier=LatestBlockParam,
-            )
-
-        return gas_estimate
 
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False
@@ -569,15 +578,15 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: tx_digest, if present
         """
-        signed_transaction = SignedTransactionTranslator.from_dict(tx_signed)
-        hex_value = self._api.eth.send_raw_transaction(  # pylint: disable=no-member
-            signed_transaction.rawTransaction
-        )
-        tx_digest = hex_value.hex()
-        _default_logger.debug(
-            "Successfully sent transaction with digest: {}".format(tx_digest)
-        )
-        return tx_digest
+        # signed_transaction = SignedTransactionTranslator.from_dict(tx_signed)
+        # hex_value = self._api.eth.send_raw_transaction(  # pylint: disable=no-member
+        #     signed_transaction.rawTransaction
+        # )
+        # tx_digest = hex_value.hex()
+        # _default_logger.debug(
+        #     "Successfully sent transaction with digest: {}".format(tx_digest)
+        # )
+        return None
 
     def get_transaction_receipt(
         self, tx_digest: str, raise_on_try: bool = False
@@ -617,10 +626,10 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-        tx_receipt = self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
-            cast(HexStr, tx_digest)
-        )
-        return AttributeDictTranslator.to_dict(tx_receipt)
+        # tx_receipt = self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
+        #     cast(HexStr, tx_digest)
+        # )
+        return None
 
     def get_transaction(
         self,
@@ -649,43 +658,40 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx, if found
         """
-        tx = self._api.eth.get_transaction(
-            cast(HexStr, tx_digest)
-        )  # pylint: disable=no-member
-        return AttributeDictTranslator.to_dict(tx)
+        # tx = self._api.eth.get_transaction(
+        #     cast(HexStr, tx_digest)
+        # )  # pylint: disable=no-member
+        return None
 
-    @try_decorator(
+    @ try_decorator(
         "Error when attempting getting tx revert reason: {}", logger_method="debug"
     )
-    def _try_get_revert_reason(self, tx: TxData, **_kwargs: Any) -> str:
-        """Try to check the revert reason of a transaction.
-
-        :param tx: the transaction for which we want to get the revert reason.
-        :param _kwargs: the keyword arguments. Possible kwargs are:
-            `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
-        :return: the revert reason message.
-        """
-        # build a new transaction to replay:
-        replay_tx = {
-            "to": tx["to"],
-            "from": tx["from"],
-            "value": tx["value"],
-            "data": tx["input"],
-        }
-
-        try:
-            # replay the transaction on the provider
-            self.api.eth.call(replay_tx, tx["blockNumber"] - 1)
-        except SolidityError as e:
-            # execution reverted exception
-            return str(e)
-        except HTTPError as e:
-            # http exception
-            raise e
-        else:
-            # given tx not reverted
-            raise ValueError(f"The given transaction has not been reverted!\ntx: {tx}")
-
+    # def _try_get_revert_reason(self, tx: TxData, **_kwargs: Any) -> str:
+    #     """Try to check the revert reason of a transaction.
+    #     :param tx: the transaction for which we want to get the revert reason.
+    #     :param _kwargs: the keyword arguments. Possible kwargs are:
+    #         `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
+    #     :return: the revert reason message.
+    #     """
+    #     # build a new transaction to replay:
+    #     replay_tx = {
+    #         "to": tx["to"],
+    #         "from": tx["from"],
+    #         "value": tx["value"],
+    #         "data": tx["input"],
+    #     }
+    # try:
+    #     # replay the transaction on the provider
+    #     self.api.eth.call(replay_tx, tx["blockNumber"] - 1)
+    # except SolidityError as e:
+    #     # execution reverted exception
+    #     return str(e)
+    # except HTTPError as e:
+    #     # http exception
+    #     raise e
+    # else:
+    #     # given tx not reverted
+    #     raise ValueError(f"The given transaction has not been reverted!\ntx: {tx}")
     def get_contract_instance(
         self, contract_interface: Dict[str, str], contract_address: Optional[str] = None
     ) -> Any:
@@ -698,14 +704,14 @@ class SolanaApi(LedgerApi):
         """
         if contract_address is None:
             instance = self.api.eth.contract(
-                abi=contract_interface[_ABI],
+                idl=contract_interface[_IDL],
                 bytecode=contract_interface[_BYTECODE],
             )
         else:
             _contract_address = self.api.toChecksumAddress(contract_address)
             instance = self.api.eth.contract(
                 address=_contract_address,
-                abi=contract_interface[_ABI],
+                idl=contract_interface[_IDL],
                 bytecode=contract_interface[_BYTECODE],
             )
         return instance
@@ -923,7 +929,7 @@ class SolanaApi(LedgerApi):
             if tx_receipt is None:
                 raise ValueError  # pragma: nocover
 
-        except (TransactionNotFound, ValueError):  # pragma: nocover
+        except (Exception, ValueError):  # pragma: nocover
             return dict(logs=[])
 
         transfer_logs = contract_instance.events.Transfer().processReceipt(tx_receipt)

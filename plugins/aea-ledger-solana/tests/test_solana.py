@@ -34,7 +34,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from aea_ledger_solana import (
     # AttributeDictTranslator,
-    # EthereumApi,
+    SolanaApi,
     SolanaCrypto,
     SolanaFaucetApi,
     # EthereumHelper,
@@ -322,6 +322,20 @@ from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 #     )
 #     assert is_valid, "Failed to settle tx correctly!"
 #     assert tx != transaction_receipt, "Should not be same!"
+
+
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
+@pytest.mark.integration
+@pytest.mark.ledger
+def test_get_sol_balance(caplog):
+    """Test the balance is zero for a new account."""
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.solana._default_logger"):
+        # solana_faucet_api = SolanaFaucetApi()
+        sc = SolanaCrypto(private_key_path="./solana_private_key.txt")
+        sa = SolanaApi()
+
+        balance = sa.get_balance(sc.address)
+        assert isinstance(balance, int)
 
 
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
