@@ -42,6 +42,11 @@ from solana.publickey import PublicKey
 from solana.rpc.api import Client
 from solana.keypair import Keypair
 from nacl.signing import VerifyKey
+from pathlib import Path
+import asyncio
+import json
+from solana.publickey import PublicKey
+from anchorpy import Idl, Program
 
 from lru import LRU
 from eth_keys import keys
@@ -106,7 +111,6 @@ class SolanaCrypto(Crypto[Keypair]):
         """
         Return a public key in hex format.
 
-        128 hex characters (i.e. 64 bytes) + "0x" prefix.
 
         :return: a public key string in hex format
         """
@@ -237,14 +241,15 @@ class SolanaApi(LedgerApi):
 
     def update_with_gas_estimate(self, transaction: JSONLike) -> JSONLike:
         """
+        **DO NOT NEED**
         Attempts to update the transaction with a gas estimate
 
         :param transaction: the transaction
         :return: the updated transaction
         """
-        gas_estimate = self._try_get_gas_estimate(transaction)
-        if gas_estimate is not None:
-            transaction["gas"] = gas_estimate
+        # gas_estimate = self._try_get_gas_estimate(transaction)
+        # if gas_estimate is not None:
+        #     transaction["gas"] = gas_estimate
         return transaction
 
     def get_balance(
@@ -299,6 +304,7 @@ class SolanaApi(LedgerApi):
         cls, message: bytes, signature: str, is_deprecated_mode: bool = False
     ) -> Tuple[Address, ...]:
         """
+        **TO BE DONE**
         Recover the addresses from the hash.
 
         :param message: the message we expect
@@ -320,6 +326,7 @@ class SolanaApi(LedgerApi):
         cls, message: bytes, signature: str, is_deprecated_mode: bool = False
     ) -> Tuple[str, ...]:
         """
+        **TO BE DONE**
         Get the public key used to produce the `signature` of the `message`
 
         :param message: raw bytes used to produce signature
@@ -348,11 +355,9 @@ class SolanaApi(LedgerApi):
         :param file_path: the file path to the interface
         :return: the interface
         """
-        with open_file(file_path, "r") as interface_file_ethereum:
-            contract_interface = json.load(interface_file_ethereum)
-        for key in [_IDL, _BYTECODE]:
-            if key not in contract_interface:  # pragma: nocover
-                raise ValueError(f"Contract {file_path} missing key {key}.")
+        with open_file(file_path, "r") as interface_file_solana:
+            contract_interface = json.load(interface_file_solana)
+
         return contract_interface
 
     @staticmethod
@@ -638,9 +643,9 @@ class SolanaApi(LedgerApi):
         # pylint: disable=no-member
         return tx
 
-    @ try_decorator(
-        "Error when attempting getting tx revert reason: {}", logger_method="debug"
-    )
+    # @ try_decorator(
+    #     "Error when attempting getting tx revert reason: {}", logger_method="debug"
+    # )
     # def _try_get_revert_reason(self, tx: TxData, **_kwargs: Any) -> str:
     #     """Try to check the revert reason of a transaction.
     #     :param tx: the transaction for which we want to get the revert reason.
@@ -668,7 +673,7 @@ class SolanaApi(LedgerApi):
     #     # given tx not reverted
     #     raise ValueError(f"The given transaction has not been reverted!\ntx: {tx}")
     def get_contract_instance(
-        self, contract_interface: Dict[str, str], contract_address: Optional[str] = None
+        self, contract_interface: Dict[str, str], contract_address: str
     ) -> Any:
         """
         Get the instance of a contract.
@@ -677,19 +682,12 @@ class SolanaApi(LedgerApi):
         :param contract_address: the contract address.
         :return: the contract instance
         """
-        if contract_address is None:
-            instance = self.api.eth.contract(
-                idl=contract_interface[_IDL],
-                bytecode=contract_interface[_BYTECODE],
-            )
-        else:
-            _contract_address = self.api.toChecksumAddress(contract_address)
-            instance = self.api.eth.contract(
-                address=_contract_address,
-                idl=contract_interface[_IDL],
-                bytecode=contract_interface[_BYTECODE],
-            )
-        return instance
+        program_id = PublicKey(contract_address)
+        idl = Idl.from_json(contract_interface)
+
+        pg = Program(idl, program_id)
+
+        return pg
 
     def get_deploy_transaction(  # pylint: disable=arguments-differ
         self,

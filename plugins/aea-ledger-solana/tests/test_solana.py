@@ -33,44 +33,20 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from aea_ledger_solana import (
-    # AttributeDictTranslator,
     SolanaApi,
     SolanaCrypto,
     SolanaFaucetApi,
-    # EthereumHelper,
     LruLockWrapper,
-    # get_gas_price_strategy,
-    # get_gas_price_strategy_eip1559,
     # requests,
-    # rpc_gas_price_strategy_wrapper,
 )
-# from aea_ledger_ethereum.ethereum import (
-#     DEFAULT_EIP1559_STRATEGY,
-#     DEFAULT_GAS_STATION_STRATEGY,
-#     EIP1559,
-#     EIP1559_POLYGON,
-#     GAS_STATION,
-#     TIP_INCREASE,
-# )
+
 # from web3 import Web3
-# from web3._utils.request import _session_cache as session_cache
-# from web3.datastructures import AttributeDict
-# from web3.exceptions import SolidityError
+from web3._utils.request import _session_cache as session_cache
 
 from aea.common import JSONLike
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
 
 from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
-
-# def get_default_gas_strategies() -> Dict:
-#     """Returns default gas price strategy."""
-#     return {
-#         "default_gas_price_strategy": "eip1559",
-#         "gas_price_strategies": {
-#             "gas_station": DEFAULT_GAS_STATION_STRATEGY,
-#             "eip1559": DEFAULT_EIP1559_STRATEGY,
-#         },
-#     }
 
 
 # def get_history_data(n_blocks: int, base_multiplier: int = 100) -> Dict:
@@ -160,12 +136,6 @@ def test_get_hash():
 
 # def test_api_creation(ethereum_testnet_config):
 #     """Test api instantiation."""
-#     assert EthereumApi(**ethereum_testnet_config), "Failed to initialise the api"
-
-
-# def test_api_creation_poa(ethereum_testnet_config):
-#     """Test api instantiation with the poa flag enabled."""
-#     ethereum_testnet_config["poa_chain"] = True
 #     assert EthereumApi(**ethereum_testnet_config), "Failed to initialise the api"
 
 
@@ -392,12 +362,23 @@ def test_get_wealth_positive(caplog):
 #     )
 
 
-# def test_load_contract_interface():
-#     """Test the load_contract_interface method."""
-#     path = Path(ROOT_DIR, "tests", "data", "dummy_contract", "build", "some.json")
-#     result = EthereumApi.load_contract_interface(path)
-#     assert "abi" in result
-#     assert "bytecode" in result
+def test_load_contract_interface():
+    """Test the load_contract_interface method."""
+    path = Path(ROOT_DIR, "tests", "data", "dummy_contract", "build", "idl.json")
+    result = SolanaApi.load_contract_interface(path)
+
+    assert "name" in result
+
+
+def test_load_contract_instance():
+    """Test the load_contract_interface method."""
+    path = Path(ROOT_DIR, "tests", "data", "dummy_contract", "build", "idl.json")
+    result = SolanaApi.load_contract_interface(path)
+    pid = "ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD"
+    instance = SolanaApi.get_contract_instance(SolanaApi,
+                                               contract_interface=result, contract_address=pid)
+
+    assert hasattr(instance, 'coder')
 
 
 # @patch.object(EthereumApi, "_try_get_transaction_count", return_value=None)
@@ -474,139 +455,14 @@ def test_get_wealth_positive(caplog):
 #         )
 
 
-# def test_session_cache():
-#     """Test session cache."""
-#     assert isinstance(session_cache, LruLockWrapper)
+def test_session_cache():
+    """Test session cache."""
+    assert isinstance(session_cache, LruLockWrapper)
 
-#     session_cache[1] = 1
-#     assert session_cache[1] == 1
-#     del session_cache[1]
-#     assert 1 not in session_cache
-
-
-# def test_gas_price_strategy_eip1559() -> None:
-#     """Test eip1559 based gas price strategy."""
-
-#     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
-
-#     web3 = Web3()
-#     get_block_mock = mock.patch.object(
-#         web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
-#     )
-
-#     fee_history_mock = mock.patch.object(
-#         web3.eth,
-#         "fee_history",
-#         return_value=get_history_data(
-#             n_blocks=5,
-#         ),
-#     )
-
-#     with get_block_mock:
-#         with fee_history_mock:
-#             gas_stregy = callable_(web3, "tx_params")
-
-#     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-#     assert all([value > 1e8 for value in gas_stregy.values()])
-
-
-# def test_gas_price_strategy_eip1559_estimate_none() -> None:
-#     """Test eip1559 based gas price strategy."""
-
-#     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
-
-#     web3 = Web3()
-#     get_block_mock = mock.patch.object(
-#         web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
-#     )
-
-#     fee_history_mock = mock.patch.object(
-#         web3.eth,
-#         "fee_history",
-#         return_value=get_history_data(
-#             n_blocks=5,
-#         ),
-#     )
-#     with get_block_mock:
-#         with fee_history_mock:
-#             with mock.patch(
-#                 "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-#                 new_callable=lambda: lambda *args, **kwargs: None,
-#             ):
-#                 gas_stregy = callable_(web3, "tx_params")
-
-#     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-
-
-# def test_gas_price_strategy_eip1559_fallback() -> None:
-#     """Test eip1559 based gas price strategy."""
-
-#     strategy_kwargs = DEFAULT_EIP1559_STRATEGY.copy()
-#     strategy_kwargs["max_gas_fast"] = -1
-
-#     callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
-#     web3 = Web3()
-#     get_block_mock = mock.patch.object(
-#         web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
-#     )
-
-#     fee_history_mock = mock.patch.object(
-#         web3.eth,
-#         "fee_history",
-#         return_value=get_history_data(
-#             n_blocks=5,
-#         ),
-#     )
-#     with get_block_mock:
-#         with fee_history_mock:
-#             with mock.patch(
-#                 "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-#                 new_callable=lambda: lambda *args, **kwargs: None,
-#             ):
-#                 gas_stregy = callable_(web3, "tx_params")
-
-#     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-
-
-# def test_gas_price_strategy_eth_gasstation():
-#     """Test the gas price strategy when using eth gasstation."""
-#     gas_price_strategy = "fast"
-#     excepted_result = 10
-#     callable_ = get_gas_price_strategy(gas_price_strategy, "api_key")
-#     with patch.object(
-#         requests,
-#         "get",
-#         return_value=MagicMock(
-#             status_code=200,
-#             json=MagicMock(return_value={gas_price_strategy: excepted_result}),
-#         ),
-#     ):
-#         result = callable_(Web3, "tx_params")
-#     assert cast(int, result["gasPrice"]) == cast(int, excepted_result / 10 * 1000000000)
-
-
-# def test_gas_price_strategy_not_supported(caplog):
-#     """Test the gas price strategy when not supported."""
-#     gas_price_strategy = "superfast"
-#     with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
-#         callable_ = get_gas_price_strategy(gas_price_strategy, "api_key")
-#     assert callable_ == rpc_gas_price_strategy_wrapper
-#     assert (
-#         f"Gas price strategy `{gas_price_strategy}` not in list of supported modes:"
-#         in caplog.text
-#     )
-
-
-# def test_gas_price_strategy_no_api_key(caplog):
-#     """Test the gas price strategy when no api key is provided."""
-#     gas_price_strategy = "fast"
-#     with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
-#         callable_ = get_gas_price_strategy(gas_price_strategy, None)
-#     assert callable_ == rpc_gas_price_strategy_wrapper
-#     assert (
-#         "No ethgasstation api key provided. Falling back to `rpc_gas_price_strategy`."
-#         in caplog.text
-#     )
+    session_cache[1] = 1
+    assert session_cache[1] == 1
+    del session_cache[1]
+    assert 1 not in session_cache
 
 
 # def test_dump_load_with_password():
@@ -832,110 +688,3 @@ def test_get_wealth_positive(caplog):
 #             )
 
 #             assert transaction_receipt["revert_reason"] == "test revert reason"
-
-
-# @pytest.mark.parametrize(
-#     "strategy",
-#     (
-#         {"name": EIP1559, "params": ("maxPriorityFeePerGas", "maxFeePerGas")},
-#         {"name": GAS_STATION, "params": ("gasPrice",)},
-#         {"name": EIP1559_POLYGON, "params": ("maxPriorityFeePerGas", "maxFeePerGas")},
-#     ),
-# )
-# def test_try_get_gas_pricing(
-#     strategy: Dict[str, Union[str, Tuple[str, ...]]],
-#     ethereum_testnet_config: dict,
-#     ganache: Generator,
-# ) -> None:
-#     """Test `try_get_gas_pricing`."""
-#     ethereum_api = EthereumApi(**ethereum_testnet_config)
-
-#     # test gas pricing
-#     gas_price = ethereum_api.try_get_gas_pricing(gas_price_strategy=strategy["name"])
-#     assert set(strategy["params"]) == set(gas_price.keys())
-#     assert all(
-#         gas_price[param] > 0 and isinstance(gas_price[param], int)
-#         for param in strategy["params"]
-#     )
-
-#     # test gas repricing
-#     gas_reprice = ethereum_api.try_get_gas_pricing(
-#         gas_price_strategy=strategy["name"], old_price=gas_price
-#     )
-#     assert all(
-#         gas_reprice[param] > 0 and isinstance(gas_reprice[param], int)
-#         for param in strategy["params"]
-#     )
-#     assert gas_reprice == {
-#         gas_price_param: math.ceil(gas_price[gas_price_param] * TIP_INCREASE)
-#         for gas_price_param in strategy["params"]
-#     }, "The repricing was performed incorrectly!"
-
-
-# @pytest.mark.parametrize(
-#     "strategy",
-#     ({"name": EIP1559_POLYGON, "params": ("maxPriorityFeePerGas", "maxFeePerGas")},),
-# )
-# def test_try_get_gas_pricing_poa(
-#     strategy: Dict[str, Union[str, Tuple[str, ...]]],
-#     polygon_testnet_config: dict,
-#     ganache: Generator,
-# ) -> None:
-#     """Test `try_get_gas_pricing` for a poa chain like Rinkeby."""
-#     ethereum_api = EthereumApi(**polygon_testnet_config)
-#     assert "geth_poa_middleware" in ethereum_api.api.middleware_onion.keys()
-
-#     # test gas pricing
-#     gas_price = ethereum_api.try_get_gas_pricing(gas_price_strategy=strategy["name"])
-#     assert set(strategy["params"]) == set(gas_price.keys())
-#     assert all(
-#         gas_price[param] > 0 and isinstance(gas_price[param], int)
-#         for param in strategy["params"]
-#     )
-
-#     # test gas repricing
-#     gas_reprice = ethereum_api.try_get_gas_pricing(
-#         gas_price_strategy=strategy["name"], old_price=gas_price
-#     )
-#     assert all(
-#         gas_reprice[param] > 0 and isinstance(gas_reprice[param], int)
-#         for param in strategy["params"]
-#     )
-#     assert gas_reprice == {
-#         gas_price_param: math.ceil(gas_price[gas_price_param] * TIP_INCREASE)
-#         for gas_price_param in strategy["params"]
-#     }, "The repricing was performed incorrectly!"
-
-
-# @pytest.mark.parametrize("mock_exception", (True, False))
-# def test_gas_estimation(
-#     mock_exception,
-#     ethereum_testnet_config: dict,
-#     ganache: Generator,
-#     caplog,
-# ) -> None:
-#     """Test gas estimation."""
-#     ethereum_api = EthereumApi(**ethereum_testnet_config)
-#     tx = {
-#         "value": 0,
-#         "chainId": 1337,
-#         "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
-#         "gas": 291661,
-#         "maxPriorityFeePerGas": 3000000000,
-#         "maxFeePerGas": 4000000000,
-#         "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
-#         "data": "",
-#     }
-#     with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
-#         with patch.object(ethereum_api._api.eth, "estimate_gas") as estimate_gas_mock:
-#             if mock_exception:
-#                 # raise exception on first call only
-#                 estimate_gas_mock.side_effect = [
-#                     ValueError("triggered exception"),
-#                     None,
-#                 ]
-#             ethereum_api.update_with_gas_estimate(tx)
-#         if mock_exception:
-#             assert (
-#                 "ValueError: triggered exception" in caplog.text
-#             ), f"Cannot find message in output: {caplog.text}"
