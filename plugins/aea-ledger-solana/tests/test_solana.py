@@ -88,20 +88,6 @@ from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 #     }
 
 
-# def test_attribute_dict_translator():
-#     """Test the AttributeDictTranslator."""
-#     di = {
-#         "1": None,
-#         "2": True,
-#         "3": b"some",
-#         "4": 0.1,
-#         "5": [1, None, True, {}],
-#         "6": {"hex": "0x01"},
-#     }
-#     res = AttributeDictTranslator.from_dict(di)
-#     assert AttributeDictTranslator.to_dict(res) == di
-
-
 # def test_creation(ethereum_private_key_file):
 #     """Test the creation of the crypto_objects."""
 #     assert EthereumCrypto(), "Managed to initialise the eth_account"
@@ -123,41 +109,25 @@ from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 #     assert account.entity is not None, "After creation the entity must no be None"
 
 
-# def test_derive_address():
-#     """Test the get_address_from_public_key method"""
-#     account = EthereumCrypto()
-#     address = EthereumApi.get_address_from_public_key(account.public_key)
-#     assert account.address == address, "Address derivation incorrect"
+def test_derive_address():
+    """Test the get_address_from_public_key method"""
+    account = SolanaCrypto()
+    address = SolanaApi.get_address_from_public_key(account.public_key)
+    assert account.address == address, "Address derivation incorrect"
 
 
-# def test_sign_and_recover_message(ethereum_private_key_file):
-#     """Test the signing and the recovery function for the eth_crypto."""
-#     account = EthereumCrypto(ethereum_private_key_file)
-#     sign_bytes = account.sign_message(message=b"hello")
-#     assert len(sign_bytes) > 0, "The len(signature) must not be 0"
-#     recovered_addresses = EthereumApi.recover_message(
-#         message=b"hello", signature=sign_bytes
-#     )
-#     assert len(recovered_addresses) == 1, "Wrong number of addresses recovered."
-#     assert (
-#         recovered_addresses[0] == account.address
-#     ), "Failed to recover the correct address."
-
-
-# def test_sign_and_recover_message_deprecated(ethereum_private_key_file):
-#     """Test the signing and the recovery function for the eth_crypto."""
-#     account = EthereumCrypto(ethereum_private_key_file)
-#     message = b"hello"
-#     message_hash = hashlib.sha256(message).digest()
-#     sign_bytes = account.sign_message(message=message_hash, is_deprecated_mode=True)
-#     assert len(sign_bytes) > 0, "The len(signature) must not be 0"
-#     recovered_addresses = EthereumApi.recover_message(
-#         message=message_hash, signature=sign_bytes, is_deprecated_mode=True
-#     )
-#     assert len(recovered_addresses) == 1, "Wrong number of addresses recovered."
-#     assert (
-#         recovered_addresses[0] == account.address
-#     ), "Failed to recover the correct address."
+def test_sign_and_recover_message():
+    """Test the signing and the recovery function for the sol_crypto."""
+    account = SolanaCrypto()
+    sign_bytes = account.sign_message(message=b"hello")
+    assert len(sign_bytes) > 0, "The len(signature) must not be 0"
+    # recovered_addresses = SolanaApi.recover_message(
+    #     message=b"hello", signature=sign_bytes
+    # )
+    # assert len(recovered_addresses) == 1, "Wrong number of addresses recovered."
+    # assert (
+    #     recovered_addresses[0] == account.address
+    # ), "Failed to recover the correct address."
 
 
 # def test_sign_and_recover_message_public_key(ethereum_private_key_file):
@@ -175,11 +145,11 @@ from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 #     ), "Failed to recover the correct address."
 
 
-# def test_get_hash():
-#     """Test the get hash functionality."""
-#     expected_hash = "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac8"
-#     hash_ = EthereumApi.get_hash(message=b"hello")
-#     assert expected_hash == hash_
+def test_get_hash():
+    """Test the get hash functionality."""
+    expected_hash = "0x1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac8"
+    hash_ = SolanaApi.get_hash(message=b"hello")
+    assert expected_hash == hash_
 
 
 # def test_dump_positive(ethereum_private_key_file):
@@ -239,24 +209,24 @@ from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 #     assert "number" in block, "response to get_block() does not contain 'number'"
 
 
-# def _wait_get_receipt(
-#     ethereum_api: EthereumApi, transaction_digest: str
-# ) -> Tuple[Optional[JSONLike], bool]:
-#     transaction_receipt = None
-#     not_settled = True
-#     elapsed_time = 0
-#     time_to_wait = 40
-#     sleep_time = 2
-#     while not_settled and elapsed_time < time_to_wait:
-#         elapsed_time += sleep_time
-#         time.sleep(sleep_time)
-#         transaction_receipt = ethereum_api.get_transaction_receipt(transaction_digest)
-#         if transaction_receipt is None:
-#             continue
-#         is_settled = ethereum_api.is_transaction_settled(transaction_receipt)
-#         not_settled = not is_settled
+def _wait_get_receipt(
+    solana_api: SolanaApi, transaction_digest: str
+) -> Tuple[Optional[JSONLike], bool]:
+    transaction_receipt = None
+    not_settled = True
+    elapsed_time = 0
+    time_to_wait = 40
+    sleep_time = 2
+    while not_settled and elapsed_time < time_to_wait:
+        elapsed_time += sleep_time
+        time.sleep(sleep_time)
+        transaction_receipt = solana_api.get_transaction_receipt(transaction_digest)
+        if transaction_receipt['result'] is None:
+            continue
+        is_settled = solana_api.is_transaction_settled(transaction_receipt)
+        not_settled = not is_settled
 
-#     return transaction_receipt, not not_settled
+    return transaction_receipt, not not_settled
 
 
 # def _construct_and_settle_tx(
@@ -341,6 +311,38 @@ def test_get_sol_balance(caplog):
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 @pytest.mark.integration
 @pytest.mark.ledger
+def test_get_tx(caplog):
+    """Test get tx from signature"""
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.solana._default_logger"):
+        solana_faucet_api = SolanaFaucetApi()
+        sc = SolanaCrypto(private_key_path="./solana_private_key.txt")
+        solana_api = SolanaApi()
+        tx_signature = solana_faucet_api.get_wealth(
+            sc.address, "http://127.0.0.1:8899/")
+
+        tx, settled = _wait_get_receipt(solana_api, tx_signature)
+        assert settled is True
+
+
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
+@pytest.mark.integration
+@pytest.mark.ledger
+def test_get_wealth(caplog):
+    """Test the balance is zero for a new account."""
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.solana._default_logger"):
+        solana_faucet_api = SolanaFaucetApi()
+        # sc = SolanaCrypto(private_key_path="./solana_private_key.txt")
+        sc = SolanaCrypto()
+
+        tx_signature = solana_faucet_api.get_wealth(
+            sc.address, "http://127.0.0.1:8899/")
+
+        assert tx_signature is not None
+
+
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
+@pytest.mark.integration
+@pytest.mark.ledger
 def test_get_wealth_positive(caplog):
     """Test the balance is zero for a new account."""
     with caplog.at_level(logging.DEBUG, logger="aea.crypto.solana._default_logger"):
@@ -348,8 +350,9 @@ def test_get_wealth_positive(caplog):
         # sc = SolanaCrypto(private_key_path="./solana_private_key.txt")
         sc = SolanaCrypto()
 
-        solana_faucet_api.get_wealth(
-            sc.address, "TEST")
+        tx_signature = solana_faucet_api.get_wealth(
+            sc.address, "test")
+
         assert (
             "airdrop failed" in caplog.text
         ), f"Cannot find message in output: {caplog.text}"

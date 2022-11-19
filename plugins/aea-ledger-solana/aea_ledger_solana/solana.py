@@ -41,7 +41,7 @@ from aea.helpers.io import open_file
 from solana.publickey import PublicKey
 from solana.rpc.api import Client
 from solana.keypair import Keypair
-
+from nacl.signing import VerifyKey
 
 from lru import LRU
 from eth_keys import keys
@@ -54,8 +54,8 @@ from eth_account import Account
 _default_logger = logging.getLogger(__name__)
 
 _SOLANA = "solana"
-TESTNET_NAME = "devnet"
-DEFAULT_ADDRESS = "https://api.devnet.solana.com"
+TESTNET_NAME = "testnet"
+DEFAULT_ADDRESS = "http://127.0.0.1:8899"
 DEFAULT_CHAIN_ID = "solana"
 DEFAULT_CURRENCY_DENOM = "lamports"
 _IDL = "idl"
@@ -94,11 +94,12 @@ class SolanaCrypto(Crypto[Keypair]):
         """
         Return a private key.
 
-        64 random hex characters (i.e. 32 bytes) + "0x" prefix.
+        64 random hex characters (i.e. 32 bytes) prefix.
 
         :return: a private key string in hex format
         """
-        return self.entity.key.secret_key.toBase58()
+
+        return self.entity.secret_key.hex()
 
     @property
     def public_key(self) -> str:
@@ -154,17 +155,11 @@ class SolanaCrypto(Crypto[Keypair]):
         :param is_deprecated_mode: if the deprecated signing is used
         :return: signature of the message in string form
         """
-        if is_deprecated_mode and len(message) == 32:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                signature_dict = self.entity.signHash(message)
-            signed_msg = signature_dict["signature"].hex()
-        else:
-            # signable_message = encode_defunct(primitive=message)
-            # signature = self.entity.sign_message(signable_message=signable_message)
-            # signed_msg = signature["signature"].hex()
-            pass
-        return None
+
+        keypair = Keypair.from_secret_key(bytes.fromhex(self.private_key))
+        signed_msg = keypair.sign(message)
+
+        return signed_msg
 
     def sign_transaction(self, transaction: JSONLike) -> JSONLike:
         """
@@ -173,20 +168,17 @@ class SolanaCrypto(Crypto[Keypair]):
         :param transaction: the transaction to be signed
         :return: signed transaction
         """
-        signed_transaction = cast(Account, self.entity).sign_transaction(
-            transaction_dict=transaction
-        )
-        # signed_transaction_dict = SignedTransactionTranslator.to_dict(
-        #     signed_transaction
-        # )
-        return None
+        keypair = Keypair.from_secret_key(bytes.fromhex(self.private_key))
+
+        signed_tx = keypair.sign(transaction)
+        return signed_tx
 
     @classmethod
     def generate_private_key(
         cls, extra_entropy: Union[str, bytes, int] = ""
     ) -> Keypair:
         """
-        Generate a key pair for ethereum network.
+        Generate a key pair for Solana network.
 
         :param extra_entropy: add extra randomness to whatever randomness your OS can provide
         :return: account object
@@ -242,6 +234,18 @@ class SolanaApi(LedgerApi):
     def api(self) -> Web3:
         """Get the underlying API object."""
         return self._api
+
+    def update_with_gas_estimate(self, transaction: JSONLike) -> JSONLike:
+        """
+        Attempts to update the transaction with a gas estimate
+
+        :param transaction: the transaction
+        :return: the updated transaction
+        """
+        gas_estimate = self._try_get_gas_estimate(transaction)
+        if gas_estimate is not None:
+            transaction["gas"] = gas_estimate
+        return transaction
 
     def get_balance(
         self, address: Address, raise_on_try: bool = False
@@ -302,18 +306,13 @@ class SolanaApi(LedgerApi):
         :param is_deprecated_mode: if the deprecated signing was used
         :return: the recovered addresses
         """
-        # if is_deprecated_mode:
-        #     enforce(len(message) == 32, "Message must be hashed to exactly 32 bytes.")
-        #     with warnings.catch_warnings():
-        #         warnings.simplefilter("ignore")
-        #         address = Account.recoverHash(  # pylint: disable=no-value-for-parameter
-        #             message_hash=message, signature=signature
-        #         )
-        # else:
-        #     signable_message = encode_defunct(primitive=message)
-        #     address = Account.recover_message(  # pylint: disable=no-value-for-parameter
-        #         signable_message=signable_message, signature=signature
-        #     )
+
+        try:
+            pass
+            # VerifyKey(bytes(self.address)).verify(msg.message, msg.signature)
+        except:
+            return False
+        return True
         return "(address,)"
 
     @classmethod
@@ -393,8 +392,8 @@ class SolanaApi(LedgerApi):
         :return: True if the transaction has been settled, False o/w.
         """
         is_successful = False
-        if tx_receipt is not None:
-            is_successful = tx_receipt.get("status", 0) == 1
+        if tx_receipt['result'] is not None:
+            is_successful = tx_receipt['result']['meta']['status'] == {'Ok': None}
         return is_successful
 
     @staticmethod
@@ -427,10 +426,8 @@ class SolanaApi(LedgerApi):
         :param public_key: the public key
         :return: str
         """
-        keccak_hash = Web3.keccak(hexstr=public_key)
-        raw_address = keccak_hash[-20:].hex()
-        address = Web3.toChecksumAddress(raw_address)
-        return address
+
+        return public_key
 
     @staticmethod
     def generate_tx_nonce(seller: Address, client: Address) -> str:
@@ -539,18 +536,6 @@ class SolanaApi(LedgerApi):
         )
         return nonce
 
-    def update_with_gas_estimate(self, transaction: JSONLike) -> JSONLike:
-        """
-        Attempts to update the transaction with a gas estimate
-
-        :param transaction: the transaction
-        :return: the updated transaction
-        """
-        gas_estimate = self._try_get_gas_estimate(transaction)
-        if gas_estimate is not None:
-            transaction["gas"] = gas_estimate
-        return transaction
-
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False
     ) -> Optional[str]:
@@ -603,13 +588,6 @@ class SolanaApi(LedgerApi):
             raise_on_try=raise_on_try,
         )
 
-        if tx_receipt is not None and not bool(tx_receipt["status"]):
-            tx = self.get_transaction(tx_digest, raise_on_try=raise_on_try)
-            tx_receipt["revert_reason"] = self._try_get_revert_reason(
-                tx,
-                raise_on_try=raise_on_try,
-            )
-
         return tx_receipt
 
     @try_decorator(
@@ -626,10 +604,8 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-        # tx_receipt = self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
-        #     cast(HexStr, tx_digest)
-        # )
-        return None
+        tx_receipt = self._api.get_transaction(tx_digest)  # pylint: disable=no-member
+        return tx_receipt
 
     def get_transaction(
         self,
@@ -658,10 +634,9 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx, if found
         """
-        # tx = self._api.eth.get_transaction(
-        #     cast(HexStr, tx_digest)
-        # )  # pylint: disable=no-member
-        return None
+        tx = self._api.get_confirmed_transaction(tx_digest)
+        # pylint: disable=no-member
+        return tx
 
     @ try_decorator(
         "Error when attempting getting tx revert reason: {}", logger_method="debug"
@@ -950,14 +925,14 @@ class SolanaFaucetApi(FaucetApi):
         :param address: the address.
         :param url: the url
         """
-        self._try_get_wealth(address, url)
+        return self._try_get_wealth(address, url)
 
     @staticmethod
     @try_decorator(
         "An error occured while attempting to generate wealth:\n{}",
         logger_method="error",
     )
-    def _try_get_wealth(address: Address, url: Optional[str] = None) -> None:
+    def _try_get_wealth(address: Address, url: Optional[str] = None) -> str or None:
         """
         Get wealth from the faucet for the provided address.
 
@@ -973,6 +948,7 @@ class SolanaFaucetApi(FaucetApi):
         try:
             response = solana_client.request_airdrop(PublicKey(address), 1000000000)
         except Exception as e:
+            msg = e
             pass
 
         if response == None:
@@ -986,6 +962,7 @@ class SolanaFaucetApi(FaucetApi):
                     "success", response['result']
                 )
             )
+            return response['result']
 
 
 class LruLockWrapper:
