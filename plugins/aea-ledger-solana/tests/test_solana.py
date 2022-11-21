@@ -171,7 +171,7 @@ def test_get_hash():
 @pytest.mark.integration
 @pytest.mark.ledger
 def test_load_contract_interface_pid():
-    """Test that get_state() with 'get_block' function returns something containing the block number."""
+    """Test that you can load contract interface from onchain idl store."""
     solana_api = SolanaApi()
     contract_interface = solana_api.load_contract_interface(
         program_address="ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD", rpc_api="https://api.mainnet-beta.solana.com")
