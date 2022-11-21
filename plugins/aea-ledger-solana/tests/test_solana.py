@@ -39,6 +39,7 @@ from aea_ledger_solana import (
     LruLockWrapper,
     # requests,
 )
+from solana.transaction import Transaction
 
 # from web3 import Web3
 from web3._utils.request import _session_cache as session_cache
@@ -166,17 +167,16 @@ def test_get_hash():
 #     assert balance > 0, "Existing account has no balance."
 
 
-# @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
-# @pytest.mark.integration
-# @pytest.mark.ledger
-# def test_get_state(ethereum_testnet_config, ganache):
-#     """Test that get_state() with 'get_block' function returns something containing the block number."""
-#     ethereum_api = EthereumApi(**ethereum_testnet_config)
-#     callable_name = "get_block"
-#     args = ("latest",)
-#     block = ethereum_api.get_state(callable_name, *args)
-#     assert block is not None, "response to get_block is empty."
-#     assert "number" in block, "response to get_block() does not contain 'number'"
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
+@pytest.mark.integration
+@pytest.mark.ledger
+def test_load_contract_interface_pid():
+    """Test that get_state() with 'get_block' function returns something containing the block number."""
+    solana_api = SolanaApi()
+    contract_interface = solana_api.load_contract_interface(
+        program_address="ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD", rpc_api="https://api.mainnet-beta.solana.com")
+
+    assert "name" in contract_interface, "idl has a name"
 
 
 def _wait_get_receipt(
@@ -199,69 +199,84 @@ def _wait_get_receipt(
     return transaction_receipt, not not_settled
 
 
-# def _construct_and_settle_tx(
-#     ethereum_api: EthereumApi,
-#     account: EthereumCrypto,
-#     tx_params: dict,
-# ) -> Tuple[str, JSONLike, bool]:
-#     """Construct and settle a transaction."""
-#     transfer_transaction = ethereum_api.get_transfer_transaction(**tx_params)
-#     assert (
-#         isinstance(transfer_transaction, dict) and len(transfer_transaction) == 8
-#     ), "Incorrect transfer_transaction constructed."
+def _construct_and_settle_tx(
+    solana_api: SolanaApi,
+    account: SolanaCrypto,
+    tx_params: dict,
+) -> Tuple[str, JSONLike, bool]:
+    """Construct and settle a transaction."""
+    transfer_transaction = solana_api.get_transfer_transaction(**tx_params)
+    assert (
+        isinstance(transfer_transaction, Transaction)
+    ), "Incorrect transfer_transaction constructed."
 
-#     signed_transaction = account.sign_transaction(transfer_transaction)
-#     assert (
-#         isinstance(signed_transaction, dict) and len(signed_transaction) == 5
-#     ), "Incorrect signed_transaction constructed."
+    signed_transaction = account.sign_transaction(
+        transfer_transaction, solana_api.generate_tx_nonce(solana_api)
+    )
+    assert (
+        isinstance(signed_transaction, Transaction)
+    ), "Incorrect signed_transaction constructed."
 
-#     transaction_digest = ethereum_api.send_signed_transaction(signed_transaction)
-#     assert transaction_digest is not None, "Failed to submit transfer transaction!"
+    transaction_digest = solana_api.send_signed_transaction(signed_transaction)
+    assert transaction_digest is not None, "Failed to submit transfer transaction!"
 
-#     transaction_receipt, is_settled = _wait_get_receipt(
-#         ethereum_api, transaction_digest
-#     )
+    transaction_receipt, is_settled = _wait_get_receipt(
+        solana_api, transaction_digest
+    )
 
-#     assert transaction_receipt is not None, "Failed to retrieve transaction receipt."
+    assert transaction_receipt['result'] is not None, "Failed to retrieve transaction receipt."
 
-#     return transaction_digest, transaction_receipt, is_settled
+    return transaction_digest, transaction_receipt, is_settled
 
 
-# @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
-# @pytest.mark.integration
-# @pytest.mark.ledger
-# def test_construct_sign_and_submit_transfer_transaction(
-#     ethereum_testnet_config, ganache, ethereum_private_key_file
-# ):
-#     """Test the construction, signing and submitting of a transfer transaction."""
-#     account = EthereumCrypto(private_key_path=ethereum_private_key_file)
-#     ec2 = EthereumCrypto()
-#     ethereum_api = EthereumApi(**ethereum_testnet_config)
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
+@pytest.mark.integration
+@pytest.mark.ledger
+def test_construct_sign_and_submit_transfer_transaction():
+    """Test the construction, signing and submitting of a transfer transaction."""
+    account1 = SolanaCrypto(private_key_path="./solana_private_key.txt")
+    account2 = SolanaCrypto()
 
-#     tx_params = {
-#         "sender_address": account.address,
-#         "destination_address": ec2.address,
-#         "amount": 40000,
-#         "tx_fee": 30000,
-#         "tx_nonce": ethereum_api.generate_tx_nonce(ec2.address, account.address),
-#         "chain_id": DEFAULT_GANACHE_CHAIN_ID,
-#         "max_priority_fee_per_gas": 1_000_000_000,
-#         "max_fee_per_gas": 1_000_000_000,
-#     }
+    solana_api = SolanaApi()
+    solana_faucet_api = SolanaFaucetApi()
 
-#     transaction_digest, transaction_receipt, is_settled = _construct_and_settle_tx(
-#         ethereum_api,
-#         account,
-#         tx_params,
-#     )
-#     assert is_settled, "Failed to verify tx!"
+    solana_faucet_api.get_wealth(account2.address)
 
-#     tx = ethereum_api.get_transaction(transaction_digest)
-#     is_valid = ethereum_api.is_transaction_valid(
-#         tx, ec2.address, account.address, tx_params["tx_nonce"], tx_params["amount"]
-#     )
-#     assert is_valid, "Failed to settle tx correctly!"
-#     assert tx != transaction_receipt, "Should not be same!"
+    time.sleep(10)
+    balance1 = solana_api.get_balance(account1.address)
+    balance2 = solana_api.get_balance(account2.address)
+    counter = 0
+    flag = True
+    while flag == True:
+        balance2 = solana_api.get_balance(account2.address)
+        if balance2 != 0:
+            flag = False
+        counter += 1
+        if counter > 10:
+            flag = False
+        time.sleep(2)
+
+    AMOUNT = 232323
+    tx_params = {
+        "sender_address": account1.address,
+        "destination_address": account2.address,
+        "amount": AMOUNT,
+    }
+
+    transaction_digest, transaction_receipt, is_settled = _construct_and_settle_tx(
+        solana_api,
+        account1,
+        tx_params,
+    )
+    assert is_settled, "Failed to verify tx!"
+
+    tx = solana_api.get_transaction(transaction_digest)
+
+    assert tx['result'] == transaction_receipt['result'], "Should be same"
+
+    balance3 = solana_api.get_balance(account2.address)
+
+    assert balance2 + AMOUNT == balance3, "Should be the same balance"
 
 
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)

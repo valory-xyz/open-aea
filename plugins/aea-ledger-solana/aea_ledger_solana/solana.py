@@ -29,6 +29,8 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
 from uuid import uuid4
 from ast import literal_eval
+import zlib
+
 
 from aea.common import Address, JSONLike
 from aea.crypto.base import Crypto, FaucetApi, Helper, LedgerApi
@@ -45,8 +47,15 @@ from nacl.signing import VerifyKey
 from pathlib import Path
 import asyncio
 import json
+from solana.blockhash import Blockhash
 from solana.publickey import PublicKey
-from anchorpy import Idl, Program
+from anchorpy import Program, Provider
+from anchorpy.idl import Idl, _decode_idl_account, _idl_address
+from anchorpy.coder.accounts import ACCOUNT_DISCRIMINATOR_SIZE
+
+from solana.system_program import TransferParams, transfer
+from solana.transaction import Transaction
+from base64 import b64decode
 
 from lru import LRU
 from eth_keys import keys
@@ -65,6 +74,14 @@ DEFAULT_CHAIN_ID = "solana"
 DEFAULT_CURRENCY_DENOM = "lamports"
 _IDL = "idl"
 _BYTECODE = "bytecode"
+
+
+def _pako_inflate(data):
+    # https://stackoverflow.com/questions/46351275/using-pako-deflate-with-python
+    decompress = zlib.decompressobj(15)
+    decompressed_data = decompress.decompress(data)
+    decompressed_data += decompress.flush()
+    return decompressed_data
 
 
 class SolanaCrypto(Crypto[Keypair]):
@@ -165,19 +182,22 @@ class SolanaCrypto(Crypto[Keypair]):
 
         return signed_msg
 
-    def sign_transaction(self, transaction: JSONLike) -> JSONLike:
+    def sign_transaction(self, transaction: JSONLike, recent_blockhash: Blockhash) -> JSONLike:
         """
         Sign a transaction in bytes string form.
 
         :param transaction: the transaction to be signed
+        :param recent_blockhash: a recent blockhash
         :return: signed transaction
         """
+
         keypair = Keypair.from_secret_key(bytes.fromhex(self.private_key))
+        transaction.recent_blockhash = recent_blockhash
+        transaction.sign(keypair)
 
-        signed_tx = keypair.sign(transaction)
-        return signed_tx
+        return transaction
 
-    @classmethod
+    @ classmethod
     def generate_private_key(
         cls, extra_entropy: Union[str, bytes, int] = ""
     ) -> Keypair:
@@ -200,7 +220,7 @@ class SolanaCrypto(Crypto[Keypair]):
         encrypted = Account.encrypt(self.private_key, password)
         return json.dumps(encrypted)
 
-    @classmethod
+    @ classmethod
     def decrypt(cls, keyfile_json: str, password: str) -> str:
         """
         Decrypt the private key and return in raw form.
@@ -238,6 +258,19 @@ class SolanaApi(LedgerApi):
     def api(self) -> Web3:
         """Get the underlying API object."""
         return self._api
+
+    @property
+    def recent_blockhash(self) -> str:
+        """
+        Return a recent blockhash.
+
+
+        :return: a blockhash
+        """
+        result = self._api.get_recent_blockhash()
+        blockhash = result['result']['value']['blockhash']
+
+        return Blockhash(blockhash)
 
     def update_with_gas_estimate(self, transaction: JSONLike) -> JSONLike:
         """
@@ -348,19 +381,45 @@ class SolanaApi(LedgerApi):
         return "(str(pubkey),)"
 
     @classmethod
-    def load_contract_interface(cls, file_path: Path) -> Dict[str, str]:
+    def load_contract_interface(cls,
+                                file_path: Optional[Path] = None,
+                                program_address: Optional[str] = None,
+                                rpc_api: Optional[str] = None,
+                                ) -> Dict[str, str]:
         """
         Load contract interface.
 
         :param file_path: the file path to the interface
         :return: the interface
         """
-        with open_file(file_path, "r") as interface_file_solana:
-            contract_interface = json.load(interface_file_solana)
+        contract_interface = None
+        if program_address is not None and rpc_api is not None:
+            try:
+                base = PublicKey.find_program_address([], PublicKey(program_address))[0]
+                idl_address = PublicKey.create_with_seed(
+                    base, "anchor:idl", PublicKey(program_address))
+                client = Client(endpoint=rpc_api)
+                account_info = client.get_account_info(idl_address)
 
+                account_info_val = account_info["result"]["value"]
+                idl_account = _decode_idl_account(
+                    b64decode(account_info_val["data"][0])[ACCOUNT_DISCRIMINATOR_SIZE:]
+                )
+                inflated_idl = _pako_inflate(bytes(idl_account["data"])).decode()
+                json_idl = json.loads(inflated_idl)
+                return json_idl
+            except Exception as e:
+                raise Exception("Could not locate IDL")
+
+        elif file_path is not None:
+            with open_file(file_path, "r") as interface_file_solana:
+                contract_interface = json.load(interface_file_solana)
+            return contract_interface
+        else:
+            raise Exception("Could not locate IDL")
         return contract_interface
 
-    @staticmethod
+    @ staticmethod
     def is_transaction_valid(
         tx: dict,
         seller: Address,
@@ -388,7 +447,7 @@ class SolanaApi(LedgerApi):
             )
         return is_valid
 
-    @staticmethod
+    @ staticmethod
     def is_transaction_settled(tx_receipt: JSONLike) -> bool:
         """
         Check whether a transaction is settled or not.
@@ -401,7 +460,7 @@ class SolanaApi(LedgerApi):
             is_successful = tx_receipt['result']['meta']['status'] == {'Ok': None}
         return is_successful
 
-    @staticmethod
+    @ staticmethod
     def get_hash(message: bytes) -> str:
         """
         Get the hash of a message.
@@ -412,7 +471,7 @@ class SolanaApi(LedgerApi):
         digest = Web3.keccak(message).hex()
         return digest
 
-    @staticmethod
+    @ staticmethod
     def get_contract_address(tx_receipt: JSONLike) -> Optional[str]:
         """
         Retrieve the `contract_address` from a transaction receipt.
@@ -423,7 +482,7 @@ class SolanaApi(LedgerApi):
         contract_address = cast(Optional[str], tx_receipt.get("contractAddress", None))
         return contract_address
 
-    @classmethod
+    @ classmethod
     def get_address_from_public_key(cls, public_key: str) -> str:
         """
         Get the address from the public key.
@@ -434,33 +493,27 @@ class SolanaApi(LedgerApi):
 
         return public_key
 
-    @staticmethod
-    def generate_tx_nonce(seller: Address, client: Address) -> str:
+    @ staticmethod
+    def generate_tx_nonce(self) -> str:
         """
         Generate a unique hash to distinguish transactions with the same terms.
 
-        :param seller: the address of the seller.
+        :param self: .
         :param client: the address of the client.
         :return: return the hash in hex.
         """
-        aggregate_hash = Web3.keccak(
-            b"".join([seller.encode(), client.encode(), uuid4().bytes])
-        )
-        return aggregate_hash.hex()
+
+        result = self._api.get_recent_blockhash()
+        blockhash = result['result']['value']['blockhash']
+
+        return Blockhash(blockhash)
 
     def get_transfer_transaction(  # pylint: disable=arguments-differ
         self,
         sender_address: Address,
         destination_address: Address,
         amount: int,
-        tx_fee: int,
-        tx_nonce: str,
         chain_id: Optional[int] = None,
-        max_fee_per_gas: Optional[int] = None,
-        max_priority_fee_per_gas: Optional[str] = None,
-        gas_price: Optional[str] = None,
-        gas_price_strategy: Optional[str] = None,
-        gas_price_strategy_extra_config: Optional[Dict] = None,
         raise_on_try: bool = False,
         **kwargs: Any,
     ) -> Optional[JSONLike]:
@@ -469,77 +522,18 @@ class SolanaApi(LedgerApi):
 
         :param sender_address: the sender address of the payer.
         :param destination_address: the destination address of the payee.
-        :param amount: the amount of wealth to be transferred (in Wei).
-        :param tx_fee: the transaction fee (gas) to be used (in Wei).
-        :param tx_nonce: verifies the authenticity of the tx.
+        :param amount: the amount of wealth to be transferred (in Lamports).
         :param chain_id: the Chain ID of the Ethereum transaction.
-        :param max_fee_per_gas: maximum amount you’re willing to pay, inclusive of `baseFeePerGas` and `maxPriorityFeePerGas`. The difference between `maxFeePerGas` and `baseFeePerGas + maxPriorityFeePerGas` is refunded  (in Wei).
-        :param max_priority_fee_per_gas: the part of the fee that goes to the miner (in Wei).
-        :param gas_price: the gas price (in Wei)
-        :param gas_price_strategy: the gas price strategy to be used.
-        :param gas_price_strategy_extra_config: extra config for gas price strategy.
         :param raise_on_try: whether the method will raise or log on error
         :param kwargs: keyword arguments
         :return: the transfer transaction
         """
-        transaction: Optional[JSONLike] = None
         chain_id = chain_id if chain_id is not None else self._chain_id
-        destination_address = self._api.toChecksumAddress(destination_address)
-        sender_address = self._api.toChecksumAddress(sender_address)
-        nonce = self._try_get_transaction_count(
-            sender_address,
-            raise_on_try=raise_on_try,
-        )
-        if nonce is None:
-            return transaction
-        transaction = {
-            "nonce": nonce,
-            "chainId": chain_id,
-            "to": destination_address,
-            "value": amount,
-            "gas": tx_fee,
-            "data": tx_nonce,
-        }
-        if self._is_gas_estimation_enabled:
-            transaction = self.update_with_gas_estimate(transaction)
 
-        if max_fee_per_gas is not None:
-            max_priority_fee_per_gas = (
-                self._try_get_max_priority_fee(raise_on_try=raise_on_try)
-                if max_priority_fee_per_gas is None
-                else max_priority_fee_per_gas
-            )
-            transaction.update(
-                {
-                    "maxFeePerGas": max_fee_per_gas,
-                    "maxPriorityFeePerGas": max_priority_fee_per_gas,
-                }
-            )
+        txn = Transaction(fee_payer=PublicKey(sender_address)).add(transfer(TransferParams(
+            from_pubkey=PublicKey(sender_address), to_pubkey=PublicKey(destination_address), lamports=amount)))
 
-        if gas_price is not None:
-            transaction.update({"gasPrice": gas_price})
-
-        if gas_price is None and max_fee_per_gas is None:
-            gas_pricing = self.try_get_gas_pricing(
-                gas_price_strategy,
-                gas_price_strategy_extra_config,
-                raise_on_try=raise_on_try,
-            )
-            if gas_pricing is None:
-                return transaction  # pragma: nocover
-            transaction.update(gas_pricing)
-
-        return transaction
-
-    @try_decorator("Unable to retrieve transaction count: {}", logger_method="warning")
-    def _try_get_transaction_count(
-        self, address: Address, **_kwargs: Any
-    ) -> Optional[int]:
-        """Try get the transaction count."""
-        nonce = self._api.eth.get_transaction_count(  # pylint: disable=no-member
-            self._api.toChecksumAddress(address)
-        )
-        return nonce
+        return txn
 
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False
@@ -554,9 +548,9 @@ class SolanaApi(LedgerApi):
         tx_digest = self._try_send_signed_transaction(
             tx_signed, raise_on_try=raise_on_try
         )
-        return tx_digest
+        return tx_digest['result']
 
-    @try_decorator("Unable to send transaction: {}", logger_method="warning")
+    @ try_decorator("Unable to send transaction: {}", logger_method="warning")
     def _try_send_signed_transaction(
         self, tx_signed: JSONLike, **_kwargs: Any
     ) -> Optional[str]:
@@ -568,15 +562,9 @@ class SolanaApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: tx_digest, if present
         """
-        # signed_transaction = SignedTransactionTranslator.from_dict(tx_signed)
-        # hex_value = self._api.eth.send_raw_transaction(  # pylint: disable=no-member
-        #     signed_transaction.rawTransaction
-        # )
-        # tx_digest = hex_value.hex()
-        # _default_logger.debug(
-        #     "Successfully sent transaction with digest: {}".format(tx_digest)
-        # )
-        return None
+        txn_resp = self._api.send_raw_transaction(tx_signed.serialize())
+
+        return txn_resp
 
     def get_transaction_receipt(
         self, tx_digest: str, raise_on_try: bool = False
@@ -595,7 +583,7 @@ class SolanaApi(LedgerApi):
 
         return tx_receipt
 
-    @try_decorator(
+    @ try_decorator(
         "Error when attempting getting tx receipt: {}", logger_method="debug"
     )
     def _try_get_transaction_receipt(
@@ -627,7 +615,7 @@ class SolanaApi(LedgerApi):
         tx = self._try_get_transaction(tx_digest, raise_on_try=raise_on_try)
         return tx
 
-    @try_decorator("Error when attempting getting tx: {}", logger_method="debug")
+    @ try_decorator("Error when attempting getting tx: {}", logger_method="debug")
     def _try_get_transaction(
         self, tx_digest: str, **_kwargs: Any
     ) -> Optional[JSONLike]:
@@ -787,12 +775,12 @@ class SolanaApi(LedgerApi):
             transaction = self.update_with_gas_estimate(transaction)
         return transaction
 
-    @try_decorator("Unable to retrieve max_priority_fee: {}", logger_method="warning")
+    @ try_decorator("Unable to retrieve max_priority_fee: {}", logger_method="warning")
     def _try_get_max_priority_fee(self, **_kwargs: Any) -> str:
         """Try get the gas estimate."""
         return cast(str, self.api.eth.max_priority_fee)
 
-    @classmethod
+    @ classmethod
     def is_valid_address(cls, address: Address) -> bool:
         """
         Check if the address is valid.
@@ -802,7 +790,7 @@ class SolanaApi(LedgerApi):
         """
         return Web3.isAddress(address)
 
-    @classmethod
+    @ classmethod
     def contract_method_call(
         cls,
         contract_instance: Any,
@@ -923,10 +911,11 @@ class SolanaFaucetApi(FaucetApi):
         :param address: the address.
         :param url: the url
         """
+
         return self._try_get_wealth(address, url)
 
-    @staticmethod
-    @try_decorator(
+    @ staticmethod
+    @ try_decorator(
         "An error occured while attempting to generate wealth:\n{}",
         logger_method="error",
     )
@@ -938,9 +927,8 @@ class SolanaFaucetApi(FaucetApi):
         :param url: the url
         """
         if url is None:
-            raise ValueError(  # pragma: nocover
-                "Url is none, no default url provided. Please provide a faucet url."
-            )
+            url = DEFAULT_ADDRESS
+
         solana_client = Client(url)
         response = None
         try:
