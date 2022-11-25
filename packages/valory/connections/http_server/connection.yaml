@@ -8,14 +8,14 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeihkuhhsdfw5qqtz2jwpfppub6yvsehzmvmaqjlxnal4v76x47mcrq
-  __init__.py: bafybeif5pkr5oarwd7yagdgn46miolmdmvgdyxv4kadgws2bf3iwshom24
-  connection.py: bafybeicqhb5zrdmjt6vtb253luc7nfr4p4vrxkmniigqsokgatrsoeptoa
+  __init__.py: bafybeihqfiuclvfjhganjjyddsutml7w73xjhbtn45x2hq6env4mtzblgq
+  connection.py: bafybeiaurawraf7ivrwtssptqfkpsuwsehgjulbmbkhhdihol6dqicdgo4
   tests/__init__.py: bafybeidpthyhnhsvpixejrud77klcfkb3titlmyrssovfzt4a76dn3wnpm
   tests/data/certs/server.crt: bafybeiev5i3xxkvn36wflf633gkumuxexsw4y2bubwbvl7edrz4igfgv34
   tests/data/certs/server.csr: bafybeicvp7xdl5w3o4bzikkudpduitss3bpp6xqfwlxbw6kabdangohy5u
   tests/data/certs/server.key: bafybeiabvpkpqr4fctrbssfal6pviv5otgmu32qyrfpyhcql5wgmlzjtoe
   tests/data/petstore_sim.yaml: bafybeiaekkfxljlv57uviz4ug6isdqbzsnuxpsgy3dvhzh22daql3xh2i4
-  tests/test_http_server.py: bafybeiflry2rkfwt3rwlwof6weemwrhmtjx64znlusn5elhawdbjy4bxlm
+  tests/test_http_server.py: bafybeihkv3whyg3zttlipnlz5n52fesul4na74wyn3attiyuwsefotbdrm
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
