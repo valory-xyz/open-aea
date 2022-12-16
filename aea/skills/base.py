@@ -439,9 +439,7 @@ class Behaviour(AbstractBehaviour, ABC):
             e_str = parse_exception(e)
             err_msg = f"An error occurred during act of behaviour {self.context.skill_id}/{type(self).__name__}:\n{e_str}"
             self.context.logger.exception(err_msg)
-            raise AEAActException(
-               err_msg
-            )
+            raise AEAActException(err_msg)
 
     @classmethod
     def parse_module(  # pylint: disable=arguments-differ
