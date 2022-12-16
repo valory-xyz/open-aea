@@ -437,8 +437,10 @@ class Behaviour(AbstractBehaviour, ABC):
             raise
         except Exception as e:  # pylint: disable=broad-except
             e_str = parse_exception(e)
+            err_msg = f"An error occurred during act of behaviour {self.context.skill_id}/{type(self).__name__}:\n{e_str}"
+            self.context.logger.exception(err_msg)
             raise AEAActException(
-                f"An error occurred during act of behaviour {self.context.skill_id}/{type(self).__name__}:\n{e_str}"
+               err_msg
             )
 
     @classmethod
