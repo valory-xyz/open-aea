@@ -422,8 +422,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        tox_job: ['py', 'packages-py', 'plugins-py']
         os: [ubuntu-latest, macos-latest, windows-latest]
         python_version: ['3.7', '3.8', '3.9', '3.10']
+        
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@master
@@ -433,7 +435,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: "1.17.7"
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-latest' && matrix.python_version != '3.10'
         name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -500,26 +502,69 @@ jobs:
           Expand-Archive -Path go-ipfs_v0.6.0.zip -DestinationPath ~\Apps\
           cp ~\Apps\go-ipfs\ipfs.exe C:\Users\runneradmin\go\bin\
           ipfs init
+      - if: matrix.os != 'ubuntu-latest' && matrix.python_version != '3.10'
+        name: Unit tests ${{ matrix.tox_job }}
+        run: |
+          tox -e ${{ matrix.tox_job }}${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
 
+  coverage_check:
+    continue-on-error: True
+    needs:
+      - common_checks_1
+      - common_checks_2
+      - common_checks_3
+      - common_checks_4
+      - dependencies_checks
+      - plugins_install_check
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - uses: actions/setup-go@v3
+        with:
+          go-version: "1.17.7"
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get autoremove
+          sudo apt-get autoclean
+          pip install tomte[tox]==0.1.5
+          # install Protobuf compiler
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
+          unzip protoc-3.19.4-linux-x86_64.zip -d protoc
+          sudo mv protoc/bin/protoc /usr/local/bin/protoc
+          make protolint_install
+          # install ipfs
+          wget https://dist.ipfs.tech/go-ipfs/v0.6.0/go-ipfs_v0.6.0_linux-amd64.tar.gz
+          tar -xvzf go-ipfs_v0.6.0_linux-amd64.tar.gz
+          cd go-ipfs
+          sudo ./install.sh
+          cd ..
+          rm -rf go-ipfs
+          ipfs init
+      # sudo apt-get install -y protobuf-compiler
+      # use sudo rm /var/lib/apt/lists/lock above in line above update if dependency install failures persist
+      # use sudo apt-get dist-upgrade above in line below update if dependency install failures persist
       - if: True
         name: Framework unit tests
         run: |
-          tox -e py${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
+          tox -e py3.10 -- -m 'not integration and not unstable and not profiling'
       - name: Packages unit tests
         run: |
-          tox -e packages-py${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
+          tox -e packages-py3.10 -- -m 'not integration and not unstable and not profiling'
       - name: Plugin unit tests
         run: |
-          tox -e plugins-py${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
+          tox -e plugins-py3.10 -- -m 'not integration and not unstable and not profiling'
 
-      - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
-        name: Show full coverage report
+      - name: Show full coverage report
         run: |
           pip install tomte[tests]==0.1.5
           coverage report -m -i
 
-      - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
-        name: Upload coverage to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
