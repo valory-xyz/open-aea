@@ -39,6 +39,37 @@ from bech32 import (  # pylint: disable=wrong-import-order
     bech32_encode,
     convertbits,
 )
+from cosmpy.auth.rest_client import AuthRestClient
+from cosmpy.bank.rest_client import BankRestClient, QueryBalanceRequest
+from cosmpy.common.rest_client import RestClient
+from cosmpy.cosmwasm.rest_client import CosmWasmRestClient
+from cosmpy.protos.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
+from cosmpy.protos.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
+from cosmpy.protos.cosmos.bank.v1beta1.tx_pb2 import MsgSend
+from cosmpy.protos.cosmos.base.v1beta1.coin_pb2 import Coin
+from cosmpy.protos.cosmos.crypto.secp256k1.keys_pb2 import PubKey as ProtoPubKey
+from cosmpy.protos.cosmos.tx.signing.v1beta1.signing_pb2 import SignMode
+from cosmpy.protos.cosmos.tx.v1beta1.service_pb2 import (
+    BroadcastMode,
+    BroadcastTxRequest,
+    GetTxRequest,
+)
+from cosmpy.protos.cosmos.tx.v1beta1.tx_pb2 import (
+    AuthInfo,
+    Fee,
+    ModeInfo,
+    SignDoc,
+    SignerInfo,
+    Tx,
+    TxBody,
+)
+from cosmpy.protos.cosmwasm.wasm.v1.query_pb2 import QuerySmartContractStateRequest
+from cosmpy.protos.cosmwasm.wasm.v1.tx_pb2 import (
+    MsgExecuteContract,
+    MsgInstantiateContract,
+    MsgStoreCode,
+)
+from cosmpy.tx.rest_client import TxRestClient
 from ecdsa import (  # type: ignore # pylint: disable=wrong-import-order
     SECP256k1,
     SigningKey,
@@ -58,44 +89,6 @@ from aea.helpers import http_requests as requests
 from aea.helpers.base import try_decorator
 
 from .hashfuncs import ripemd160, sha256
-
-
-def lazy_load():  # Python caches all imported modules
-    """Temporary solution because of protos mismatch."""
-    # pylint: disable=import-error
-    from cosmpy.auth.rest_client import AuthRestClient
-    from cosmpy.bank.rest_client import BankRestClient, QueryBalanceRequest
-    from cosmpy.common.rest_client import RestClient
-    from cosmpy.cosmwasm.rest_client import CosmWasmRestClient
-    from cosmpy.protos.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
-    from cosmpy.protos.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
-    from cosmpy.protos.cosmos.bank.v1beta1.tx_pb2 import MsgSend
-    from cosmpy.protos.cosmos.base.v1beta1.coin_pb2 import Coin
-    from cosmpy.protos.cosmos.crypto.secp256k1.keys_pb2 import PubKey as ProtoPubKey
-    from cosmpy.protos.cosmos.tx.signing.v1beta1.signing_pb2 import SignMode
-    from cosmpy.protos.cosmos.tx.v1beta1.service_pb2 import (
-        BroadcastMode,
-        BroadcastTxRequest,
-        GetTxRequest,
-    )
-    from cosmpy.protos.cosmos.tx.v1beta1.tx_pb2 import (
-        AuthInfo,
-        Fee,
-        ModeInfo,
-        SignDoc,
-        SignerInfo,
-        Tx,
-        TxBody,
-    )
-    from cosmpy.protos.cosmwasm.wasm.v1.query_pb2 import QuerySmartContractStateRequest
-    from cosmpy.protos.cosmwasm.wasm.v1.tx_pb2 import (
-        MsgExecuteContract,
-        MsgInstantiateContract,
-        MsgStoreCode,
-    )
-    from cosmpy.tx.rest_client import TxRestClient
-
-    return locals()
 
 
 _default_logger = logging.getLogger(__name__)
@@ -540,9 +533,6 @@ class CosmosCrypto(Crypto[SigningKey]):
         :param transaction: the transaction to be signed
         :return: signed transaction
         """
-        Tx, ProtoPubKey, SignDoc = (
-            lazy_load()[k] for k in ("Tx", "ProtoPubKey", "SignDoc")
-        )
         tx = ParseDict(transaction["tx"], Tx())
 
         # If public key is not already part of transaction
@@ -620,16 +610,6 @@ class _CosmosApi(LedgerApi):
 
     def __init__(self, **kwargs: Any) -> None:
         """Initialize the Cosmos ledger APIs."""
-        RestClient, TxRestClient, AuthRestClient, CosmWasmRestClient, BankRestClient = (
-            lazy_load()[k]
-            for k in (
-                "RestClient",
-                "TxRestClient",
-                "AuthRestClient",
-                "CosmWasmRestClient",
-                "BankRestClient",
-            )
-        )
         self._api = None
         self.network_address = kwargs.pop("address", DEFAULT_ADDRESS)
         self.denom = kwargs.pop("denom", DEFAULT_CURRENCY_DENOM)
@@ -657,7 +637,6 @@ class _CosmosApi(LedgerApi):
         logger_method=_default_logger.warning,
     )
     def _try_get_balance(self, address: Address, **_kwargs: Any) -> Optional[int]:
-        QueryBalanceRequest = lazy_load()["QueryBalanceRequest"]
         res = self.bank_client.Balance(
             QueryBalanceRequest(address=address, denom=self.denom)
         )
@@ -826,7 +805,6 @@ class _CosmosApi(LedgerApi):
         :param memo: any string comment.
         :return: the unsigned CosmWasm contract deploy message
         """
-        MsgStoreCode, Coin = (lazy_load()[k] for k in ("MsgStoreCode", "Coin"))
         store_msg = MsgStoreCode(
             sender=str(deployer_address),
             wasm_byte_code=base64.b64decode(contract_interface[_BYTECODE]),
@@ -881,9 +859,6 @@ class _CosmosApi(LedgerApi):
         :param memo: any string comment.
         :return: the unsigned CosmWasm InitMsg
         """
-        MsgInstantiateContract, Coin = (
-            lazy_load()[k] for k in ("MsgInstantiateContract", "Coin")
-        )
         if amount == 0:
             init_funds = []
         else:
@@ -947,9 +922,6 @@ class _CosmosApi(LedgerApi):
         :param raise_on_try: whether the method will raise or log on error
         :return: the unsigned CosmWasm HandleMsg
         """
-        MsgExecuteContract, Coin = (
-            lazy_load()[k] for k in ("MsgExecuteContract", "Coin")
-        )
         denom = denom if denom is not None else self.denom
         chain_id = chain_id if chain_id is not None else self.chain_id
         tx_fee_denom = tx_fee_denom if tx_fee_denom is not None else denom
@@ -1027,7 +999,6 @@ class _CosmosApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the message receipt
         """
-        QuerySmartContractStateRequest = lazy_load()["QuerySmartContractStateRequest"]
         request = QuerySmartContractStateRequest(
             address=contract_address, query_data=json.dumps(query_msg).encode("UTF8")
         )
@@ -1070,7 +1041,6 @@ class _CosmosApi(LedgerApi):
         :param kwargs: keyword arguments.
         :return: the transfer transaction
         """
-        MsgSend, Coin = (lazy_load()[k] for k in ("MsgSend", "Coin"))
         denom = denom if denom is not None else self.denom
         chain_id = chain_id if chain_id is not None else self.chain_id
         tx_fee_denom = tx_fee_denom if tx_fee_denom is not None else denom
@@ -1125,9 +1095,6 @@ class _CosmosApi(LedgerApi):
 
         :return: Packed MsgExecuteContract
         """
-        MsgExecuteContract, Coin = (
-            lazy_load()[k] for k in ("MsgExecuteContract", "Coin")
-        )
         denom = denom if denom is not None else self.denom
 
         if funds == 0:
@@ -1163,7 +1130,6 @@ class _CosmosApi(LedgerApi):
 
         :return: packer ProtoAny type message
         """
-        MsgSend, Coin = (lazy_load()[k] for k in ("MsgSend", "Coin"))
         denom = denom if denom is not None else self.denom
 
         amount_coins = [Coin(denom=denom, amount=str(amount))]
@@ -1209,7 +1175,6 @@ class _CosmosApi(LedgerApi):
 
         :return: the transaction
         """
-        Coin = lazy_load()["Coin"]
         if pub_keys is not None and len(pub_keys) != len(from_addresses):
             raise RuntimeError("Number of pubkeys is not equal to number of addresses")
 
@@ -1274,19 +1239,6 @@ class _CosmosApi(LedgerApi):
 
         :return: the transaction
         """
-        SignerInfo, ProtoPubKey, SignMode, ModeInfo, AuthInfo, Fee, TxBody, Tx = (
-            lazy_load()[k]
-            for k in (
-                "SignerInfo",
-                "ProtoPubKey",
-                "SignMode",
-                "ModeInfo",
-                "AuthInfo",
-                "Fee",
-                "TxBody",
-                "Tx",
-            )
-        )
         # Txs will fail if gas is higher than MAXIMUM_GAS_AMOUNT
         if gas > MAXIMUM_GAS_AMOUNT:
             _default_logger.warning(
@@ -1368,10 +1320,6 @@ class _CosmosApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: a tuple of account number and sequence
         """
-        QueryAccountRequest, BaseAccount = (
-            lazy_load()[k] for k in ("QueryAccountRequest", "BaseAccount")
-        )
-
         account_response = self.auth_client.Account(
             QueryAccountRequest(address=address)
         )
@@ -1394,9 +1342,6 @@ class _CosmosApi(LedgerApi):
         :param raise_on_try: whether the method will raise or log on error
         :return: tx_digest, if present
         """
-        Tx, BroadcastTxRequest, BroadcastMode = (
-            lazy_load()[k] for k in ("Tx", "BroadcastTxRequest", "BroadcastMode")
-        )
         tx = ParseDict(tx_signed["tx"], Tx())
 
         tx_data = tx.SerializeToString()
@@ -1449,7 +1394,6 @@ class _CosmosApi(LedgerApi):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-        GetTxRequest = lazy_load()["GetTxRequest"]
         tx_request = GetTxRequest(hash=tx_digest)
         tx_response = self.tx_client.GetTx(tx_request)
         return MessageToDict(tx_response)
