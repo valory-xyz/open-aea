@@ -22,11 +22,6 @@
 import inspect
 import os
 
-from cosmpy.protos.cosmos.base.v1beta1.coin_pb2 import Coin  # type: ignore
-
-
-_ = Coin
-
 from aea_ledger_fetchai import FetchAICrypto  # noqa
 
 
