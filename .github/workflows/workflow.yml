@@ -500,12 +500,17 @@ jobs:
           Expand-Archive -Path go-ipfs_v0.6.0.zip -DestinationPath ~\Apps\
           cp ~\Apps\go-ipfs\ipfs.exe C:\Users\runneradmin\go\bin\
           ipfs init
-
-      - if: True
+      - if: ${{ matrix.os == 'linux-latest' }}
+        name: Pull docker images
+        run: |
+          docker pull fetchai/fetchd:0.10.2
+          docker pull trufflesuite/ganache-cli:latest
+      - if: False
         name: Framework unit tests
         run: |
           tox -e py${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
-      - name: Packages unit tests
+      - if: False
+        name: Packages unit tests
         run: |
           tox -e packages-py${{ matrix.python_version }} -- -m 'not integration and not unstable and not profiling'
       - name: Plugin unit tests
@@ -518,7 +523,7 @@ jobs:
           pip install tomte[tests]==0.1.5
           coverage report -m -i
 
-      - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
+      - if: False #matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
         name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:

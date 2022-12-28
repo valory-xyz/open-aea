@@ -17,6 +17,8 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ethereum module."""
+import platform
+
 import pytest
 import requests
 from _pytest.compat import get_real_func
@@ -29,6 +31,9 @@ from aea_ledger_ethereum.test_tools.fixture_helpers import (
 
 def test_ganache_fixture() -> None:
     """Test ganache fixture just start and stop."""
+    if platform.system() != "Linux":
+        pytest.skip("Skip on non Linux systems")
+
     request = dict(jsonrpc=2.0, method="web3_clientVersion", params=[], id=1)
 
     gen = get_real_func(ganache)()
