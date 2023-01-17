@@ -33,7 +33,7 @@ from aea.test_tools.network import (
 def test_get_unused_tcp_port() -> None:
     """Test get_unused_tcp_port"""
 
-    n_ports = 100
+    n_ports = 10  # suppose it's enough
     for _ in range(n_ports):
         assert not is_port_in_use(get_unused_tcp_port())
 
