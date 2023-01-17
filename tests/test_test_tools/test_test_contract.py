@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -135,6 +135,10 @@ class TestBaseContractTestCaseSetup:
             mock_get_deploy_transaction,
             mock_send_signed_transaction,
             mock_time_sleep,
+            mock.patch(
+                "web3.eth.Eth.get_transaction_receipt",
+                side_effect=ConnectionError("mocked connection error"),
+            ),
             pytest.raises(ValueError, match="Transaction receipt not found!"),
         ):
             self.setup_test_cls()
