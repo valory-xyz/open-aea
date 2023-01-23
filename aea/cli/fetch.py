@@ -20,7 +20,6 @@
 """Implementation of the 'aea fetch' subcommand."""
 import os
 import shutil
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from pathlib import Path
 from typing import Optional, Union, cast
 
@@ -246,7 +245,7 @@ def fetch_agent_locally(
         os.makedirs(target_path)  # pragma: nocover
 
     ctx.clean_paths.append(target_path)
-    copy_tree(source_path, target_path)
+    shutil.copytree(source_path, target_path, dirs_exist_ok=True)
 
     ctx.cwd = target_path
     try_to_load_agent_config(ctx)
