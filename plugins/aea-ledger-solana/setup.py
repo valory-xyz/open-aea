@@ -38,7 +38,8 @@ setup(
         "solders==0.14.0",
         "cryptography",
         "PyNaCl==1.5.0",
-        "anchorpy @ git+https://github.com/8ball030/anchorpy.git",
+        "anchorpy @ git+https://github.com/kevinheavey/anchorpy.git",
+        "solana==0.29.2",
     ],
     tests_require=["pytest"],
     entry_points={
