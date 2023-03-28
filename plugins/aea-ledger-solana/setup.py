@@ -39,7 +39,7 @@ setup(
         "cryptography",
         "PyNaCl==1.5.0",
         "anchorpy @ git+https://github.com/kevinheavey/anchorpy.git",
-        "solana==0.29.2",
+        "solana>=0.29.1",
     ],
     tests_require=["pytest"],
     entry_points={
