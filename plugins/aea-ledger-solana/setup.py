@@ -39,7 +39,7 @@ setup(
         "cryptography",
         "PyNaCl==1.5.0",
         "anchorpy==0.17.0",
-        "solana==0.29.2",
+        "solana==0.30.0",
     ],
     tests_require=["pytest"],
     entry_points={
