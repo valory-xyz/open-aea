@@ -35,7 +35,7 @@ setup(
     package_data={},
     install_requires=[
         "open-aea>=1.0.0, <2.0.0",
-        "solders==0.14.0",
+        "solders==0.15.1",
         "cryptography",
         "PyNaCl==1.5.0",
         "anchorpy==0.17.0",
