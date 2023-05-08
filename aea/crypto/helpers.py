@@ -30,6 +30,7 @@ from aea.configurations.constants import (
     MULTIKEY_FILENAME,
     PRIVATE_KEY,
     PRIVATE_KEY_PATH_SCHEMA,
+    PRIVATE_KEY_TYPE
 )
 from aea.crypto.registries import crypto_registry, make_crypto, make_faucet_api
 from aea.crypto.wallet import Wallet
@@ -233,7 +234,7 @@ def generate_multiple_keys(
             if password is not None
             else crypto.private_key
         )
-        key_pairs.append({ADDRESS: crypto.address, PRIVATE_KEY: priv_key})
+        key_pairs.append({ADDRESS: crypto.address, PRIVATE_KEY: priv_key, PRIVATE_KEY_TYPE: type_})
 
     file = file or MULTIKEY_FILENAME
     with open(file, mode="w", encoding="utf-8") as fp:
