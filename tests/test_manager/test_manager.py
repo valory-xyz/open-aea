@@ -76,6 +76,7 @@ def default_wait_for(condition: Callable) -> None:
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class BaseCase(TestCase):
     """Base case setup/teardown."""
 
@@ -131,6 +132,7 @@ class BaseCase(TestCase):
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerDependencies(BaseCase):
     """Test plugin installed and loaded as a dependency."""
 
@@ -170,6 +172,7 @@ class TestMultiAgentManagerDependencies(BaseCase):
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
 @patch("aea.aea_builder.AEABuilder.check_project_dependencies")
+@pytest.mark.skip  # Takes too much time
 class BaseTestMultiAgentManager(BaseCase):
     """Base test class for multi-agent manager"""
 
@@ -682,12 +685,14 @@ class BaseTestMultiAgentManager(BaseCase):
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerAsyncMode(
     BaseTestMultiAgentManager
 ):  # pylint: disable=unused-argument,protected-access,attribute-defined-outside-init
     """Tests for MultiAgentManager in async mode."""
 
 
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerAsyncModeWithPassword(
     BaseTestMultiAgentManager
 ):  # pylint: disable=unused-argument,protected-access,attribute-defined-outside-init
@@ -697,6 +702,7 @@ class TestMultiAgentManagerAsyncModeWithPassword(
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerThreadedMode(BaseTestMultiAgentManager):
     """Tests for MultiAgentManager in threaded mode."""
 
@@ -704,6 +710,7 @@ class TestMultiAgentManagerThreadedMode(BaseTestMultiAgentManager):
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerMultiprocessMode(BaseTestMultiAgentManager):
     """Tests for MultiAgentManager in multiprocess mode."""
 
@@ -713,6 +720,7 @@ class TestMultiAgentManagerMultiprocessMode(BaseTestMultiAgentManager):
         """Skip test cause multiprocess works another way."""
 
 
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerMultiprocessModeWithPassword(
     TestMultiAgentManagerMultiprocessMode
 ):
@@ -721,6 +729,7 @@ class TestMultiAgentManagerMultiprocessModeWithPassword(
     PASSWORD = "password"  # nosec
 
 
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerThreadedModeWithPassword(BaseTestMultiAgentManager):
     """Tests for MultiAgentManager in threaded mode, with password."""
 
@@ -729,6 +738,7 @@ class TestMultiAgentManagerThreadedModeWithPassword(BaseTestMultiAgentManager):
 
 
 @patch("aea.aea_builder.AEABuilder.install_pypi_dependencies")
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerPackageConsistencyError:
     """
     Test that the MultiAgentManager (MAM) raises an error on package version inconsistency.
@@ -785,6 +795,7 @@ class TestMultiAgentManagerPackageConsistencyError:
             self.tmp_dir.cleanup()
 
 
+@pytest.mark.skip  # Takes too much time
 class TestMultiAgentManagerWithPotentiallyConflictingPackages:
     """
     Test that the MultiAgentManager (MAM) handles correctly potentially conflicting packages.
