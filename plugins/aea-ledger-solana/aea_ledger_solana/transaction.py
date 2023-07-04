@@ -21,6 +21,10 @@ import json
 
 from solana.transaction import Transaction
 from solders.transaction import Transaction as SoldersTransaction
+from solders.transaction import VersionedTransaction as BaseSoldersVersionedTransaction
+
+
+SoldersVersionedTransaction = BaseSoldersVersionedTransaction
 
 
 class SolanaTransaction(Transaction):
