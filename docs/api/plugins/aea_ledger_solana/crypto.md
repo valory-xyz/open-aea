@@ -32,6 +32,17 @@ Instantiate a solana crypto object.
 - `password`: the password to encrypt/decrypt the private key.
 - `extra_entropy`: add extra randomness to whatever randomness from OS.
 
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.crypto.SolanaCrypto.pubkey"></a>
+
+#### pubkey
+
+```python
+@property
+def pubkey() -> Pubkey
+```
+
+Pubkey object.
+
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.crypto.SolanaCrypto.private_key"></a>
 
 #### private`_`key

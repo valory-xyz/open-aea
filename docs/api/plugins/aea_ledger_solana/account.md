@@ -39,7 +39,7 @@ True if the `pubkey` can be loaded as a read-write account.
 
 ```python
 @classmethod
-def from_solders(cls, meta: instruction.AccountMeta)
+def from_solders(cls, meta: AccountMeta)
 ```
 
 Convert from a `solders` AccountMeta.
@@ -49,7 +49,7 @@ Convert from a `solders` AccountMeta.
 #### to`_`solders
 
 ```python
-def to_solders() -> instruction.AccountMeta
+def to_solders() -> AccountMeta
 ```
 
 Convert to a `solders` AccountMeta.

@@ -28,6 +28,17 @@ Initialize the Solana ledger APIs.
 
 - `kwargs`: keyword arguments
 
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.api"></a>
+
+#### api
+
+```python
+@property
+def api() -> SolanaApiClient
+```
+
+Get the underlying API object.
+
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.latest_hash"></a>
 
 #### latest`_`hash
@@ -38,6 +49,99 @@ def latest_hash()
 ```
 
 Get the latest hash.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.system_program"></a>
+
+#### system`_`program
+
+```python
+@property
+def system_program() -> Pubkey
+```
+
+System program.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.sol_to_lamp"></a>
+
+#### sol`_`to`_`lamp
+
+```python
+@staticmethod
+def sol_to_lamp(sol: float) -> int
+```
+
+Solana to lamport value.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.to_account_meta"></a>
+
+#### to`_`account`_`meta
+
+```python
+@staticmethod
+def to_account_meta(pubkey: Pubkey, is_signer: bool,
+                    is_writable: bool) -> AccountMeta
+```
+
+To account meta.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.to_pubkey"></a>
+
+#### to`_`pubkey
+
+```python
+@staticmethod
+def to_pubkey(key: Union[SolanaCrypto, Keypair, Pubkey, str]) -> Pubkey
+```
+
+To pubkey.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.to_keypair"></a>
+
+#### to`_`keypair
+
+```python
+@staticmethod
+def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Pubkey
+```
+
+To keypair object.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.pda"></a>
+
+#### pda
+
+```python
+@staticmethod
+def pda(seeds: Sequence[bytes], program_id: Pubkey) -> Pubkey
+```
+
+Create TX PDA
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.create_pda"></a>
+
+#### create`_`pda
+
+```python
+@staticmethod
+def create_pda(from_address: str, new_account_address: str, base_address: str,
+               seed: str, lamports: int, space: int, program_id: str)
+```
+
+Build a create pda transaction.
+
+**Arguments**:
+
+- `from_address`: the sender public key
+- `new_account_address`: the new account public key
+- `base_address`: base address
+- `seed`: seed
+- `lamports`: the amount of lamports to send
+- `space`: the space to allocate
+- `program_id`: the program id
+
+**Returns**:
+
+the tx, if present
 
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.wait_get_receipt"></a>
 
@@ -60,17 +164,6 @@ def construct_and_settle_tx(account1: SolanaCrypto, account2: SolanaCrypto,
 ```
 
 Construct and settle a transaction.
-
-<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.api"></a>
-
-#### api
-
-```python
-@property
-def api() -> SolanaApiClient
-```
-
-Get the underlying API object.
 
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.update_with_gas_estimate"></a>
 
@@ -259,32 +352,6 @@ Build a create account transaction.
 
 the tx, if present
 
-<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.create_pda"></a>
-
-#### create`_`pda
-
-```python
-@staticmethod
-def create_pda(from_address: str, new_account_address: str, base_address: str,
-               seed: str, lamports: int, space: int, program_id: str)
-```
-
-Build a create pda transaction.
-
-**Arguments**:
-
-- `from_address`: the sender public key
-- `new_account_address`: the new account public key
-- `base_address`: base address
-- `seed`: seed
-- `lamports`: the amount of lamports to send
-- `space`: the space to allocate
-- `program_id`: the program id
-
-**Returns**:
-
-the tx, if present
-
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.get_contract_instance"></a>
 
 #### get`_`contract`_`instance
@@ -378,6 +445,67 @@ Prepare a transaction
 **Returns**:
 
 the transaction
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.build_instruction"></a>
+
+#### build`_`instruction
+
+```python
+def build_instruction(
+        contract_instance: Program,
+        method_name: str,
+        data: List[Any],
+        accounts: Dict[str, Pubkey],
+        remaining_accounts: Optional[List[AccountMeta]] = None) -> JSONLike
+```
+
+Prepare an instruction
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.serialize_tx"></a>
+
+#### serialize`_`tx
+
+```python
+def serialize_tx(
+    tx: Union[Dict, SolanaTransaction, SoldersTransaction,
+              SoldersVersionedTransaction]
+) -> Dict
+```
+
+Serialize transaction to solders transaction compatible json object.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.deserialize_tx"></a>
+
+#### deserialize`_`tx
+
+```python
+def deserialize_tx(
+    tx: Union[Dict, SolanaTransaction, SoldersTransaction,
+              SoldersVersionedTransaction]
+) -> SolanaTransaction
+```
+
+Deserialize transaction to a solana transaction object.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.serialize_ix"></a>
+
+#### serialize`_`ix
+
+```python
+def serialize_ix(ix: Instruction) -> Dict
+```
+
+Serialize instruction.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.deserialize_ix"></a>
+
+#### deserialize`_`ix
+
+```python
+def deserialize_ix(ix: Dict) -> Instruction
+```
+
+Deserialize instruction.
 
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.get_transaction_transfer_logs"></a>
 
