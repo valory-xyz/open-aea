@@ -20,7 +20,7 @@
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 from aea_ledger_solana.constants import (
     DEFAULT_ADDRESS,
@@ -32,14 +32,21 @@ from aea_ledger_solana.crypto import SolanaCrypto
 from aea_ledger_solana.faucet import SolanaFaucetApi  # noqa: F401
 from aea_ledger_solana.helper import SolanaHelper
 from aea_ledger_solana.solana_api import SolanaApiClient
-from aea_ledger_solana.transaction import SolanaTransaction
+from aea_ledger_solana.transaction import (
+    SolanaTransaction,
+    SoldersTransaction,
+    SoldersVersionedTransaction,
+)
 from aea_ledger_solana.transaction_instruction import TransactionInstruction
 from anchorpy import Context, Idl, Program  # type: ignore
 from solana.blockhash import BlockhashCache
 from solana.transaction import Transaction  # type: ignore
 from solders import system_program as ssp  # type: ignore
-from solders.instruction import Instruction
-from solders.pubkey import Pubkey as PublicKey  # type: ignore
+from solders.hash import Hash
+from solders.instruction import AccountMeta, Instruction
+from solders.keypair import Keypair
+from solders.pubkey import Pubkey  # type: ignore
+from solders.pubkey import Pubkey as PublicKey
 from solders.signature import Signature  # type: ignore
 from solders.system_program import (  # type: ignore; SYS_PROGRAM_ID,
     CreateAccountParams,
@@ -89,10 +96,110 @@ class SolanaApi(LedgerApi, SolanaHelper):
         self.BlockhashCache.set(blockhash=self._hash, slot=result.context.slot)
 
     @property
+    def api(self) -> SolanaApiClient:
+        """Get the underlying API object."""
+        return self._api
+
+    @property
     def latest_hash(self):
         """Get the latest hash."""
         self._get_latest_hash()
         return self._hash
+
+    @property
+    def system_program(self) -> Pubkey:
+        """System program."""
+        return SYS_PROGRAM_ID
+
+    @staticmethod
+    def sol_to_lamp(sol: float) -> int:
+        """Solana to lamport value."""
+        return int(sol * 1000000000)
+
+    @staticmethod
+    def to_account_meta(
+        pubkey: Pubkey,
+        is_signer: bool,
+        is_writable: bool,
+    ) -> AccountMeta:
+        """To account meta."""
+        return AccountMeta(
+            pubkey=pubkey,
+            is_signer=is_signer,
+            is_writable=is_writable,
+        )
+
+    @staticmethod
+    def to_pubkey(key: Union[SolanaCrypto, Keypair, Pubkey, str]) -> Pubkey:
+        """To pubkey."""
+        if isinstance(key, Pubkey):
+            return key
+        if isinstance(key, Keypair):
+            return key.pubkey()
+        if isinstance(key, SolanaCrypto):
+            return key.entity.pubkey()
+        try:
+            return Pubkey.from_string(key)
+        except BaseException:
+            return Keypair.from_base58_string(key).pubkey()
+
+    @staticmethod
+    def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Pubkey:
+        """To keypair object."""
+        if isinstance(key, Keypair):
+            return key
+        if isinstance(key, SolanaCrypto):
+            return key.entity
+        return Keypair.from_base58_string(key).pubkey()
+
+    @staticmethod
+    def pda(
+        seeds: Sequence[bytes],
+        program_id: Pubkey,
+    ) -> Pubkey:
+        """Create TX PDA"""
+        return Pubkey.find_program_address(
+            seeds=seeds,
+            program_id=program_id,
+        )
+
+    @staticmethod
+    def create_pda(
+        from_address: str,
+        new_account_address: str,
+        base_address: str,
+        seed: str,
+        lamports: int,
+        space: int,
+        program_id: str,
+    ):
+        """
+        Build a create pda transaction.
+
+        :param from_address: the sender public key
+        :param new_account_address: the new account public key
+        :param base_address: base address
+        :param seed: seed
+        :param lamports: the amount of lamports to send
+        :param space: the space to allocate
+        :param program_id: the program id
+        :return: the tx, if present
+        """
+        params = CreateAccountWithSeedParams(
+            PublicKey(from_address),
+            PublicKey(new_account_address),
+            PublicKey(base_address),
+            seed,
+            lamports,
+            space,
+            PublicKey(program_id),
+        )
+        createPDAInstruction = TransactionInstruction.from_solders(
+            ssp.create_account_with_seed(params.to_solders())
+        )
+        txn = Transaction().add(createPDAInstruction)
+        tx = txn._solders.to_json()  # pylint: disable=protected-access
+        return json.loads(tx)
 
     def wait_get_receipt(
         self, transaction_digest: str
@@ -139,11 +246,6 @@ class SolanaApi(LedgerApi, SolanaHelper):
             raise Exception("Failed to settle transfer transaction!")
 
         return transaction_digest, transaction_receipt, is_settled
-
-    @property
-    def api(self) -> SolanaApiClient:
-        """Get the underlying API object."""
-        return self._api
 
     def update_with_gas_estimate(self, transaction: JSONLike) -> JSONLike:
         """
@@ -295,8 +397,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: tx_digest, if present
         """
-
-        stxn = SolanaTransaction.from_json(tx_signed)
+        stxn = self.deserialize_tx(tx=tx_signed)
         txn_resp = self._api.send_raw_transaction(bytes(stxn.serialize()))
         retries = 2
         while True and retries > 0:
@@ -426,44 +527,6 @@ class SolanaApi(LedgerApi, SolanaHelper):
         tx = txn._solders.to_json()  # pylint: disable=protected-access
         return json.loads(tx)
 
-    @staticmethod
-    def create_pda(
-        from_address: str,
-        new_account_address: str,
-        base_address: str,
-        seed: str,
-        lamports: int,
-        space: int,
-        program_id: str,
-    ):
-        """
-        Build a create pda transaction.
-
-        :param from_address: the sender public key
-        :param new_account_address: the new account public key
-        :param base_address: base address
-        :param seed: seed
-        :param lamports: the amount of lamports to send
-        :param space: the space to allocate
-        :param program_id: the program id
-        :return: the tx, if present
-        """
-        params = CreateAccountWithSeedParams(
-            PublicKey(from_address),
-            PublicKey(new_account_address),
-            PublicKey(base_address),
-            seed,
-            lamports,
-            space,
-            PublicKey(program_id),
-        )
-        createPDAInstruction = TransactionInstruction.from_solders(
-            ssp.create_account_with_seed(params.to_solders())
-        )
-        txn = Transaction().add(createPDAInstruction)
-        tx = txn._solders.to_json()  # pylint: disable=protected-access
-        return json.loads(tx)
-
     def get_contract_instance(
         self, contract_interface: Dict[str, str], contract_address: Optional[str] = None
     ) -> Any:
@@ -589,22 +652,87 @@ class SolanaApi(LedgerApi, SolanaHelper):
         """
         if method_args is None:
             raise ValueError("`method_args` can not be None")
-
         if method_args["data"] is None:
             raise ValueError("Data is required")
         if method_args["accounts"] is None:
             raise ValueError("Accounts are required")
-        if "remaining_accounts" not in method_args:
-            method_args["remaining_accounts"] = None
-
-        data = method_args["data"]
-        accounts = method_args["accounts"]
-        remaining_accounts = method_args["remaining_accounts"]
-
-        txn = contract_instance.transaction[method_name](
-            *data, ctx=Context(accounts=accounts, remaining_accounts=remaining_accounts)
+        tx = contract_instance.transaction[method_name](
+            *method_args["data"],
+            ctx=Context(
+                accounts=method_args["accounts"],
+                remaining_accounts=method_args.get("remaining_accounts"),
+            ),
+            payer=tx_args.get("payer"),
+            blockhash=Hash.from_string(self.latest_hash),
         )
-        return json.loads(txn.to_solders().to_json())
+        return self.serialize_tx(tx=tx)
+
+    def build_instruction(  # pylint: disable=too-many-arguments
+        self,
+        contract_instance: Program,
+        method_name: str,
+        data: List[Any],
+        accounts: Dict[str, Pubkey],
+        remaining_accounts: Optional[List[AccountMeta]] = None,
+    ) -> JSONLike:
+        """Prepare an instruction"""
+        return self.serialize_ix(
+            contract_instance.methods[method_name]
+            .args(arguments=data)
+            .accounts(accs=accounts)
+            .remaining_accounts(accounts=remaining_accounts or [])
+            .instruction()
+        )
+
+    def serialize_tx(
+        self,
+        tx: Union[
+            Dict, SolanaTransaction, SoldersTransaction, SoldersVersionedTransaction
+        ],
+    ) -> Dict:
+        """Serialize transaction to solders transaction compatible json object."""
+        if isinstance(tx, Dict):
+            return tx
+        if isinstance(tx, SolanaTransaction):
+            return json.loads(cast(SolanaTransaction, tx).to_solders().to_json())
+        if isinstance(tx, SoldersTransaction):
+            return json.loads(cast(SoldersTransaction, tx).to_json())
+        if isinstance(tx, SoldersVersionedTransaction):
+            return json.loads(
+                cast(SoldersVersionedTransaction, tx)
+                .into_legacy_transaction()
+                .to_json()
+            )
+        raise ValueError(f"Unknown transction type found `{type(tx)}`")
+
+    def deserialize_tx(
+        self,
+        tx: Union[
+            Dict, SolanaTransaction, SoldersTransaction, SoldersVersionedTransaction
+        ],
+    ) -> SolanaTransaction:
+        """Deserialize transaction to a solana transaction object."""
+        if isinstance(tx, SolanaTransaction):
+            return cast(SolanaTransaction, tx)
+        if isinstance(tx, SoldersTransaction):
+            return SolanaTransaction.from_solders(txn=tx)
+        if isinstance(tx, SoldersVersionedTransaction):
+            return SolanaTransaction.from_solders(txn=tx.into_legacy_transaction())
+        if not isinstance(tx, Dict):
+            raise ValueError(f"Unknown transction type found `{type(tx)}`")
+
+        # TODO: Safeguard for tx serialized to solders
+        return SolanaTransaction.from_solders(
+            SoldersTransaction.from_json(json.dumps(tx))
+        )
+
+    def serialize_ix(self, ix: Instruction) -> Dict:
+        """Serialize instruction."""
+        return json.loads(ix.to_json())
+
+    def deserialize_ix(self, ix: Dict) -> Instruction:
+        """Deserialize instruction."""
+        return Instruction.from_json(json.dumps(ix))
 
     def get_transaction_transfer_logs(  # pylint: disable=too-many-arguments,too-many-locals
         self,
