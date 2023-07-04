@@ -656,6 +656,14 @@ class SolanaApi(LedgerApi, SolanaHelper):
             raise ValueError("Data is required")
         if method_args["accounts"] is None:
             raise ValueError("Accounts are required")
+        if tx_args.get("instruction_only", False):
+            return self.build_instruction(
+                contract_instance=contract_instance,
+                method_name=method_name,
+                data=method_args["data"],
+                accounts=method_args["accounts"],
+                remaining_accounts=method_args.get("remaining_accounts"),
+            )
         tx = contract_instance.transaction[method_name](
             *method_args["data"],
             ctx=Context(
