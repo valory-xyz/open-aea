@@ -116,15 +116,16 @@ class SolanaApi(LedgerApi, SolanaHelper):
         """Solana to lamport value."""
         return int(sol * 1000000000)
 
-    @staticmethod
+    @classmethod
     def to_account_meta(
-        pubkey: Pubkey,
+        cls,
+        pubkey: Union[Pubkey, str],
         is_signer: bool,
         is_writable: bool,
     ) -> AccountMeta:
         """To account meta."""
         return AccountMeta(
-            pubkey=pubkey,
+            pubkey=cls.to_pubkey(pubkey),
             is_signer=is_signer,
             is_writable=is_writable,
         )
@@ -158,10 +159,11 @@ class SolanaApi(LedgerApi, SolanaHelper):
         program_id: Pubkey,
     ) -> Pubkey:
         """Create TX PDA"""
-        return Pubkey.find_program_address(
+        pda, _ = Pubkey.find_program_address(
             seeds=seeds,
             program_id=program_id,
         )
+        return pda
 
     @staticmethod
     def create_pda(
