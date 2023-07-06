@@ -84,11 +84,12 @@ ledger_ids = pytest.mark.parametrize(
         (EthereumCrypto.identifier, EthereumCrypto(ETHEREUM_PRIVATE_KEY_PATH).address),
     ],
 )
+# TODO: uncomment gas station strategy config after the gasstation API start
 gas_strategies = pytest.mark.parametrize(
     "gas_strategies",
     [
         {"gas_price_strategy": None},
-        {"gas_price_strategy": "gas_station"},
+        # {"gas_price_strategy": "gas_station"}, # noqa:E800
         {"gas_price_strategy": "eip1559"},
         {
             "max_fee_per_gas": 1_000_000_000,
