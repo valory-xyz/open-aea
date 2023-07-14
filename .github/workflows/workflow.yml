@@ -432,7 +432,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python_version: ['3.7', '3.8', '3.9', '3.10']
+        python_version: ['3.8', '3.9', '3.10', '3.11']
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@master
@@ -567,7 +567,3 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: "1.17.7"
-    # - if: matrix.python-version == '3.7'
-    #   name: Golang unit tests (aealite)
-    #   working-directory: ./libs/go/aealite
-    #   run: go test -p 1 -timeout 0 -count 1 -v ./...
