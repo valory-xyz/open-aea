@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -152,7 +152,6 @@ class DictProtobufStructSerializer:
         # protobuf Struct doesn't recursively convert Struct to dict
         need_patch = dictionary.pop(cls.NEED_PATCH, {})
         for key, value in dictionary.items():
-
             # protobuf struct doesn't recursively convert Struct to dict
             if isinstance(value, Struct):
                 dictionary[key] = cls._restore_value(value)

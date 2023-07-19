@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -123,7 +123,6 @@ def test_capfd_on_cli_runner(mix_stderr: bool, capfd: CaptureFixture):
     cli_runner = CliRunner(mix_stderr=mix_stderr)
 
     with patch.object(capfd, "readouterr", wraps=capfd.readouterr) as m:
-
         # streams captured via CliRunner.isolation context manager
         run_cli_command_and_assert()
         m.assert_not_called()

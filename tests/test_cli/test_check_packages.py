@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -121,7 +121,11 @@ class TestCheckPackagesCommand(BaseAEATestCase):
 
         with _unified_yaml_load_patch(
             description=""
-        ), check_author_patch, check_dependencies_patch, find_all_packages_ids_patch, _find_all_configuration_files_patch(
+        ), (
+            check_author_patch
+        ), (
+            check_dependencies_patch
+        ), find_all_packages_ids_patch, _find_all_configuration_files_patch(
             [
                 self.test_aea_config,
             ]
