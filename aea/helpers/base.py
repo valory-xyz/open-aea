@@ -372,8 +372,8 @@ def try_decorator(
             try:
                 return fn(*args, **kwargs)
             except (
-                Exception
-            ) as e:  # pylint: disable=broad-except  # pragma: no cover  # generic code
+                Exception  # pylint: disable=broad-except
+            ) as e:  # pragma: no cover  # generic code
                 if kwargs.get("raise_on_try", False):
                     raise e
                 if error_message:
@@ -417,8 +417,8 @@ def retry_decorator(
                 try:
                     return fn(*args, **kwargs)
                 except (
-                    Exception
-                ) as e:  # pylint: disable=broad-except  # pragma: no cover  # generic code
+                    Exception  # pylint: disable=broad-except
+                ) as e:  # pragma: no cover  # generic code
                     if error_message:
                         log(error_message.format(retry=retry + 1, error=e))
                     if delay:

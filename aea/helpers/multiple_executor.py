@@ -219,8 +219,8 @@ class AbstractMultipleExecutor(ABC):  # pragma: nocover
                 if not skip_exceptions:
                     raise
             except (
-                Exception
-            ) as e:  # pylint: disable=broad-except  # handle any exception with own code.
+                Exception  # pylint: disable=broad-except
+            ) as e:  # handle any exception with own code.
                 _default_logger.exception("Exception in task!")
                 if not skip_exceptions:
                     await self._handle_exception(

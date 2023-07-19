@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -162,8 +162,8 @@ class ContractApiRequestDispatcher(RequestDispatcher):
             )
             response = self.get_error_message(exception, ledger_api, message, dialogue)
         except (
-            Exception
-        ) as exception:  # pylint: disable=broad-except  # pragma: nocover
+            Exception  # pylint: disable=broad-except  # pragma: nocover
+        ) as exception:
             self.logger.debug(
                 f"Whilst processing the contract api request:\n{message}\nthe following error occured:\n{parse_exception(exception)}"
             )

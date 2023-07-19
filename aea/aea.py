@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -330,8 +330,8 @@ class AEA(Agent):
             msg.to = envelope.to
             return msg, handlers
         except (
-            Exception
-        ) as e:  # pylint: disable=broad-except  # thats ok, because we send the decoding error back
+            Exception  # pylint: disable=broad-except
+        ) as e:  # thats ok, because we send the decoding error back
             error_handler.send_decoding_error(envelope, e, self.logger)
             return None, []
 
