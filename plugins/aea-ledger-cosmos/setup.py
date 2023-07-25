@@ -26,7 +26,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="open-aea-ledger-cosmos",
-    version="1.36.0",
+    version="1.37.0",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of Cosmos.",
@@ -43,7 +43,7 @@ setup(
         "ecdsa>=0.15,<0.17.0",
         "bech32==1.2.0",
         "pycryptodome>=3.10.1,<4.0.0",
-        "cosmpy==0.6.0",
+        "open-aea-cosmpy==0.6.3",
     ],
     tests_require=["pytest"],
     entry_points={
