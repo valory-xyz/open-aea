@@ -4,8 +4,7 @@
 ## 1.37.0 (2023-07-25)
 
 Plugins:
-- cosmpy replaced with open-aea-cosmpy
-
+- Replaces `cosmpy` with `open-aea-cosmpy`
 
 ## 1.36.0 (2023-07-19)
 
@@ -14,7 +13,6 @@ Plugins:
 
 Framework:
 - pyyaml updated, tomte updated  
-
 
 ## 1.35.0 (2023-06-20)
 

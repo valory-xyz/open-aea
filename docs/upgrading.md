@@ -17,7 +17,6 @@ Below we describe the additional manual steps required to upgrade between differ
 
 - No backwards incompatible changes
   
-
 ## `v1.34.0` to `v1.35.0`
 
 - No backwards incompatible changes
