@@ -1,6 +1,12 @@
 # Release History - open AEA
 
 
+## 1.37.0 (2023-07-25)
+
+Plugins:
+- cosmpy replaced with open-aea-cosmpy
+
+
 ## 1.36.0 (2023-07-19)
 
 Plugins:
