@@ -115,6 +115,8 @@ DEFAULT_EIP1559_STRATEGY_POLYGON = {
 
 DEFAULT_GAS_STATION_STRATEGY = {"gas_price_api_key": "", "gas_price_strategy": "fast"}
 
+GAS_STATION_FALLBACK_ESTIMATE = 20  # gwei
+
 DEFAULT_GAS_PRICE_STRATEGIES = {
     EIP1559: DEFAULT_EIP1559_STRATEGY,
     GAS_STATION: DEFAULT_GAS_STATION_STRATEGY,
@@ -337,11 +339,16 @@ def get_gas_price_strategy(
         :param transaction_params: transaction parameters
         :return: wei
         """
+        _default_logger.info(  # pragma: nocover
+            "`ethgasstation.info` has been deprecated and will be replaced with an alternative on the next release."
+        )
         response = requests.get(f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}")
-        if response.status_code != 200:
-            raise ValueError(  # pragma: nocover
-                f"Gas station API response: {response.status_code}, {response.text}"
+        if response.status_code != 200:  # pragma: nocover
+            # TODO : Use some other gas station API # pylint: disable=fixme
+            _default_logger.error(
+                f"Gas station API response: {response.status_code}, {response.text}, using fallback gas price."
             )
+            return {"gasPrice": web3.toWei(GAS_STATION_FALLBACK_ESTIMATE, "gwei")}
         response_dict = response.json()
         _default_logger.debug("Gas station API response: {}".format(response_dict))
         result = response_dict.get(gas_price_strategy, None)
