@@ -16,6 +16,12 @@ safeLow, standard, fast
 
 percentage
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.GAS_STATION_FALLBACK_ESTIMATE"></a>
+
+#### GAS`_`STATION`_`FALLBACK`_`ESTIMATE
+
+gwei
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.wei_to_gwei"></a>
 
 #### wei`_`to`_`gwei
