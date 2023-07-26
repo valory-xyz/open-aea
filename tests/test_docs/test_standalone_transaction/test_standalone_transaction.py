@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,6 @@ class TestStandaloneTransaction(BaseAEATestCase):
 
     @classmethod
     def _patch_logger(cls):
-
         cls.patch_logger_info = patch.object(logger, "info")
         cls.mocked_logger_info = cls.patch_logger_info.__enter__()
 

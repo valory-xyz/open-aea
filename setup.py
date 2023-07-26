@@ -33,9 +33,9 @@ def get_all_extras() -> Dict:
 
     cli_deps = [
         "click==8.0.2",
-        "pyyaml>=4.2b1,<6.0",
-        "jsonschema>=3.0.0,<4.0.0",
-        "packaging>=20.3,<22.0",
+        "pyyaml==6.0.1",
+        "jsonschema<5.0.0,>=4.16.0",
+        "packaging>=23.1,<24.0",
         "pytest>=7.0.0,<7.3.0",
         "coverage>=6.4.4,<8.0.0",
         "semver>=2.9.1,<3.0.0",
@@ -56,11 +56,11 @@ all_extras = get_all_extras()
 base_deps = [
     "semver>=2.9.1,<3.0.0",
     "base58>=1.0.3,<3.0.0",
-    "jsonschema>=3.0.0,<4.0.0",
-    "packaging>=20.3,<22.0",
+    "jsonschema<5.0.0,>=4.16.0",
+    "packaging>=23.1,<24.0",
     "protobuf>=3.19.0,<4.0.0",
     "pymultihash==0.8.2",
-    "pyyaml>=4.2b1,<6.0",
+    "pyyaml==6.0.1",
     "requests>=2.22.0,<3.0.0",
     "python-dotenv>=0.14.0,<0.18.0",
     "ecdsa>=0.15,<0.17.0",

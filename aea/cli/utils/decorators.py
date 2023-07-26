@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,7 +80,6 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
     )  # type: Dict[PublicId, PackageType]
 
     for public_id, item_type in packages_public_ids_to_types.items():
-
         # find the configuration file.
         try:
             # either in vendor/ or in personal packages.

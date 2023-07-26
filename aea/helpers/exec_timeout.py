@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -225,6 +225,7 @@ class ExecTimeoutThreadGuard(BaseExecTimeout):
     @classmethod
     def _supervisor_event_loop(cls) -> None:
         """Start supervisor thread to execute asyncio task controlling execution time."""
+
         # pydocstyle: noqa # cause black reformats with pydocstyle conflict # noqa: E800
         async def wait_stopped() -> None:
             cls._stopped_future = Future()

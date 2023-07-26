@@ -45,6 +45,8 @@ INDEX_FILE_PATH = Path("docs/index.md")
 # Remove non-url-allowed characters like ` before adding them here
 URL_SKIPS: List[str] = [
     "https://faucet.dimensions.network/",
+    "https://www.cs.ox.ac.uk/people/michael.wooldridge/",
+    "https://multiformats.io/multiaddr/",
 ]
 
 # Define here custom timeouts for some edge cases

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -142,7 +142,6 @@ def test_fetch_ipfs() -> None:
         "aea_cli_ipfs.registry.load_local_registry",
         new=lambda *_, **__: DUMMY_REGISTRY_DATA,
     ), TemporaryDirectory() as dest_path:
-
         with mock.patch("aea_cli_ipfs.ipfs_utils.IPFSTool.download"), mock.patch(
             "aea_cli_ipfs.ipfs_utils.IPFSTool.check_ipfs_node_running"
         ):
