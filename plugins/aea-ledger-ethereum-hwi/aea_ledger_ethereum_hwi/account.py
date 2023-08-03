@@ -24,8 +24,8 @@ from itertools import islice
 from typing import Any, Generator, List, NamedTuple, Optional
 
 import rlp
+from aea_ledger_ethereum_hwi.bip32 import h, m
 from aea_ledger_ethereum_hwi.exceptions import HWIError
-from apduboy.lib.bip32 import h, m
 from construct import (
     Byte,
     Bytes,
