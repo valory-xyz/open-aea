@@ -12,7 +12,7 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ## `v1.37.0` to `v1.38.0`
 
-- `web3py` has been bumped to `v6.0.1`, that means the method names will use the `snake-case` and the `camel-case` naming has been deprecated
+- `web3py` has been replaced with `open-aea-web3` and we forked this from `web3py@v6.0.0`, that means the method names will use the `snake-case` and the `camel-case` naming has been deprecated
 
 ## `v1.36.0` to `v1.37.0`
 

@@ -114,7 +114,7 @@ new_env: clean
 	then\
 		pipenv --rm;\
 		pipenv --clear;\
-		pipenv --python 3.11;\
+		pipenv --python 3.10;\
 		pipenv install --dev --skip-lock;\
 		pipenv run pip install -e .[all];\
 		pipenv run pip install --no-deps file:plugins/aea-ledger-ethereum;\
