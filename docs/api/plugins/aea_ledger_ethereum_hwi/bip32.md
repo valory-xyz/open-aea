@@ -2,7 +2,9 @@
 
 # plugins.aea-ledger-ethereum-hwi.aea`_`ledger`_`ethereum`_`hwi.bip32
 
-BIP32 utils.
+BIP32 utils
+
+Original implementation: https://github.com/LedgerHQ/apduboy/blob/master/apduboy/lib/bip32.py
 
 <a id="plugins.aea-ledger-ethereum-hwi.aea_ledger_ethereum_hwi.bip32.Level"></a>
 
