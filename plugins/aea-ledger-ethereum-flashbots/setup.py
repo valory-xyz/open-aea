@@ -42,7 +42,7 @@ setup(
     python_requires=">=3.9,<4.0",
     install_requires=[
         "open-aea-ledger-ethereum~=1.37.0",
-        "flashbots==1.1.1",
+        "open-aea-flashbots==1.3.0",
     ],
     tests_require=["pytest"],
     entry_points={
@@ -63,10 +63,10 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: Microsoft",
         "Operating System :: Unix",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

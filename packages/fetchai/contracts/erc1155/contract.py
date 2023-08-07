@@ -115,10 +115,10 @@ class ERC1155Contract(Contract):
             instance = cls.get_instance(ledger_api, contract_address)
             tx = instance.functions.createBatch(
                 deployer_address, token_ids
-            ).buildTransaction(
+            ).build_transaction(
                 {
                     "gas": gas,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -169,11 +169,11 @@ class ERC1155Contract(Contract):
             nonce = ledger_api.api.eth.get_transaction_count(deployer_address)
             instance = cls.get_instance(ledger_api, contract_address)
             tx = instance.functions.createSingle(
-                deployer_address, token_id, data
-            ).buildTransaction(
+                deployer_address, token_id, cast(bytes, data).decode(encoding="utf-8")
+            ).build_transaction(
                 {
                     "gas": gas,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -230,10 +230,10 @@ class ERC1155Contract(Contract):
             instance = cls.get_instance(ledger_api, contract_address)
             tx = instance.functions.mintBatch(
                 recipient_address, token_ids, mint_quantities, data
-            ).buildTransaction(
+            ).build_transaction(
                 {
                     "gas": gas,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -328,10 +328,10 @@ class ERC1155Contract(Contract):
             instance = cls.get_instance(ledger_api, contract_address)
             tx = instance.functions.mint(
                 recipient_address, token_id, mint_quantity, data
-            ).buildTransaction(
+            ).build_transaction(
                 {
                     "gas": gas,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -449,7 +449,7 @@ class ERC1155Contract(Contract):
             gas = gas if gas is not None else DEFAUT_ETH_ATOMIC_SWAP_GAS_LIMIT
             nonce = ledger_api.api.eth.get_transaction_count(from_address)
             instance = cls.get_instance(ledger_api, contract_address)
-            value_eth_wei = ledger_api.api.toWei(value, "ether")
+            value_eth_wei = ledger_api.api.to_wei(value, "ether")
             tx = instance.functions.trade(
                 from_address,
                 to_address,
@@ -460,12 +460,12 @@ class ERC1155Contract(Contract):
                 trade_nonce,
                 signature,
                 data,
-            ).buildTransaction(
+            ).build_transaction(
                 {
                     "gas": gas,
                     "from": from_address,
                     "value": value_eth_wei,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -670,7 +670,7 @@ class ERC1155Contract(Contract):
             gas = gas if gas is not None else DEFAUT_ETH_ATOMIC_SWAP_GAS_LIMIT
             nonce = ledger_api.api.eth.get_transaction_count(from_address)
             instance = cls.get_instance(ledger_api, contract_address)
-            value_eth_wei = ledger_api.api.toWei(value, "ether")
+            value_eth_wei = ledger_api.api.to_wei(value, "ether")
             tx = instance.functions.tradeBatch(
                 from_address,
                 to_address,
@@ -681,12 +681,12 @@ class ERC1155Contract(Contract):
                 trade_nonce,
                 signature,
                 data,
-            ).buildTransaction(
+            ).build_transaction(
                 {
                     "gas": gas,
                     "from": from_address,
                     "value": value_eth_wei,
-                    "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                    "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                     "nonce": nonce,
                 }
             )
@@ -840,7 +840,7 @@ class ERC1155Contract(Contract):
             instance = cls.get_instance(ledger_api, contract_address)
             from_address_hash = instance.functions.getAddress(from_address).call()
             to_address_hash = instance.functions.getAddress(to_address).call()
-            value_eth_wei = ledger_api.api.toWei(value, "ether")
+            value_eth_wei = ledger_api.api.to_wei(value, "ether")
             tx_hash = cls._get_hash_single(
                 _from=from_address_hash,
                 _to=to_address_hash,
@@ -935,7 +935,7 @@ class ERC1155Contract(Contract):
             instance = cls.get_instance(ledger_api, contract_address)
             from_address_hash = instance.functions.getAddress(from_address).call()
             to_address_hash = instance.functions.getAddress(to_address).call()
-            value_eth_wei = ledger_api.api.toWei(value, "ether")
+            value_eth_wei = ledger_api.api.to_wei(value, "ether")
             tx_hash = cls._get_hash_batch(
                 _from=from_address_hash,
                 _to=to_address_hash,

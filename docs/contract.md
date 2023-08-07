@@ -170,10 +170,10 @@ class MyContract(Contract):
         instance = cls.get_instance(ledger_api, contract_address)
         tx = instance.functions.createBatch(
             deployer_address, token_ids
-        ).buildTransaction(
+        ).build_transaction(
             {
                 "gas": gas,
-                "gasPrice": ledger_api.api.toWei("50", "gwei"),
+                "gasPrice": ledger_api.api.to_wei("50", "gwei"),
                 "nonce": nonce,
             }
         )

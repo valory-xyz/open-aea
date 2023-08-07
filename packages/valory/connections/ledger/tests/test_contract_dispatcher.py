@@ -151,7 +151,7 @@ def test_validate_and_call_callable() -> None:
 
     message.callable = "getAddress"
     # Call a method present in the ABI but not in the contract package
-    with mock.patch("web3.contract.ContractFunction.call", return_value=0):
+    with mock.patch("web3.contract.contract.ContractFunction.call", return_value=0):
         result = ContractApiRequestDispatcher._validate_and_call_callable(
             ledger_api, message, contract
         )

@@ -39,7 +39,7 @@ from aea_ledger_ethereum import (
     EthereumCrypto,
     EthereumFaucetApi,
     EthereumHelper,
-    SessionCacheLockWrapper,
+    SimpleCacheLockWrapper,
     get_gas_price_strategy,
     get_gas_price_strategy_eip1559,
     requests,
@@ -60,7 +60,7 @@ from requests import HTTPError
 from web3 import Web3
 from web3._utils.request import _session_cache as session_cache
 from web3.datastructures import AttributeDict
-from web3.exceptions import ContractLogicError, SolidityError
+from web3.exceptions import ContractLogicError
 
 from aea.common import JSONLike
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
@@ -461,7 +461,7 @@ def test_ethereum_api_get_deploy_transaction(ethereum_testnet_config):
 
     contract_instance = Mock()
     constructor = Mock()
-    constructor.buildTransaction = lambda x: x
+    constructor.build_transaction = lambda x: x
     contract_instance.constructor = Mock(return_value=constructor)
 
     with patch.object(
@@ -492,7 +492,7 @@ def test_ethereum_api_get_deploy_transaction(ethereum_testnet_config):
 
 def test_session_cache():
     """Test session cache."""
-    assert isinstance(session_cache, SessionCacheLockWrapper)
+    assert isinstance(session_cache, SimpleCacheLockWrapper)
 
     session_cache.cache("key", 1)
     assert session_cache.get_cache_entry("key") == 1
@@ -696,7 +696,7 @@ def test_build_transaction(ethereum_testnet_config):
         return tx_params
 
     tx_mock = MagicMock()
-    tx_mock.buildTransaction = pass_tx_params
+    tx_mock.build_transaction = pass_tx_params
 
     method_mock = MagicMock(return_value=tx_mock)
 
@@ -865,7 +865,7 @@ def test_revert_reason(
     ):
         with mock.patch(
             "web3.eth.Eth.call",
-            side_effect=SolidityError("test revert reason"),
+            side_effect=ContractLogicError("test revert reason"),
         ):
             _, transaction_receipt, is_settled = _construct_and_settle_tx(
                 ethereum_api,

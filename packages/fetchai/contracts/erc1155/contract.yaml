@@ -11,7 +11,7 @@ fingerprint:
   build/Migrations.json: bafybeih3i7gw7wekpsw7eylufug26dqphxara7acclv45mgkwy2bsookye
   build/erc1155.json: bafybeifopttvhbk7gsi3iqwewwfhtytrld6o4ooeb7xjmlons3v6m25zna
   build/erc1155.wasm: bafybeicabhxaz2syhzmoobrmbi5gt47txtvhkavs5mum2fxcgo2nb2vxl4
-  contract.py: bafybeifasrplvubavbk7kjrzbbt3p7edve5foze3kjzchyhpb4q5hr67ni
+  contract.py: bafybeich7izxsdqrx4ntqgpuydho3v3hdkaysucbw6ms5b6m3vc72ok5b4
   contracts/Migrations.sol: bafybeigdr5xyir4mhnqk4vp6hpivu2m2kq4jnlq7orwb7wqtgjzfihw2cm
   contracts/erc1155.vy: bafybeieoxkgqprmmgvl2xdqtch4payvxzpw3c76thmtrl7vbmc6zxzl2a4
   migrations/1_initial_migration.js: bafybeigzg7dadlq7sepncquzoo5hgs7q2pwvbhzilolgkjkr3jacb2owvy

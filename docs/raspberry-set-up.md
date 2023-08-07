@@ -40,10 +40,10 @@ First, install pipenv:
 sudo apt-get install pipenv
 ```
 
-Once installed, create and launch a clean virtual environment with Python 3.7:
+Once installed, create and launch a clean virtual environment with Python 3.8:
 
 ``` bash
-pipenv --python 3.7 && pipenv shell
+pipenv --python 3.8 && pipenv shell
 ```
 
 Finally, install the AEA framework from PyPI:

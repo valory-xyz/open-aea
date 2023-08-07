@@ -7,7 +7,7 @@ sudo apt-get dist-upgrade
 sudo apt-get install pipenv
 ```
 ``` bash
-pipenv --python 3.7 && pipenv shell
+pipenv --python 3.8 && pipenv shell
 ```
 ``` bash
 pip install aea[all]
