@@ -17,7 +17,11 @@
 #
 # ------------------------------------------------------------------------------
 
-"""BIP32 utils."""
+"""
+BIP32 utils
+
+Original implementation: https://github.com/LedgerHQ/apduboy/blob/master/apduboy/lib/bip32.py
+"""
 
 from dataclasses import dataclass, field
 from typing import List

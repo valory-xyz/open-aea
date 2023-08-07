@@ -29,7 +29,7 @@ function is_python_version_ok() {
 		version=`python3 -V 2>/dev/null`
 		if [[ -z `echo $version|grep -E 'Python 3\.(7|8|9|10)\.[0-9]+'` ]];
 		then
-			echo "Python3 version: ${version} is not supported. Supported versions are 3.8, 3.9, 3.10."
+			echo "Python3 version: ${version} is not supported. Supported versions are 3.8, 3.9, 3.10, 3.11."
 			return 1
 		fi
 		return 0
