@@ -187,9 +187,9 @@ jobs:
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - name: Set up support for multi platform build
         run: |
-          	docker run --privileged --rm tonistiigi/binfmt --install all
-            docker buildx create --use --name multibuild
-            docker buildx inspect --bootstrap
+          docker run --privileged --rm tonistiigi/binfmt --install all
+          docker buildx create --use --name multibuild
+          docker buildx inspect --bootstrap
       - name: Set up tag
         run: echo export TAG=$(python3 -c "from setup import about; print(about[\"__version__\"])") > env.sh
       - name: Build and push version tagged images
