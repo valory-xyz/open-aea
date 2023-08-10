@@ -1,6 +1,19 @@
 # Release History - open AEA
 
 
+## 1.38.0 (2023-08-09)
+
+Framework:
+- Deprecates the support for `Python 3.7` and adds support for `Python 3.11`
+- Adds support for multi platform docker images
+
+Plugins:
+- Replaces `web3py==5.31.4` with `open-aea-web3==6.0.1`
+- Replaces `flashbots==1.1.1` with `open-aea-flashbots==1.3.0`
+- Bumps `open-aea-cosmpy` to `v0.6.5`
+- Deprecates the `apduboy` as a dependency
+- Pins `ledgerwallet==0.1.3`
+
 ## 1.37.0 (2023-07-25)
 
 Plugins:
@@ -8,11 +21,11 @@ Plugins:
 
 ## 1.36.0 (2023-07-19)
 
+AEA:
+- pyyaml updated, tomte updated  
+
 Plugins:
 - cosmpy updated to 0.6.0
-
-Framework:
-- pyyaml updated, tomte updated  
 
 ## 1.35.0 (2023-06-20)
 
