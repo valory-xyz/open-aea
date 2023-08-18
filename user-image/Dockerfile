@@ -1,9 +1,10 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get upgrade -y
+RUN apt-get install sudo git curl -y
 
-RUN apt-get install sudo -y 
-RUN apt-get install git -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > ./rustup.sh
+RUN sh ./rustup.sh -y
 
 RUN adduser --disabled-password --gecos '' ubuntu
 RUN adduser ubuntu sudo
