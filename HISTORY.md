@@ -1,6 +1,12 @@
 # Release History - open AEA
 
 
+## 1.39.0 (2023-09-07)
+
+AEA:
+- Removes the rust installation layer from the user image
+
+
 ## 1.38.0 (2023-08-09)
 
 Framework:

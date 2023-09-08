@@ -3,14 +3,11 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install sudo git curl -y
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > ./rustup.sh
-RUN sh ./rustup.sh -y
-
 RUN adduser --disabled-password --gecos '' ubuntu
 RUN adduser ubuntu sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN apt install -y python3.10 python3.10-dev python3-pip
+RUN apt install -y python3.10 python3.10-dev python3-pip libffi-dev
 RUN pip3 install --upgrade pip
 RUN pip3 install pipenv
 
@@ -35,6 +32,5 @@ COPY user-image/openssl.cnf /etc/ssl
 RUN echo 'PATH="$(python3.10 -m site --user-base)/bin:${PATH}"' >> ~/.bashrc
 RUN echo "alias pip=pip3" >> ~/.bashrc
 RUN echo "alias python=python3.10" >> ~/.bashrc
-
 
 ENTRYPOINT [ "/bin/bash"]
