@@ -196,7 +196,7 @@ jobs:
         run: |
           # export `TAG` variable
           source env.sh
-          docker build -t valory/open-aea-docs:$TAG -f docs-image/Dockerfile . --pushs
+          docker build -t valory/open-aea-docs:$TAG -f docs-image/Dockerfile . --push
           docker build -t valory/open-aea-docs:latest -f docs-image/Dockerfile . --push
 
   publish-user-images:
