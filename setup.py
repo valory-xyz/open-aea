@@ -18,19 +18,22 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-import sys
 import os
 import re
+import shutil
+import sys
+from pathlib import Path
 from typing import Dict
 
 from setuptools import find_packages, setup  # type: ignore
+from setuptools.command.install_scripts import install_scripts
+
 
 PACKAGE_NAME = "aea"
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_all_extras() -> Dict:
-
     cli_deps = [
         "click==8.0.2",
         "pyyaml==6.0.1",
@@ -94,6 +97,32 @@ def parse_readme():
     return "\n".join([header, get_started, cite])
 
 
+def fix_runtime_script() -> None:
+    """Fixes AEA runner"""
+    exec_file = Path(shutil.which("aea"))
+    if exec_file is None:
+        return
+    exec_content = exec_file.read_text("utf-8")
+    split_chars = "import re\n"
+    exec_split = exec_content.split(split_chars)
+    exec_content = (
+        exec_split[0]
+        + "from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2\n"
+        + split_chars
+        + exec_split[1]
+    )
+    Path(exec_file).write_text(exec_content, encoding="utf-8")
+
+
+class install_scripts_helper(install_scripts):
+    """Install helper."""
+
+    def run(self):
+        """Run post install helper."""
+        super().run()
+        fix_runtime_script()
+
+
 if __name__ == "__main__":
     setup(
         name=about["__title__"],
@@ -137,5 +166,8 @@ if __name__ == "__main__":
         project_urls={
             "Bug Reports": "https://github.com/valory-xyz/open-aea/issues",
             "Source": "https://github.com/valory-xyz/open-aea",
+        },
+        cmdclass={
+            "install_scripts": install_scripts_helper,
         },
     )
