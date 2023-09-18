@@ -19,4 +19,18 @@
 
 """This module contains the implementation of command-line tool 'aea'."""
 
+# pylint: disable=wrong-import-position
+
+import sys
+
+
+# Patch to fix https://github.com/protocolbuffers/protobuf/issues/3276
+
+_google_upb_message = sys.modules.pop("google._upb._message")
+
+from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
+
+
+sys.modules["google._upb._message"] = _google_upb_message
+
 from .core import cli
