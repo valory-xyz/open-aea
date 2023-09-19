@@ -22,12 +22,13 @@
 # pylint: disable=too-many-statements,too-many-locals,no-member,too-few-public-methods,redefined-builtin
 from typing import Any, Dict, cast
 
-from aea.mail.base_pb2 import DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
-from aea.protocols.base import Message, Serializer
+from aea.mail.base_pb2 import DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
+from aea.protocols.base import Message  # type: ignore
+from aea.protocols.base import Serializer  # type: ignore
 
-from packages.valory.protocols.ledger_api import ledger_api_pb2
-from packages.valory.protocols.ledger_api.custom_types import (
+from packages.valory.protocols.ledger_api import ledger_api_pb2  # type: ignore
+from packages.valory.protocols.ledger_api.custom_types import (  # type: ignore
     Kwargs,
     RawTransaction,
     SignedTransaction,
@@ -38,7 +39,9 @@ from packages.valory.protocols.ledger_api.custom_types import (
     TransactionDigests,
     TransactionReceipt,
 )
-from packages.valory.protocols.ledger_api.message import LedgerApiMessage
+from packages.valory.protocols.ledger_api.message import (  # type: ignore
+    LedgerApiMessage,
+)
 
 
 class LedgerApiSerializer(Serializer):
@@ -55,7 +58,7 @@ class LedgerApiSerializer(Serializer):
         msg = cast(LedgerApiMessage, msg)
         message_pb = ProtobufMessage()
         dialogue_message_pb = DialogueMessage()
-        ledger_api_msg = ledger_api_pb2.LedgerApiMessage()
+        ledger_api_msg = ledger_api_pb2.LedgerApiMessage()  # type: ignore
 
         dialogue_message_pb.message_id = msg.message_id
         dialogue_reference = msg.dialogue_reference
@@ -189,7 +192,7 @@ class LedgerApiSerializer(Serializer):
         :return: the 'LedgerApi' message.
         """
         message_pb = ProtobufMessage()
-        ledger_api_pb = ledger_api_pb2.LedgerApiMessage()
+        ledger_api_pb = ledger_api_pb2.LedgerApiMessage()  # type: ignore
         message_pb.ParseFromString(obj)
         message_id = message_pb.dialogue_message.message_id
         dialogue_reference = (

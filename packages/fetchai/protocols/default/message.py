@@ -25,7 +25,7 @@ from typing import Any, Dict, Set, Tuple, cast
 
 from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
-from aea.protocols.base import Message
+from aea.protocols.base import Message  # type: ignore
 
 from packages.fetchai.protocols.default.custom_types import ErrorCode as CustomErrorCode
 

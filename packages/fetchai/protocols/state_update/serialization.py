@@ -22,12 +22,15 @@
 # pylint: disable=too-many-statements,too-many-locals,no-member,too-few-public-methods,redefined-builtin
 from typing import Any, Dict, cast
 
-from aea.mail.base_pb2 import DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
-from aea.protocols.base import Message, Serializer
+from aea.mail.base_pb2 import DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
+from aea.protocols.base import Message  # type: ignore
+from aea.protocols.base import Serializer  # type: ignore
 
-from packages.fetchai.protocols.state_update import state_update_pb2
-from packages.fetchai.protocols.state_update.message import StateUpdateMessage
+from packages.fetchai.protocols.state_update import state_update_pb2  # type: ignore
+from packages.fetchai.protocols.state_update.message import (  # type: ignore
+    StateUpdateMessage,
+)
 
 
 class StateUpdateSerializer(Serializer):
@@ -44,7 +47,7 @@ class StateUpdateSerializer(Serializer):
         msg = cast(StateUpdateMessage, msg)
         message_pb = ProtobufMessage()
         dialogue_message_pb = DialogueMessage()
-        state_update_msg = state_update_pb2.StateUpdateMessage()
+        state_update_msg = state_update_pb2.StateUpdateMessage()  # type: ignore
 
         dialogue_message_pb.message_id = msg.message_id
         dialogue_reference = msg.dialogue_reference
@@ -94,7 +97,7 @@ class StateUpdateSerializer(Serializer):
         :return: the 'StateUpdate' message.
         """
         message_pb = ProtobufMessage()
-        state_update_pb = state_update_pb2.StateUpdateMessage()
+        state_update_pb = state_update_pb2.StateUpdateMessage()  # type: ignore
         message_pb.ParseFromString(obj)
         message_id = message_pb.dialogue_message.message_id
         dialogue_reference = (
