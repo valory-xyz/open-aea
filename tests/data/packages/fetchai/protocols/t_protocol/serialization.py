@@ -22,19 +22,24 @@
 # pylint: disable=too-many-statements,too-many-locals,no-member,too-few-public-methods,redefined-builtin
 from typing import Any, Dict, cast
 
-from aea.mail.base_pb2 import DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
-from aea.protocols.base import Message, Serializer
+from aea.mail.base_pb2 import DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
+from aea.protocols.base import Message  # type: ignore
+from aea.protocols.base import Serializer  # type: ignore
 
-from tests.data.packages.fetchai.protocols.t_protocol import t_protocol_pb2
-from tests.data.packages.fetchai.protocols.t_protocol.custom_types import (
+from tests.data.packages.fetchai.protocols.t_protocol import (
+    t_protocol_pb2,  # type: ignore
+)
+from tests.data.packages.fetchai.protocols.t_protocol.custom_types import (  # type: ignore
     DataModel,
     DataModel1,
     DataModel2,
     DataModel3,
     DataModel4,
 )
-from tests.data.packages.fetchai.protocols.t_protocol.message import TProtocolMessage
+from tests.data.packages.fetchai.protocols.t_protocol.message import (  # type: ignore
+    TProtocolMessage,
+)
 
 
 class TProtocolSerializer(Serializer):
@@ -51,7 +56,7 @@ class TProtocolSerializer(Serializer):
         msg = cast(TProtocolMessage, msg)
         message_pb = ProtobufMessage()
         dialogue_message_pb = DialogueMessage()
-        t_protocol_msg = t_protocol_pb2.TProtocolMessage()
+        t_protocol_msg = t_protocol_pb2.TProtocolMessage()  # type: ignore
 
         dialogue_message_pb.message_id = msg.message_id
         dialogue_reference = msg.dialogue_reference
@@ -351,7 +356,7 @@ class TProtocolSerializer(Serializer):
         :return: the 'TProtocol' message.
         """
         message_pb = ProtobufMessage()
-        t_protocol_pb = t_protocol_pb2.TProtocolMessage()
+        t_protocol_pb = t_protocol_pb2.TProtocolMessage()  # type: ignore
         message_pb.ParseFromString(obj)
         message_id = message_pb.dialogue_message.message_id
         dialogue_reference = (
