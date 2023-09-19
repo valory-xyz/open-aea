@@ -27,7 +27,7 @@ import base58
 import multihash  # type: ignore
 from ecdsa import VerifyingKey, curves, keys
 
-from aea.helpers.multiaddr.crypto_pb2 import KeyType, PublicKey
+from aea.helpers.multiaddr.crypto_pb2 import KeyType, PublicKey  # type: ignore
 
 
 # NOTE:

@@ -23,10 +23,10 @@ from aea.helpers.ipfs.utils import _protobuf_python_implementation
 
 # fix for ipfs hashes, preload protobuf classes with protobuf python implementation
 with _protobuf_python_implementation():
-    from aea.helpers.ipfs.pb import (  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
+    from aea.helpers.ipfs.pb import (  # type: ignore  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
         merkledag_pb2,
         unixfs_pb2,
     )
-    from aea.helpers.ipfs.pb.merkledag_pb2 import (  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
+    from aea.helpers.ipfs.pb.merkledag_pb2 import (  # type: ignore  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
         PBNode,
     )

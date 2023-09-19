@@ -207,7 +207,7 @@ class ProtobufEnvelopeSerializer(EnvelopeSerializer):
         :param envelope: the envelope to encode
         :return: the encoded envelope
         """
-        envelope_pb = base_pb2.Envelope()
+        envelope_pb = base_pb2.Envelope()  # type: ignore # pylint: disable=no-member
         envelope_pb.to = envelope.to
         envelope_pb.sender = envelope.sender
         envelope_pb.protocol_id = str(envelope.protocol_specification_id)
@@ -227,7 +227,7 @@ class ProtobufEnvelopeSerializer(EnvelopeSerializer):
         :param envelope_bytes: the encoded envelope
         :return: the envelope
         """
-        envelope_pb = base_pb2.Envelope()
+        envelope_pb = base_pb2.Envelope()  # type: ignore # pylint: disable=no-member
         envelope_pb.ParseFromString(envelope_bytes)
 
         to = envelope_pb.to  # pylint: disable=no-member

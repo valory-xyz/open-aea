@@ -40,7 +40,7 @@ LEN_SHA256 = "20"  # 0x20
 
 with _protobuf_python_implementation():  # pylint: disable=import-outside-toplevel
     from aea.helpers.ipfs.pb import merkledag_pb2, unixfs_pb2
-    from aea.helpers.ipfs.pb.merkledag_pb2 import PBNode
+    from aea.helpers.ipfs.pb.merkledag_pb2 import PBNode  # type: ignore
 
 
 def _dos2unix(file_content: bytes) -> bytes:
@@ -179,7 +179,7 @@ class IPFSHashOnly:
     @staticmethod
     def create_link(link_hash: bytes, tsize: int, name: str) -> Any:
         """Create PBLink object."""
-        link = merkledag_pb2.PBLink()
+        link = merkledag_pb2.PBLink()  # type: ignore # pylint: disable=no-member
         link.Hash = link_hash
         link.Tsize = tsize
         link.Name = name
@@ -192,9 +192,9 @@ class IPFSHashOnly:
         wrapper_node = PBNode()
         wrapper_node.Links.append(link)  # type: ignore # pylint: disable=no-member
 
-        wrapper_node_data = unixfs_pb2.Data()
+        wrapper_node_data = unixfs_pb2.Data()  # type: ignore # pylint: disable=no-member
         # type: ignore  # pylint: disable=no-member
-        wrapper_node_data.Type = unixfs_pb2.Data.Directory
+        wrapper_node_data.Type = unixfs_pb2.Data.Directory  # type: ignore
         wrapper_node.Data = wrapper_node_data.SerializeToString(
             deterministic=True
         )  # type: ignore # pylint: disable=no-member
@@ -241,9 +241,9 @@ class IPFSHashOnly:
                     cls.create_link(child_hash, file_length, child_path.name)
                 )
 
-        root_node_data = unixfs_pb2.Data()
+        root_node_data = unixfs_pb2.Data()  # type: ignore # pylint: disable=no-member
         # type: ignore  # pylint: disable=no-member
-        root_node_data.Type = unixfs_pb2.Data.Directory
+        root_node_data.Type = unixfs_pb2.Data.Directory  # type: ignore
         root_node.Data = root_node_data.SerializeToString(
             deterministic=True
         )  # type: ignore # pylint: disable=no-member
@@ -263,7 +263,7 @@ class IPFSHashOnly:
     def _make_unixfs_pb2(cls, data: bytes) -> bytes:
         if len(data) > cls.DEFAULT_CHUNK_SIZE:  # pragma: nocover
             raise ValueError("Data is too big! use chunks!")
-        data_pb = unixfs_pb2.Data()  # type: ignore
+        data_pb = unixfs_pb2.Data()  # type: ignore  # pylint: disable=no-member
         data_pb.Type = unixfs_pb2.Data.File  # type: ignore # pylint: disable=no-member
         data_pb.Data = data
         data_pb.filesize = len(data)
@@ -299,8 +299,8 @@ class IPFSHashOnly:
         if len(data) > cls.DEFAULT_CHUNK_SIZE:
             content_size = 0
             outer_node = PBNode()  # type: ignore
-            data_pb = unixfs_pb2.Data()  # type: ignore
-            data_pb.Type = unixfs_pb2.Data.File  # type: ignore # pylint: disable=no-member
+            data_pb = unixfs_pb2.Data()  # type: ignore   # pylint: disable=no-member
+            data_pb.Type = unixfs_pb2.Data.File  # type: ignore  # pylint: disable=no-member
             data_pb.filesize = len(data)
             for chunk in chunks(data, cls.DEFAULT_CHUNK_SIZE):
                 block = cls._pb_serialize_data(chunk)
