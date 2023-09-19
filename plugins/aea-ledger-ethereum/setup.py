@@ -41,7 +41,7 @@ setup(
     },
     install_requires=[
         "open-aea>=1.0.0, <2.0.0",
-        "open-aea-web3==6.0.1",
+        "web3>=6.0.0,<7",
         "ipfshttpclient==0.8.0a2",
         "eth-account>=0.8.0,<0.9.0",
     ],
