@@ -19,6 +19,16 @@
 
 """Python package wrapping the public and private key cryptography and support for hardware wallet interactions."""
 
+import os
+
+if os.environ.get("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None) != "python":
+    print(
+        (
+            'Please export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python"'
+            "to use the hardware wallet without any issues"
+        )
+    )
+
 from aea_ledger_ethereum_hwi.hwi import (  # noqa: F401
     EthereumHWIApi,
     EthereumHWICrypto,
