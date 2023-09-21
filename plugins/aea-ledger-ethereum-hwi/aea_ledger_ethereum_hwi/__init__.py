@@ -21,10 +21,11 @@
 
 import os
 
+
 if os.environ.get("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None) != "python":
     print(
         (
-            'Please export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python"'
+            'Please export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python" '
             "to use the hardware wallet without any issues"
         )
     )
