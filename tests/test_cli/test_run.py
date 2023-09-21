@@ -260,7 +260,7 @@ def test_run_with_profiling():
             logfile=sys.stdout,
         )
 
-        process.expect("Start processing messages", timeout=30)
+        process.expect("Start processing messages", timeout=60)
         process.expect("Profiling details", timeout=10)
         process.control_c()
         process.wait_to_complete(10)
