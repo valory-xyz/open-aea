@@ -22,11 +22,9 @@
 
 import json
 import os
-import platform
 from pathlib import Path
 from typing import List
 
-import pytest
 from aea_ledger_cosmos import CosmosCrypto
 from aea_ledger_ethereum.ethereum import EthereumCrypto as Ethereum
 
@@ -40,7 +38,10 @@ from packages.valory.connections.p2p_libp2p.consts import (
     LIBP2P_CERT_NOT_AFTER,
     LIBP2P_CERT_NOT_BEFORE,
 )
-from packages.valory.connections.p2p_libp2p.tests.base import libp2p_log_on_failure_all
+from packages.valory.connections.p2p_libp2p.tests.base import (
+    SKIP_WINDOWS,
+    libp2p_log_on_failure_all,
+)
 
 
 p2p_libp2p_path = f"vendor.{p2p_libp2p.__name__.split('.', 1)[-1]}"
@@ -48,6 +49,7 @@ DEFAULT_NET_SIZE = 4
 LIBP2P_LAUNCH_TIMEOUT = 20  # may downloads up to ~66Mb
 
 
+@SKIP_WINDOWS
 class BaseP2PLibp2pConnectionAEATest(AEATestCaseEmpty):
     """Base class for AEA CLI tests"""
 
@@ -91,10 +93,6 @@ class BaseP2PLibp2pConnectionAEATest(AEATestCaseEmpty):
         assert not missing_strings
 
 
-@pytest.mark.skipif(
-    condition=(platform.platform() == "Windows"),
-    reason="https://github.com/golang/go/issues/51007",
-)
 @libp2p_log_on_failure_all
 class TestP2PLibp2pConnectionAEARunningEthereumConfigNode(
     BaseP2PLibp2pConnectionAEATest

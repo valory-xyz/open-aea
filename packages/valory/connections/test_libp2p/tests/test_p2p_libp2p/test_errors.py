@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -134,6 +134,10 @@ def test_libp2p_connection_mixed_ip_address() -> None:
     assert _ip_all_private_or_all_public(["fetch.ai", "acn.fetch.ai"]) is True
 
 
+@pytest.mark.skipif(
+    condition=(platform.system() == "Windows"),
+    reason="https://github.com/golang/go/issues/51007",
+)
 def test_libp2p_connection_node_config_registration_delay() -> None:
     """Test node registration delay configuration"""
 
