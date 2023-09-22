@@ -22,9 +22,11 @@
 
 import json
 import os
+import platform
 from pathlib import Path
 from typing import List
 
+import pytest
 from aea_ledger_cosmos import CosmosCrypto
 from aea_ledger_ethereum.ethereum import EthereumCrypto as Ethereum
 
@@ -89,6 +91,10 @@ class BaseP2PLibp2pConnectionAEATest(AEATestCaseEmpty):
         assert not missing_strings
 
 
+@pytest.mark.skipif(
+    condition=(platform.platform() == "Windows"),
+    reason="https://github.com/golang/go/issues/51007",
+)
 @libp2p_log_on_failure_all
 class TestP2PLibp2pConnectionAEARunningEthereumConfigNode(
     BaseP2PLibp2pConnectionAEATest

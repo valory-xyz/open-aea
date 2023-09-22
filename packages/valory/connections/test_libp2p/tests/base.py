@@ -296,7 +296,7 @@ class BaseP2PLibp2pTest:
         cls.cwd, cls.tmp = os.getcwd(), TEMP_LIBP2P_TEST_DIR
         if Path(cls.tmp).exists():
             cls.remove_temp_test_dir()
-        Path(cls.tmp).mkdir()
+        Path(cls.tmp).mkdir(exist_ok=True)
         os.chdir(cls.tmp)
 
     @classmethod
