@@ -4,10 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN apt update
-RUN apt install -y python3.11-dev python3-pip -y
-RUN apt autoremove
-RUN apt autoclean
+RUN apt update && apt install -y python3.11-dev python3-pip -y && apt autoremove && apt autoclean
 
 RUN pip3 install --upgrade pip
 RUN pip3 install "open-aea[all]==1.39.0.post1" open-aea-cli-ipfs==1.39.0.post1
