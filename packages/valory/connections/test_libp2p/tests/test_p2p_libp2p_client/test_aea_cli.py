@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ from packages.valory.connections import p2p_libp2p_client
 from packages.valory.connections.p2p_libp2p.tests.base import libp2p_log_on_failure_all
 from packages.valory.connections.p2p_libp2p_client.connection import PUBLIC_ID
 from packages.valory.connections.test_libp2p.tests.base import (
+    SKIP_WINDOWS,
     _make_libp2p_connection,
     make_cert_request,
     ports,
@@ -45,6 +46,7 @@ DEFAULT_CLIENTS_PER_NODE = 4
 DEFAULT_LAUNCH_TIMEOUT = 10
 
 
+@SKIP_WINDOWS
 @libp2p_log_on_failure_all
 class TestP2PLibp2pClientConnectionAEARunning(AEATestCaseEmpty):
     """Test AEA with client connection is correctly run"""
