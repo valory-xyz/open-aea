@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +40,7 @@ from packages.valory.connections.p2p_libp2p.check_dependencies import (
     check_versions as base_check_versions,
 )
 from packages.valory.connections.p2p_libp2p.check_dependencies import version_to_string
+from packages.valory.connections.p2p_libp2p.tests.base import SKIP_WINDOWS
 
 
 def check_versions() -> None:
@@ -95,6 +96,7 @@ def test_check_versions_negative_cannot_parse_version(capsys: CaptureFixture) ->
     )
 
 
+@SKIP_WINDOWS
 def test_build_node() -> None:
     """Test build node function."""
     with tempfile.TemporaryDirectory() as build_dir:

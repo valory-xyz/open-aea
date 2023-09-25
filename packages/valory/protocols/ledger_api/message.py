@@ -25,7 +25,7 @@ from typing import Any, Optional, Set, Tuple, cast
 
 from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError, enforce
-from aea.protocols.base import Message
+from aea.protocols.base import Message  # type: ignore
 
 from packages.valory.protocols.ledger_api.custom_types import Kwargs as CustomKwargs
 from packages.valory.protocols.ledger_api.custom_types import (

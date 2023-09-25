@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +34,8 @@ from google.protobuf.struct_pb2 import Struct
 
 from aea.exceptions import AEAEnforceError
 from aea.mail.base import Envelope
-from aea.mail.base_pb2 import DialogueMessage as Pb2DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
+from aea.mail.base_pb2 import DialogueMessage as Pb2DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
 from aea.protocols.base import Message, Protocol, Serializer
 from aea.protocols.dialogue.base import Dialogue, DialogueLabel
 from aea.test_tools.constants import UNKNOWN_PROTOCOL_PUBLIC_ID

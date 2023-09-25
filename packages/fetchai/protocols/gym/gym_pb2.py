@@ -4,9 +4,8 @@
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
-from google.protobuf import message as _message
-from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf.internal import builder as _builder
 
 # @@protoc_insertion_point(imports)
 
@@ -17,120 +16,27 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
     b'\n\tgym.proto\x12\x16\x61\x65\x61.fetchai.gym.v1_0_0"\x94\x07\n\nGymMessage\x12\x42\n\x03\x61\x63t\x18\x05 \x01(\x0b\x32\x33.aea.fetchai.gym.v1_0_0.GymMessage.Act_PerformativeH\x00\x12\x46\n\x05\x63lose\x18\x06 \x01(\x0b\x32\x35.aea.fetchai.gym.v1_0_0.GymMessage.Close_PerformativeH\x00\x12J\n\x07percept\x18\x07 \x01(\x0b\x32\x37.aea.fetchai.gym.v1_0_0.GymMessage.Percept_PerformativeH\x00\x12\x46\n\x05reset\x18\x08 \x01(\x0b\x32\x35.aea.fetchai.gym.v1_0_0.GymMessage.Reset_PerformativeH\x00\x12H\n\x06status\x18\t \x01(\x0b\x32\x36.aea.fetchai.gym.v1_0_0.GymMessage.Status_PerformativeH\x00\x1a\x18\n\tAnyObject\x12\x0b\n\x03\x61ny\x18\x01 \x01(\x0c\x1a\x61\n\x10\x41\x63t_Performative\x12<\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32,.aea.fetchai.gym.v1_0_0.GymMessage.AnyObject\x12\x0f\n\x07step_id\x18\x02 \x01(\x05\x1a\xc4\x01\n\x14Percept_Performative\x12\x0f\n\x07step_id\x18\x01 \x01(\x05\x12\x41\n\x0bobservation\x18\x02 \x01(\x0b\x32,.aea.fetchai.gym.v1_0_0.GymMessage.AnyObject\x12\x0e\n\x06reward\x18\x03 \x01(\x01\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\x12:\n\x04info\x18\x05 \x01(\x0b\x32,.aea.fetchai.gym.v1_0_0.GymMessage.AnyObject\x1a\x9b\x01\n\x13Status_Performative\x12T\n\x07\x63ontent\x18\x01 \x03(\x0b\x32\x43.aea.fetchai.gym.v1_0_0.GymMessage.Status_Performative.ContentEntry\x1a.\n\x0c\x43ontentEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x14\n\x12Reset_Performative\x1a\x14\n\x12\x43lose_PerformativeB\x0e\n\x0cperformativeb\x06proto3'
 )
 
-
-_GYMMESSAGE = DESCRIPTOR.message_types_by_name["GymMessage"]
-_GYMMESSAGE_ANYOBJECT = _GYMMESSAGE.nested_types_by_name["AnyObject"]
-_GYMMESSAGE_ACT_PERFORMATIVE = _GYMMESSAGE.nested_types_by_name["Act_Performative"]
-_GYMMESSAGE_PERCEPT_PERFORMATIVE = _GYMMESSAGE.nested_types_by_name[
-    "Percept_Performative"
-]
-_GYMMESSAGE_STATUS_PERFORMATIVE = _GYMMESSAGE.nested_types_by_name[
-    "Status_Performative"
-]
-_GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY = (
-    _GYMMESSAGE_STATUS_PERFORMATIVE.nested_types_by_name["ContentEntry"]
-)
-_GYMMESSAGE_RESET_PERFORMATIVE = _GYMMESSAGE.nested_types_by_name["Reset_Performative"]
-_GYMMESSAGE_CLOSE_PERFORMATIVE = _GYMMESSAGE.nested_types_by_name["Close_Performative"]
-GymMessage = _reflection.GeneratedProtocolMessageType(
-    "GymMessage",
-    (_message.Message,),
-    {
-        "AnyObject": _reflection.GeneratedProtocolMessageType(
-            "AnyObject",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _GYMMESSAGE_ANYOBJECT,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.AnyObject)
-            },
-        ),
-        "Act_Performative": _reflection.GeneratedProtocolMessageType(
-            "Act_Performative",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _GYMMESSAGE_ACT_PERFORMATIVE,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Act_Performative)
-            },
-        ),
-        "Percept_Performative": _reflection.GeneratedProtocolMessageType(
-            "Percept_Performative",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _GYMMESSAGE_PERCEPT_PERFORMATIVE,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Percept_Performative)
-            },
-        ),
-        "Status_Performative": _reflection.GeneratedProtocolMessageType(
-            "Status_Performative",
-            (_message.Message,),
-            {
-                "ContentEntry": _reflection.GeneratedProtocolMessageType(
-                    "ContentEntry",
-                    (_message.Message,),
-                    {
-                        "DESCRIPTOR": _GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY,
-                        "__module__": "gym_pb2"
-                        # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Status_Performative.ContentEntry)
-                    },
-                ),
-                "DESCRIPTOR": _GYMMESSAGE_STATUS_PERFORMATIVE,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Status_Performative)
-            },
-        ),
-        "Reset_Performative": _reflection.GeneratedProtocolMessageType(
-            "Reset_Performative",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _GYMMESSAGE_RESET_PERFORMATIVE,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Reset_Performative)
-            },
-        ),
-        "Close_Performative": _reflection.GeneratedProtocolMessageType(
-            "Close_Performative",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _GYMMESSAGE_CLOSE_PERFORMATIVE,
-                "__module__": "gym_pb2"
-                # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage.Close_Performative)
-            },
-        ),
-        "DESCRIPTOR": _GYMMESSAGE,
-        "__module__": "gym_pb2"
-        # @@protoc_insertion_point(class_scope:aea.fetchai.gym.v1_0_0.GymMessage)
-    },
-)
-_sym_db.RegisterMessage(GymMessage)
-_sym_db.RegisterMessage(GymMessage.AnyObject)
-_sym_db.RegisterMessage(GymMessage.Act_Performative)
-_sym_db.RegisterMessage(GymMessage.Percept_Performative)
-_sym_db.RegisterMessage(GymMessage.Status_Performative)
-_sym_db.RegisterMessage(GymMessage.Status_Performative.ContentEntry)
-_sym_db.RegisterMessage(GymMessage.Reset_Performative)
-_sym_db.RegisterMessage(GymMessage.Close_Performative)
-
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "gym_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
     DESCRIPTOR._options = None
     _GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY._options = None
     _GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY._serialized_options = b"8\001"
-    _GYMMESSAGE._serialized_start = 38
-    _GYMMESSAGE._serialized_end = 954
-    _GYMMESSAGE_ANYOBJECT._serialized_start = 414
-    _GYMMESSAGE_ANYOBJECT._serialized_end = 438
-    _GYMMESSAGE_ACT_PERFORMATIVE._serialized_start = 440
-    _GYMMESSAGE_ACT_PERFORMATIVE._serialized_end = 537
-    _GYMMESSAGE_PERCEPT_PERFORMATIVE._serialized_start = 540
-    _GYMMESSAGE_PERCEPT_PERFORMATIVE._serialized_end = 736
-    _GYMMESSAGE_STATUS_PERFORMATIVE._serialized_start = 739
-    _GYMMESSAGE_STATUS_PERFORMATIVE._serialized_end = 894
-    _GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY._serialized_start = 848
-    _GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY._serialized_end = 894
-    _GYMMESSAGE_RESET_PERFORMATIVE._serialized_start = 896
-    _GYMMESSAGE_RESET_PERFORMATIVE._serialized_end = 916
-    _GYMMESSAGE_CLOSE_PERFORMATIVE._serialized_start = 918
-    _GYMMESSAGE_CLOSE_PERFORMATIVE._serialized_end = 938
+    _globals["_GYMMESSAGE"]._serialized_start = 38
+    _globals["_GYMMESSAGE"]._serialized_end = 954
+    _globals["_GYMMESSAGE_ANYOBJECT"]._serialized_start = 414
+    _globals["_GYMMESSAGE_ANYOBJECT"]._serialized_end = 438
+    _globals["_GYMMESSAGE_ACT_PERFORMATIVE"]._serialized_start = 440
+    _globals["_GYMMESSAGE_ACT_PERFORMATIVE"]._serialized_end = 537
+    _globals["_GYMMESSAGE_PERCEPT_PERFORMATIVE"]._serialized_start = 540
+    _globals["_GYMMESSAGE_PERCEPT_PERFORMATIVE"]._serialized_end = 736
+    _globals["_GYMMESSAGE_STATUS_PERFORMATIVE"]._serialized_start = 739
+    _globals["_GYMMESSAGE_STATUS_PERFORMATIVE"]._serialized_end = 894
+    _globals["_GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY"]._serialized_start = 848
+    _globals["_GYMMESSAGE_STATUS_PERFORMATIVE_CONTENTENTRY"]._serialized_end = 894
+    _globals["_GYMMESSAGE_RESET_PERFORMATIVE"]._serialized_start = 896
+    _globals["_GYMMESSAGE_RESET_PERFORMATIVE"]._serialized_end = 916
+    _globals["_GYMMESSAGE_CLOSE_PERFORMATIVE"]._serialized_start = 918
+    _globals["_GYMMESSAGE_CLOSE_PERFORMATIVE"]._serialized_end = 938
 # @@protoc_insertion_point(module_scope)

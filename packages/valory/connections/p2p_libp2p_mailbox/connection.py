@@ -151,7 +151,7 @@ class NodeClient:
     async def register(self) -> None:
         """Register agent on the remote node."""
         agent_record = self.make_agent_record()
-        performative = acn_pb2.AcnMessage.Register_Performative()  # type: ignore
+        performative = acn_pb2.AcnMessage.Register_Performative()  # type: ignore  # pylint: disable=no-member
         AcnMessage.AgentRecord.encode(
             performative.record, agent_record  # pylint: disable=no-member
         )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,8 @@
 
 # pylint: disable=wrong-import-position
 
+import inspect
+import os
 import sys
 
 
@@ -35,8 +37,6 @@ from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 if _google_upb_message is not None:
     sys.modules["google._upb._message"] = _google_upb_message
 
-import inspect
-import os
 
 from packaging.version import Version
 
