@@ -64,6 +64,7 @@ from packages.valory.connections.p2p_libp2p.consts import (
 )
 from packages.valory.connections.p2p_libp2p.tests.base import (
     MockDefaultMessageProtocol,
+    SKIP_WINDOWS,
     TEMP_LIBP2P_TEST_DIR,
     TIMEOUT,
     ports,
@@ -274,6 +275,7 @@ def _make_libp2p_connection(
     return connection
 
 
+@SKIP_WINDOWS
 class BaseP2PLibp2pTest:
     """Base class for ACN p2p libp2p tests"""
 
@@ -440,6 +442,7 @@ class BaseP2PLibp2pTest:
         return self._multiplexers_by_connection_type(P2PLibp2pMailboxConnection)
 
 
+@SKIP_WINDOWS
 class BaseP2PLibp2pAEATestCaseMany(AEATestCaseMany):
     """BaseP2PLibp2pAEATestCaseMany"""
 
