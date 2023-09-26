@@ -9,11 +9,12 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
-## `v1.39.0` to `v1.39.0.post1`
+## `v1.39.0.post1` to `v1.40.0`
 
 - `open-aea-web3` has been replaced with `web3py`
 - `protobuf` has been bumped to `protobuf>=4.21.6,<5.0.0`, this means you will have to bump your protocol generator to `v24.3` and generate your protocol packages again.
 - Because of the protobuf version bump hardware wallet plugin might now work as expected, so please export `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python"` to use the hardware wallet without any issues
+- The `valory/open-aea-user` image will use Python 3.11 as default interpreter for running AEAs
 
 ## `v1.39.0` to `v1.39.0.post1`
 
