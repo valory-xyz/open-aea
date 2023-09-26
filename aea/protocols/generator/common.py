@@ -55,8 +55,8 @@ PYTHON_COMPOSITIONAL_TYPES = [
     "Optional",
 ]
 
-MESSAGE_IMPORT = "from aea.protocols.base import Message"
-SERIALIZER_IMPORT = "from aea.protocols.base import Serializer"
+MESSAGE_IMPORT = "from aea.protocols.base import Message   # type: ignore"
+SERIALIZER_IMPORT = "from aea.protocols.base import Serializer   # type: ignore"
 
 PATH_TO_PACKAGES = PACKAGES
 INIT_FILE_NAME = "__init__.py"

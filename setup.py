@@ -18,19 +18,18 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-import sys
 import os
 import re
 from typing import Dict
 
 from setuptools import find_packages, setup  # type: ignore
 
+
 PACKAGE_NAME = "aea"
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_all_extras() -> Dict:
-
     cli_deps = [
         "click==8.0.2",
         "pyyaml==6.0.1",
@@ -58,7 +57,7 @@ base_deps = [
     "base58>=1.0.3,<3.0.0",
     "jsonschema<=4.19.0,>=4.16.0",
     "packaging>=23.1,<24.0",
-    "protobuf>=3.19.0,<4.0.0",
+    "protobuf>=4.21.6,<5.0.0",
     "pymultihash==0.8.2",
     "pyyaml==6.0.1",
     "requests>=2.22.0,<3.0.0",

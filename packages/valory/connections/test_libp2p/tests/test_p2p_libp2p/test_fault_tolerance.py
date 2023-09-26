@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +27,17 @@ from aea.multiplexer import Empty, Multiplexer
 from aea.test_tools.utils import wait_for_condition
 
 from packages.valory.connections.p2p_libp2p.check_dependencies import build_node
-from packages.valory.connections.p2p_libp2p.tests.base import libp2p_log_on_failure_all
+from packages.valory.connections.p2p_libp2p.tests.base import (
+    SKIP_WINDOWS,
+    libp2p_log_on_failure_all,
+)
 from packages.valory.connections.test_libp2p.tests.base import BaseP2PLibp2pTest
 
 
 TIMEOUT = 10
 
 
+@SKIP_WINDOWS
 class BaseTestLibp2pRelay(BaseP2PLibp2pTest):
     """Base test class for libp2p connection relay."""
 

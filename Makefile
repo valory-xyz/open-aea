@@ -89,6 +89,7 @@ dist: clean
 	python setup.py bdist_wheel --plat-name=manylinux1_x86_64
 	python setup.py bdist_wheel --plat-name=manylinux2014_aarch64
 	python setup.py bdist_wheel --plat-name=macosx_10_9_x86_64
+	python setup.py bdist_wheel
 
 h := $(shell git rev-parse --abbrev-ref HEAD)
 
@@ -182,3 +183,17 @@ common-checks-1:
 common-checks-2:
 	tox -e check-api-docs
 	tox -e check-doc-links-hashes
+
+.PHONY: build-proto
+build-proto:
+	@# Usage: INCLUDE=PATH_TO_PROTOC_INCLUDE_DIRECTORY make build-proto
+	@echo "Building aea/mail/base.proto"
+	@protoc --proto_path=aea/mail/ --python_out=aea/mail/ aea/mail/base.proto -I $$INCLUDE
+	@echo "Building aea/ipfs/pb/merkledag.proto"
+	@protoc --proto_path=aea/helpers/ipfs/pb/ --python_out=aea/helpers/ipfs/pb/ aea/helpers/ipfs/pb/merkledag.proto -I $$INCLUDE
+	@echo "Building aea/ipfs/pb/unixfs.proto"
+	@protoc --proto_path=aea/helpers/ipfs/pb/ --python_out=aea/helpers/ipfs/pb/ aea/helpers/ipfs/pb/unixfs.proto -I $$INCLUDE
+	@echo "Building aea/helpers/search/models.proto"
+	@protoc --proto_path=aea/helpers/search/ --python_out=aea/helpers/search/ aea/helpers/search/models.proto -I $$INCLUDE
+	@echo "Building aea/helpers/multiaddr/crypto.proto"
+	@protoc --proto_path=aea/helpers/multiaddr/ --python_out=aea/helpers/multiaddr/ aea/helpers/multiaddr/crypto.proto -I $$INCLUDE
