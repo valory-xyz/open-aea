@@ -9,7 +9,7 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
-## `v1.39.0` to `v1.39.0.post1`
+## `v1.39.0` to `v1.40.0`
 
 - No backwards incompatible changes
 
