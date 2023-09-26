@@ -1,6 +1,15 @@
 # Release History - open AEA
 
 
+## 1.40.0 (2023-09-26)
+
+AEA:
+- Removes the `web3py` fork as a dependency
+- Bumps the protobuf to `protobuf>=4.21.6,<5.0.0`
+- Updates protocol buffers compiler to `v24.3`
+- Updates the protocol generator
+- Removes unused layers from the user image and uses minimal python image as base
+
 ## 1.39.0.post1 (2023-09-21)
 
 AEA:
