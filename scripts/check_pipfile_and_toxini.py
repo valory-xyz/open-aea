@@ -39,6 +39,7 @@ WHITELIST = {
     "memory-profiler",
     "apduboy",
     "matplotlib",
+    "open-aea-flashbots",
 }
 
 
