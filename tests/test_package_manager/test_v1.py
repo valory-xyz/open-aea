@@ -562,7 +562,7 @@ class TestVerifyFailure(BaseAEATestCase):
             pm.package_path_from_package_id(package_id=EXAMPLE_PACKAGE_ID)
             / INIT_FILE_NAME
         )
-        init_file.write_text("")
+        init_file.write_text("dummy")
 
         with caplog.at_level(logging.ERROR), mock.patch(
             "aea.package_manager.v1.check_fingerprint",
