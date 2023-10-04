@@ -352,8 +352,7 @@ class TestPackageManagerV1UpdateFingerprint(TestPackageManagerV1):
                 dev_packages=OrderedDict({package_id: package_hash}),
             )
 
-            (temp_package / "__init__.py").write_text("")
-
+            (temp_package / "__init__.py").write_text("hello")
             with caplog.at_level(logging.ERROR):
                 assert pm.verify() == 1
                 assert (
