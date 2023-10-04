@@ -42,7 +42,7 @@ with _protobuf_python_implementation():  # pylint: disable=import-outside-toplev
 
 
 def _read(file_path: str) -> bytes:
-    """Read a file, replacing Windows line endings if it is a text file."""
+    """Read and verify the file is not empty."""
     with open(file_path, "rb") as file:
         data = file.read()
     if len(data) == 0:
