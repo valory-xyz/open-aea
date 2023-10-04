@@ -35,6 +35,7 @@ setup(
     packages=find_packages(
         where=".", include=["aea_cli_benchmark", "aea_cli_benchmark.*"]
     ),
+    package_data={"aea_cli_benchmark": ["py.typed"]},
     entry_points={"aea.cli": ["benchmark = aea_cli_benchmark.core:benchmark"]},
     install_requires=["open-aea>=1.0.0, <2.0.0", "psutil==5.7.0"],
     classifiers=[
