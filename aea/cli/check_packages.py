@@ -498,12 +498,20 @@ class ImportsTool:
     @classmethod
     @list_decorator
     def list_all_pyfiles_with_third_party_imports(
-        cls, root_path: Union[str, Path], pattern: str = "**/*.py"
+        cls,
+        root_path: Union[str, Path],
+        pattern: str = "**/*.py",
+        check_tests: bool = False,
     ) -> Generator:
         """Get list of all python sources with 3rd party modules imported."""
-        for pyfile in cls.list_all_pyfiles(
-            root_path, pattern=pattern, ignores=IGNORE_PACKAGE_SUBFOLDERS
-        ):
+        im_files = (
+            cls.list_all_pyfiles(root_path, pattern=pattern)
+            if check_tests
+            else cls.list_all_pyfiles(
+                root_path, pattern=pattern, ignores=IGNORE_PACKAGE_SUBFOLDERS
+            )
+        )
+        for pyfile in im_files:
             mods = list(cls.get_third_part_imports_for_file(root_path / pyfile))
             if not mods:
                 continue
@@ -539,10 +547,11 @@ class PyPIDependenciesCheckTool:
             result[dep] = DependenciesTool.get_package_files(dep)
         return result
 
-    def run(self) -> None:
+    def run(self, check_tests: bool = False) -> None:
         """Run dependency check."""
         files_and_modules = ImportsTool.list_all_pyfiles_with_third_party_imports(
-            self.configuration_file.parent
+            self.configuration_file.parent,
+            check_tests=check_tests,
         )
         package_dependencies = self.get_dependencies()
         third_party_imports = self.make_third_party_imports(files_and_modules)
@@ -594,15 +603,21 @@ class PyPIDependenciesCheckTool:
         return missed_deps_for_imports, deps_not_imported_directly
 
 
-def check_pypi_dependencies(configuration_file: Path) -> None:
+def check_pypi_dependencies(
+    configuration_file: Path,
+    check_tests: bool = False,
+) -> None:
     """Check PyPI dependencies of the AEA package."""
-    PyPIDependenciesCheckTool(configuration_file).run()
+    PyPIDependenciesCheckTool(configuration_file).run(check_tests=check_tests)
 
 
 @click.command(name="check-packages")
 @click.option("--vendor", type=str, default=None, required=False)
+@click.option("--check-tests", is_flag=True, help="Check test imports")
 @pass_ctx
-def check_packages(ctx: Context, vendor: Optional[str]) -> None:
+def check_packages(
+    ctx: Context, vendor: Optional[str], check_tests: bool = False
+) -> None:
     """
     Run different checks on AEA packages.
 
@@ -612,6 +627,7 @@ def check_packages(ctx: Context, vendor: Optional[str]) -> None:
 
     :param ctx: AEA cli context.
     :param vendor: filter by author name
+    :param check_tests: Check test packages for imports
     """
     packages_dir = Path(ctx.registry_path).absolute()
     all_packages_ids_ = find_all_packages_ids(packages_dir)
@@ -625,7 +641,7 @@ def check_packages(ctx: Context, vendor: Optional[str]) -> None:
             check_dependencies(file, all_packages_ids_)
             check_description(file)
             check_public_id(file)
-            check_pypi_dependencies(file)
+            check_pypi_dependencies(file, check_tests=check_tests)
         except CustomException as exception:
             exception.print_error()
             failed = True
