@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea generate_key' subcommand."""
+import json
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -26,9 +27,14 @@ import click
 from aea.cli.add_key import _add_private_key
 from aea.cli.utils.click_utils import password_option
 from aea.cli.utils.decorators import _check_aea_project
-from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
-from aea.crypto.helpers import create_private_key, generate_multiple_keys
-from aea.crypto.registries import crypto_registry
+from aea.configurations.constants import (
+    ADDRESS,
+    MULTIKEY_FILENAME,
+    PRIVATE_KEY,
+    PRIVATE_KEY_PATH_SCHEMA,
+)
+from aea.crypto.helpers import create_private_key
+from aea.crypto.registries import crypto_registry, make_crypto
 
 
 @click.command()
@@ -84,7 +90,7 @@ def generate_key(
         )
         return
 
-    generate_multiple_keys(
+    _generate_multiple_keys(
         n=n,
         type_=type_,
         password=password,
@@ -140,6 +146,30 @@ def _generate_private_key(
             create_private_key(type__, private_key_file, password, extra_entropy)
         keys[type__] = private_key_file
     return keys
+
+
+def _generate_multiple_keys(
+    n: int,
+    type_: str,
+    password: Optional[str] = None,
+    extra_entropy: Union[str, bytes, int] = "",
+    file: Optional[str] = None,
+) -> None:
+    """Generate n key pairs."""
+
+    key_pairs = []
+    for _ in range(n):
+        crypto = make_crypto(type_, extra_entropy=extra_entropy)
+        priv_key = (
+            crypto.encrypt(password=password)
+            if password is not None
+            else crypto.private_key
+        )
+        key_pairs.append({ADDRESS: crypto.address, PRIVATE_KEY: priv_key})
+
+    file = file or MULTIKEY_FILENAME
+    if _can_write(file):
+        Path(file).write_text(json.dumps(obj=key_pairs, indent=2), encoding="utf-8")
 
 
 def _can_write(path: str) -> bool:
