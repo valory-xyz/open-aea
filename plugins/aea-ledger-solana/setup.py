@@ -32,7 +32,7 @@ setup(
     long_description="Python package wrapping the public and private key cryptography and ledger api of solana.",
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ledger_solana*"]),
-    package_data={},
+    package_data={"aea_ledger_solana": ["py.typed"]},
     install_requires=[
         "open-aea>=1.0.0, <2.0.0",
         "cryptography",

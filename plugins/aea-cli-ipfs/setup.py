@@ -35,6 +35,7 @@ setup(
     long_description="CLI extension for open AEA framework wrapping IPFS functionality.",
     long_description_content_type="text/markdown",
     packages=["aea_cli_ipfs"],
+    package_data={"aea_cli_ipfs": ["py.typed"]},
     entry_points={"aea.cli": ["ipfs_cli_command = aea_cli_ipfs.core:ipfs"]},
     install_requires=[
         "open-aea>=1.0.0, <2.0.0",
