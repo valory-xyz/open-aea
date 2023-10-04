@@ -22,23 +22,12 @@
 import tempfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
 
 import pytest
 from aea_cli_ipfs.ipfs_utils import IPFSTool  # type: ignore
 
 from aea.helpers.cid import to_v1
-from aea.helpers.ipfs.base import IPFSHashOnly, _is_text
-
-
-def test_is_text_negative():
-    """Test the helper method 'is_text' negative case."""
-    # https://gehrcke.de/2015/12/how-to-raise-unicodedecodeerror-in-python-3/
-    with patch(
-        "aea.helpers.ipfs.base.open_file",
-        side_effect=UnicodeDecodeError("foo", b"bytes", 1, 2, "Fake reason"),
-    ):
-        assert not _is_text("path")
+from aea.helpers.ipfs.base import IPFSHashOnly
 
 
 def test_hash_for_big_file():
