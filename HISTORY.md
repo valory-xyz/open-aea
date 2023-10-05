@@ -4,6 +4,12 @@
 ## 1.40.0 (2023-09-26)
 
 AEA:
+- Adds support for specifying extra dependencies and overriding dependencies via `-e` flag on `aea install`
+- Updates the selection of dependencies in `aea install` command to override the dependencies in the `extra dependencies provided by flag > agent > skill > connection > contract > protocol` order instead of merging them.
+
+## 1.40.0 (2023-09-26)
+
+AEA:
 - Removes the `web3py` fork as a dependency
 - Bumps the protobuf to `protobuf>=4.21.6,<5.0.0`
 - Updates protocol buffers compiler to `v24.3`

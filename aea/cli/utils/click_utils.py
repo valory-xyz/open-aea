@@ -45,7 +45,7 @@ from aea.configurations.constants import (
     PROTOCOL,
     SKILL,
 )
-from aea.configurations.data_types import PackageType, PublicId
+from aea.configurations.data_types import Dependency, PackageType, PublicId
 from aea.helpers.io import open_file
 from aea.package_manager.base import PACKAGE_SOURCE_RE
 
@@ -242,6 +242,21 @@ class PackagesSource(click.ParamType):
                 f"Bad value provided for package source `{value}`"
             )
         return value
+
+
+class PyPiDependency(click.ParamType):
+    """Click parameter for PyPy dependency string"""
+
+    def get_metavar(self, param: Any) -> str:
+        """Return the metavar default for this param if it provides one."""
+        return "DEPENDENCY"  # pragma: no cover
+
+    def convert(self, value: str, param: Any, ctx: click.Context) -> Dependency:
+        """Convert the value."""
+        try:
+            return Dependency.from_string(value)
+        except ValueError as e:
+            raise click.ClickException(str(e)) from e
 
 
 def registry_flag(
