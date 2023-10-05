@@ -20,8 +20,10 @@
 
 """This test module contains the tests for the `aea install` sub-command."""
 
+import logging
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
+from unittest import mock
 
 import pytest
 import yaml
@@ -39,15 +41,30 @@ class TestInstall(AEATestCase):
 
     path_to_aea: Path = Path(CUR_PATH, "data", "dummy_aea")
 
-    @classmethod
-    def setup_class(cls):
-        """Set the test up."""
-        super().setup_class()
-        cls.result = cls.run_cli_command("install", cwd=cls._get_cwd())
-
     def test_exit_code_equal_to_zero(self):
         """Assert that the exit code is equal to zero (i.e. success)."""
-        assert self.result.exit_code == 0
+        result = self.run_cli_command("install", cwd=self._get_cwd())
+        assert result.exit_code == 0
+
+    def test_extra_dependencies(self, caplog: Any):
+        """Assert that the exit code is equal to zero (i.e. success)."""
+        with caplog.at_level(logging.DEBUG), mock.patch(
+            "aea.cli.install.install_dependencies"
+        ):
+            result = self.run_cli_command(
+                "-v",
+                "DEBUG",
+                "install",
+                "-e",
+                "open-aea-ledger-cosmos==1.0.0",
+                cwd=self._get_cwd(),
+            )
+
+        assert result.exit_code == 0
+        assert (
+            "`['open-aea-ledger-cosmos<2.0.0,>=1.0.0']` will be overridden by ['open-aea-ledger-cosmos==1.0.0']"
+            in caplog.text
+        )
 
 
 class TestInstallFromRequirementFile(AEATestCase):
@@ -179,6 +196,6 @@ class TestInstallFailsWhenDependencyHasUnsatisfiableSpecifier(AEATestCaseEmpty):
         """Assert an error occurs."""
         with pytest.raises(
             ClickException,
-            match="cannot install the following dependencies as the joint version specifier is unsatisfiable:\n - this_is_a_test_dependency: ==0.1.0,==0.2.0",
+            match="Error while merging dependencies for connections; Joint version specifier is unsatisfiable for following dependencies",
         ):
             self.run_cli_command("install", cwd=self._get_cwd())
