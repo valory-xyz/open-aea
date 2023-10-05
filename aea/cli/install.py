@@ -19,15 +19,15 @@
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea install' subcommand."""
 
-from typing import Optional, cast
+from typing import Optional, Tuple, cast
 
 import click
 
+from aea.cli.utils.click_utils import PyPiDependency
 from aea.cli.utils.context import Context
 from aea.cli.utils.decorators import check_aea_project
 from aea.cli.utils.loggers import logger
-from aea.configurations.data_types import Dependencies
-from aea.configurations.pypi import is_satisfiable, is_simple_dep, to_set_specifier
+from aea.configurations.data_types import Dependency
 from aea.exceptions import AEAException
 from aea.helpers.install_dependency import call_pip, install_dependencies
 
@@ -41,64 +41,54 @@ from aea.helpers.install_dependency import call_pip, install_dependencies
     default=None,
     help="Install from the given requirements file.",
 )
+@click.option(
+    "-e",
+    "--extra-dependency",
+    "extra_dependencies",
+    type=PyPiDependency(),
+    help="Provide extra dependency.",
+    multiple=True,
+)
 @click.pass_context
 @check_aea_project
-def install(click_context: click.Context, requirement: Optional[str]) -> None:
+def install(
+    click_context: click.Context,
+    requirement: Optional[str],
+    extra_dependencies: Tuple[Dependency],
+) -> None:
     """Install the dependencies of the agent."""
     ctx = cast(Context, click_context.obj)
-    do_install(ctx, requirement)
+    do_install(ctx, requirement, extra_dependencies)
 
 
-def do_install(ctx: Context, requirement: Optional[str] = None) -> None:
+def do_install(
+    ctx: Context,
+    requirement: Optional[str] = None,
+    extra_dependencies: Optional[Tuple[Dependency]] = None,
+) -> None:
     """
     Install necessary dependencies.
 
     :param ctx: context object.
     :param requirement: optional str requirement.
+    :param extra_dependencies: List of the extra dependencies to use
 
     :raises ClickException: if AEAException occurs.
     """
     try:
         if requirement:
+            if extra_dependencies is not None and len(extra_dependencies) > 0:
+                logger.debug(
+                    "Extra dependencies will be ignored while installing from requirements file"
+                )
             logger.debug("Installing the dependencies in '{}'...".format(requirement))
             _install_from_requirement(requirement)
         else:
             logger.debug("Installing all the dependencies...")
-            dependencies = ctx.get_dependencies()
-
-            logger.debug("Preliminary check on satisfiability of version specifiers...")
-            unsat_dependencies = _find_unsatisfiable_dependencies(dependencies)
-            if len(unsat_dependencies) != 0:
-                raise AEAException(
-                    "cannot install the following dependencies "
-                    + "as the joint version specifier is unsatisfiable:\n - "
-                    + "\n -".join(
-                        [
-                            f"{name}: {to_set_specifier(dep)}"
-                            for name, dep in unsat_dependencies.items()
-                        ]
-                    )
-                )
+            dependencies = ctx.get_dependencies(extra_dependencies=extra_dependencies)
             install_dependencies(list(dependencies.values()), logger=logger)
     except AEAException as e:
         raise click.ClickException(str(e))
-
-
-def _find_unsatisfiable_dependencies(dependencies: Dependencies) -> Dependencies:
-    """
-    Find unsatisfiable dependencies.
-
-    It only checks among 'simple' dependencies (i.e. if it has no field specified,
-    or only the 'version' field set.)
-
-    :param dependencies: the dependencies to check.
-    :return: the unsatisfiable dependencies.
-    """
-    return {
-        name: dep
-        for name, dep in dependencies.items()
-        if is_simple_dep(dep) and not is_satisfiable(to_set_specifier(dep))
-    }
 
 
 def _install_from_requirement(file: str, install_timeout: float = 300) -> None:

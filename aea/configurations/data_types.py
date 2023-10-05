@@ -62,6 +62,9 @@ from aea.helpers.base import (
 T = TypeVar("T")
 PackageVersionLike = Union[str, semver.VersionInfo]
 
+PYPI_RE = r"(?P<name>[a-zA-Z0-9_-]+)(?P<version>(>|<|=|~).+)?"
+GIT_RE = r"git\+(?P<git>https://github.com/([a-z-_0-9A-Z]+\/[a-z-_0-9A-Z]+)\.git)@(?P<ref>.+)#egg=(?P<name>.+)"
+
 
 class JSONSerializable(ABC):
     """Interface for JSON-serializable objects."""
@@ -837,6 +840,28 @@ class Dependency:
         :return: the SpecifierSet instance.
         """
         return version if isinstance(version, SpecifierSet) else SpecifierSet(version)
+
+    @classmethod
+    def from_string(cls, string: str) -> "Dependency":
+        """Parse from string."""
+        match = re.match(GIT_RE, string)
+        if match is not None:
+            data = match.groupdict()
+            return cls(name=data["name"], git=data["git"], ref=data["ref"])
+
+        match = re.match(PYPI_RE, string)
+        if match is None:
+            raise ValueError(f"Cannot parse the dependency string '{string}'")
+
+        data = match.groupdict()
+        return Dependency(
+            name=data["name"],
+            version=(
+                SpecifierSet(data["version"])
+                if data["version"] is not None
+                else SpecifierSet("")
+            ),
+        )
 
     @classmethod
     def from_json(cls, obj: Dict[str, Dict[str, str]]) -> "Dependency":
