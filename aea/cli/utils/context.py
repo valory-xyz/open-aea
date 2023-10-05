@@ -20,28 +20,31 @@
 """A module with context tools of the aea cli."""
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 from aea.cli.registry.settings import REGISTRY_LOCAL, REGISTRY_TYPES
 from aea.cli.utils.loggers import logger
 from aea.configurations.base import (
     AgentConfig,
     Dependencies,
+    Dependency,
     PackageType,
     PublicId,
     _get_default_configuration_file_name_from_type,
 )
 from aea.configurations.constants import (
-    CONNECTION,
-    CONTRACT,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_REGISTRY_NAME,
-    PROTOCOL,
-    SKILL,
     VENDOR,
 )
 from aea.configurations.loader import ConfigLoader
-from aea.configurations.pypi import merge_dependencies_list
+from aea.configurations.pypi import (
+    is_satisfiable,
+    is_simple_dep,
+    merge_dependencies_list,
+    to_set_specifier,
+)
+from aea.exceptions import AEAException
 from aea.helpers.io import open_file
 
 
@@ -184,39 +187,96 @@ class Context:
         deps = cast(Dependencies, config.dependencies)
         return deps
 
-    def get_dependencies(self) -> Dependencies:
+    @staticmethod
+    def _find_unsatisfiable_dependencies(dependencies: Dependencies) -> Dependencies:
+        """
+        Find unsatisfiable dependencies.
+
+        It only checks among 'simple' dependencies (i.e. if it has no field specified,
+        or only the 'version' field set.)
+
+        :param dependencies: the dependencies to check.
+        :return: the unsatisfiable dependencies.
+        """
+        return {
+            name: dep
+            for name, dep in dependencies.items()
+            if is_simple_dep(dep) and not is_satisfiable(to_set_specifier(dep))
+        }
+
+    def _get_dependencies_by_item_type(self, item_type: PackageType) -> Dependencies:
+        """Get the dependencies from item type and public id."""
+        if item_type == PackageType.AGENT:
+            return self.agent_config.dependencies
+        dependency_to_package: Dict[str, List[Tuple[PublicId, Dependency]]] = {}
+        dependencies = []
+        for item_id in getattr(self.agent_config, item_type.to_plural()):
+            package_dependencies = self._get_item_dependencies(item_type.value, item_id)
+            dependencies += [package_dependencies]
+            for dep, spec in package_dependencies.items():
+                if dep not in dependency_to_package:
+                    dependency_to_package[dep] = []
+                dependency_to_package[dep].append((item_id, spec))
+
+        merged_dependencies = merge_dependencies_list(*dependencies)
+        unsat_dependencies = self._find_unsatisfiable_dependencies(merged_dependencies)
+        if len(unsat_dependencies) > 0:
+            error = f"Error while merging dependencies for {item_type.to_plural()}"
+            error += "; Joint version specifier is unsatisfiable for following dependencies:\n"
+            error += "======================================\n"
+            for name, spec in unsat_dependencies.items():
+                error += f"Dependency: {name}\n"
+                error += f"Specifier: {to_set_specifier(spec)}\n"
+                error += "Packages containing dependency: \n"
+                for package, dep_spec in dependency_to_package[name]:
+                    error += f"  - {package.without_hash()}: {dep_spec.get_pip_install_args()[0]}\n"
+                error += "======================================\n"
+
+            raise AEAException(error[:-1])
+        return merged_dependencies
+
+    def get_dependencies(
+        self,
+        extra_dependencies: Optional[Tuple[Dependency]] = None,
+    ) -> Dependencies:
         """
         Aggregate the dependencies from every component.
 
+        :param extra_dependencies: List of the extra dependencies to use, if the
+                                extra dependencies and agent dependencies have conflicts
+                                the packages from extra dependencies list will be prefered
+                                over the agent dependencies
         :return: a list of dependency version specification. e.g. ["gym >= 1.0.0"]
         """
-        protocol_dependencies = [
-            self._get_item_dependencies(PROTOCOL, protocol_id)
-            for protocol_id in self.agent_config.protocols
-        ]
-        connection_dependencies = [
-            self._get_item_dependencies(CONNECTION, connection_id)
-            for connection_id in self.agent_config.connections
-        ]
-        skill_dependencies = [
-            self._get_item_dependencies(SKILL, skill_id)
-            for skill_id in self.agent_config.skills
-        ]
-        contract_dependencies = [
-            self._get_item_dependencies(CONTRACT, contract_id)
-            for contract_id in self.agent_config.contracts
-        ]
+        dependencies: Dependencies = {}
 
-        all_dependencies = [
-            self.agent_config.dependencies,
-            *protocol_dependencies,
-            *connection_dependencies,
-            *skill_dependencies,
-            *contract_dependencies,
-        ]
+        def _update_dependencies(updates: Dependencies) -> None:
+            """Update dependencies."""
+            for dep, spec in updates.items():
+                if dep in dependencies and dependencies[dep] != spec:
+                    logger.debug(
+                        f"`{dependencies[dep].get_pip_install_args()}` "
+                        f"will be overridden by {spec.get_pip_install_args()}"
+                    )
+                dependencies[dep] = spec
 
-        result = merge_dependencies_list(*all_dependencies)
-        return result
+        for item_type in (
+            PackageType.PROTOCOL,
+            PackageType.CONTRACT,
+            PackageType.CONNECTION,
+            PackageType.SKILL,
+            PackageType.AGENT,
+        ):
+            logger.debug(f"Loading {item_type.value} dependencies")
+            type_deps = self._get_dependencies_by_item_type(item_type)
+            _update_dependencies(type_deps)
+
+        if extra_dependencies is not None and len(extra_dependencies) > 0:
+            logger.debug("Loading extra dependencies")
+            type_deps = {spec.name: spec for spec in extra_dependencies}
+            _update_dependencies(type_deps)
+
+        return dependencies
 
     def dump_agent_config(self) -> None:
         """Dump the current agent configuration."""
