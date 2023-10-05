@@ -9,6 +9,16 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.40.0` to `v1.40.1`
+
+- The way the dependencies will be selected for installation when running `aea install` has changed. Before this version, the versions were being merging all of the versions for a python package and using the most compatible version specifier possible. With this release, this behaviour will be replaced by overriding the dependencies in the following order `extra dependencies provided by flag > agent > skill > connection > contract > protocol` what this means is, let's say you have 3 packages with a same python package as a dependency
+
+* protocol package with `protobuf>1.0.0`
+* connection package with `protobuf==1.0.0`
+* skill package with `protobuf>=1.0.0,<2.0.0`
+
+`protobuf>=1.0.0,<2.0.0` will be used for installation since skill has higher priority over protocol and connection packages.
+
 ## `v1.39.0.post1` to `v1.40.0`
 
 - `open-aea-web3` has been replaced with `web3py`
