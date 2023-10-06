@@ -66,7 +66,9 @@ class TestSyncCommand(BaseAEATestCase):
 
         with mock.patch.object(
             PackageManagerV1, "dev_packages", new=packages
-        ), caplog.at_level(logging.INFO):
+        ), caplog.at_level(logging.INFO), mock.patch.object(
+            PackageManagerV1, "add_package"
+        ):
             result = self.run_cli_command("packages", "sync", "--dev")
             assert result.exit_code == 0
             assert (
@@ -87,7 +89,9 @@ class TestSyncCommand(BaseAEATestCase):
 
         with mock.patch.object(
             PackageManagerV1, "third_party_packages", new=packages
-        ), caplog.at_level(logging.INFO):
+        ), caplog.at_level(logging.INFO), mock.patch.object(
+            PackageManagerV1, "add_package"
+        ):
             result = self.run_cli_command("packages", "sync")
             assert result.exit_code == 0
             assert (
