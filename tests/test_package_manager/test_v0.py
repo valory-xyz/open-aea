@@ -101,7 +101,12 @@ class TestPackageManagerV0(BaseAEATestCase):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync()
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         with pytest.raises(
             ValueError,
