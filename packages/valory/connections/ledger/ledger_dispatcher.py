@@ -452,3 +452,12 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             ),
         )
         return response
+
+    def get_chain_id(self, message: Message) -> str:
+        """
+        Get the chain id. For ledger messages this is the same as the ledger id, for now.
+
+        :param message: the message
+        :return: the chain id
+        """
+        return self.get_ledger_id(message)

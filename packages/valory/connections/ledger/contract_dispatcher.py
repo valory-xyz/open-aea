@@ -417,3 +417,35 @@ class ContractApiRequestDispatcher(RequestDispatcher):
         raise AEAException(  # pragma: nocover
             f"Unexpected performative: {message.performative}"
         )
+
+    def get_chain_id(self, message: Message) -> str:
+        """
+        Get the chain id. For ledger messages this is the same as the ledger id, for now.
+
+        :param message: the message
+        :return: the chain id
+        """
+        if not isinstance(message, ContractApiMessage):  # pragma: nocover
+            raise ValueError("argument is not a ContractApiMessage instance.")
+        message = cast(ContractApiMessage, message)
+        kwargs = cast(JSONLike, message.kwargs.body)
+        # if the chain id is specified in the message, use it.
+        # otherwise, use the ledger id.
+        chain_id = cast(str, kwargs.get("chain_id", self.get_ledger_id(message)))
+        return chain_id
+
+    def set_extra_kwargs(self, message: Message) -> None:
+        """
+        Set extra kwargs for the contract api message.
+
+        :param message: the message
+        """
+        if not isinstance(message, ContractApiMessage):
+            raise ValueError("argument is not a ContractApiMessage instance.")
+        message = cast(ContractApiMessage, message)
+        if message.kwargs.body is not None and message.kwargs.body.get(
+            "set_ledger_api_configs", False
+        ):
+            message.kwargs.body.update(
+                {"ledger_api_configs": cast(dict, self._api_configs).copy()}
+            )
