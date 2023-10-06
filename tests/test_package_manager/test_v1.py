@@ -142,7 +142,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=True, third_party=False)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # test package already exists.
         with mock.patch.object(pm, "add_package") as update_patch, mock.patch(
@@ -204,7 +209,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=False, third_party=True)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # 3d part hashes
         pm = PackageManagerV1(
@@ -214,7 +224,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=False, third_party=True, update_hashes=True)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # 3d part packages
         with mock.patch.object(pm, "update_package") as update_patch, mock.patch.object(
