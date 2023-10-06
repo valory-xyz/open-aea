@@ -20,6 +20,7 @@
 """Test package manager base."""
 
 
+import logging
 import re
 from collections import OrderedDict
 from pathlib import Path
@@ -93,6 +94,7 @@ class DummyPackageManager(BasePackageManager):
         self.path = path
         self.packages = packages
         self.config_loader = config_loader
+        self._logger = logging.getLogger()
 
     @classmethod
     def from_dir(
