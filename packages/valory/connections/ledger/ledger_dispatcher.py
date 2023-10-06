@@ -22,6 +22,7 @@ import asyncio
 import logging
 from typing import Any, cast
 
+from aea.common import JSONLike
 from aea.connections.base import ConnectionStates
 from aea.crypto.base import LedgerApi
 from aea.helpers.transaction.base import RawTransaction, State, TransactionDigest
@@ -460,4 +461,11 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
         :param message: the message
         :return: the chain id
         """
-        return self.get_ledger_id(message)
+        if not isinstance(message, LedgerApiMessage):  # pragma: nocover
+            raise ValueError("argument is not a LedgerApiMessage instance.")
+        message = cast(LedgerApiMessage, message)
+        kwargs = cast(JSONLike, message.kwargs.body)
+        # if the chain id is specified in the message, use it.
+        # otherwise, use the ledger id.
+        chain_id = cast(str, kwargs.get("chain_id", self.get_ledger_id(message)))
+        return chain_id
