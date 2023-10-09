@@ -29,7 +29,7 @@ Add the http server connection package:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection valory/http_server:0.22.0:bafybeihtkwnmohvusfjjhahb7gxbyh6yo22cumaghfe4mbunscusbcbiym --remote
+aea add connection valory/http_server:0.22.0:bafybeie3d6tj2kzewced4nnttxdvr7njue2ortvawmwdt67gwf4tcuosom --remote
 aea push connection valory/http_server --local
 aea add protocol fetchai/default:1.0.0:bafybeibtqp56jkijwjsohk4z5vqp6pfkiexmnmk5uleteotbsgrypy6gxm --remote
 aea push protocol fetchai/default --local
