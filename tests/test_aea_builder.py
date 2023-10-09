@@ -64,11 +64,11 @@ from aea.skills.base import Skill
 from aea.test_tools.mocks import RegexComparator
 from aea.test_tools.test_cases import AEATestCase, AEATestCaseEmpty, BaseAEATestCase
 
+from packages.fetchai.connections.stub.connection import StubConnection
+from packages.fetchai.protocols.default import DefaultMessage
 from packages.valory.connections.http_server.connection import (
     PUBLIC_ID as HTTP_SERVER_CONNECTION_PUBLIC_ID,
 )
-from packages.fetchai.connections.stub.connection import StubConnection
-from packages.fetchai.protocols.default import DefaultMessage
 from packages.valory.protocols.http.message import HttpMessage
 
 from tests.conftest import (
