@@ -152,7 +152,7 @@ class TestRemoveConfig(
     #         self.run_cli_command(  # noqa: E800
     #             "add", "--local", self.ITEM_TYPE, str(self.ITEM_PUBLIC_ID)  # noqa: E800
     #         )  # noqa: E800
-    #         self.run_cli_command("add", "--local", "connection", "fetchai/http_server")  # noqa: E800
+    #         self.run_cli_command("add", "--local", "connection", "valory/http_server")  # noqa: E800
 
     #         self.runner.invoke(  # noqa: E800
     #             cli,  # noqa: E800

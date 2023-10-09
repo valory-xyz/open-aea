@@ -152,7 +152,7 @@ def test_when_package_has_missing_dependency():
         f"Missing dependencies: ['(protocol, {str(HttpMessage.protocol_id)})']"
     )
     with pytest.raises(AEAException, match=expected_message):
-        # connection "fetchai/http_server" requires
+        # connection "valory/http_server" requires
         # "fetchai/http" protocols.
         builder.add_component(
             ComponentType.CONNECTION,
