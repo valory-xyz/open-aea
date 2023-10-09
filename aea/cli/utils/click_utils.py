@@ -18,7 +18,6 @@
 #
 # ------------------------------------------------------------------------------
 """Module with click utils of the aea cli."""
-
 import os
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -46,6 +45,7 @@ from aea.configurations.constants import (
     SKILL,
 )
 from aea.configurations.data_types import Dependency, PackageType, PublicId
+from aea.crypto.registries import crypto_registry
 from aea.helpers.io import open_file
 from aea.package_manager.base import PACKAGE_SOURCE_RE
 
@@ -257,6 +257,34 @@ class PyPiDependency(click.ParamType):
             return Dependency.from_string(value)
         except ValueError as e:
             raise click.ClickException(str(e)) from e
+
+
+class LedgerChoice(click.ParamType):
+    """Ledger choice flag."""
+
+    ALL = "all"
+
+    def get_metavar(self, param: click.Parameter) -> str:
+        """Get metavar name."""
+        return "LEDGER_ID"
+
+    def convert(
+        self,
+        value: str,
+        param: Optional[click.Parameter] = None,
+        ctx: Optional[click.Context] = None,
+    ) -> str:
+        """Convert to ledger id."""
+        if len(crypto_registry.supported_ids) == 0:
+            raise click.ClickException("No ledger installation found")
+
+        if value not in crypto_registry.supported_ids and value != self.ALL:
+            raise click.ClickException(
+                f"Invalid identifier provided `{value}`; "
+                f"Available ledger identifiers {crypto_registry.supported_ids}"
+            )
+
+        return value
 
 
 def registry_flag(

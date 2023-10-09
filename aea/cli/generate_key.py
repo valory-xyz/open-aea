@@ -25,7 +25,7 @@ from typing import Dict, Optional, Union
 import click
 
 from aea.cli.add_key import _add_private_key
-from aea.cli.utils.click_utils import password_option
+from aea.cli.utils.click_utils import LedgerChoice, password_option
 from aea.cli.utils.decorators import _check_aea_project
 from aea.configurations.constants import (
     ADDRESS,
@@ -41,7 +41,7 @@ from aea.crypto.registries import crypto_registry, make_crypto
 @click.argument(
     "type_",
     metavar="TYPE",
-    type=click.Choice([*list(crypto_registry.supported_ids), "all"]),
+    type=LedgerChoice(),
     required=True,
 )
 @click.argument(
