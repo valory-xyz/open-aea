@@ -413,6 +413,10 @@ class DummyRequestDispatcher(RequestDispatcher):
             raise ValueError("argument is not a `DummyLedgerApiMessage` instance.")
         return message.ledger_id
 
+    def get_chain_id(self, message: Message) -> str:
+        """Extract the chain id from the message."""
+        return self.get_ledger_id(message=message)
+
 
 class LedgerConnectionWithDummyDispatcher(LedgerConnection):
     """An extended `LedgerConnection` which utilizes the `DummyDispatcher`."""
