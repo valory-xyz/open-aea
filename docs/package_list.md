@@ -7,7 +7,7 @@
 | protocol/valory/contract_api/1.0.0                            | `bafybeiasywsvax45qmugus5kxogejj66c5taen27h4voriodz7rgushtqa` |
 | protocol/valory/http/1.0.0                                    | `bafybeia5bxdua2i6chw6pg47bvoljzcpuqxzy4rdrorbdmcbnwmnfdobtu` |
 | protocol/valory/ledger_api/1.0.0                              | `bafybeigsvceac33asd6ecbqev34meyyjwu3rangenv6xp5rkxyz4krvcby` |
-| connection/fetchai/http_server/0.22.0                         | `bafybeihp5umafxzx45aad5pj7s3343se2wjkgnbirt4pybrape22swm6de` |
+| connection/valory/http_server/0.22.0                         | `bafybeihp5umafxzx45aad5pj7s3343se2wjkgnbirt4pybrape22swm6de` |
 | connection/fetchai/stub/0.21.0                                | `bafybeihijtaawc2adyewb3g7kta7hw6jyhyhoi7cotkzgqilves5zz7smm` |
 | connection/valory/ledger/0.19.0                               | `bafybeiejc7g7ebv3cleiqb4f4h4pspcu6vtr54332szwlqiabfs3sfdh44` |
 | connection/valory/p2p_libp2p/0.1.0                            | `bafybeigfvt35r5blb3pp43iads6a56jolquvib5unbndkue7cgysazuxuu` |
