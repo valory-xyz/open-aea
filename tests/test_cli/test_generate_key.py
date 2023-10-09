@@ -27,7 +27,6 @@ import string
 import tempfile
 from pathlib import Path
 from typing import Type
-from unittest import mock
 
 import pytest
 from aea_ledger_cosmos import CosmosCrypto
