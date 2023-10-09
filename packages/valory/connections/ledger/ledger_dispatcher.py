@@ -464,7 +464,10 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
         if not isinstance(message, LedgerApiMessage):  # pragma: nocover
             raise ValueError("argument is not a LedgerApiMessage instance.")
         message = cast(LedgerApiMessage, message)
-        kwargs = cast(JSONLike, message.kwargs.body)
+        kwargs = {}
+        if message.is_set("kwargs"):
+            # check if kwargs is set
+            kwargs = cast(JSONLike, message.kwargs.body)
         # if the chain id is specified in the message, use it.
         # otherwise, use the ledger id.
         chain_id = cast(str, kwargs.get("chain_id", self.get_ledger_id(message)))

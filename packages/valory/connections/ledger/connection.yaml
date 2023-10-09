@@ -11,7 +11,7 @@ fingerprint:
   base.py: bafybeifuoq2oqlcjlgeg2fg5l2ijiylb23v65xghv7u422helief2cjjuy
   connection.py: bafybeicydkymhz2feqmihtkiwdfg7pp4pww2elqv4tijuhjcplyvawdk74
   contract_dispatcher.py: bafybeifm5n2nh3z7cr47h2ejs4zu47s6uxliuvaacndxwt6sdcvbqwmpqa
-  ledger_dispatcher.py: bafybeibvvtotspsgt4e4dgevvj3lexzpohr7bha7i7hmlsvq5i2l3qagrm
+  ledger_dispatcher.py: bafybeigeziwsrriamjycjwu6qri2vervgbta7xkludnae2fzqqegwp6d5e
   tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
   tests/conftest.py: bafybeid7vo7e2m76ey5beeadtbxywxx5ukefd5slwbc362rwmhht6i45ou
   tests/test_contract_dispatcher.py: bafybeiag5lnpc7h25w23ash4hk4cowxsy5buxgpr474l3tfewnhf56eqyq
