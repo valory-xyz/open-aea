@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -132,6 +132,19 @@ class RequestDispatcher(ABC):
         func_result = await asyncio.wait_for(running_func, timeout=timeout)
         return func_result
 
+    def set_extra_kwargs(  # pylint: disable=no-self-use, unused-argument
+        self, message: Message
+    ) -> None:
+        """
+        Set extra kwargs for the provided message.
+
+        By default, this method does nothing. Override it in subclasses to set extra kwargs.
+
+        :param message: the message that will be decorated with the extra kwargs.
+        :return: None
+        """
+        return
+
     def dispatch(self, envelope: Envelope) -> Task:
         """
         Dispatch the request to the right sender handler.
@@ -143,7 +156,9 @@ class RequestDispatcher(ABC):
             raise ValueError("Ledger connection expects non-serialized messages.")
         message = envelope.message
         ledger_id = self.get_ledger_id(message)
-        api = self.ledger_api_registry.make(ledger_id, **self.api_config(ledger_id))
+        chain_id = self.get_chain_id(message)
+        self.set_extra_kwargs(message)
+        api = self.ledger_api_registry.make(ledger_id, **self.api_config(chain_id))
         dialogue = self.dialogues.update(message)
         if dialogue is None:
             raise ValueError(  # pragma: nocover
@@ -196,3 +211,7 @@ class RequestDispatcher(ABC):
     @abstractmethod
     def get_ledger_id(self, message: Message) -> str:
         """Extract the ledger id from the message."""
+
+    @abstractmethod
+    def get_chain_id(self, message: Message) -> str:
+        """Extract the chain id from the message."""

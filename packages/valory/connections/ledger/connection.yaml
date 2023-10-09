@@ -7,15 +7,15 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
-  __init__.py: bafybeierqitcqk7oy6m3qp7jgs67lcg55mzt3arltkwimuii2ynfejccwi
-  base.py: bafybeicpyhus3h2t5urzldnjns2sfwae64uinethqnlunudclbdg4xftnq
+  __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
+  base.py: bafybeifuoq2oqlcjlgeg2fg5l2ijiylb23v65xghv7u422helief2cjjuy
   connection.py: bafybeicydkymhz2feqmihtkiwdfg7pp4pww2elqv4tijuhjcplyvawdk74
-  contract_dispatcher.py: bafybeibxclfbs3m6yc7jsldid3l6zlyssg74mdpzt3xuthyrq3ul5qosfu
-  ledger_dispatcher.py: bafybeidk2ucd2oc6bdmevdlmia5i5d66t446otzhq5loepvz5altpl6xdu
-  tests/__init__.py: bafybeieyhttiwruutk6574yzj7dk2afamgdum5vktyv54gsax7dlkuqtc4
+  contract_dispatcher.py: bafybeifm5n2nh3z7cr47h2ejs4zu47s6uxliuvaacndxwt6sdcvbqwmpqa
+  ledger_dispatcher.py: bafybeigeziwsrriamjycjwu6qri2vervgbta7xkludnae2fzqqegwp6d5e
+  tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
   tests/conftest.py: bafybeid7vo7e2m76ey5beeadtbxywxx5ukefd5slwbc362rwmhht6i45ou
   tests/test_contract_dispatcher.py: bafybeiag5lnpc7h25w23ash4hk4cowxsy5buxgpr474l3tfewnhf56eqyq
-  tests/test_ledger.py: bafybeib5q7ypsuumitcsai3mpnjsrzxijtuj7ut5xcsbvpwnllkfozhsk4
+  tests/test_ledger.py: bafybeigcedfr3yv3jse3xwrerrgwbelgb56uhgrvdus527d3daekh6dx4m
   tests/test_ledger_api.py: bafybeifwdpbds7ujd2uzxcapprdgdp5fn2gpbycsgbbefbsabrucnvrfiq
 fingerprint_ignore_patterns: []
 connections: []
@@ -54,8 +54,43 @@ config:
       is_gas_estimation_enabled: true
       poa_chain: false
       authentication_private_key: null
-      flashbot_relayer_uri: null
+      flashbots_builders: []
     solana:
+      address: http://127.0.0.1:8545
+      chain_id: 1337
+      default_gas_price_strategy: eip1559
+      gas_price_strategies: *id001
+      is_gas_estimation_enabled: true
+      poa_chain: false
+    arbitrum:
+      address: http://127.0.0.1:8545
+      chain_id: 1337
+      default_gas_price_strategy: eip1559
+      gas_price_strategies: *id001
+      is_gas_estimation_enabled: true
+      poa_chain: false
+    zksync:
+      address: http://127.0.0.1:8545
+      chain_id: 1337
+      default_gas_price_strategy: eip1559
+      gas_price_strategies: *id001
+      is_gas_estimation_enabled: true
+      poa_chain: false
+    bnb:
+      address: http://127.0.0.1:8545
+      chain_id: 1337
+      default_gas_price_strategy: eip1559
+      gas_price_strategies: *id001
+      is_gas_estimation_enabled: true
+      poa_chain: false
+    gnosis:
+      address: http://127.0.0.1:8545
+      chain_id: 1337
+      default_gas_price_strategy: eip1559
+      gas_price_strategies: *id001
+      is_gas_estimation_enabled: true
+      poa_chain: false
+    consensys:
       address: http://127.0.0.1:8545
       chain_id: 1337
       default_gas_price_strategy: eip1559
