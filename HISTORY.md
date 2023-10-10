@@ -4,6 +4,22 @@
 ## 1.40.0 (2023-09-26)
 
 AEA:
+- Fixes the source repository validation regex
+- Updates the `generate-key` command to prompt before overwriting the existing keys file
+- Fixes the inconsistent hashing caused by the `CRLF` line endings
+- Updates the component loader to ignore the test modules when loading the component
+- Adds support for overriding dependencies
+- Updates the `sync` command to download missing dependencies and update `packages.json`
+- Updates the error messages for missing ledger plugins on `generate-key` command
+  
+Plugins:
+- Adds missing `py.typed` markers
+- Backports the changes from the `agent-academy-2` repository on the ledger connection
+- Ports `http_server` as a valory connection
+
+## 1.40.0 (2023-09-26)
+
+AEA:
 - Adds support for specifying extra dependencies and overriding dependencies via `-e` flag on `aea install`
 - Updates the selection of dependencies in `aea install` command to override the dependencies in the `extra dependencies provided by flag > agent > skill > connection > contract > protocol` order instead of merging them.
 
