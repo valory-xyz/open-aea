@@ -22,12 +22,15 @@ import codecs
 import hashlib
 import io
 import os
+import platform
+import re
 from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
 
 import base58
 
 from aea.helpers.cid import to_v1
+from aea.helpers.io import open_file
 from aea.helpers.ipfs.utils import _protobuf_python_implementation
 
 
@@ -41,12 +44,34 @@ with _protobuf_python_implementation():  # pylint: disable=import-outside-toplev
     from aea.helpers.ipfs.pb.merkledag_pb2 import PBNode  # type: ignore
 
 
+def _is_text(file_path: str) -> bool:
+    """Check if a file can be read as text or not."""
+    try:
+        with open_file(file_path, "r") as f:
+            f.readline()
+        return True
+    except UnicodeDecodeError:
+        return False
+
+
+def _dos2unix(file_content: bytes) -> bytes:
+    """
+    Replace occurrences of Windows line terminator CR/LF with only LF.
+
+    :param file_content: the content of the file.
+    :return: the same content but with the line terminator
+    """
+    return re.sub(b"\r\n", b"\n", file_content, flags=re.M)
+
+
 def _read(file_path: str) -> bytes:
     """Read and verify the file is not empty."""
     with open(file_path, "rb") as file:
         data = file.read()
     if len(data) == 0:
         raise ValueError(f"File cannot be empty: {file_path}")
+    if platform.system() == "Windows" and _is_text(file_path=file_path):
+        data = _dos2unix(data)
     return data
 
 
