@@ -156,7 +156,7 @@ def test_when_package_has_missing_dependency():
         # "fetchai/http" protocols.
         builder.add_component(
             ComponentType.CONNECTION,
-            Path(ROOT_DIR) / "packages" / "fetchai" / "connections" / "http_server",
+            Path(ROOT_DIR) / "packages" / "valory" / "connections" / "http_server",
         )
 
 
