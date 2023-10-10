@@ -18,7 +18,7 @@ Usually, an interaction involves three types of framework packages: <a href="../
 
 ### Example 1: AEA <> web client
 
-In the <a href="../http-connection-and-skill">http connection guide</a> we demonstrate how an AEA with an http server connection (e.g. `fetchai/http_server`) receives http payloads from web clients, translates them to messages conforming with the `fetchai/http` protocol and passes it to a skill (e.g. `fetchai/http_echo`) to process. The `fetchai/http` protocol in this case is used for communication between the connection and the skill.
+In the <a href="../http-connection-and-skill">http connection guide</a> we demonstrate how an AEA with an http server connection (e.g. `valory/http_server`) receives http payloads from web clients, translates them to messages conforming with the `fetchai/http` protocol and passes it to a skill (e.g. `fetchai/http_echo`) to process. The `fetchai/http` protocol in this case is used for communication between the connection and the skill.
 
 ### Example 2 : AEA <> 3rd party server
 

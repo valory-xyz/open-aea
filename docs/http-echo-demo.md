@@ -16,7 +16,7 @@ The easiest way to get started with the http server is to use our pre-built exam
 
 ``` bash
 pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeie6dxx5zbu6bz7at7kqj3thjvvzucj45f3tksbio5dg23ywsbb2ty --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeiaosh5h4msjh4rubd3xnygpqco47hjv4zbt6cz4zrai6zmvd77bv4 --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install
@@ -27,8 +27,8 @@ Adding protocol 'valory/http:1.0.0'...
 Successfully added protocol 'valory/http:1.0.0'.
 Adding protocol 'fetchai/default:1.0.0'...
 Successfully added protocol 'fetchai/default:1.0.0'.
-Adding connection 'fetchai/http_server:0.22.0'...
-Successfully added connection 'fetchai/http_server:0.22.0'.
+Adding connection 'valory/http_server:0.22.0'...
+Successfully added connection 'valory/http_server:0.22.0'.
 Adding skill 'fetchai/http_echo:0.20.0'...
 Successfully added skill 'fetchai/http_echo:0.20.0'.
 Agent http_echo successfully fetched.

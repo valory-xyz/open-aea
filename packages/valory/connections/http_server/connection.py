@@ -67,7 +67,7 @@ SERVER_ERROR = 500
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.http_server")
 
 RequestId = DialogueLabel
-PUBLIC_ID = PublicId.from_str("fetchai/http_server:0.22.0")
+PUBLIC_ID = PublicId.from_str("valory/http_server:0.22.0")
 
 
 class HttpDialogues(BaseHttpDialogues):

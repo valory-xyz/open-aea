@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -152,7 +152,7 @@ class TestRemoveConfig(
     #         self.run_cli_command(  # noqa: E800
     #             "add", "--local", self.ITEM_TYPE, str(self.ITEM_PUBLIC_ID)  # noqa: E800
     #         )  # noqa: E800
-    #         self.run_cli_command("add", "--local", "connection", "fetchai/http_server")  # noqa: E800
+    #         self.run_cli_command("add", "--local", "connection", "valory/http_server")  # noqa: E800
 
     #         self.runner.invoke(  # noqa: E800
     #             cli,  # noqa: E800

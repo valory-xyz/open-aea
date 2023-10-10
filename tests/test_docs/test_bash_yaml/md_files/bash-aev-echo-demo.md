@@ -8,7 +8,7 @@ aea_version: '>=1.3.0, <2.0.0'
 fingerprint: {}
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/http_server:0.22.0
+- valory/http_server:0.22.0
 contracts: []
 protocols:
 - fetchai/default:1.0.0
@@ -30,7 +30,7 @@ dependencies:
   open-aea-ledger-ethereum: {}
 default_connection: null
 ---
-public_id: fetchai/http_server:0.22.0
+public_id: valory/http_server:0.22.0
 type: connection
 config:
   host: ${HOST:str:localhost}

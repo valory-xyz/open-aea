@@ -8,7 +8,7 @@ fingerprint:
   README.md: bafybeibkr6ecv5efx3hwxvxposvpmr76ugrj6kydeasb7bppo3ibynnjcu
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/http_server:0.22.0:bafybeihvscddpxjbtqsetngmxo3kiht2wqhosmwiyuh3f6zjti3x3byu5u
+- valory/http_server:0.22.0:bafybeie3d6tj2kzewced4nnttxdvr7njue2ortvawmwdt67gwf4tcuosom
 contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeibtqp56jkijwjsohk4z5vqp6pfkiexmnmk5uleteotbsgrypy6gxm
@@ -29,7 +29,7 @@ dependencies:
   open-aea-ledger-ethereum: {}
 default_connection: null
 ---
-public_id: fetchai/http_server:0.22.0
+public_id: valory/http_server:0.22.0
 type: connection
 config:
   host: ${HOST:str:localhost}

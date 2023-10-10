@@ -64,7 +64,7 @@ from aea.helpers.base import (
     win_popen_kwargs,
 )
 
-from packages.fetchai.connections.http_server.connection import HTTPServerConnection
+from packages.valory.connections.http_server.connection import HTTPServerConnection
 
 from tests.conftest import CUR_PATH, ROOT_DIR, skip_test_windows
 from tests.data.dummy_skill import PUBLIC_ID as DUMMY_SKILL_PUBLIC_ID
@@ -97,7 +97,7 @@ class TestHelpersBase:
         os.chdir(os.path.join(CUR_PATH, ".."))
         expected_class = HTTPServerConnection
         actual_class = locate(
-            "packages.fetchai.connections.http_server.connection.HTTPServerConnection"
+            "packages.valory.connections.http_server.connection.HTTPServerConnection"
         )
         os.chdir(cwd)
         # although they are the same class, they are different instances in memory

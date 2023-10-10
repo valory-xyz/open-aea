@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,11 +33,11 @@ from aea.identity.base import Identity
 from aea.mail.base import Envelope, Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 
-from packages.fetchai.connections.http_server.connection import (
+from packages.valory.connections.http_client.connection import HTTPClientConnection
+from packages.valory.connections.http_server.connection import (
     HTTPServerConnection,
     headers_to_string,
 )
-from packages.valory.connections.http_client.connection import HTTPClientConnection
 from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
 
