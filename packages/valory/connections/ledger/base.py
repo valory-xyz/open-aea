@@ -34,6 +34,25 @@ from aea.mail.base import Envelope
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue, Dialogues
 
+ETHEREUM_LEDGER_ID = "ethereum"
+
+EVM_LEDGERS = {
+    i: ETHEREUM_LEDGER_ID
+    for i in [
+        "matic",
+        "gnosis",
+        "bsc",
+        "optimism",
+        "arbitrum",
+        "celo",
+        "avalanche",
+        "fantom",
+        "base",
+        "zksync",
+        "canto",
+    ]
+}
+
 
 class RequestDispatcher(ABC):
     """Base class for a request dispatcher."""
@@ -158,7 +177,11 @@ class RequestDispatcher(ABC):
         ledger_id = self.get_ledger_id(message)
         chain_id = self.get_chain_id(message)
         self.set_extra_kwargs(message)
-        api = self.ledger_api_registry.make(ledger_id, **self.api_config(chain_id))
+        if ledger_id not in EVM_LEDGERS:
+            registry_ledger_id = ledger_id
+        else:
+            registry_ledger_id = ETHEREUM_LEDGER_ID
+        api = self.ledger_api_registry.make(registry_ledger_id, **self.api_config(chain_id))
         dialogue = self.dialogues.update(message)
         if dialogue is None:
             raise ValueError(  # pragma: nocover
