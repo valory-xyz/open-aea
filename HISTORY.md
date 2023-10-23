@@ -1,7 +1,12 @@
 # Release History - open AEA
 
 
-## 1.40.0 (2023-09-26)
+## 1.41.0.post1 (2023-10-23)
+
+Packages:
+- Use `kwargs.pop` instead of `kwargs.get` to avoid extra argument error on ledger connection
+
+## 1.41.0 (2023-10-10)
 
 AEA:
 - Fixes the source repository validation regex
