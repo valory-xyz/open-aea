@@ -470,5 +470,5 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             kwargs = cast(JSONLike, message.kwargs.body)
         # if the chain id is specified in the message, use it.
         # otherwise, use the ledger id.
-        chain_id = cast(str, kwargs.get("chain_id", self.get_ledger_id(message)))
+        chain_id = cast(str, kwargs.pop("chain_id", self.get_ledger_id(message)))
         return chain_id
