@@ -33,7 +33,7 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
 from typing import OrderedDict as OrderedDictType
-from typing import Set, Tuple, cast
+from typing import Tuple, cast
 
 import click
 
@@ -366,10 +366,9 @@ def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
                     dependencies[key] = value
                 if value == dependencies[key]:
                     continue
-                else:
-                    print(
-                        f"Non-matching dependency versions for {key}: {value} vs {dependencies[key]}"
-                    )
+                print(
+                    f"Non-matching dependency versions for {key}: {value} vs {dependencies[key]}"
+                )
 
     return list(dependencies.values())
 
