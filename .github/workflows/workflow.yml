@@ -141,6 +141,8 @@ jobs:
         run: tox -e package-version-checks
       - name: Check package dependencies
         run: tox -e package-dependencies-checks
+      - name: Check dependencies
+        run: tox -e check-dependencies
       - name: Check generate protocols
         run: tox -e check-generate-all-protocols
       - name: Generate Documentation
