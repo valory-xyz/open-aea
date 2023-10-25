@@ -25,7 +25,7 @@ restricted_to_protocols:
 - valory/http:1.0.0
 dependencies:
   aiohttp:
-    version: <3.8,>=3.7.4
+    version: <4.0.0,>=3.8.5
   certifi: {}
   multidict: {}
 is_abstract: false
