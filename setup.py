@@ -60,7 +60,7 @@ base_deps = [
     "protobuf>=4.21.6,<5.0.0",
     "pymultihash==0.8.2",
     "pyyaml==6.0.1",
-    "requests>=2.31.0,<3.0.0",
+    "requests==2.28.1",
     "python-dotenv>=0.14.0,<0.18.0",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",
