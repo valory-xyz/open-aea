@@ -603,16 +603,7 @@ def check_pypi_dependencies(configuration_file: Path) -> None:
 @click.option("--vendor", type=str, default=None, required=False)
 @pass_ctx
 def check_packages(ctx: Context, vendor: Optional[str]) -> None:
-    """
-    Run different checks on AEA packages.
-
-    Namely:
-    - Check that every package has existing dependencies
-    - Check that every package has non-empty description
-
-    :param ctx: AEA cli context.
-    :param vendor: filter by author name
-    """
+    """Run different checks on AEA packages."""
     packages_dir = Path(ctx.registry_path).absolute()
     all_packages_ids_ = find_all_packages_ids(packages_dir)
     failed: bool = False
