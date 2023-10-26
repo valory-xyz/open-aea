@@ -29,11 +29,11 @@ Add the http server connection package:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection fetchai/http_server:0.22.0:bafybeihaax5od5zo5jk2l62hv4jwuwtxloh5mijozudpsjombqc4ncmi6i --remote
-aea push connection fetchai/http_server --local
-aea add protocol fetchai/default:1.0.0:bafybeieqqzgzuappi2ped42upgzad5gt3mxiyjhojwibxm4o367ffsian4 --remote
+aea add connection valory/http_server:0.22.0:bafybeid4nl6ruidpto3ynwjmc76nf42egcroqlhqq6krh2onwktu4ywpne --remote
+aea push connection valory/http_server --local
+aea add protocol fetchai/default:1.0.0:bafybeibtqp56jkijwjsohk4z5vqp6pfkiexmnmk5uleteotbsgrypy6gxm --remote
 aea push protocol fetchai/default --local
-aea add protocol valory/http:1.0.0:bafybeifyoio7nlh5zzyn5yz7krkou56l22to3cwg7gw5v5o3vxwklibhty --remote
+aea add protocol valory/http:1.0.0:bafybeiejoqgv7finfxo3rcvvovrlj5ccrbgxodjq43uo26ylpowsa3llfe --remote
 aea push protocol valory/http --local
 cd ..
 aea delete my_aea
@@ -42,7 +42,7 @@ aea delete my_aea
 Update the default connection:
 
 ``` bash
-aea config set agent.default_connection fetchai/http_server:0.22.0
+aea config set agent.default_connection valory/http_server:0.22.0
 ```
 
 Modify the `api_spec_path`:

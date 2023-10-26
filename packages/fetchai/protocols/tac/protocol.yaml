@@ -9,13 +9,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeibmlti3bag4zk4o7nhjglt7nrrujpstfudd7pje4qfgofoxq5vbea
-  __init__.py: bafybeig2nzegcfrbwtsxu6wc622trcayqmmf3yrubpbyzfoih5hfv4c2bq
+  __init__.py: bafybeic7yjoolsdbzsmhe2fvho44sqe3tbzi5ezw4kecjvhwinv3kejmqm
   custom_types.py: bafybeiajzip37odvfonxcalejaxua3un3lzfepk74mltev5jxil4l6t5ae
   dialogues.py: bafybeigyrtdcjmlklucsbntypw3hdriijwy6f77iguvohwjm3kmzfkexty
-  message.py: bafybeigklfnwvntvng73nymg7pdj3ybmmigsab7ghmkhtiynkhcvybgjs4
-  serialization.py: bafybeihnjre73zvclsc76fxpi6mkk57dz2soulavyp7urtll5doilhqyxm
+  message.py: bafybeieiygprdamnpa63wtwsq3th54l72epo7ujc5nsz3j6bfpoofxull4
+  serialization.py: bafybeieipzx2rqweyhufdilxfmacx7jqxxmqemkejqhtqklpmfpb7yri4a
   tac.proto: bafybeig5yaqdqk5vzxibwbfkmd2oqsty4nsyhjihphjtq6q3ht7lyc334u
-  tac_pb2.py: bafybeihz5o5atjzsd23ljhshzsjwmhd5xqrsqb2oh5qgscljcuz2espvwy
+  tac_pb2.py: bafybeialt4qutqgzcmqbvc7puewz5usf7gl3mewpyn5ren4ocz2odrqkdi
   tests/__init__.py: bafybeigio4dcbzdb4zxbycaredo4l4a72z4rk6wt5bbvubhu6fdj73t6oe
   tests/test_tac.py: bafybeicwgqy3xhgaad3m7zlbk5yytoch45lvysf4l4g62hoyvb7lhzqobq
   tests/test_tac_dialogues.py: bafybeigqdsgi3uecuf2vg3jz6fpowlto36777laz6bnsw5u3dfvbppjdei

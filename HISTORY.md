@@ -1,5 +1,78 @@
 # Release History - open AEA
 
+
+## 1.41.0.post1 (2023-10-23)
+
+Packages:
+- Use `kwargs.pop` instead of `kwargs.get` to avoid extra argument error on ledger connection
+
+## 1.41.0 (2023-10-10)
+
+AEA:
+- Fixes the source repository validation regex
+- Updates the `generate-key` command to prompt before overwriting the existing keys file
+- Fixes the inconsistent hashing caused by the `CRLF` line endings
+- Updates the component loader to ignore the test modules when loading the component
+- Adds support for overriding dependencies
+- Updates the `sync` command to download missing dependencies and update `packages.json`
+- Updates the error messages for missing ledger plugins on `generate-key` command
+  
+Plugins:
+- Adds missing `py.typed` markers
+- Backports the changes from the `agent-academy-2` repository on the ledger connection
+- Ports `http_server` as a valory connection
+
+## 1.40.0 (2023-09-26)
+
+AEA:
+- Adds support for specifying extra dependencies and overriding dependencies via `-e` flag on `aea install`
+- Updates the selection of dependencies in `aea install` command to override the dependencies in the `extra dependencies provided by flag > agent > skill > connection > contract > protocol` order instead of merging them.
+
+## 1.40.0 (2023-09-26)
+
+AEA:
+- Removes the `web3py` fork as a dependency
+- Bumps the protobuf to `protobuf>=4.21.6,<5.0.0`
+- Updates protocol buffers compiler to `v24.3`
+- Updates the protocol generator
+- Removes unused layers from the user image and uses minimal python image as base
+
+## 1.39.0.post1 (2023-09-21)
+
+AEA:
+- Pins `jsonschema<=4.19.0,>=4.16.0`
+
+## 1.39.0 (2023-09-07)
+
+AEA:
+- Removes the rust installation layer from the user image
+
+## 1.38.0 (2023-08-09)
+
+Framework:
+- Deprecates the support for `Python 3.7` and adds support for `Python 3.11`
+- Adds support for multi platform docker images
+
+Plugins:
+- Replaces `web3py==5.31.4` with `open-aea-web3==6.0.1`
+- Replaces `flashbots==1.1.1` with `open-aea-flashbots==1.3.0`
+- Bumps `open-aea-cosmpy` to `v0.6.5`
+- Deprecates the `apduboy` as a dependency
+- Pins `ledgerwallet==0.1.3`
+
+## 1.37.0 (2023-07-25)
+
+Plugins:
+- Replaces `cosmpy` with `open-aea-cosmpy`
+
+## 1.36.0 (2023-07-19)
+
+AEA:
+- pyyaml updated, tomte updated  
+
+Plugins:
+- cosmpy updated to 0.6.0
+
 ## 1.35.0 (2023-06-20)
 
 Plugins:

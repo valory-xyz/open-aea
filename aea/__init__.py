@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,23 @@
 
 """Contains the AEA package."""
 
+# pylint: disable=wrong-import-position
+
 import inspect
 import os
+import sys
+
+
+# Patch to fix https://github.com/protocolbuffers/protobuf/issues/3276
+
+_google_upb_message = sys.modules.pop("google._upb._message", None)
+
+from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
+
+
+if _google_upb_message is not None:
+    sys.modules["google._upb._message"] = _google_upb_message
+
 
 from packaging.version import Version
 

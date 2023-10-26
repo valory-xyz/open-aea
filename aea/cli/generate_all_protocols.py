@@ -63,7 +63,7 @@ from aea.manager.helpers import AEAProject
 
 
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
-LIBPROTOC_VERSION = "libprotoc 3.19.4"
+LIBPROTOC_VERSION = "libprotoc 24.3"
 CUSTOM_TYPE_MODULE_NAME = "custom_types.py"
 PROTOCOL_GENERATOR_DOCSTRING_REGEX = "It was created with protocol buffer compiler version `libprotoc .*` and aea protocol generator version `.*`."
 

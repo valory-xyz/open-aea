@@ -1658,25 +1658,35 @@ class ProtocolGenerator:
         cls_str += self.indent + "from typing import Any, Dict, cast\n\n"
         cls_str += (
             self.indent
-            + "from aea.mail.base_pb2 import DialogueMessage, Message as ProtobufMessage\n"
+            + "from aea.mail.base_pb2 import DialogueMessage  # type: ignore\n"
+        )
+        cls_str += (
+            self.indent
+            + "from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore\n"
         )
         cls_str += MESSAGE_IMPORT + "\n"
         cls_str += SERIALIZER_IMPORT + "\n\n"
-        cls_str += self.indent + "from {} import (\n    {}_pb2,\n)\n".format(
-            self.dotted_path_to_protocol_package,
-            self.protocol_specification.name,
+        cls_str += (
+            self.indent
+            + "from {} import (  # type: ignore\n    {}_pb2,\n)\n".format(
+                self.dotted_path_to_protocol_package,
+                self.protocol_specification.name,
+            )
         )
         for custom_type in self.spec.all_custom_types:
             cls_str += (
                 self.indent
-                + "from {}.custom_types import (\n    {},\n)\n".format(
+                + "from {}.custom_types import (  # type: ignore\n    {},\n)\n".format(
                     self.dotted_path_to_protocol_package,
                     custom_type,
                 )
             )
-        cls_str += self.indent + "from {}.message import (\n    {}Message,\n)\n".format(
-            self.dotted_path_to_protocol_package,
-            self.protocol_specification_in_camel_case,
+        cls_str += (
+            self.indent
+            + "from {}.message import (  # type: ignore\n    {}Message,\n)\n".format(
+                self.dotted_path_to_protocol_package,
+                self.protocol_specification_in_camel_case,
+            )
         )
 
         # Class Header
@@ -1707,10 +1717,13 @@ class ProtocolGenerator:
         )
         cls_str += self.indent + "message_pb = ProtobufMessage()\n"
         cls_str += self.indent + "dialogue_message_pb = DialogueMessage()\n"
-        cls_str += self.indent + "{}_msg = {}_pb2.{}Message()\n\n".format(
-            self.protocol_specification.name,
-            self.protocol_specification.name,
-            self.protocol_specification_in_camel_case,
+        cls_str += (
+            self.indent
+            + "{}_msg = {}_pb2.{}Message()  # type: ignore\n\n".format(
+                self.protocol_specification.name,
+                self.protocol_specification.name,
+                self.protocol_specification_in_camel_case,
+            )
         )
         cls_str += self.indent + "dialogue_message_pb.message_id = msg.message_id\n"
         cls_str += self.indent + "dialogue_reference = msg.dialogue_reference\n"
@@ -1787,7 +1800,7 @@ class ProtocolGenerator:
         )
         cls_str += self.indent + '"""\n'
         cls_str += self.indent + "message_pb = ProtobufMessage()\n"
-        cls_str += self.indent + "{}_pb = {}_pb2.{}Message()\n".format(
+        cls_str += self.indent + "{}_pb = {}_pb2.{}Message()  # type: ignore\n".format(
             self.protocol_specification.name,
             self.protocol_specification.name,
             self.protocol_specification_in_camel_case,

@@ -257,7 +257,7 @@ def test_scaffolded_contract_method_call():
         SPENDER_ADDRESS = "0x7A1236d5195e31f1F573AD618b2b6FEFC85C5Ce6"
         OWNER_ADDRESS = "0x7A1236d5195e31f1F573AD618b2b6FEFC85C5Ce6"
 
-        with mock.patch("web3.contract.ContractFunction.call", return_value=0):
+        with mock.patch("web3.contract.contract.ContractFunction.call", return_value=0):
             res = contract.contract_method_call(
                 ledger_api=ledger_api,
                 method_name="allowance",
@@ -330,7 +330,7 @@ def test_default_method_call():
     )
 
     # Call a function present in the ABI but not in the contract package
-    with mock.patch("web3.contract.ContractFunction.call", return_value=0):
+    with mock.patch("web3.contract.contract.ContractFunction.call", return_value=0):
         result = contract.default_method_call(
             ledger_api=ledger_api,
             contract_address=dummy_address,

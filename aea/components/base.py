@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -350,8 +350,10 @@ def perform_load_aea_package(
     )
 
     prefix_pkg = prefix_pkg_type + f".{package_name}"
-
     for subpackage_init_file in dir_.rglob("__init__.py"):
+        if subpackage_init_file.parent.name == "tests":
+            continue
+
         parent_dir = subpackage_init_file.parent
         relative_parent_dir = parent_dir.relative_to(dir_)
         if relative_parent_dir == Path("."):

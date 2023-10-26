@@ -1067,6 +1067,17 @@ def ref() -> Optional[str]
 
 Get the ref.
 
+<a id="aea.configurations.data_types.Dependency.from_string"></a>
+
+#### from`_`string
+
+```python
+@classmethod
+def from_string(cls, string: str) -> "Dependency"
+```
+
+Parse from string.
+
 <a id="aea.configurations.data_types.Dependency.from_json"></a>
 
 #### from`_`json

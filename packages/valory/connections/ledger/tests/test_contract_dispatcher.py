@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ def test_validate_and_call_callable() -> None:
 
     message.callable = "getAddress"
     # Call a method present in the ABI but not in the contract package
-    with mock.patch("web3.contract.ContractFunction.call", return_value=0):
+    with mock.patch("web3.contract.contract.ContractFunction.call", return_value=0):
         result = ContractApiRequestDispatcher._validate_and_call_callable(
             ledger_api, message, contract
         )
@@ -243,6 +243,7 @@ def test_build_response_fails_on_bad_data_type() -> None:
 @pytest.mark.asyncio
 async def test_run_async() -> None:
     """Test run async error handled."""
+
     # for pydocstyle
     def _raise():  # type: ignore
         raise Exception("Expected")

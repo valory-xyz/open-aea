@@ -206,7 +206,7 @@ class EthereumFlashbotApi(EthereumApi):
         :return: the transaction digest if the transaction went through, None otherwise.
         """
         for target_block in target_blocks:
-            current_block = self.api.eth.blockNumber
+            current_block = self.api.eth.block_number
             if current_block >= target_block:
                 # we can only target future blocks
                 _default_logger.debug(
@@ -276,7 +276,7 @@ class EthereumFlashbotApi(EthereumApi):
         :param num_blocks: the number of blocks to get.
         :return: the next blocks.
         """
-        current_block = self.api.eth.blockNumber
+        current_block = self.api.eth.block_number
         return list(range(current_block, current_block + num_blocks))
 
     @try_decorator("Unable to send transactions: {}", logger_method="warning")

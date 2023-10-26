@@ -22,13 +22,14 @@
 # pylint: disable=too-many-statements,too-many-locals,no-member,too-few-public-methods,redefined-builtin
 from typing import Any, Dict, cast
 
-from aea.mail.base_pb2 import DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
-from aea.protocols.base import Message, Serializer
+from aea.mail.base_pb2 import DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
+from aea.protocols.base import Message  # type: ignore
+from aea.protocols.base import Serializer  # type: ignore
 
-from packages.fetchai.protocols.tac import tac_pb2
-from packages.fetchai.protocols.tac.custom_types import ErrorCode
-from packages.fetchai.protocols.tac.message import TacMessage
+from packages.fetchai.protocols.tac import tac_pb2  # type: ignore
+from packages.fetchai.protocols.tac.custom_types import ErrorCode  # type: ignore
+from packages.fetchai.protocols.tac.message import TacMessage  # type: ignore
 
 
 class TacSerializer(Serializer):
@@ -45,7 +46,7 @@ class TacSerializer(Serializer):
         msg = cast(TacMessage, msg)
         message_pb = ProtobufMessage()
         dialogue_message_pb = DialogueMessage()
-        tac_msg = tac_pb2.TacMessage()
+        tac_msg = tac_pb2.TacMessage()  # type: ignore
 
         dialogue_message_pb.message_id = msg.message_id
         dialogue_reference = msg.dialogue_reference
@@ -151,7 +152,7 @@ class TacSerializer(Serializer):
         :return: the 'Tac' message.
         """
         message_pb = ProtobufMessage()
-        tac_pb = tac_pb2.TacMessage()
+        tac_pb = tac_pb2.TacMessage()  # type: ignore
         message_pb.ParseFromString(obj)
         message_id = message_pb.dialogue_message.message_id
         dialogue_reference = (

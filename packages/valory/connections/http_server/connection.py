@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,7 +67,7 @@ SERVER_ERROR = 500
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.http_server")
 
 RequestId = DialogueLabel
-PUBLIC_ID = PublicId.from_str("fetchai/http_server:0.22.0")
+PUBLIC_ID = PublicId.from_str("valory/http_server:0.22.0")
 
 
 class HttpDialogues(BaseHttpDialogues):
@@ -213,7 +213,6 @@ class Response(web.Response):
         :return: the response
         """
         if http_message.performative == HttpMessage.Performative.RESPONSE:
-
             if http_message.is_set("headers") and http_message.headers:
                 headers: Optional[dict] = dict(
                     email.message_from_string(http_message.headers).items()

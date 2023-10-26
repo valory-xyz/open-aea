@@ -4,6 +4,12 @@
 
 Module wrapping the helpers of public and private key cryptography.
 
+<a id="aea.crypto.helpers._"></a>
+
+#### `_`
+
+some modules expect this here
+
 <a id="aea.crypto.helpers.try_validate_private_key_path"></a>
 
 #### try`_`validate`_`private`_`key`_`path
@@ -165,18 +171,4 @@ def hex_to_bytes_for_key(data: str) -> bytes
 ```
 
 Convert hex string to bytes with error handling.
-
-<a id="aea.crypto.helpers.generate_multiple_keys"></a>
-
-#### generate`_`multiple`_`keys
-
-```python
-def generate_multiple_keys(n: int,
-                           type_: str,
-                           password: Optional[str] = None,
-                           extra_entropy: Union[str, bytes, int] = "",
-                           file: Optional[str] = None) -> None
-```
-
-Generate n key pairs.
 

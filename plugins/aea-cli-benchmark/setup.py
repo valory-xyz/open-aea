@@ -26,7 +26,7 @@ from setuptools import setup  # type: ignore
 
 setup(
     name="open-aea-cli-benchmark",
-    version="1.35.0",
+    version="1.41.0.post1",
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for AEA framework benchmarking.",
@@ -35,6 +35,7 @@ setup(
     packages=find_packages(
         where=".", include=["aea_cli_benchmark", "aea_cli_benchmark.*"]
     ),
+    package_data={"aea_cli_benchmark": ["py.typed"]},
     entry_points={"aea.cli": ["benchmark = aea_cli_benchmark.core:benchmark"]},
     install_requires=["open-aea>=1.0.0, <2.0.0", "psutil==5.7.0"],
     classifiers=[
@@ -47,10 +48,10 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: Microsoft",
         "Operating System :: Unix",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

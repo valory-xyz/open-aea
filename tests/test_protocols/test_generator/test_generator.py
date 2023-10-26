@@ -1443,6 +1443,9 @@ class ProtocolGeneratorTestCase(TestCase):
         assert Path(path_to_protobuf_objc_headers).exists()
         assert Path(path_to_protobuf_objc_implementation).exists()
 
+    @pytest.mark.skip(
+        reason="https://github.com/protocolbuffers/protobuf-javascript/issues/127"
+    )
     def test_generate_protobuf_only_mode_positive_js(self):
         """Positive test for the 'generate_protobuf_only_mode' where language is JS."""
         protocol_generator = ProtocolGenerator(PATH_TO_T_PROTOCOL_SPECIFICATION, self.t)

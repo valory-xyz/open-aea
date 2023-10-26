@@ -15,7 +15,7 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeifyoio7nlh5zzyn5yz7krkou56l22to3cwg7gw5v5o3vxwklibhty
+- valory/http:1.0.0:bafybeiejoqgv7finfxo3rcvvovrlj5ccrbgxodjq43uo26ylpowsa3llfe
 class_name: HTTPClientConnection
 config:
   host: 127.0.0.1
@@ -25,7 +25,7 @@ restricted_to_protocols:
 - valory/http:1.0.0
 dependencies:
   aiohttp:
-    version: <3.8,>=3.7.4
+    version: <4.0.0,>=3.8.5
   certifi: {}
   multidict: {}
 is_abstract: false

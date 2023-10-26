@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ from aea_ledger_fetchai.test_tools.constants import FETCHAI_PRIVATE_KEY_FILE
 from aea.cli import cli
 from aea.configurations.constants import MULTIKEY_FILENAME
 from aea.crypto.base import Crypto as BaseCrypto
-from aea.crypto.registries import make_crypto
+from aea.crypto.registries import crypto_registry, make_crypto
 from aea.helpers.io import open_file
 from aea.helpers.sym_link import cd
 from aea.test_tools.test_cases import AEATestCaseEmpty
@@ -104,6 +104,25 @@ class TestGenerateKey:
 
         Path(FETCHAI_PRIVATE_KEY_FILE).unlink()
         Path(ETHEREUM_PRIVATE_KEY_FILE).unlink()
+
+    def test_invalid_ledger_id(self):
+        """Test that the fetch private key is created correctly."""
+        args = [*CLI_LOG_OPTION, "generate-key", "ledger"]
+        result = self.runner.invoke(cli, args)
+        assert result.exit_code == 1
+        assert "Invalid identifier provided `ledger`" in result.stdout
+
+    def test_no_ledger_installation_found(self):
+        """Test that the fetch private key is created correctly."""
+        args = [*CLI_LOG_OPTION, "generate-key", "ledger"]
+        specs = crypto_registry.specs.copy()
+        crypto_registry.specs = {}
+        try:
+            result = self.runner.invoke(cli, args)
+            assert result.exit_code == 1
+            assert "No ledger installation found" in result.stdout
+        finally:
+            crypto_registry.specs = specs
 
     @classmethod
     def teardown_class(cls):

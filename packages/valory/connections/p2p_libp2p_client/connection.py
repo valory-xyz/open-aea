@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,7 +89,7 @@ class NodeClient:
     @staticmethod
     def make_acn_envelope_message(envelope: Envelope) -> bytes:
         """Make acn message with envelope in."""
-        acn_msg = acn_pb2.AcnMessage()
+        acn_msg = acn_pb2.AcnMessage()  # type: ignore
         performative = acn_pb2.AcnMessage.Aea_Envelope_Performative()  # type: ignore
         performative.envelope = envelope.encode()
         acn_msg.aea_envelope.CopyFrom(performative)  # pylint: disable=no-member
@@ -98,7 +98,7 @@ class NodeClient:
 
     async def write_acn_status_ok(self) -> None:
         """Send acn status ok."""
-        acn_msg = acn_pb2.AcnMessage()
+        acn_msg = acn_pb2.AcnMessage()  # type: ignore
         performative = acn_pb2.AcnMessage.Status_Performative()  # type: ignore
         status = AcnMessage.StatusBody(
             status_code=AcnMessage.StatusBody.StatusCode.SUCCESS, msgs=[]
@@ -116,7 +116,7 @@ class NodeClient:
         status_code: AcnMessage.StatusBody.StatusCode = AcnMessage.StatusBody.StatusCode.ERROR_GENERIC,  # type: ignore
     ) -> None:
         """Send acn status error generic."""
-        acn_msg = acn_pb2.AcnMessage()
+        acn_msg = acn_pb2.AcnMessage()  # type: ignore
         performative = acn_pb2.AcnMessage.Status_Performative()  # type: ignore
         status = AcnMessage.StatusBody(status_code=status_code, msgs=[msg])
         AcnMessage.StatusBody.encode(
@@ -172,7 +172,7 @@ class NodeClient:
                 return None
 
             try:
-                acn_msg = acn_pb2.AcnMessage()
+                acn_msg = acn_pb2.AcnMessage()  # type: ignore
                 acn_msg.ParseFromString(buf)
 
             except Exception as e:  # pragma: nocover
@@ -228,7 +228,7 @@ class NodeClient:
     ) -> None:
         """Register agent on the remote node."""
         agent_record = self.make_agent_record()
-        acn_msg = acn_pb2.AcnMessage()
+        acn_msg = acn_pb2.AcnMessage()  # type: ignore
         performative = acn_pb2.AcnMessage.Register_Performative()  # type: ignore
         AcnMessage.AgentRecord.encode(
             performative.record, agent_record  # pylint: disable=no-member
@@ -249,7 +249,7 @@ class NodeClient:
             raise ConnectionError(
                 "Error on connection setup. Incoming buffer is empty!"
             )
-        acn_msg = acn_pb2.AcnMessage()
+        acn_msg = acn_pb2.AcnMessage()  # type: ignore
         acn_msg.ParseFromString(buf)
         performative = acn_msg.WhichOneof("performative")
         if performative != "status":  # pragma: nocover

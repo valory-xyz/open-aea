@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,10 @@ from aea.helpers.ipfs.utils import _protobuf_python_implementation
 
 # fix for ipfs hashes, preload protobuf classes with protobuf python implementation
 with _protobuf_python_implementation():
-    from aea.helpers.ipfs.pb import (  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
+    from aea.helpers.ipfs.pb import (  # type: ignore  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
         merkledag_pb2,
         unixfs_pb2,
     )
-    from aea.helpers.ipfs.pb.merkledag_pb2 import (  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
+    from aea.helpers.ipfs.pb.merkledag_pb2 import (  # type: ignore  # noqa: F401   # pylint: disable=import-outside-toplevel,unused-import
         PBNode,
     )

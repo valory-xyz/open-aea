@@ -4,6 +4,24 @@
 
 Ethereum module wrapping the public and private key cryptography and ledger api.
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SPEED_FAST"></a>
+
+#### SPEED`_`FAST
+
+safeLow, standard, fast
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.PRIORITY_FEE_INCREASE_BOUNDARY"></a>
+
+#### PRIORITY`_`FEE`_`INCREASE`_`BOUNDARY
+
+percentage
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.GAS_STATION_FALLBACK_ESTIMATE"></a>
+
+#### GAS`_`STATION`_`FALLBACK`_`ESTIMATE
+
+gwei
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.wei_to_gwei"></a>
 
 #### wei`_`to`_`gwei
@@ -949,27 +967,27 @@ Get wealth from the faucet for the provided address.
 - `address`: the address.
 - `url`: the url
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper"></a>
 
-## SessionCacheLockWrapper Objects
+## SimpleCacheLockWrapper Objects
 
 ```python
-class SessionCacheLockWrapper()
+class SimpleCacheLockWrapper()
 ```
 
 Wrapper for session_cache with threading.Lock.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.__init__"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.__init__"></a>
 
 #### `__`init`__`
 
 ```python
-def __init__(session_cache: SessionCache) -> None
+def __init__(session_cache: SimpleCache) -> None
 ```
 
 Init wrapper.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.__contains__"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.__contains__"></a>
 
 #### `__`contains`__`
 
@@ -979,7 +997,7 @@ def __contains__(*args: Any, **kwargs: Any) -> Any
 
 Contain item.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.__len__"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.__len__"></a>
 
 #### `__`len`__`
 
@@ -989,7 +1007,7 @@ def __len__() -> int
 
 Length of the cache
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.cache"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.cache"></a>
 
 #### cache
 
@@ -999,7 +1017,7 @@ def cache(key: str, value: Any) -> Dict[str, Any]
 
 session_cache Cache.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.get_cache_entry"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.get_cache_entry"></a>
 
 #### get`_`cache`_`entry
 
@@ -1009,7 +1027,7 @@ def get_cache_entry(key: str) -> Any
 
 Get cache entry.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SessionCacheLockWrapper.clear"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.clear"></a>
 
 #### clear
 
@@ -1018,6 +1036,16 @@ def clear() -> None
 ```
 
 Clear cache entries.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SimpleCacheLockWrapper.items"></a>
+
+#### items
+
+```python
+def items() -> Dict[str, Any]
+```
+
+Return session items.
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.set_wrapper_for_web3py_session_cache"></a>
 

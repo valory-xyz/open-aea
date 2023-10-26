@@ -50,7 +50,7 @@ except (ImportError, ModuleNotFoundError):  # pragma: nocover  # cause obvious
     IS_IPFS_PLUGIN_INSTALLED = False
 
 PACKAGES_FILE = "packages.json"
-PACKAGE_SOURCE_RE = re.compile(r"([a-z-_0-9]+\/[a-z-_0-9]+)((:)([a-z\.0-9_-]+))?")
+PACKAGE_SOURCE_RE = re.compile(r"([a-z-_0-9A-Z]+\/[a-z-_0-9A-Z]+)((:)([a-z\.0-9_-]+))?")
 
 PackageIdToHashMapping = OrderedDictType[PackageId, str]
 ConfigLoaderCallableType = Callable[[PackageType, Path], PackageConfiguration]
@@ -147,7 +147,7 @@ class BasePackageManager(ABC):
             sync_needed = True
             self._logger.info(f"{package_id} not found locally, downloading...")
             package_id_with_hash = package_id.with_hash(packages[package_id])
-            self.add_package(package_id=package_id_with_hash)
+            self.add_package(package_id=package_id_with_hash, with_dependencies=True)
 
         return sync_needed, hash_updates, package_updates
 
@@ -315,6 +315,7 @@ class BasePackageManager(ABC):
 
         if not actual_package_id:
             # no package on fs, download one
+            self._logger.info(f"Adding {package_id.without_hash()}")
             self._fetch_package(package_id)
         elif not is_update_needed:
             # actual version already, nothing to do
@@ -324,6 +325,7 @@ class BasePackageManager(ABC):
                 f"Required package and package in the registry does not match: {package_id} vs {actual_package_id}"
             )
         else:
+            self._logger.info(f"Updating {package_id.without_hash()}")
             self._update_package(package_id)
 
         if with_dependencies:
@@ -357,12 +359,12 @@ class BasePackageManager(ABC):
             (package_type_collection / "__init__.py").touch()
 
         download_path = package_type_collection / package_id.name
-
         fetch_ipfs(
             str(package_id.package_type),
             package_id.public_id,
             dest=str(download_path),
         )
+        self._logger.debug(f"Downloaded {package_id.without_hash()}")
 
     def add_dependencies_for_package(
         self, package_id: PackageId, allow_update: bool = False

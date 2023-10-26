@@ -268,9 +268,21 @@ def _fetch_agent_deps(ctx: Context) -> None:
     """
     for item_type in (PROTOCOL, CONTRACT, CONNECTION, SKILL):
         item_type_plural = "{}s".format(item_type)
-        required_items = getattr(ctx.agent_config, item_type_plural)
-        for item_id in required_items:
-            add_item(ctx, item_type, item_id)
+        required_items = cast(set, getattr(ctx.agent_config, item_type_plural))
+        required_items_check = required_items.copy()
+        try:
+            for item_id in required_items:
+                add_item(ctx, item_type, item_id)
+        except RuntimeError as e:
+            missing_deps = required_items_check.symmetric_difference(required_items)
+            error = "\n- ".join(
+                [
+                    "Size of the dependency set changed during the iteration; "
+                    "Following dependencies are missing from the agent configuration: ",
+                    *map(lambda x: str(x.without_hash()), missing_deps),
+                ]
+            )
+            raise click.ClickException(error) from e
 
 
 def fetch_mixed(

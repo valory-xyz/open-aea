@@ -101,7 +101,12 @@ class TestPackageManagerV0(BaseAEATestCase):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync()
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         with pytest.raises(
             ValueError,
@@ -147,7 +152,7 @@ class TestPackageManagerV0(BaseAEATestCase):
                 path=packages_dir, packages=OrderedDict({package_id: package_hash})
             )
 
-            (temp_package / "__init__.py").write_text("")
+            (temp_package / "__init__.py").write_text("dummy")
 
             with caplog.at_level(logging.ERROR):
                 assert pm.verify() == 1
@@ -210,7 +215,7 @@ class TestVerifyFailure(BaseAEATestCase):
             pm.package_path_from_package_id(package_id=EXAMPLE_PACKAGE_ID)
             / INIT_FILE_NAME
         )
-        init_file.write_text("")
+        init_file.write_text("dummy")
 
         with caplog.at_level(logging.ERROR), mock.patch(
             "aea.package_manager.v0.check_fingerprint",
@@ -225,7 +230,9 @@ class TestVerifyFailure(BaseAEATestCase):
                 in caplog.text
             )
 
-        with mock.patch("traceback.print_exc",) as print_tb, mock.patch(
+        with mock.patch(
+            "traceback.print_exc",
+        ) as print_tb, mock.patch(
             "aea.package_manager.v0.check_fingerprint",
             side_effect=ValueError("expeceted_exception"),
         ):
@@ -255,7 +262,6 @@ class TestVerifyFailure(BaseAEATestCase):
                 EXAMPLE_PACKAGE_ID,
             ],
         ):
-
             assert pm.verify() == 1
             assert (
                 f"Fingerprints does not match for {EXAMPLE_PACKAGE_ID}" in caplog.text
@@ -278,7 +284,6 @@ class TestVerifyFailure(BaseAEATestCase):
                 EXAMPLE_PACKAGE_ID,
             ],
         ):
-
             assert pm.verify() == 1
             assert f"Cannot find hash for {EXAMPLE_PACKAGE_ID}" in caplog.text
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@
 import functools
 import inspect
 import itertools
+import platform
 import tempfile
 from typing import Any, Callable, Type
 from unittest import mock
+
+import pytest
 
 from packages.fetchai.protocols.default.message import DefaultMessage
 
@@ -38,6 +41,11 @@ MockDefaultMessageProtocol = mock.Mock()
 MockDefaultMessageProtocol.protocol_id = DefaultMessage.protocol_id
 MockDefaultMessageProtocol.protocol_specification_id = (
     DefaultMessage.protocol_specification_id
+)
+
+SKIP_WINDOWS = pytest.mark.skipif(
+    condition=(platform.system() == "Windows"),
+    reason="https://github.com/golang/go/issues/51007",
 )
 
 

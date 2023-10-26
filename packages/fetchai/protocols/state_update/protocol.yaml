@@ -8,12 +8,12 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeieh3nvfgvwdybc7dz44ac3qhleeleaojmwo32o3nticdw24ltdekq
-  __init__.py: bafybeihdq4a2yugoou24etbyr6ixoxc3k6v2ghanqfhcfq3b5eh5pavxvu
+  __init__.py: bafybeifsx3dekfcndpw566kcknldbo622ot3j54ebgxprjvxk55zs7knhe
   dialogues.py: bafybeihybfbnjbknuytpftkluhjdn3wivuvjviv2fblswp2xbqwvns77s4
-  message.py: bafybeid2conpcg6hjkj54edg76nuzhqbir4cpzsg7ba3p2fgyiy3nsllvy
-  serialization.py: bafybeih7g5oqrk2zzn33sl36q3pav6o232cnjlfonn2q7deasebflo4pqu
+  message.py: bafybeifqkkmjcd5ysw2hlhmul42c7xxdtawwdktvja2e5ibntp7lwpzrke
+  serialization.py: bafybeigvqjbmwmzu4rmy7sba4lezgwkmek3h4qvdwlwnfapf6krd4fvgwe
   state_update.proto: bafybeifb4w4hhbfulbsj3uoazthtcywhqkxabhtztwycsx3dtsmq6x43re
-  state_update_pb2.py: bafybeibkgjhcg2drachxjvnqilqehu4i72nslrdbwqwe6iburtnmbbr7im
+  state_update_pb2.py: bafybeigxg6dl2sgh2ivlu6my5osijmkkd6rl4ntrdzwd5tv7dwf5zdl73m
   tests/__init__.py: bafybeicf4p3m6qv3qkvd3ahxemeslvkrzjegetayjwrvjoch4ajoqezgpq
   tests/test_state_update.py: bafybeicjeibmkt2tsq2qqdmk7xqtkslrk7yavcr3vm7jnytgiog4he5feq
   tests/test_state_update_dialogues.py: bafybeiadrik76dnme5r3b2idoso3mbygbg245pprphgolifofoig6sxh6i

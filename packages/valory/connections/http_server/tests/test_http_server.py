@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.test_tools.mocks import RegexComparator
 from aea.test_tools.network import get_host, get_unused_tcp_port
 
-from packages.fetchai.connections.http_server.connection import (
+from packages.valory.connections.http_server.connection import (
     APISpec,
     HTTPServerConnection,
     Response,

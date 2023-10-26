@@ -60,7 +60,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Security Check
         run: tox -e bandit
       - name: Safety Check
@@ -99,7 +99,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Pylint check
         run: |
           tox -e pylint
@@ -120,11 +120,11 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           pip install --user --upgrade setuptools
           # install Protobuf compiler
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
-          unzip protoc-3.19.4-linux-x86_64.zip -d protoc
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
+          unzip protoc-24.3-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           # install IPFS
           sudo apt-get install -y wget
@@ -162,7 +162,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           pip install --user --upgrade setuptools
       - name: Copyright Check
         run: tox -e check-copyright
@@ -187,7 +187,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Install markdown-spellcheck
         run: sudo npm install -g markdown-spellcheck
       - name: Check API Docs updated
@@ -215,7 +215,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Check Docs links and IPFS hashes
         run: tox -e check-doc-links-hashes
 
@@ -249,7 +249,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
         run: |
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Check Pipfile and tox.ini consistency
         run: |
           python ./scripts/check_pipfile_and_toxini.py
@@ -281,7 +281,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
         run: |
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Check plugin aea-ledger-cosmos
         run: |
           tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-cosmos && aea generate-key cosmos && echo aea-ledger-cosmos checked!"
@@ -345,10 +345,10 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           # install Protobuf compiler
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
-          unzip protoc-3.19.4-linux-x86_64.zip -d protoc
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
+          unzip protoc-24.3-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           
           # pull pre-built images
@@ -382,10 +382,10 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           # install Protobuf compiler
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
-          unzip protoc-3.19.4-linux-x86_64.zip -d protoc
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
+          unzip protoc-24.3-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
       - name: Framework integration tests
         run: tox -e py3.10 -- -m 'profiling'
@@ -411,7 +411,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
       - name: Framework integration tests
         run: tox -e py3.10 -- -m 'integration and not unstable and ledger and not profiling'
       - name: Packages integration tests
@@ -432,7 +432,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python_version: ['3.7', '3.8', '3.9', '3.10']
+        python_version: ['3.8', '3.9', '3.10', '3.11']
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@master
@@ -448,10 +448,10 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           # install Protobuf compiler
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-linux-x86_64.zip
-          unzip protoc-3.19.4-linux-x86_64.zip -d protoc
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
+          unzip protoc-24.3-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           make protolint_install
           # install ipfs
@@ -470,12 +470,12 @@ jobs:
       - if: matrix.os == 'macos-latest'
         name: Install dependencies (macos-latest)
         run: |
-          pip install tomte[tox]==0.2.4
+          pip install tomte[tox]==0.2.13
           brew install gcc
           # brew install protobuf
           # brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/72457f0166d5619a83f508f2345b22d0617b5021/Formula/protobuf.rb
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-osx-x86_64.zip
-          unzip protoc-3.19.4-osx-x86_64.zip -d protoc
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-osx-x86_64.zip
+          unzip protoc-24.3-osx-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           brew tap yoheimuta/protolint
           brew install protolint
@@ -496,14 +496,14 @@ jobs:
         run: |
           python -m pip install -U pip
           echo "::add-path::C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64"
-          choco install protoc --version 3.19.4
+          choco install protoc --version 24.3
           choco install mingw -y
           choco install make -y
           # to check make was installed
           make --version
-          pip install tomte[tox]==0.2.4
-          # wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protoc-3.19.4-win64.zip
-          # unzip protoc-3.19.4-win64.zip -d protoc
+          pip install tomte[tox]==0.2.13
+          # wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-win64.zip
+          # unzip protoc-24.3-win64.zip -d protoc
           # sudo mv protoc/bin/protoc /usr/local/bin/protoc
           python scripts/update_symlinks_cross_platform.py
           make protolint_install_win
@@ -531,7 +531,7 @@ jobs:
       - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
         name: Show full coverage report
         run: |
-          pip install tomte[tests]==0.2.4
+          pip install tomte[tests]==0.2.13
           coverage report -m -i
 
       - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
@@ -567,7 +567,3 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: "1.17.7"
-    # - if: matrix.python-version == '3.7'
-    #   name: Golang unit tests (aealite)
-    #   working-directory: ./libs/go/aealite
-    #   run: go test -p 1 -timeout 0 -count 1 -v ./...

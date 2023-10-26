@@ -9,6 +9,50 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.41.0` to `v1.41.0.post1`
+
+- No backwards incompatible changes
+
+## `v1.40.0` to `v1.41.0`
+
+- The way the dependencies will be selected for installation when running `aea install` has changed. Before this version, the versions were being merging all of the versions for a python package and using the most compatible version specifier possible. With this release, this behaviour will be replaced by overriding the dependencies in the following order `extra dependencies provided by flag > agent > skill > connection > contract > protocol` what this means is, let's say you have 3 packages with a same python package as a dependency
+
+* protocol package with `protobuf>1.0.0`
+* connection package with `protobuf==1.0.0`
+* skill package with `protobuf>=1.0.0,<2.0.0`
+
+`protobuf>=1.0.0,<2.0.0` will be used for installation since skill has higher priority over protocol and connection packages.
+
+## `v1.39.0.post1` to `v1.40.0`
+
+- `open-aea-web3` has been replaced with `web3py`
+- `protobuf` has been bumped to `protobuf>=4.21.6,<5.0.0`, this means you will have to bump your protocol generator to `v24.3` and generate your protocol packages again.
+- Because of the protobuf version bump hardware wallet plugin might now work as expected, so please export `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python"` to use the hardware wallet without any issues
+- The `valory/open-aea-user` image will use Python 3.11 as default interpreter for running AEAs
+
+## `v1.39.0` to `v1.39.0.post1`
+
+- No backwards incompatible changes
+
+## `v1.38.0` to `v1.39.0`
+
+- No backwards incompatible changes
+
+## `v1.37.0` to `v1.38.0`
+
+- `web3py` has been replaced with `open-aea-web3` and we forked this from `web3py@v6.0.0`, that means the method names will use the `snake_case` and the `camelCase` naming has been deprecated
+- `apduboy` has been deprecated as a dependency
+- `flashbots` has been replaced with `open-aea-flashbots`
+- Support for `Python 3.7` has been deprecated
+
+## `v1.36.0` to `v1.37.0`
+
+- No backwards incompatible changes
+
+## `v1.35.0` to `v1.36.0`
+
+- No backwards incompatible changes
+  
 ## `v1.34.0` to `v1.35.0`
 
 - No backwards incompatible changes

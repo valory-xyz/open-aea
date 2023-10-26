@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import codecs
 import hashlib
 import io
 import os
+import platform
 import re
 from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
@@ -40,7 +41,17 @@ LEN_SHA256 = "20"  # 0x20
 
 with _protobuf_python_implementation():  # pylint: disable=import-outside-toplevel
     from aea.helpers.ipfs.pb import merkledag_pb2, unixfs_pb2
-    from aea.helpers.ipfs.pb.merkledag_pb2 import PBNode
+    from aea.helpers.ipfs.pb.merkledag_pb2 import PBNode  # type: ignore
+
+
+def _is_text(file_path: str) -> bool:
+    """Check if a file can be read as text or not."""
+    try:
+        with open_file(file_path, "r") as f:
+            f.readline()
+        return True
+    except UnicodeDecodeError:
+        return False
 
 
 def _dos2unix(file_content: bytes) -> bytes:
@@ -53,25 +64,15 @@ def _dos2unix(file_content: bytes) -> bytes:
     return re.sub(b"\r\n", b"\n", file_content, flags=re.M)
 
 
-def _is_text(file_path: str) -> bool:
-    """Check if a file can be read as text or not."""
-    try:
-        with open_file(file_path, "r") as f:
-            f.read()
-        return True
-    except UnicodeDecodeError:
-        return False
-
-
 def _read(file_path: str) -> bytes:
-    """Read a file, replacing Windows line endings if it is a text file."""
-    is_text = _is_text(file_path)
+    """Read and verify the file is not empty."""
     with open(file_path, "rb") as file:
-        file_b = file.read()
-        if is_text:
-            file_b = _dos2unix(file_b)
-
-    return file_b
+        data = file.read()
+    if len(data) == 0:
+        raise ValueError(f"File cannot be empty: {file_path}")
+    if platform.system() == "Windows" and _is_text(file_path=file_path):
+        data = _dos2unix(data)
+    return data
 
 
 def chunks(data: Sized, size: int) -> Generator:
@@ -179,7 +180,7 @@ class IPFSHashOnly:
     @staticmethod
     def create_link(link_hash: bytes, tsize: int, name: str) -> Any:
         """Create PBLink object."""
-        link = merkledag_pb2.PBLink()
+        link = merkledag_pb2.PBLink()  # type: ignore # pylint: disable=no-member
         link.Hash = link_hash
         link.Tsize = tsize
         link.Name = name
@@ -192,9 +193,9 @@ class IPFSHashOnly:
         wrapper_node = PBNode()
         wrapper_node.Links.append(link)  # type: ignore # pylint: disable=no-member
 
-        wrapper_node_data = unixfs_pb2.Data()
+        wrapper_node_data = unixfs_pb2.Data()  # type: ignore # pylint: disable=no-member
         # type: ignore  # pylint: disable=no-member
-        wrapper_node_data.Type = unixfs_pb2.Data.Directory
+        wrapper_node_data.Type = unixfs_pb2.Data.Directory  # type: ignore
         wrapper_node.Data = wrapper_node_data.SerializeToString(
             deterministic=True
         )  # type: ignore # pylint: disable=no-member
@@ -241,9 +242,9 @@ class IPFSHashOnly:
                     cls.create_link(child_hash, file_length, child_path.name)
                 )
 
-        root_node_data = unixfs_pb2.Data()
+        root_node_data = unixfs_pb2.Data()  # type: ignore # pylint: disable=no-member
         # type: ignore  # pylint: disable=no-member
-        root_node_data.Type = unixfs_pb2.Data.Directory
+        root_node_data.Type = unixfs_pb2.Data.Directory  # type: ignore
         root_node.Data = root_node_data.SerializeToString(
             deterministic=True
         )  # type: ignore # pylint: disable=no-member
@@ -263,7 +264,7 @@ class IPFSHashOnly:
     def _make_unixfs_pb2(cls, data: bytes) -> bytes:
         if len(data) > cls.DEFAULT_CHUNK_SIZE:  # pragma: nocover
             raise ValueError("Data is too big! use chunks!")
-        data_pb = unixfs_pb2.Data()  # type: ignore
+        data_pb = unixfs_pb2.Data()  # type: ignore  # pylint: disable=no-member
         data_pb.Type = unixfs_pb2.Data.File  # type: ignore # pylint: disable=no-member
         data_pb.Data = data
         data_pb.filesize = len(data)
@@ -299,8 +300,8 @@ class IPFSHashOnly:
         if len(data) > cls.DEFAULT_CHUNK_SIZE:
             content_size = 0
             outer_node = PBNode()  # type: ignore
-            data_pb = unixfs_pb2.Data()  # type: ignore
-            data_pb.Type = unixfs_pb2.Data.File  # type: ignore # pylint: disable=no-member
+            data_pb = unixfs_pb2.Data()  # type: ignore   # pylint: disable=no-member
+            data_pb.Type = unixfs_pb2.Data.File  # type: ignore  # pylint: disable=no-member
             data_pb.filesize = len(data)
             for chunk in chunks(data, cls.DEFAULT_CHUNK_SIZE):
                 block = cls._pb_serialize_data(chunk)

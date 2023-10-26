@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -150,7 +150,6 @@ class LogParser:
                 LOG_TYPE = "json"
 
             for line in content:
-
                 line_time: Optional[datetime.datetime] = None
                 line_data: str = line
 
@@ -243,7 +242,6 @@ class LogParser:
             for figure_name in tracker_data["figure_names"]:
                 plt.figure(figure_name)
                 for var_name, var_data in tracker_data["var_data"].items():
-
                     if tracker_data["type"] == "event" and var_data["times"]:
                         t0 = var_data["times"][0]
                         plt.plot(

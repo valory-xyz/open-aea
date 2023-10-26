@@ -373,3 +373,10 @@ ERC20
 WETH
 Solana
 plug-in
+0.6.0
+cosmpy
+tomte
+pyyaml
+1.36.0
+1.39.0.post1
+1.41.0.post1

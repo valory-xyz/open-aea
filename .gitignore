@@ -154,4 +154,5 @@ coverage.txt
 
 temp/
 agent_name/
+agent/
 leak_report

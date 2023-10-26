@@ -18,24 +18,23 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
-import sys
 import os
 import re
 from typing import Dict
 
 from setuptools import find_packages, setup  # type: ignore
 
+
 PACKAGE_NAME = "aea"
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_all_extras() -> Dict:
-
     cli_deps = [
         "click==8.0.2",
-        "pyyaml>=4.2b1,<6.0",
-        "jsonschema>=3.0.0,<4.0.0",
-        "packaging>=20.3,<22.0",
+        "pyyaml==6.0.1",
+        "jsonschema<=4.19.0,>=4.16.0",
+        "packaging>=23.1,<24.0",
         "pytest>=7.0.0,<7.3.0",
         "coverage>=6.4.4,<8.0.0",
         "semver>=2.9.1,<3.0.0",
@@ -56,12 +55,12 @@ all_extras = get_all_extras()
 base_deps = [
     "semver>=2.9.1,<3.0.0",
     "base58>=1.0.3,<3.0.0",
-    "jsonschema>=3.0.0,<4.0.0",
-    "packaging>=20.3,<22.0",
-    "protobuf>=3.19.0,<4.0.0",
+    "jsonschema<=4.19.0,>=4.16.0",
+    "packaging>=23.1,<24.0",
+    "protobuf>=4.21.6,<5.0.0",
     "pymultihash==0.8.2",
-    "pyyaml>=4.2b1,<6.0",
-    "requests>=2.22.0,<3.0.0",
+    "pyyaml==6.0.1",
+    "requests==2.28.1",
     "python-dotenv>=0.14.0,<0.18.0",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",
@@ -115,10 +114,10 @@ if __name__ == "__main__":
             "Operating System :: MacOS",
             "Operating System :: Microsoft",
             "Operating System :: Unix",
-            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
             "Topic :: Communications",
             "Topic :: Internet",
             "Topic :: Scientific/Engineering",
@@ -132,7 +131,7 @@ if __name__ == "__main__":
         zip_safe=False,
         include_package_data=True,
         license=about["__license__"],
-        python_requires=">=3.7",
+        python_requires=">=3.8",
         keywords="aea open-aea autonomous-economic-agents agent-framework multi-agent-systems multi-agent cryptocurrency cryptocurrencies dezentralized dezentralized-network",
         project_urls={
             "Bug Reports": "https://github.com/valory-xyz/open-aea/issues",

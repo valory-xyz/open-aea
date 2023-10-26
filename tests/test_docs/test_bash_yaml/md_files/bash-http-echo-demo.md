@@ -1,6 +1,6 @@
 ``` bash
 pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeidnmee6kefsq2nef6gsrg4qmhuky5dfstbg7mi6ophdzedoxbi7au --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeiah75oosb24i3nwtbotqjd44waxg7ldmxgle4iiumemgbrvlosxsu --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install
@@ -11,8 +11,8 @@ Adding protocol 'valory/http:1.0.0'...
 Successfully added protocol 'valory/http:1.0.0'.
 Adding protocol 'fetchai/default:1.0.0'...
 Successfully added protocol 'fetchai/default:1.0.0'.
-Adding connection 'fetchai/http_server:0.22.0'...
-Successfully added connection 'fetchai/http_server:0.22.0'.
+Adding connection 'valory/http_server:0.22.0'...
+Successfully added connection 'valory/http_server:0.22.0'.
 Adding skill 'fetchai/http_echo:0.20.0'...
 Successfully added skill 'fetchai/http_echo:0.20.0'.
 Agent http_echo successfully fetched.

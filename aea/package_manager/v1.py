@@ -199,7 +199,9 @@ class PackageManagerV1(BasePackageManager):
         self.dump(file=self._packages_file)
 
     def register(
-        self, package_path: Path, package_type: Optional[PackageType] = None
+        self,
+        package_path: Path,
+        package_type: Optional[PackageType] = None,
     ) -> "PackageManagerV1":
         """Add package to the index."""
         package_type = package_type or PackageType(package_path.parent.name[:-1])
@@ -241,8 +243,8 @@ class PackageManagerV1(BasePackageManager):
                 update_hashes=update_hashes,
                 update_packages=update_packages,
             )
-            sync_needed = sync_needed or _sync_needed
 
+            sync_needed = sync_needed or _sync_needed
             if update_hashes and hash_updates_third_party:
                 third_party_package_id = "\n\t- ".join(
                     map(str, hash_updates_third_party)
@@ -281,6 +283,8 @@ class PackageManagerV1(BasePackageManager):
 
         if sync_needed:
             self._logger.info("Sync complete")
+            self._logger.info("Updating hashes")
+            self.dump()
         else:
             self._logger.info("No package was updated.")
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -340,7 +340,6 @@ def parse_command_line():
 
 
 if __name__ == "__main__":
-
     run_args = parse_command_line()
 
     node_config: Optional[AcnNodeConfig] = None

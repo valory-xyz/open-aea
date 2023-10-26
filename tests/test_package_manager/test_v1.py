@@ -142,7 +142,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=True, third_party=False)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # test package already exists.
         with mock.patch.object(pm, "add_package") as update_patch, mock.patch(
@@ -204,7 +209,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=False, third_party=True)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # 3d part hashes
         pm = PackageManagerV1(
@@ -214,7 +224,12 @@ class TestPackageManagerV1Sync(TestPackageManagerV1):
 
         with mock.patch.object(pm, "add_package") as update_patch:
             pm.sync(dev=False, third_party=True, update_hashes=True)
-            update_patch.assert_called_with(package_id=DUMMY_PACKAGE_ID)
+            update_patch.assert_called_with(
+                package_id=DUMMY_PACKAGE_ID.with_hash(
+                    "bafybei0000000000000000000000000000000000000000000000000000"
+                ),
+                with_dependencies=True,
+            )
 
         # 3d part packages
         with mock.patch.object(pm, "update_package") as update_patch, mock.patch.object(
@@ -352,8 +367,7 @@ class TestPackageManagerV1UpdateFingerprint(TestPackageManagerV1):
                 dev_packages=OrderedDict({package_id: package_hash}),
             )
 
-            (temp_package / "__init__.py").write_text("")
-
+            (temp_package / "__init__.py").write_text("hello")
             with caplog.at_level(logging.ERROR):
                 assert pm.verify() == 1
                 assert (
@@ -461,7 +475,6 @@ class TestHashUpdateDev(BaseAEATestCase):
             pm,
             "update_dependencies",
         ):
-
             with pytest.raises(
                 PackageNotValid,
                 match="Found a package which is not listed in the `packages.json`",
@@ -564,7 +577,7 @@ class TestVerifyFailure(BaseAEATestCase):
             pm.package_path_from_package_id(package_id=EXAMPLE_PACKAGE_ID)
             / INIT_FILE_NAME
         )
-        init_file.write_text("")
+        init_file.write_text("dummy")
 
         with caplog.at_level(logging.ERROR), mock.patch(
             "aea.package_manager.v1.check_fingerprint",
@@ -617,7 +630,6 @@ class TestVerifyFailure(BaseAEATestCase):
             "is_third_party_package",
             return_value=True,
         ):
-
             assert pm.verify() == 1
             assert (
                 f"Fingerprints does not match for {EXAMPLE_PACKAGE_ID}" in caplog.text
@@ -638,7 +650,6 @@ class TestVerifyFailure(BaseAEATestCase):
                 EXAMPLE_PACKAGE_ID,
             ],
         ):
-
             assert pm.verify() == 1
             assert f"Cannot find hash for {EXAMPLE_PACKAGE_ID}" in caplog.text
 

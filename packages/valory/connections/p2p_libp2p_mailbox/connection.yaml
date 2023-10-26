@@ -10,11 +10,11 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeibs3yp2sx6ax6h7isibyffq5unamfdxupmrb4wybjrhcjjmoycksq
   __init__.py: bafybeid2azroxglu6fl7bxdfcsv3j77vyzgpikjnfwpxg73zeb5orez6ju
-  connection.py: bafybeihh3tdukc2p3f2t27tinlfbo2jk3fg5wfrr7q4lvc3iafezdkwe3m
+  connection.py: bafybeiau3nqcdaqntr5e5wuz33dwmezog5ejycahxjzngolmlw36djtr3m
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/acn:1.1.0:bafybeignmc5uh3vgpuckljcj2tgg7hdqyytkm6m5b6v6mxtazdcvubibva
+- valory/acn:1.1.0:bafybeic2pxzfc3voxl2ejhcqyf2ehm4wm5gxvgx7bliloiqi2uppmq6weu
 class_name: P2PLibp2pMailboxConnection
 config:
   connect_retries: 3
@@ -42,7 +42,7 @@ excluded_protocols: []
 restricted_to_protocols: []
 dependencies:
   aiohttp:
-    version: <3.8,>=3.7.4
+    version: <4.0.0,>=3.8.5
   asn1crypto:
     version: <1.5.0,>=1.4.0
   ecdsa: {}

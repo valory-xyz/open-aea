@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,9 @@ from packages.valory.protocols.acn.message import AcnMessage
 
 
 try:
-    from asyncio.streams import IncompleteReadError  # pylint: disable=ungrouped-imports
+    from asyncio.streams import (  # type: ignore  # pylint: disable=ungrouped-imports
+        IncompleteReadError,
+    )
 except ImportError:  # pragma: nocover
     from asyncio import IncompleteReadError  # pylint: disable=ungrouped-imports
 
@@ -149,7 +151,7 @@ class NodeClient:
     async def register(self) -> None:
         """Register agent on the remote node."""
         agent_record = self.make_agent_record()
-        performative = acn_pb2.AcnMessage.Register_Performative()  # type: ignore
+        performative = acn_pb2.AcnMessage.Register_Performative()  # type: ignore  # pylint: disable=no-member
         AcnMessage.AgentRecord.encode(
             performative.record, agent_record  # pylint: disable=no-member
         )

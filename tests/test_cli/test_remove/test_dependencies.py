@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ from aea.configurations.base import (
 )
 from aea.configurations.loader import ConfigLoader
 
-from packages.fetchai.connections.http_server.connection import (
+from packages.valory.connections.http_server.connection import (
     PUBLIC_ID as HTTP_SERVER_PUBLIC_ID,
 )
 from packages.valory.protocols.http.message import HttpMessage

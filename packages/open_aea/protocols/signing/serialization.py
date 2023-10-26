@@ -22,12 +22,13 @@
 # pylint: disable=too-many-statements,too-many-locals,no-member,too-few-public-methods,redefined-builtin
 from typing import Any, Dict, cast
 
-from aea.mail.base_pb2 import DialogueMessage
-from aea.mail.base_pb2 import Message as ProtobufMessage
-from aea.protocols.base import Message, Serializer
+from aea.mail.base_pb2 import DialogueMessage  # type: ignore
+from aea.mail.base_pb2 import Message as ProtobufMessage  # type: ignore
+from aea.protocols.base import Message  # type: ignore
+from aea.protocols.base import Serializer  # type: ignore
 
-from packages.open_aea.protocols.signing import signing_pb2
-from packages.open_aea.protocols.signing.custom_types import (
+from packages.open_aea.protocols.signing import signing_pb2  # type: ignore
+from packages.open_aea.protocols.signing.custom_types import (  # type: ignore
     ErrorCode,
     RawMessage,
     RawTransaction,
@@ -35,7 +36,7 @@ from packages.open_aea.protocols.signing.custom_types import (
     SignedTransaction,
     Terms,
 )
-from packages.open_aea.protocols.signing.message import SigningMessage
+from packages.open_aea.protocols.signing.message import SigningMessage  # type: ignore
 
 
 class SigningSerializer(Serializer):
@@ -52,7 +53,7 @@ class SigningSerializer(Serializer):
         msg = cast(SigningMessage, msg)
         message_pb = ProtobufMessage()
         dialogue_message_pb = DialogueMessage()
-        signing_msg = signing_pb2.SigningMessage()
+        signing_msg = signing_pb2.SigningMessage()  # type: ignore
 
         dialogue_message_pb.message_id = msg.message_id
         dialogue_reference = msg.dialogue_reference
@@ -110,7 +111,7 @@ class SigningSerializer(Serializer):
         :return: the 'Signing' message.
         """
         message_pb = ProtobufMessage()
-        signing_pb = signing_pb2.SigningMessage()
+        signing_pb = signing_pb2.SigningMessage()  # type: ignore
         message_pb.ParseFromString(obj)
         message_id = message_pb.dialogue_message.message_id
         dialogue_reference = (

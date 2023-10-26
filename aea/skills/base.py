@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -1083,7 +1083,7 @@ class _SkillComponentLoader:
 
         # populate indexes
         for _path, component_classes in component_classes_by_path.items():
-            for (component_classname, _component_class) in component_classes:
+            for component_classname, _component_class in component_classes:
                 type_ = self._get_skill_component_type(_component_class)
                 class_index.setdefault(component_classname, {}).setdefault(
                     type_, set()

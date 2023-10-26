@@ -43,9 +43,9 @@ from eth_typing import HexStr
 from eth_utils.currency import from_wei, to_wei  # pylint: disable=import-error
 from requests import HTTPError
 from web3 import HTTPProvider, Web3
-from web3._utils.request import SessionCache
+from web3._utils.request import SimpleCache
 from web3.datastructures import AttributeDict
-from web3.exceptions import ContractLogicError, SolidityError, TransactionNotFound
+from web3.exceptions import ContractLogicError, TransactionNotFound
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.middleware import geth_poa_middleware
 from web3.types import TxData, TxParams, TxReceipt, Wei
@@ -114,6 +114,8 @@ DEFAULT_EIP1559_STRATEGY_POLYGON = {
 }
 
 DEFAULT_GAS_STATION_STRATEGY = {"gas_price_api_key": "", "gas_price_strategy": "fast"}
+
+GAS_STATION_FALLBACK_ESTIMATE = 20  # gwei
 
 DEFAULT_GAS_PRICE_STRATEGIES = {
     EIP1559: DEFAULT_EIP1559_STRATEGY,
@@ -280,10 +282,8 @@ def get_gas_price_strategy_eip1559_polygon(
         transaction_params: TxParams,  # pylint: disable=unused-argument
     ) -> Dict[str, Wei]:
         try:
-
             response = requests.get(gas_endpoint)
             if response.status_code == 200:
-
                 data = response.json()[speed]
                 return {
                     "maxFeePerGas": Wei(to_wei(data["maxFee"], "gwei")),
@@ -339,18 +339,23 @@ def get_gas_price_strategy(
         :param transaction_params: transaction parameters
         :return: wei
         """
+        _default_logger.info(  # pragma: nocover
+            "`ethgasstation.info` has been deprecated and will be replaced with an alternative on the next release."
+        )
         response = requests.get(f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}")
-        if response.status_code != 200:
-            raise ValueError(  # pragma: nocover
-                f"Gas station API response: {response.status_code}, {response.text}"
+        if response.status_code != 200:  # pragma: nocover
+            # TODO : Use some other gas station API # pylint: disable=fixme
+            _default_logger.error(
+                f"Gas station API response: {response.status_code}, {response.text}, using fallback gas price."
             )
+            return {"gasPrice": web3.to_wei(GAS_STATION_FALLBACK_ESTIMATE, "gwei")}
         response_dict = response.json()
         _default_logger.debug("Gas station API response: {}".format(response_dict))
         result = response_dict.get(gas_price_strategy, None)
         if type(result) not in [int, float]:  # pragma: nocover
             raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")
         gwei_result = result / 10  # adjustment (see api documentation)
-        wei_result = web3.toWei(gwei_result, "gwei")
+        wei_result = web3.to_wei(gwei_result, "gwei")
         return {"gasPrice": wei_result}
 
     return gas_station_gas_price_strategy
@@ -492,7 +497,7 @@ class EthereumCrypto(Crypto[LocalAccount]):
             extra_entropy=extra_entropy,
         )
 
-        bytes_representation = Web3.toBytes(hexstr=self.entity.key.hex())
+        bytes_representation = Web3.to_bytes(hexstr=self.entity.key.hex())
         self._public_key = str(keys.PrivateKey(bytes_representation).public_key)
         self._address = self.entity.address
 
@@ -714,7 +719,7 @@ class EthereumHelper(Helper):
         """
         keccak_hash = Web3.keccak(hexstr=public_key)
         raw_address = keccak_hash[-20:].hex()
-        address = Web3.toChecksumAddress(raw_address)
+        address = Web3.to_checksum_address(raw_address)
         return address
 
     @classmethod
@@ -733,7 +738,7 @@ class EthereumHelper(Helper):
             enforce(len(message) == 32, "Message must be hashed to exactly 32 bytes.")
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                address = Account.recoverHash(  # pylint: disable=no-value-for-parameter
+                address = Account._recover_hash(  # pylint: disable=no-value-for-parameter,protected-access
                     message_hash=message, signature=signature
                 )
         else:
@@ -854,7 +859,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
     @try_decorator("Unable to retrieve balance: {}", logger_method="warning")
     def _try_get_balance(self, address: Address, **_kwargs: Any) -> Optional[int]:
         """Get the balance of a given account."""
-        check_address = self._api.toChecksumAddress(address)
+        check_address = self._api.to_checksum_address(address)
         return self._api.eth.get_balance(check_address)  # pylint: disable=no-member
 
     def get_state(
@@ -928,8 +933,8 @@ class EthereumApi(LedgerApi, EthereumHelper):
         """
         transaction: Optional[JSONLike] = None
         chain_id = chain_id if chain_id is not None else self._chain_id
-        destination_address = self._api.toChecksumAddress(destination_address)
-        sender_address = self._api.toChecksumAddress(sender_address)
+        destination_address = self._api.to_checksum_address(destination_address)
+        sender_address = self._api.to_checksum_address(sender_address)
         nonce = self._try_get_transaction_count(
             sender_address,
             raise_on_try=raise_on_try,
@@ -1043,7 +1048,9 @@ class EthereumApi(LedgerApi, EthereumHelper):
             return None
         gas_price_strategy, gas_price_strategy_callable = retrieved_strategy
 
-        prior_strategy = self._api.eth.gasPriceStrategy
+        prior_strategy = (
+            self._api.eth._gas_price_strategy  # pylint: disable=protected-access
+        )
         try:
             self._api.eth.set_gas_price_strategy(gas_price_strategy_callable)
             gas_price = self._api.eth.generate_gas_price()
@@ -1076,7 +1083,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
     ) -> Optional[int]:
         """Try get the transaction count."""
         nonce = self._api.eth.get_transaction_count(  # pylint: disable=no-member
-            self._api.toChecksumAddress(address)
+            self._api.to_checksum_address(address)
         )
         return nonce
 
@@ -1264,7 +1271,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         try:
             # replay the transaction on the provider
             self.api.eth.call(replay_tx, tx["blockNumber"] - 1)
-        except SolidityError as e:
+        except ContractLogicError as e:
             # execution reverted exception
             return str(e)
         except HTTPError as e:
@@ -1290,7 +1297,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
                 bytecode=contract_interface[_BYTECODE],
             )
         else:
-            _contract_address = self.api.toChecksumAddress(contract_address)
+            _contract_address = self.api.to_checksum_address(contract_address)
             instance = self.api.eth.contract(
                 address=_contract_address,
                 abi=contract_interface[_ABI],
@@ -1343,7 +1350,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         )
 
         transaction: Optional[JSONLike] = None
-        _deployer_address = self.api.toChecksumAddress(deployer_address)
+        _deployer_address = self.api.to_checksum_address(deployer_address)
         nonce = self._try_get_transaction_count(
             _deployer_address, raise_on_try=raise_on_try
         )
@@ -1384,7 +1391,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
             transaction.update(gas_pricing)
 
-        transaction = instance.constructor(**kwargs).buildTransaction(transaction)
+        transaction = instance.constructor(**kwargs).build_transaction(transaction)
         if transaction is None:
             return None  # pragma: nocover
         transaction.pop("to", None)  # only 'from' address, don't insert 'to' address!
@@ -1408,7 +1415,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param address: the address to validate
         :return: whether the address is valid
         """
-        return Web3.isAddress(address)
+        return Web3.is_address(address)
 
     @classmethod
     def contract_method_call(  # pylint: disable=arguments-differ
@@ -1461,7 +1468,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         tx_params = {
             "nonce": nonce,
             "value": tx_args["value"] if "value" in tx_args else 0,
-            "gas": 1,  # set this as a placeholder to avoid estimation on buildTransaction()
+            "gas": 1,  # set this as a placeholder to avoid estimation on build_transaction()
         }
 
         # Parameter camel-casing due to contract api requirements
@@ -1485,7 +1492,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             if gas_data:
                 tx_params.update(gas_data)  # pragma: nocover
 
-        tx = tx.buildTransaction(tx_params)
+        tx = tx.build_transaction(tx_params)
         if self._is_gas_estimation_enabled:
             tx = self.update_with_gas_estimate(tx, raise_on_try=raise_on_try)
 
@@ -1587,10 +1594,10 @@ class EthereumFaucetApi(FaucetApi):
             )
 
 
-class SessionCacheLockWrapper:
+class SimpleCacheLockWrapper:
     """Wrapper for session_cache with threading.Lock."""
 
-    def __init__(self, session_cache: SessionCache) -> None:
+    def __init__(self, session_cache: SimpleCache) -> None:
         """Init wrapper."""
         self.session_cache = session_cache
         self.lock = threading.Lock()
@@ -1618,12 +1625,16 @@ class SessionCacheLockWrapper:
         with self.lock:
             self.session_cache.clear()
 
+    def items(self) -> Dict[str, Any]:
+        """Return session items."""
+        return self.session_cache.items()
+
 
 def set_wrapper_for_web3py_session_cache() -> None:
     """Wrap web3py session cache with threading.Lock."""
 
     # pylint: disable=protected-access
-    web3._utils.request._session_cache = SessionCacheLockWrapper(
+    web3._utils.request._session_cache = SimpleCacheLockWrapper(
         web3._utils.request._session_cache
     )
 

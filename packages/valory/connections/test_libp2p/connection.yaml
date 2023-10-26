@@ -12,19 +12,19 @@ fingerprint:
   readme.md: bafybeihg5yfzgqvg5ngy7r2o5tfeqnelx2ffxw4po5hmheqjfhumpmxpoq
   tests/__init__.py: bafybeiarz6mhky6pnkdihibcuqrfpx3qo55roygneoaoq2mndi5lzdlcj4
   tests/acn_image.py: bafybeidkaavxkfocmg5c6y3i32fmbdf5i77jmqteoylmutifoh4zig3pr4
-  tests/base.py: bafybeiezhwp66aft6332mb34olbtuy2bgjcuit6zn5rrkoidvzqjqlapui
+  tests/base.py: bafybeicnngqp7pw6thjf4yjewk6kazaezpfumiob6mfwupdvwxaij6xwwm
   tests/conftest.py: bafybeifkjrvsysdb7ujp2wxurzgytzy3ecu6fv247zfszfymdvb7y7klpu
   tests/test_certificate_dates.py: bafybeif4t76wsvsfvvplkmi4gecgod6ijff3bbqgtaqmpep6ywfapfptfm
   tests/test_dht.py: bafybeienykwwpdjlbjzxzttxjhgas2edp2f657gbsexjtkztehoq4yfb7m
   tests/test_p2p_libp2p/__init__.py: bafybeig7f7s5ptqtscf74y25dtqvhp75joekcxi6qnuzxgxyzictpsp4dm
   tests/test_p2p_libp2p/test_aea_cli.py: bafybeiej55kwbxuqjvjjz4tc7we54pxur7kvsh5o36lau7b7utltzwkc34
-  tests/test_p2p_libp2p/test_communication.py: bafybeihnkle2pokfzfkguegmq4ptatvpcaezxrv564l76atjnuec57b2am
-  tests/test_p2p_libp2p/test_errors.py: bafybeifyl3anbjjm22xey73vhgdkosnd3nubyyl7xxr4kxbigsiwdsk25u
-  tests/test_p2p_libp2p/test_fault_tolerance.py: bafybeigbzraksxj35q3q6thnkbvgvybixapkow4dz6vyo7jlbgnyulbv4a
-  tests/test_p2p_libp2p/test_integration.py: bafybeicuu7nlyksb6ytipmjyuk5v4jhjt7ossegp74t7u5b2ckmlk5swci
+  tests/test_p2p_libp2p/test_communication.py: bafybeial5x6lzh5a5uvqs7s5p424szsbbkmfmnm7dx5unspxjnx5fwdf4a
+  tests/test_p2p_libp2p/test_errors.py: bafybeihp3pg25xowtnekz7s4mdhcsalrdpqu4reqlulzaa6zhmg7ahd4by
+  tests/test_p2p_libp2p/test_fault_tolerance.py: bafybeid3765nbedlwm52463hh42z67ww47f3yepa2cm53wsmn63iipu5om
+  tests/test_p2p_libp2p/test_integration.py: bafybeicidfdxwbesfamxtpevhq74udl5ne5xeqt523ggc2v2enam7yenyu
   tests/test_p2p_libp2p/test_slow_queue.py: bafybeihx6dga3bxiy7i67ggf6gnoakygyf5djyzv6prias5tcjpxawlpyy
   tests/test_p2p_libp2p_client/__init__.py: bafybeihjzl7ireo5rbnxcdbghbncykgcgcbh26m4mjjofsseeflauuf6sy
-  tests/test_p2p_libp2p_client/test_aea_cli.py: bafybeigcyn7yqcmfsdrrdy4dllqvkyhbdxywkfc3ikofczqqjhz4wsdr4y
+  tests/test_p2p_libp2p_client/test_aea_cli.py: bafybeie5yaezltj4xydnqghltt7f2t4vicdts5rm6bz4fdpt4kkkd42cyu
   tests/test_p2p_libp2p_client/test_communication.py: bafybeiceec5zsd2u37t56oiajijgwx7frpo3wzu4qdfd3lcq3lcldyqszq
   tests/test_p2p_libp2p_client/test_errors.py: bafybeiakajzr6jtecwnlzcrrx7paydz3obmleqzv7am5xbadu6wjtzabmm
   tests/test_p2p_libp2p_mailbox/__init__.py: bafybeiad64wftnugaahubhqc6bcqzg7om4435dzojdv7oeq4zdmn7kxzui
@@ -34,12 +34,12 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/p2p_libp2p:0.1.0:bafybeiesrebjctihckjc4axtyrrmofidtu7ngaxgzaostd4vokevm7nu6q
-- valory/p2p_libp2p_client:0.1.0:bafybeidwcobzb7ut3efegoedad7jfckvt2n6prcmd4g7xnkm6hp6aafrva
-- valory/p2p_libp2p_mailbox:0.1.0:bafybeiczoc27iefca3l5fc66e3bpxqu4ntgf5s4qpncbjsrdy4pf7cazlq
+- valory/p2p_libp2p:0.1.0:bafybeiaykya7tvir7k5scovjzuagpfcftvptxoi2od5qqqvukwglsrrtzy
+- valory/p2p_libp2p_client:0.1.0:bafybeihge56dn3xep2dzomu7rtvbgo4uc2qqh7ljl3fubqdi2lq44gs5lq
+- valory/p2p_libp2p_mailbox:0.1.0:bafybeiajf6msadxrr2rgkgebwlzoiznxdccsyzjopm2pkommcgcamsw27m
 protocols:
-- fetchai/default:1.0.0:bafybeieqqzgzuappi2ped42upgzad5gt3mxiyjhojwibxm4o367ffsian4
-- valory/acn:1.1.0:bafybeignmc5uh3vgpuckljcj2tgg7hdqyytkm6m5b6v6mxtazdcvubibva
+- fetchai/default:1.0.0:bafybeibtqp56jkijwjsohk4z5vqp6pfkiexmnmk5uleteotbsgrypy6gxm
+- valory/acn:1.1.0:bafybeic2pxzfc3voxl2ejhcqyf2ehm4wm5gxvgx7bliloiqi2uppmq6weu
 class_name: MyScaffoldAsyncConnection
 config:
   foo: bar

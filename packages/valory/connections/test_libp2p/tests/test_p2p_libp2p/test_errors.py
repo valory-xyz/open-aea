@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ from packages.valory.connections.p2p_libp2p.connection import (
 from packages.valory.connections.p2p_libp2p.tests.base import ports
 from packages.valory.connections.test_libp2p.tests.base import (
     BaseP2PLibp2pTest,
+    SKIP_WINDOWS,
     _make_libp2p_connection,
     create_identity,
 )
@@ -123,6 +124,7 @@ class TestP2PLibp2pConnectionFailureSetupNewConnection(BaseP2PLibp2pTest):
             )
 
 
+@SKIP_WINDOWS
 def test_libp2p_connection_mixed_ip_address() -> None:
     """Test correct public uri ip and entry peers ips configuration."""
     assert _ip_all_private_or_all_public([]) is True
@@ -134,6 +136,11 @@ def test_libp2p_connection_mixed_ip_address() -> None:
     assert _ip_all_private_or_all_public(["fetch.ai", "acn.fetch.ai"]) is True
 
 
+@pytest.mark.skipif(
+    condition=(platform.system() == "Windows"),
+    reason="https://github.com/golang/go/issues/51007",
+)
+@SKIP_WINDOWS
 def test_libp2p_connection_node_config_registration_delay() -> None:
     """Test node registration delay configuration"""
 
@@ -141,6 +148,7 @@ def test_libp2p_connection_node_config_registration_delay() -> None:
         _make_libp2p_connection(peer_registration_delay="must_be_float")
 
 
+@SKIP_WINDOWS
 def test_build_dir_not_set() -> None:
     """Test build dir not set."""
 
@@ -159,6 +167,7 @@ def test_build_dir_not_set() -> None:
 
 
 @pytest.mark.asyncio
+@SKIP_WINDOWS
 async def test_reconnect_on_write_failed() -> None:
     """Test node restart on write fail."""
 
@@ -186,6 +195,7 @@ async def test_reconnect_on_write_failed() -> None:
 
 
 @pytest.mark.asyncio
+@SKIP_WINDOWS
 async def test_reconnect_on_write_failed_reconnect_pipe() -> None:
     """Test node restart on write fail."""
 
@@ -219,6 +229,7 @@ async def test_reconnect_on_write_failed_reconnect_pipe() -> None:
 
 
 @pytest.mark.asyncio
+@SKIP_WINDOWS
 async def test_reconnect_on_read_failed() -> None:
     """Test node restart on read fail."""
 
@@ -243,6 +254,7 @@ async def test_reconnect_on_read_failed() -> None:
 
 
 @pytest.mark.asyncio
+@SKIP_WINDOWS
 async def test_node_stopped_callback() -> None:
     """Test node stopped callback called."""
 
