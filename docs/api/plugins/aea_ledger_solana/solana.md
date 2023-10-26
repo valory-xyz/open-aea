@@ -77,8 +77,8 @@ Solana to lamport value.
 #### to`_`account`_`meta
 
 ```python
-@staticmethod
-def to_account_meta(pubkey: Pubkey, is_signer: bool,
+@classmethod
+def to_account_meta(cls, pubkey: Union[Pubkey, str], is_signer: bool,
                     is_writable: bool) -> AccountMeta
 ```
 
