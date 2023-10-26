@@ -27,7 +27,7 @@ gym = "==0.15.6"
 hypothesis = "==6.21.6"
 ipfshttpclient = "==0.8.0a2"
 liccheck = "==0.6.0"
-matplotlib = ">=3.3.0,<3.4"
+matplotlib = "<3.4,>=3.3.0"
 memory-profiler = "==0.57.0"
 # ^ still used?
 numpy = ">=1.18.1"
