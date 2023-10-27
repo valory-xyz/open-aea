@@ -157,3 +157,65 @@ def test_any_latest_and_numeric_unequal(version_like_pair: Tuple[str]):
     for f in funcs:
         with pytest.raises(TypeError, match="not supported between"):
             assert f(self, other)
+
+
+class TestDependency:
+    """Test Dependency class."""
+
+    def test_parse_from_string(self) -> None:
+        """Test from_string method."""
+
+        string = "tomte==0.2.13"
+        dep = Dependency.from_string(string=string)
+        assert dep.name == "tomte"
+        assert str(dep.version) == "==0.2.13"
+        assert dep.to_pip_string() == string
+
+    def test_parse_from_string_wth_extras(self) -> None:
+        """Test from_string method."""
+
+        string = "tomte[tox,tests]==0.2.13"
+        dep = Dependency.from_string(string=string)
+        assert dep.name == "tomte"
+        assert str(dep.version) == "==0.2.13"
+        assert dep.extras == ["tox", "tests"]
+        assert dep.to_pip_string() == string
+
+    def test_parse_from_git_string(self) -> None:
+        """Test from_string method."""
+
+        string = "git+https://github.com/valory-xyz/tomte.git@03adee2a0a5681c6d8e77160be27edffaa8e3bee#egg=tomte"
+        dep = Dependency.from_string(string=string)
+        assert dep.name == "tomte"
+        assert str(dep.ref) == "03adee2a0a5681c6d8e77160be27edffaa8e3bee"
+        assert dep.git == "https://github.com/valory-xyz/tomte.git"
+        assert dep.to_pip_string() == string
+
+    def test_parse_from_pipfile_specifier(self) -> None:
+        """Test from_pipfile_specifier method"""
+
+        string = 'tomte = "==0.2.13"'
+        dep = Dependency.from_pipfile_string(string)
+        assert dep.name == "tomte"
+        assert str(dep.version) == "==0.2.13"
+        assert dep.to_pipfile_string() == string
+
+    def test_parse_from_pipfile_specifier_with_extras(self) -> None:
+        """Test from_pipfile_specifier method"""
+
+        string = 'tomte = {version = "==0.2.13", extras = ["tox", "tests"]}'
+        dep = Dependency.from_pipfile_string(string)
+        assert dep.name == "tomte"
+        assert str(dep.version) == "==0.2.13"
+        assert dep.extras == ["tox", "tests"]
+        assert dep.to_pipfile_string() == string
+
+    def test_parse_from_pipfile_specifier_with_git_ref(self) -> None:
+        """Test from_pipfile_specifier method"""
+
+        string = 'tomte = {ref = "03adee2a0a5681c6d8e77160be27edffaa8e3bee", git = "git+https://github.com/valory-xyz/tomte.git"}'
+        dep = Dependency.from_pipfile_string(string)
+        assert dep.name == "tomte"
+        assert str(dep.ref) == "03adee2a0a5681c6d8e77160be27edffaa8e3bee"
+        assert dep.git == "https://github.com/valory-xyz/tomte.git"
+        assert dep.to_pipfile_string() == string

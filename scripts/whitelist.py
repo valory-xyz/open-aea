@@ -339,3 +339,5 @@ fetch_agent  # method is used by after cli utility method rename vulture reports
 bundle_and_send  # unused function (aea/crypto/base.py:432)
 raw_signed_transactions  # unused variable (aea/crypto/base.py:434)
 target_blocks  # unused variable (aea/crypto/base.py:435)
+from_pipfile_string  # unused method (aea/configurations/data_types.py:876)
+to_pipfile_string  # unused method (aea/configurations/data_types.py:973)
