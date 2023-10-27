@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """Base config data types."""
 import functools
+import json
 import re
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -62,8 +63,31 @@ from aea.helpers.base import (
 T = TypeVar("T")
 PackageVersionLike = Union[str, semver.VersionInfo]
 
-PYPI_RE = r"(?P<name>[a-zA-Z0-9_-]+)(?P<version>(>|<|=|~).+)?"
-GIT_RE = r"git\+(?P<git>https://github.com/([a-z-_0-9A-Z]+\/[a-z-_0-9A-Z]+)\.git)@(?P<ref>.+)#egg=(?P<name>.+)"
+PACKAGE_NAME_RE = r"[a-zA-Z0-9_-]+"
+VERSION_SPECIFIER_RE = r"(>|<|=|~|\*)+.*"
+PIP_RE = (
+    r"(?P<name>"
+    + PACKAGE_NAME_RE
+    + r")(?P<extras>\[[,a-zA-Z0-9_-]+\]+)?(?P<version>"
+    + VERSION_SPECIFIER_RE
+    + r")?"
+)
+GIT_RE = (
+    r"git\+(?P<git>https://github.com/("
+    + PACKAGE_NAME_RE
+    + r"\/"
+    + PACKAGE_NAME_RE
+    + r")\.git)@(?P<ref>.+)#egg=(?P<name>.+)"
+)
+PIPFILE_VERSION_ONLY_RE = (
+    r"(?P<name>[a-zA-Z0-9_-]+) = \"(?P<version>" + VERSION_SPECIFIER_RE + r")\""
+)
+PIPFILE_EXTRA_RE = (
+    r"(?P<name>[a-zA-Z0-9_-]+) = \{(version = \"(?P<version>"
+    + VERSION_SPECIFIER_RE
+    + r")\"), extras = (?P<extras>\[[, a-zA-Z\"]+\])\}"
+)
+PIPFILE_GIT_RE = r"(?P<name>[a-zA-Z0-9_-]+) = \{(ref = \"(?P<ref>[a-zA-Z0-9]+)\"), git = \"git\+(?P<git>https:\/\/.*\.git)\"\}"
 
 
 class JSONSerializable(ABC):
@@ -781,7 +805,7 @@ class Dependency:
     These fields will be forwarded to the 'pip' command.
     """
 
-    __slots__ = ("_name", "_version", "_index", "_git", "_ref")
+    __slots__ = ("_name", "_version", "_index", "_git", "_ref", "_extras")
 
     def __init__(
         self,
@@ -790,6 +814,7 @@ class Dependency:
         index: Optional[str] = None,
         git: Optional[str] = None,
         ref: Optional[Union[GitRef, str]] = None,
+        extras: Optional[List[str]] = None,
     ) -> None:
         """
         Initialize a PyPI dependency.
@@ -799,12 +824,14 @@ class Dependency:
         :param index: the URL to the PyPI server.
         :param git: the URL to a git repository.
         :param ref: the Git reference (branch/commit/tag).
+        :param extras: Include extras section for the dependency.
         """
         self._name: PyPIPackageName = PyPIPackageName(name)
         self._version: SpecifierSet = self._parse_version(version)
         self._index: Optional[str] = index
         self._git: Optional[str] = git
         self._ref: Optional[GitRef] = GitRef(ref) if ref is not None else None
+        self._extras = extras or []
 
     @property
     def name(self) -> str:
@@ -831,6 +858,11 @@ class Dependency:
         """Get the ref."""
         return str(self._ref) if self._ref else None
 
+    @property
+    def extras(self) -> List[str]:
+        """Get the ref."""
+        return self._extras
+
     @staticmethod
     def _parse_version(version: Union[str, SpecifierSet]) -> SpecifierSet:
         """
@@ -842,6 +874,37 @@ class Dependency:
         return version if isinstance(version, SpecifierSet) else SpecifierSet(version)
 
     @classmethod
+    def from_pipfile_string(cls, string: str) -> "Dependency":
+        """Parse from Pipfile version specifier."""
+        match = re.match(PIPFILE_VERSION_ONLY_RE, string=string)
+        if match is not None:
+            data = match.groupdict()
+            return Dependency(
+                name=data["name"],
+                version=data["version"] if data["version"] != "*" else "",
+            )
+
+        match = re.match(PIPFILE_EXTRA_RE, string=string)
+        if match is not None:
+            data = match.groupdict()
+            return Dependency(
+                name=data["name"],
+                version=data["version"] if data["version"] != "*" else "",
+                extras=json.loads(data["extras"]),
+            )
+
+        match = re.match(PIPFILE_GIT_RE, string=string)
+        if match is not None:
+            data = match.groupdict()
+            return Dependency(
+                name=data["name"],
+                git=data["git"],
+                ref=data["ref"],
+            )
+
+        raise ValueError(f"Invalid string provided for Pipfile specifier: {string}")
+
+    @classmethod
     def from_string(cls, string: str) -> "Dependency":
         """Parse from string."""
         match = re.match(GIT_RE, string)
@@ -849,11 +912,14 @@ class Dependency:
             data = match.groupdict()
             return cls(name=data["name"], git=data["git"], ref=data["ref"])
 
-        match = re.match(PYPI_RE, string)
+        match = re.match(PIP_RE, string)
         if match is None:
             raise ValueError(f"Cannot parse the dependency string '{string}'")
 
         data = match.groupdict()
+        extras = []
+        if data["extras"] is not None:
+            extras = re.findall("[a-zA-Z0-9_-]+", data["extras"])
         return Dependency(
             name=data["name"],
             version=(
@@ -861,6 +927,7 @@ class Dependency:
                 if data["version"] is not None
                 else SpecifierSet("")
             ),
+            extras=extras,
         )
 
     @classmethod
@@ -894,25 +961,51 @@ class Dependency:
             result["ref"] = cast(str, self.ref)
         return {self.name: result}
 
+    def to_pip_string(self) -> str:
+        """To pip specifier."""
+        if self.git is not None:
+            revision = self.ref if self.ref is not None else DEFAULT_GIT_REF
+            return "git+" + self.git + "@" + revision + "#egg=" + self.name
+        if len(self.extras) > 0:
+            return self.name + "[" + ",".join(self.extras) + "]" + str(self.version)
+        return self.name + str(self.version)
+
+    def to_pipfile_string(self) -> str:
+        """To Pipfile specifier."""
+        if self.git is not None:
+            string = self.name + " = {"
+            revision = self.ref if self.ref is not None else DEFAULT_GIT_REF
+            string += f'ref = "{revision}", '
+            string += f'git = "git+{self.git}"'
+            string += "}"
+            return string
+
+        if len(self.extras) > 0:
+            version = self.version if self.version != "" else "*"
+            string = self.name + " = {"
+            string += f'version = "{version}", '
+            string += "extras = ["
+            string += ", ".join(map(lambda x: f'"{x}"', self.extras))
+            string += "]}"
+            return string
+
+        version = self.version if self.version != "" else "*"
+        return f'{self.name} = "{version}"'
+
     def get_pip_install_args(self) -> List[str]:
         """Get 'pip install' arguments."""
-        name = self.name
-        index = self.index
-        git_url = self.git
-        revision = self.ref if self.ref is not None else DEFAULT_GIT_REF
-        version_constraint = str(self.version)
         command: List[str] = []
-        if index is not None:
-            command += ["-i", index]
-        if git_url is not None:
-            command += ["git+" + git_url + "@" + revision + "#egg=" + name]
-        else:
-            command += [name + version_constraint]
+        if self.index is not None:
+            command += ["-i", self.index]
+        command += [self.to_pip_string()]
         return command
 
     def __str__(self) -> str:
         """Get the string representation."""
-        return f"{self.__class__.__name__}(name='{self.name}', version='{self.version}', index='{self.index}', git='{self.git}', ref='{self.ref}')"
+        return (
+            f"{self.__class__.__name__}(name='{self.name}', version='{self.version}', "
+            f"index='{self.index}', git='{self.git}', ref='{self.ref}', extras='{self.extras}')"
+        )
 
     def __eq__(self, other: Any) -> bool:
         """Check equality."""
