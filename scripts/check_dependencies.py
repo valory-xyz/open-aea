@@ -26,6 +26,7 @@ In particular:
 It is assumed the script is run from the repository root.
 """
 
+import itertools
 import logging
 import re
 import sys
@@ -36,6 +37,7 @@ from typing import OrderedDict as OrderedDictType
 from typing import Tuple, cast
 
 import click
+import toml
 
 from aea.configurations.data_types import Dependency
 from aea.package_manager.base import load_configuration
@@ -59,18 +61,20 @@ class PathArgument(click.Path):
 class Pipfile:
     """Class to represent Pipfile config."""
 
-    skip = [
+    ignore = [
         "open-aea-ledger-cosmos",
         "open-aea-ledger-ethereum",
         "open-aea-ledger-fetchai",
         "open-aea-flashbots",
+        "open-aea-flashbots",
+        "tomte",
     ]
 
     def __init__(
         self,
         sources: List[str],
-        packages: OrderedDictType[str, str],
-        dev_packages: OrderedDictType[str, str],
+        packages: OrderedDictType[str, Dependency],
+        dev_packages: OrderedDictType[str, Dependency],
         file: Path,
     ) -> None:
         """Initialize object."""
@@ -79,47 +83,33 @@ class Pipfile:
         self.dev_packages = dev_packages
         self.file = file
 
-    @staticmethod
-    def as_dependency(name: str, version: str) -> Dependency:
-        """Returns the dependency as aea.configurations.data_types.Dependency object"""
-        return Dependency(name=name, version=version.replace('"', "").replace("*", ""))
-
     def __iter__(self) -> Iterator[Dependency]:
         """Iterate dependencies as from aea.configurations.data_types.Dependency object."""
-        for package, version in self.packages.items():
-            if package.startswith("comment_"):
+        for name, dependency in itertools.chain(
+            self.packages.items(), self.dev_packages.items()
+        ):
+            if name.startswith("comment_") or name in self.ignore:
                 continue
-            if package == "tomte":
-                continue
-            yield self.as_dependency(name=package, version=version)
-
-        for package, version in self.dev_packages.items():
-            if package.startswith("comment_"):
-                continue
-            if package == "tomte":
-                continue
-            yield self.as_dependency(name=package, version=version)
+            yield dependency
 
     def update(self, dependency: Dependency) -> None:
         """Update dependency specifier"""
-        if dependency.name in self.skip:
+        if dependency.name in self.ignore:
             return
         if dependency.name in self.packages:
             if dependency.version == "":
                 return
-            self.packages[dependency.name] = f'"{dependency.version}"'
+            self.packages[dependency.name] = dependency
         else:
-            self.dev_packages[dependency.name] = f'"{dependency.version}"'
+            self.dev_packages[dependency.name] = dependency
 
     def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
         """Check dependency specifier"""
-        if dependency.name in self.skip:
+        if dependency.name in self.ignore:
             return None, 0
 
         if dependency.name in self.packages:
-            expected = self.as_dependency(
-                name=dependency.name, version=self.packages[dependency.name]
-            )
+            expected = self.packages[dependency.name]
             if expected != dependency:
                 return (
                     f"in Pipfile {expected.get_pip_install_args()[0]}; "
@@ -130,9 +120,7 @@ class Pipfile:
         if dependency.name not in self.dev_packages:
             return f"{dependency.name} not found in Pipfile", logging.ERROR
 
-        expected = self.as_dependency(
-            name=dependency.name, version=self.dev_packages[dependency.name]
-        )
+        expected = self.dev_packages[dependency.name]
         if expected != dependency:
             return (
                 f"in Pipfile {expected.get_pip_install_args()[0]}; "
@@ -144,7 +132,7 @@ class Pipfile:
     @classmethod
     def parse(
         cls, content: str
-    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, str]]]:
+    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, Dependency]]]:
         """Parse from string."""
         sources = []
         sections: OrderedDictType = OrderedDict()
@@ -163,7 +151,7 @@ class Pipfile:
             if "[dev-packages]" in line or "[packages]" in line:
                 section = line
                 sections[section] = OrderedDict()
-                while True:
+                while len(lines) > 0:
                     line = lines.pop(0).strip()
                     if line == "":
                         break
@@ -171,8 +159,8 @@ class Pipfile:
                         sections[section][f"comment_{comments}"] = line
                         comments += 1
                     else:
-                        package, *version = line.split(" = ")
-                        sections[section][package] = " = ".join(version)
+                        dep = Dependency.from_pipfile_string(line)
+                        sections[section][dep.name] = dep
         return sources, sections
 
     def compile(self) -> str:
@@ -182,23 +170,18 @@ class Pipfile:
             content += source + "\n"
 
         content += "[packages]\n"
-        for package, version in self.packages.items():
+        for package, dep in self.packages.items():
             if package.startswith("comment"):
-                content += version + "\n"
+                content += str(dep) + "\n"
             else:
-                if version == '""':
-                    version = '"*"'
-                content += f"{package} = {version}\n"
+                content += dep.to_pipfile_string() + "\n"
 
         content += "\n[dev-packages]\n"
-        for package, version in self.dev_packages.items():
+        for package, dep in self.dev_packages.items():
             if package.startswith("comment"):
-                content += version + "\n"
+                content += str(dep) + "\n"
             else:
-                if version == '""':
-                    version = '"*"'
-                content += f"{package} = {version}\n"
-
+                content += dep.to_pipfile_string() + "\n"
         return content
 
     @classmethod
@@ -272,8 +255,8 @@ class ToxFile:
     @classmethod
     def parse(cls, content: str) -> Dict[str, Dict[str, Any]]:
         """Parse file content."""
-        lines = content.split("\n")
         deps = {}
+        lines = content.split("\n")
         while len(lines) > 0:
             line = lines.pop(0)
             if line.startswith("deps"):
@@ -343,6 +326,99 @@ class ToxFile:
         self.file.write_text(content, encoding="utf-8")
 
 
+class PyProjectToml:
+    """Class to represent pyproject.toml file."""
+
+    ignore = [
+        "python",
+    ]
+
+    def __init__(
+        self,
+        dependencies: OrderedDictType[str, Dependency],
+        config: Dict[str, Dict],
+        file: Path,
+    ) -> None:
+        """Initialize object."""
+        self.dependencies = dependencies
+        self.config = config
+        self.file = file
+
+    def __iter__(self) -> Iterator[Dependency]:
+        """Iterate dependencies as from aea.configurations.data_types.Dependency object."""
+        for dependency in self.dependencies.values():
+            if dependency.name not in self.ignore:
+                yield dependency
+
+    def update(self, dependency: Dependency) -> None:
+        """Update dependency specifier"""
+        if dependency.name in self.ignore:
+            return
+        if dependency.name in self.dependencies and dependency.version == "":
+            return
+        self.dependencies[dependency.name] = dependency
+
+    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
+        """Check dependency specifier"""
+        if dependency.name in self.ignore:
+            return None, 0
+
+        if dependency.name not in self.dependencies:
+            return f"{dependency.name} not found in pyproject.toml", logging.ERROR
+
+        expected = self.dependencies[dependency.name]
+        if expected != dependency:
+            return (
+                f"in pyproject.toml {expected.get_pip_install_args()[0]}; "
+                f"got {dependency.get_pip_install_args()[0]}"
+            ), logging.WARNING
+
+        return None, 0
+
+    @classmethod
+    def load(cls, pyproject_path: Path) -> Optional["PyProjectToml"]:
+        """Load pyproject.yaml dependencies"""
+        config = toml.load(pyproject_path)
+        dependencies = OrderedDict()
+        try:
+            config["tool"]["poetry"]["dependencies"]
+        except KeyError:
+            return None
+        for name, version in config["tool"]["poetry"]["dependencies"].items():
+            if isinstance(version, str):
+                dependencies[name] = Dependency(
+                    name=name,
+                    version=version.replace("^", "==") if version != "*" else "",
+                )
+                continue
+            data = cast(Dict, version)
+            if "extras" in data:
+                version = data["version"]
+                if re.match(r"^\d", version):
+                    version = f"=={version}"
+                dependencies[name] = Dependency(
+                    name=name,
+                    version=version,
+                    extras=data["extras"],
+                )
+                continue
+
+        return cls(
+            dependencies=dependencies,
+            config=config,
+            file=pyproject_path,
+        )
+
+    def dump(self) -> None:
+        """Dump to file."""
+        self.config["tool"]["poetry"]["dependencies"] = {
+            package.name: package.version if package.version != "" else "*"
+            for package in self.dependencies.values()
+        }
+        with self.file.open("w") as fp:
+            toml.dump(self.config, fp)
+
+
 def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
     """Returns a list of package dependencies."""
     package_manager = PackageManagerV1.from_dir(packages_dir=packages_dir)
@@ -374,58 +450,97 @@ def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
 
 
 def _update(
-    tox: ToxFile,
-    pipfile: Pipfile,
     packages_dependencies: List[Dependency],
+    tox: ToxFile,
+    pipfile: Optional[Pipfile] = None,
+    pyproject: Optional[PyProjectToml] = None,
 ) -> None:
     """Update dependencies."""
 
-    for dependency in packages_dependencies:
-        pipfile.update(dependency=dependency)
+    if pipfile is not None:
+        for dependency in packages_dependencies:
+            pipfile.update(dependency=dependency)
 
-    for dependency in pipfile:
-        tox.update(dependency=dependency)
+        for dependency in pipfile:
+            tox.update(dependency=dependency)
 
-    for dependency in tox:
-        pipfile.update(dependency=dependency)
+        for dependency in tox:
+            pipfile.update(dependency=dependency)
 
-    pipfile.dump()
+        pipfile.dump()
+
+    if pyproject is not None:
+        for dependency in packages_dependencies:
+            pyproject.update(dependency=dependency)
+
+        for dependency in pyproject:
+            tox.update(dependency=dependency)
+
+        for dependency in tox:
+            pyproject.update(dependency=dependency)
+
+        pyproject.dump()
+
     tox.write()
 
 
 def _check(
-    tox: ToxFile,
-    pipfile: Pipfile,
     packages_dependencies: List[Dependency],
+    tox: ToxFile,
+    pipfile: Optional[Pipfile] = None,
+    pyproject: Optional[PyProjectToml] = None,
 ) -> None:
     """Update dependencies."""
 
     fail_check = 0
 
-    print("Comparing dependencies from Pipfile and packages")
-    for dependency in packages_dependencies:
-        error, level = pipfile.check(dependency=dependency)
-        if error is not None:
-            logging.log(level=level, msg=error)
-            fail_check = level or fail_check
+    if pipfile is not None:
+        print("Comparing dependencies from Pipfile and packages")
+        for dependency in packages_dependencies:
+            error, level = pipfile.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
+
+        print("Comparing dependencies from tox and Pipfile")
+        for dependency in pipfile:
+            error, level = tox.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
+
+        print("Comparing dependencies from Pipfile and tox")
+        for dependency in tox:
+            error, level = pipfile.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
+
+    if pyproject is not None:
+        print("Comparing dependencies from pyproject.toml and packages")
+        for dependency in packages_dependencies:
+            error, level = pyproject.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
+
+        print("Comparing dependencies from pyproject.toml and tox")
+        for dependency in pyproject:
+            error, level = tox.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
+
+        print("Comparing dependencies from tox and pyproject.toml")
+        for dependency in tox:
+            error, level = pyproject.check(dependency=dependency)
+            if error is not None:
+                logging.log(level=level, msg=error)
+                fail_check = level or fail_check
 
     print("Comparing dependencies from tox and packages")
     for dependency in packages_dependencies:
         error, level = tox.check(dependency=dependency)
-        if error is not None:
-            logging.log(level=level, msg=error)
-            fail_check = level or fail_check
-
-    print("Comparing dependencies from tox and Pipfile")
-    for dependency in pipfile:
-        error, level = tox.check(dependency=dependency)
-        if error is not None:
-            logging.log(level=level, msg=error)
-            fail_check = level or fail_check
-
-    print("Comparing dependencies from Pipfile and tox")
-    for dependency in tox:
-        error, level = pipfile.check(dependency=dependency)
         if error is not None:
             logging.log(level=level, msg=error)
             fail_check = level or fail_check
@@ -477,11 +592,22 @@ def _check(
     ),
     help="Pipfile path.",
 )
+@click.option(
+    "--pyproject",
+    "pyproject_path",
+    type=PathArgument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+    ),
+    help="Pipfile path.",
+)
 def main(
     check: bool = False,
     packages_dir: Optional[Path] = None,
     tox_path: Optional[Path] = None,
     pipfile_path: Optional[Path] = None,
+    pyproject_path: Optional[Path] = None,
 ) -> None:
     """Check dependencies across packages, tox.ini, pyproject.toml and setup.py"""
 
@@ -491,7 +617,10 @@ def main(
     tox = ToxFile.load(tox_path)
 
     pipfile_path = pipfile_path or Path.cwd() / "Pipfile"
-    pipfile = Pipfile.load(pipfile_path)
+    pipfile = Pipfile.load(pipfile_path) if pipfile_path.exists() else None
+
+    pyproject_path = pyproject_path or Path.cwd() / "pyproject.toml"
+    pyproject = PyProjectToml.load(pyproject_path) if pyproject_path.exists() else None
 
     packages_dir = packages_dir or Path.cwd() / "packages"
     packages_dependencies = load_packages_dependencies(packages_dir=packages_dir)
@@ -500,12 +629,14 @@ def main(
         return _check(
             tox=tox,
             pipfile=pipfile,
+            pyproject=pyproject,
             packages_dependencies=packages_dependencies,
         )
 
     return _update(
         tox=tox,
         pipfile=pipfile,
+        pyproject=pyproject,
         packages_dependencies=packages_dependencies,
     )
 
