@@ -999,7 +999,8 @@ def __init__(name: Union[PyPIPackageName, str],
              version: Union[str, SpecifierSet] = "",
              index: Optional[str] = None,
              git: Optional[str] = None,
-             ref: Optional[Union[GitRef, str]] = None) -> None
+             ref: Optional[Union[GitRef, str]] = None,
+             extras: Optional[List[str]] = None) -> None
 ```
 
 Initialize a PyPI dependency.
@@ -1011,6 +1012,7 @@ Initialize a PyPI dependency.
 - `index`: the URL to the PyPI server.
 - `git`: the URL to a git repository.
 - `ref`: the Git reference (branch/commit/tag).
+- `extras`: Include extras section for the dependency.
 
 <a id="aea.configurations.data_types.Dependency.name"></a>
 
@@ -1067,6 +1069,28 @@ def ref() -> Optional[str]
 
 Get the ref.
 
+<a id="aea.configurations.data_types.Dependency.extras"></a>
+
+#### extras
+
+```python
+@property
+def extras() -> List[str]
+```
+
+Get the ref.
+
+<a id="aea.configurations.data_types.Dependency.from_pipfile_string"></a>
+
+#### from`_`pipfile`_`string
+
+```python
+@classmethod
+def from_pipfile_string(cls, string: str) -> "Dependency"
+```
+
+Parse from Pipfile version specifier.
+
 <a id="aea.configurations.data_types.Dependency.from_string"></a>
 
 #### from`_`string
@@ -1098,6 +1122,26 @@ def to_json() -> Dict[str, Dict[str, str]]
 ```
 
 Transform the object to JSON.
+
+<a id="aea.configurations.data_types.Dependency.to_pip_string"></a>
+
+#### to`_`pip`_`string
+
+```python
+def to_pip_string() -> str
+```
+
+To pip specifier.
+
+<a id="aea.configurations.data_types.Dependency.to_pipfile_string"></a>
+
+#### to`_`pipfile`_`string
+
+```python
+def to_pipfile_string() -> str
+```
+
+To Pipfile specifier.
 
 <a id="aea.configurations.data_types.Dependency.get_pip_install_args"></a>
 
