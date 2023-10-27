@@ -1100,7 +1100,7 @@ def test_dependency_to_string():
     )
     assert (
         str(dependency)
-        == "Dependency(name='package_1', version='==0.1.0', index='https://index.com', git='https://some-repo.git', ref='branch')"
+        == "Dependency(name='package_1', version='==0.1.0', index='https://index.com', git='https://some-repo.git', ref='branch', extras='[]')"
     )
 
 
