@@ -35,8 +35,8 @@ dependencies:
   aiohttp:
     version: <4.0.0,>=3.8.5
   openapi-core:
-    version: ==0.13.2
+    version: ==0.15.0
   openapi-spec-validator:
-    version: ==0.2.8
+    version: <0.5.0,>=0.4.0
   werkzeug: {}
 is_abstract: false
