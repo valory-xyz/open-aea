@@ -19,7 +19,7 @@
 """Solana account implementation."""
 from dataclasses import dataclass
 
-from solders import instruction
+from solders.instruction import AccountMeta
 from solders.pubkey import Pubkey as PublicKey
 
 
@@ -35,7 +35,7 @@ class AccountMeta:
     """True if the `pubkey` can be loaded as a read-write account."""
 
     @classmethod
-    def from_solders(cls, meta: instruction.AccountMeta):
+    def from_solders(cls, meta: AccountMeta):
         """Convert from a `solders` AccountMeta."""
         return cls(
             pubkey=PublicKey.from_bytes(bytes(meta.pubkey)),
@@ -43,8 +43,8 @@ class AccountMeta:
             is_writable=meta.is_writable,
         )
 
-    def to_solders(self) -> instruction.AccountMeta:
+    def to_solders(self) -> AccountMeta:
         """Convert to a `solders` AccountMeta."""
-        return instruction.AccountMeta(
+        return AccountMeta(
             pubkey=self.pubkey, is_signer=self.is_signer, is_writable=self.is_writable
         )

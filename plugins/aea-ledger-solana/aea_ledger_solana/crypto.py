@@ -27,8 +27,11 @@ from typing import Optional, Union
 import base58
 from aea_ledger_solana.constants import _SOLANA
 from cryptography.fernet import Fernet  # type: ignore
+from solana.transaction import Transaction as SolanaTransaction
 from solders.hash import Hash
+from solders.instruction import Instruction
 from solders.keypair import Keypair
+from solders.pubkey import Pubkey
 from solders.transaction import Transaction
 
 from aea.common import JSONLike
@@ -59,6 +62,11 @@ class SolanaCrypto(Crypto[Keypair]):
             password=password,
             extra_entropy=extra_entropy,
         )
+
+    @property
+    def pubkey(self) -> Pubkey:
+        """Pubkey object."""
+        return self.entity.pubkey()
 
     @property
     def private_key(self) -> str:
@@ -128,6 +136,32 @@ class SolanaCrypto(Crypto[Keypair]):
         return str(signed_msg)
 
     def sign_transaction(
+        self, transaction: JSONLike, signers: Optional[list] = None
+    ) -> JSONLike:
+        """
+        Sign a transaction in bytes string form.
+
+        :param transaction: the transaction to be signed
+        :param signers: list of signers
+        :return: signed transaction
+        """
+        if "ixs" in transaction:
+            return self._sign_ixs(ix_container=transaction)
+        return self._sign_tx_legacy(transaction=transaction, signers=signers)
+
+    def _sign_ixs(self, ix_container: JSONLike) -> JSONLike:
+        """Create a signed transaction from instructions."""
+        tx = SolanaTransaction(
+            fee_payer=self.entity.pubkey(),
+            recent_blockhash=Hash.from_string(ix_container["recent_blockhash"]),
+            instructions=[
+                Instruction.from_json(json.dumps(ix)) for ix in ix_container["ixs"]
+            ],
+        )
+        tx.sign(self.entity)
+        return json.loads(tx.to_solders().to_json())
+
+    def _sign_tx_legacy(
         self, transaction: JSONLike, signers: Optional[list] = None
     ) -> JSONLike:
         """
