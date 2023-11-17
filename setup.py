@@ -36,6 +36,7 @@ def get_all_extras() -> Dict:
         "packaging>=23.1,<24.0",
         "pytest>=7.0.0,<7.3.0",
         "coverage>=6.4.4,<8.0.0",
+        "jsonschema<4.4.0,>=4.3.0",
         "semver>=2.9.1,<3.0.0",
     ]
 
