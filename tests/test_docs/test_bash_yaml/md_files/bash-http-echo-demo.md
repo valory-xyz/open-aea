@@ -1,6 +1,6 @@
 ``` bash
 pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeibf2bacu3jm7aqrw7tw3w6tnkkfq6vxtypgbe67q6u7plewnfupo4 --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeiahnlpss6zznrtxumilqtd4nxzx43gket2ntqje7uvq3j2kjzrgoy --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install
