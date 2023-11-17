@@ -31,11 +31,11 @@ from traceback import format_exc
 from typing import Any, Dict, Optional, cast
 from urllib.parse import parse_qs, urlparse
 
+import attr
 from aiohttp import web
 from aiohttp.web_request import BaseRequest
-from openapi_core import create_spec
-from openapi_core.validation.request.datatypes import OpenAPIRequest, RequestParameters
-from openapi_core.validation.request.shortcuts import validate_request
+from openapi_core.schema.specs import Spec
+from openapi_core.validation.request.datatypes import RequestParameters
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator.exceptions import (  # pylint: disable=wrong-import-order
     OpenAPIValidationError,
@@ -115,6 +115,36 @@ def headers_to_string(headers: Dict) -> str:
     return msg.as_string()
 
 
+@attr.s
+class OpenAPIRequest:  # pylint: disable=too-few-public-methods
+    """OpenAPI request dataclass.
+
+    Attributes:
+        full_url_pattern
+            The matched url with scheme, host and path pattern.
+            For example:
+            https://localhost:8000/api/v1/pets
+            https://localhost:8000/api/v1/pets/{pet_id}
+        method
+            The request method, as lowercase string.
+        parameters
+            A RequestParameters object.
+        body
+            The request body, as string.
+        mimetype
+            Like content type, but without parameters (eg, without charset,
+            type etc.) and always lowercase.
+            For example if the content type is "text/HTML; charset=utf-8"
+            the mimetype would be "text/html".
+    """
+
+    full_url_pattern = attr.ib()
+    method = attr.ib()
+    body = attr.ib()
+    mimetype = attr.ib()
+    parameters = attr.ib(factory=RequestParameters)
+
+
 class Request(OpenAPIRequest):
     """Generic request object."""
 
@@ -159,7 +189,7 @@ class Request(OpenAPIRequest):
             path={},
         )
 
-        request = Request(
+        request = Request(  # type: ignore
             full_url_pattern=str(url),
             method=method,
             parameters=parameters,
@@ -258,7 +288,7 @@ class APISpec:
                 api_spec_dict = read_yaml_file(api_spec_path)
                 if server is not None:
                     api_spec_dict["servers"] = [{"url": server}]
-                api_spec = create_spec(api_spec_dict)
+                api_spec = Spec.create(data=api_spec_dict)
                 self._validator = RequestValidator(api_spec)
             except OpenAPIValidationError as e:  # pragma: nocover
                 self.logger.error(
@@ -282,7 +312,8 @@ class APISpec:
             return True
 
         try:
-            validate_request(self._validator, request)
+            result = self._validator.validate(request)
+            result.raise_for_errors()
         except Exception:  # pragma: nocover # pylint: disable=broad-except
             self.logger.exception("APISpec verify error")
             return False
