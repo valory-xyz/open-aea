@@ -33,9 +33,9 @@ from urllib.parse import parse_qs, urlparse
 
 from aiohttp import web
 from aiohttp.web_request import BaseRequest
-from openapi_core import create_spec
-from openapi_core.validation.request.datatypes import OpenAPIRequest, RequestParameters
-from openapi_core.validation.request.shortcuts import validate_request
+from openapi_core import validate_request
+from openapi_core.schema.specs import Spec
+from openapi_core.validation.request.datatypes import RequestParameters
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_spec_validator.exceptions import (  # pylint: disable=wrong-import-order
     OpenAPIValidationError,
@@ -64,7 +64,7 @@ NOT_FOUND = 404
 REQUEST_TIMEOUT = 408
 SERVER_ERROR = 500
 
-_default_logger = logging.getLogger("aea.packages.fetchai.connections.http_server")
+_default_logger = logging.getLogger("aea.packages.valory.connections.http_server")
 
 RequestId = DialogueLabel
 PUBLIC_ID = PublicId.from_str("valory/http_server:0.22.0")
@@ -115,8 +115,27 @@ def headers_to_string(headers: Dict) -> str:
     return msg.as_string()
 
 
-class Request(OpenAPIRequest):
+class Request:
     """Generic request object."""
+
+    def __init__(
+        self,
+        host_url: str,
+        path: str,
+        full_url_pattern: str,
+        method: str,
+        parameters: RequestParameters,
+        body: bytes,
+        mimetype: str,
+    ) -> None:
+        """Initialize Request object."""
+        self.host_url = host_url
+        self.path = path
+        self.full_url_pattern = full_url_pattern
+        self.method = method
+        self.parameters = parameters
+        self.body = body
+        self.mimetype = mimetype
 
     @property
     def is_id_set(self) -> bool:
@@ -142,17 +161,11 @@ class Request(OpenAPIRequest):
         :return: a request
         """
         method = http_request.method.lower()
-
         parsed_path = urlparse(http_request.path_qs)
-
         url = http_request.url
-
         body = await http_request.read()
-
         mimetype = http_request.content_type
-
         query_params = parse_qs(parsed_path.query, keep_blank_values=True)
-
         parameters = RequestParameters(
             query=ImmutableMultiDict(query_params),  # type: ignore
             header=headers_to_string(dict(http_request.headers)),
@@ -160,6 +173,8 @@ class Request(OpenAPIRequest):
         )
 
         request = Request(
+            host_url=str(url.with_path("/")),
+            path=parsed_path.path,
             full_url_pattern=str(url),
             method=method,
             parameters=parameters,
@@ -258,8 +273,8 @@ class APISpec:
                 api_spec_dict = read_yaml_file(api_spec_path)
                 if server is not None:
                     api_spec_dict["servers"] = [{"url": server}]
-                api_spec = create_spec(api_spec_dict)
-                self._validator = RequestValidator(api_spec)
+                self.api_spec = Spec.create(data=api_spec_dict)
+                self._validator = RequestValidator(self.api_spec)
             except OpenAPIValidationError as e:  # pragma: nocover
                 self.logger.error(
                     f"API specification YAML source file not correctly formatted: {str(e)}"
@@ -282,7 +297,11 @@ class APISpec:
             return True
 
         try:
-            validate_request(self._validator, request)
+            validate_request(
+                spec=self.api_spec,
+                request=request,
+                validator=self._validator,
+            )
         except Exception:  # pragma: nocover # pylint: disable=broad-except
             self.logger.exception("APISpec verify error")
             return False
