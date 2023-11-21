@@ -1,5 +1,12 @@
 # Release History - open AEA
 
+## 1.42.0 (2023-11-20)
+
+AEA:
+- Pins `openapi-core==0.15.0`, `openapi-spec-validator<0.5.0,>=0.4.0` and `jsonschema<4.4.0,>=4.3.0`
+
+Chore:
+- Adds a script for managing dependencies across various project configurations
 
 ## 1.41.0.post1 (2023-10-23)
 
