@@ -49,22 +49,30 @@ from aea.helpers.install_dependency import call_pip, install_dependencies
     help="Provide extra dependency.",
     multiple=True,
 )
+@click.option(
+    "--timeout",
+    type=float,
+    default=300.0,
+    help="Specify timeout.",
+)
 @click.pass_context
 @check_aea_project
 def install(
     click_context: click.Context,
     requirement: Optional[str],
     extra_dependencies: Tuple[Dependency],
+    timeout: float,
 ) -> None:
     """Install the dependencies of the agent."""
     ctx = cast(Context, click_context.obj)
-    do_install(ctx, requirement, extra_dependencies)
+    do_install(ctx, requirement, extra_dependencies, timeout=timeout)
 
 
 def do_install(
     ctx: Context,
     requirement: Optional[str] = None,
     extra_dependencies: Optional[Tuple[Dependency]] = None,
+    timeout: float = 300.0,
 ) -> None:
     """
     Install necessary dependencies.
@@ -72,6 +80,7 @@ def do_install(
     :param ctx: context object.
     :param requirement: optional str requirement.
     :param extra_dependencies: List of the extra dependencies to use
+    :param timeout: timeout to wait pip to install
 
     :raises ClickException: if AEAException occurs.
     """
@@ -82,11 +91,15 @@ def do_install(
                     "Extra dependencies will be ignored while installing from requirements file"
                 )
             logger.debug("Installing the dependencies in '{}'...".format(requirement))
-            _install_from_requirement(requirement)
+            _install_from_requirement(requirement, install_timeout=timeout)
         else:
             logger.debug("Installing all the dependencies...")
             dependencies = ctx.get_dependencies(extra_dependencies=extra_dependencies)
-            install_dependencies(list(dependencies.values()), logger=logger)
+            install_dependencies(
+                list(dependencies.values()),
+                logger=logger,
+                install_timeout=timeout,
+            )
     except AEAException as e:
         raise click.ClickException(str(e))
 
