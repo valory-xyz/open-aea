@@ -75,7 +75,7 @@ def _dummy_loader(
     return _DummyPackageConfig(name="name", author="author")
 
 
-def _fetch_ipfs_mock(_, __, dest: str) -> None:
+def _fetch_ipfs_mock(_, __, dest: str, ___) -> None:
     """fetch_ipfs method mock."""
     Path(dest).mkdir()
 
@@ -193,7 +193,9 @@ class TestBaseManager(BaseAEATestCase):
             public_id=PublicId(author="dummy", name="skill"),
         )
 
-        with mock.patch("aea.package_manager.base.fetch_ipfs", new=_fetch_ipfs_mock):
+        with mock.patch(
+            "aea.package_manager.base.load_fetch_ipfs", new=lambda: _fetch_ipfs_mock
+        ):
             package_manager.add_package(
                 package_id=dummy_package,
             )

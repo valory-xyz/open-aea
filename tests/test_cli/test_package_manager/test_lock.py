@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ from aea.package_manager.v1 import PackageManagerV1
 from aea.test_tools.test_cases import BaseAEATestCase
 
 
-@mock.patch("aea.package_manager.base.fetch_ipfs")
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
 class TestLockCommand(BaseAEATestCase):
     """Test sync command."""
 
