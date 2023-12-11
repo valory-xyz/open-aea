@@ -288,7 +288,7 @@ class TestVerifyFailure(BaseAEATestCase):
             assert f"Cannot find hash for {EXAMPLE_PACKAGE_ID}" in caplog.text
 
 
-@mock.patch("aea.package_manager.base.fetch_ipfs")
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
 def test_package_manager_add_item_dependency_support_mock(fetch_mock):
     """Check PackageManager.add_packages works with dependencies on mocks."""
     FAKE_PACKAGES = [
