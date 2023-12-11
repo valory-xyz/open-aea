@@ -56,6 +56,7 @@ message LedgerApiMessage{
 
   message Send_Signed_Transaction_Performative{
     SignedTransaction signed_transaction = 1;
+    Kwargs kwargs = 2;
   }
 
   message Send_Signed_Transactions_Performative{
