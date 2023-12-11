@@ -42,13 +42,6 @@ from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
 
 
-try:
-    from aea_cli_ipfs.registry import fetch_ipfs  # type: ignore
-
-    IS_IPFS_PLUGIN_INSTALLED = True
-except (ImportError, ModuleNotFoundError):  # pragma: nocover  # cause obvious
-    IS_IPFS_PLUGIN_INSTALLED = False
-
 PACKAGES_FILE = "packages.json"
 PACKAGE_SOURCE_RE = re.compile(r"([a-z-_0-9A-Z]+\/[a-z-_0-9A-Z]+)((:)([a-z\.0-9_-]+))?")
 
@@ -71,6 +64,21 @@ def load_configuration(
     return cast(PackageConfiguration, configuration_obj)
 
 
+def load_fetch_ipfs() -> Callable[[str, PublicId, str, bool], Optional[Path]]:
+    """Load fetch_ipfs method."""
+
+    try:
+        from aea_cli_ipfs.registry import (  # type: ignore # pylint: disable=import-outside-toplevel
+            fetch_ipfs,
+        )
+
+        return fetch_ipfs
+    except ModuleNotFoundError:  # pragma: nocover  # cause obvious
+        raise ModuleNotFoundError(
+            "open-aea-cli-ipfs plugin is not installed; Run pip3 install open-aea-cli-ipfs"
+        )
+
+
 class DepedencyMismatchErrors(Enum):
     """Dependency mismatch errors."""
 
@@ -87,6 +95,7 @@ class BasePackageManager(ABC):
         self,
         path: Path,
         config_loader: ConfigLoaderCallableType = load_configuration,
+        logger: Optional[logging.Logger] = None,
     ) -> None:
         """Initialize object."""
 
@@ -94,7 +103,7 @@ class BasePackageManager(ABC):
         self.config_loader = config_loader
         self._packages_file = path / PACKAGES_FILE
 
-        self._logger = logging.getLogger(name="PackageManager")
+        self._logger = logger or logging.getLogger(name="PackageManager")
         self._logger.setLevel(logging.INFO)
 
     def _sync(
@@ -119,7 +128,7 @@ class BasePackageManager(ABC):
         hash_updates = packages.copy()
         package_updates = OrderedDict()
 
-        for package_id in packages:
+        for package_id in packages.copy():
             package_path = self.package_path_from_package_id(package_id)
             if package_path.exists():
                 package_hash = IPFSHashOnly.get(str(package_path))
@@ -359,10 +368,11 @@ class BasePackageManager(ABC):
             (package_type_collection / "__init__.py").touch()
 
         download_path = package_type_collection / package_id.name
-        fetch_ipfs(
+        load_fetch_ipfs()(
             str(package_id.package_type),
             package_id.public_id,
-            dest=str(download_path),
+            str(download_path),
+            True,
         )
         self._logger.debug(f"Downloaded {package_id.without_hash()}")
 

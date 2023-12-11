@@ -31,13 +31,19 @@ from aea.cli.utils.click_utils import PackagesSource
 from aea.cli.utils.context import Context
 from aea.cli.utils.decorators import pass_ctx
 from aea.configurations.constants import PACKAGES
-from aea.package_manager.base import (
-    BasePackageManager,
-    IS_IPFS_PLUGIN_INSTALLED,
-    PackageFileNotValid,
-)
+from aea.package_manager.base import BasePackageManager, PackageFileNotValid
 from aea.package_manager.v0 import PackageManagerV0
 from aea.package_manager.v1 import PackageManagerV1
+
+
+try:
+    from aea_cli_ipfs.registry import (  # type: ignore # noqa: F401 # pylint: disable=unused-import
+        fetch_ipfs,
+    )
+
+    IS_IPFS_PLUGIN_INSTALLED = True
+except ModuleNotFoundError:  # pragma: nocover  # cause obvious
+    IS_IPFS_PLUGIN_INSTALLED = False
 
 
 class SyncTypes:  # pylint: disable=too-few-public-methods
