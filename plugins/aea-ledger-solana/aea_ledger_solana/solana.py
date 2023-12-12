@@ -64,7 +64,7 @@ from aea.crypto.base import LedgerApi
 from aea.helpers.base import try_decorator
 
 
-DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 100
+DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 0
 
 
 class SolanaApi(LedgerApi, SolanaHelper):
