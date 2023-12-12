@@ -707,7 +707,7 @@ def test_package_manager_add_item_dependency_support():
         package_manager.dump()
 
 
-@mock.patch("aea.package_manager.base.fetch_ipfs")
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
 def test_package_manager_add_item_dependency_support_mock(fetch_mock):
     """Check PackageManager.add_packages works with dependencies on mocks."""
     FAKE_PACKAGES = [
@@ -752,7 +752,7 @@ def test_package_manager_add_item_dependency_support_mock(fetch_mock):
             assert len(package_manager.third_party_packages) == 4
 
 
-@mock.patch("aea.package_manager.base.fetch_ipfs")
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
 def test_package_manager_add_package_already_installed(fetch_mock: mock.Mock):
     """Test package already installed."""
     # version already installed
@@ -769,7 +769,7 @@ def test_package_manager_add_package_already_installed(fetch_mock: mock.Mock):
             fetch_mock.assert_not_called()
 
 
-@mock.patch("aea.package_manager.base.fetch_ipfs")
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
 def test_package_manager_add_package_can_be_updated(fetch_mock: mock.Mock):
     """Test package update on add_package."""
     # version already installed

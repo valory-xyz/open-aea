@@ -24,6 +24,16 @@ Load a configuration, knowing the type and the path to the package root.
 
 the configuration object.
 
+<a id="aea.package_manager.base.load_fetch_ipfs"></a>
+
+#### load`_`fetch`_`ipfs
+
+```python
+def load_fetch_ipfs() -> Callable[[str, PublicId, str, bool], Optional[Path]]
+```
+
+Load fetch_ipfs method.
+
 <a id="aea.package_manager.base.DepedencyMismatchErrors"></a>
 
 ## DepedencyMismatchErrors Objects
@@ -49,9 +59,9 @@ AEA package manager
 #### `__`init`__`
 
 ```python
-def __init__(
-        path: Path,
-        config_loader: ConfigLoaderCallableType = load_configuration) -> None
+def __init__(path: Path,
+             config_loader: ConfigLoaderCallableType = load_configuration,
+             logger: Optional[logging.Logger] = None) -> None
 ```
 
 Initialize object.

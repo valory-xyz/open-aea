@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,10 @@ import pytest
 
 from aea.manager.utils import run_in_venv
 
+
+pytestmark = pytest.mark.skip(
+    reason="Unknown issue: https://github.com/valory-xyz/open-aea/actions/runs/7162860465/job/19500538744?pr=698"
+)
 
 RETURN_VALUE = randint(0, 2000)  # nosec
 

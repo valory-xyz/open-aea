@@ -21,6 +21,7 @@
 
 import copy
 import json
+import logging
 import traceback
 from collections import OrderedDict
 from enum import Enum
@@ -73,9 +74,14 @@ class PackageManagerV1(BasePackageManager):
         dev_packages: Optional[PackageIdToHashMapping] = None,
         third_party_packages: Optional[PackageIdToHashMapping] = None,
         config_loader: ConfigLoaderCallableType = load_configuration,
+        logger: Optional[logging.Logger] = None,
     ) -> None:
         """Initialize object."""
-        super().__init__(path=path, config_loader=config_loader)
+        super().__init__(
+            path=path,
+            config_loader=config_loader,
+            logger=logger,
+        )
 
         self._dev_packages = dev_packages or OrderedDict()
         self._third_party_packages = third_party_packages or OrderedDict()
