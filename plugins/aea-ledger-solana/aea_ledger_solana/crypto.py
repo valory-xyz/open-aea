@@ -31,8 +31,9 @@ from solana.transaction import Transaction as SolanaTransaction
 from solders.hash import Hash
 from solders.instruction import Instruction
 from solders.keypair import Keypair
+from solders.message import MessageV0
 from solders.pubkey import Pubkey
-from solders.transaction import Transaction
+from solders.transaction import Transaction, VersionedTransaction
 
 from aea.common import JSONLike
 from aea.crypto.base import Crypto
@@ -171,14 +172,22 @@ class SolanaCrypto(Crypto[Keypair]):
         :param signers: list of signers
         :return: signed transaction
         """
-        signers = signers or []
-        jsonTx = json.dumps(transaction)
 
-        keypair = Keypair.from_base58_string(self.private_key)
+        signers = signers or []
         signers = [Keypair.from_base58_string(signer.private_key) for signer in signers]
-        signers.append(keypair)
+        signers.append(self.entity)
+
         recent_hash = Hash.from_string(transaction["recentBlockhash"])
-        stxn = Transaction.from_json(jsonTx)
+        if isinstance(transaction["message"], list):
+            transaction["message"][1]["recentBlockhash"] = recent_hash
+            return json.loads(
+                VersionedTransaction(
+                    message=MessageV0.from_json(json.dumps(transaction["message"][1])),
+                    keypairs=signers,
+                ).to_json()
+            )
+
+        stxn = Transaction.from_json(json.dumps(transaction))
         stxn.sign(keypairs=signers, recent_blockhash=recent_hash)
         return json.loads(stxn.to_json())
 
