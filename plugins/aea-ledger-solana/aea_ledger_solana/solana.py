@@ -41,6 +41,7 @@ from aea_ledger_solana.transaction_instruction import TransactionInstruction
 from anchorpy import Context, Idl, Program  # type: ignore
 from solana.blockhash import BlockhashCache
 from solana.transaction import Transaction  # type: ignore
+from solana.transaction import Transaction as BaseSolanaTransaction
 from solders import system_program as ssp  # type: ignore
 from solders.hash import Hash
 from solders.instruction import AccountMeta, Instruction
@@ -750,15 +751,14 @@ class SolanaApi(LedgerApi, SolanaHelper):
             return tx
         if isinstance(tx, SolanaTransaction):
             return json.loads(cast(SolanaTransaction, tx).to_solders().to_json())
+        if isinstance(tx, BaseSolanaTransaction):
+            return json.loads(tx.to_solders().to_json())
         if isinstance(tx, SoldersTransaction):
             return json.loads(cast(SoldersTransaction, tx).to_json())
         if isinstance(tx, SoldersVersionedTransaction):
-            return json.loads(
-                cast(SoldersVersionedTransaction, tx)
-                .into_legacy_transaction()
-                .to_json()
-            )
-        raise ValueError(f"Unknown transction type found `{type(tx)}`")
+            tx = json.loads(cast(SoldersVersionedTransaction, tx).to_json())
+            return tx
+        raise ValueError(f"Unknown transction type found `{type(tx)}` ")
 
     def deserialize_tx(
         self,
@@ -776,9 +776,17 @@ class SolanaApi(LedgerApi, SolanaHelper):
         if not isinstance(tx, Dict):
             raise ValueError(f"Unknown transction type found `{type(tx)}`")
 
+        if isinstance(tx["message"], list):
+            _, tx["message"] = tx["message"]
+            return SolanaTransaction.from_solders(
+                SoldersTransaction.from_json(json.dumps(tx))
+            )
+
         # TODO: Safeguard for tx serialized to solders
         return SolanaTransaction.from_solders(
-            SoldersTransaction.from_json(json.dumps(tx))
+            SoldersTransaction.from_json(
+                json.dumps(tx),
+            )
         )
 
     def serialize_ix(self, ix: Instruction) -> Dict:
