@@ -101,7 +101,7 @@ To pubkey.
 
 ```python
 @staticmethod
-def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Pubkey
+def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Keypair
 ```
 
 To keypair object.
@@ -149,7 +149,9 @@ the tx, if present
 
 ```python
 def wait_get_receipt(
-        transaction_digest: str) -> Tuple[Optional[JSONLike], bool]
+    transaction_digest: str,
+    max_supported_transaction_version: Optional[int] = None
+) -> Tuple[Optional[JSONLike], bool]
 ```
 
 Wait for the transaction to be settled and return the receipt.
@@ -290,8 +292,10 @@ Atomically send multiple of transactions.
 #### get`_`transaction`_`receipt
 
 ```python
-def get_transaction_receipt(tx_digest: str,
-                            raise_on_try: bool = False) -> Optional[JSONLike]
+def get_transaction_receipt(
+        tx_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
+        raise_on_try: bool = False) -> Optional[JSONLike]
 ```
 
 Get the transaction receipt for a transaction digest.
@@ -299,6 +303,7 @@ Get the transaction receipt for a transaction digest.
 **Arguments**:
 
 - `tx_digest`: the digest associated to the transaction.
+- `max_supported_transaction_version`: The max transaction version to return in responses.
 - `raise_on_try`: whether the method will raise or log on error
 
 **Returns**:
@@ -311,6 +316,7 @@ the tx receipt, if present
 
 ```python
 def get_transaction(tx_digest: str,
+                    max_supported_transaction_version: Optional[int] = None,
                     raise_on_try: bool = False) -> Optional[JSONLike]
 ```
 
@@ -319,6 +325,7 @@ Get the transaction for a transaction digest.
 **Arguments**:
 
 - `tx_digest`: the digest associated to the transaction.
+- `max_supported_transaction_version`: The max transaction version to return in responses.
 - `raise_on_try`: whether the method will raise or log on error
 
 **Returns**:
@@ -515,6 +522,7 @@ Deserialize instruction.
 def get_transaction_transfer_logs(
         contract_instance: Any,
         tx_hash: str,
+        max_supported_transaction_version: Optional[int] = None,
         target_address: Optional[str] = None) -> Optional[JSONLike]
 ```
 
@@ -524,6 +532,7 @@ Get all transfer events derived from a transaction.
 
 - `contract_instance`: contract instance
 - `tx_hash`: the transaction hash
+- `max_supported_transaction_version`: The max transaction version to return in responses.
 - `target_address`: optional address to filter tranfer events to just those that affect it
 
 **Returns**:

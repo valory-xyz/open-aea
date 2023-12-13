@@ -41,10 +41,12 @@ from aea_ledger_solana.transaction_instruction import TransactionInstruction
 from anchorpy import Context, Idl, Program  # type: ignore
 from solana.blockhash import BlockhashCache
 from solana.transaction import Transaction  # type: ignore
+from solana.transaction import Transaction as BaseSolanaTransaction
 from solders import system_program as ssp  # type: ignore
 from solders.hash import Hash
 from solders.instruction import AccountMeta, Instruction
 from solders.keypair import Keypair
+from solders.message import MessageV0
 from solders.pubkey import Pubkey  # type: ignore
 from solders.pubkey import Pubkey as PublicKey
 from solders.signature import Signature  # type: ignore
@@ -62,6 +64,9 @@ from solders.system_program import (  # type: ignore; SYS_PROGRAM_ID,
 from aea.common import Address, JSONLike
 from aea.crypto.base import LedgerApi
 from aea.helpers.base import try_decorator
+
+
+DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 0
 
 
 class SolanaApi(LedgerApi, SolanaHelper):
@@ -145,13 +150,13 @@ class SolanaApi(LedgerApi, SolanaHelper):
             return Keypair.from_base58_string(key).pubkey()
 
     @staticmethod
-    def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Pubkey:
+    def to_keypair(key: Union[SolanaCrypto, Keypair, str]) -> Keypair:
         """To keypair object."""
         if isinstance(key, Keypair):
             return key
         if isinstance(key, SolanaCrypto):
             return key.entity
-        return Keypair.from_base58_string(key).pubkey()
+        return Keypair.from_base58_string(key)
 
     @staticmethod
     def pda(
@@ -204,7 +209,9 @@ class SolanaApi(LedgerApi, SolanaHelper):
         return json.loads(tx)
 
     def wait_get_receipt(
-        self, transaction_digest: str
+        self,
+        transaction_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
     ) -> Tuple[Optional[JSONLike], bool]:
         """Wait for the transaction to be settled and return the receipt."""
         transaction_receipt = None
@@ -215,7 +222,10 @@ class SolanaApi(LedgerApi, SolanaHelper):
         while not_settled and elapsed_time < time_to_wait:
             elapsed_time += sleep_time
             time.sleep(sleep_time)
-            transaction_receipt = self.get_transaction_receipt(transaction_digest)
+            transaction_receipt = self.get_transaction_receipt(
+                transaction_digest,
+                max_supported_transaction_version=max_supported_transaction_version,
+            )
             if transaction_receipt is None:
                 continue
             is_settled = self.is_transaction_settled(transaction_receipt)
@@ -399,13 +409,21 @@ class SolanaApi(LedgerApi, SolanaHelper):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: tx_digest, if present
         """
+        max_supported_transaction_version: Optional[int] = None
+        if isinstance(tx_signed, dict):
+            max_supported_transaction_version = tx_signed.pop(
+                "max_supported_transaction_version", None
+            )
         stxn = self.deserialize_tx(tx=tx_signed)
         txn_resp = self._api.send_raw_transaction(bytes(stxn.serialize()))
         retries = 2
         while True and retries > 0:
             try:
                 tx_digest = str(txn_resp.value)
-                self.get_transaction_receipt(tx_digest)
+                self.get_transaction_receipt(
+                    tx_digest,
+                    max_supported_transaction_version=max_supported_transaction_version,
+                )
                 break
             except ValueError:
                 time.sleep(1)
@@ -429,17 +447,22 @@ class SolanaApi(LedgerApi, SolanaHelper):
         raise NotImplementedError
 
     def get_transaction_receipt(
-        self, tx_digest: str, raise_on_try: bool = False
+        self,
+        tx_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
+        raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
         Get the transaction receipt for a transaction digest.
 
         :param tx_digest: the digest associated to the transaction.
+        :param max_supported_transaction_version: The max transaction version to return in responses.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx receipt, if present
         """
         tx_receipt = self._try_get_transaction_receipt(
             tx_digest,
+            max_supported_transaction_version=max_supported_transaction_version,
             raise_on_try=raise_on_try,
         )
 
@@ -449,19 +472,27 @@ class SolanaApi(LedgerApi, SolanaHelper):
         "Error when attempting getting tx receipt: {}", logger_method="debug"
     )
     def _try_get_transaction_receipt(
-        self, tx_digest: str, **_kwargs: Any
+        self,
+        tx_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
+        **_kwargs: Any,
     ) -> Optional[JSONLike]:
         """
         Try get the transaction receipt.
 
         :param tx_digest: the digest associated to the transaction.
+        :param max_supported_transaction_version: The max transaction version to return in responses.
         :param _kwargs: the keyword arguments. Possible kwargs are:
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
 
         tx_receipt = self._api.get_transaction(
-            Signature.from_string(tx_digest)
+            Signature.from_string(tx_digest),
+            max_supported_transaction_version=(
+                max_supported_transaction_version
+                or DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION
+            ),
         )  # pylint: disable=no-member
 
         tx = json.loads(tx_receipt.to_json())
@@ -470,31 +501,47 @@ class SolanaApi(LedgerApi, SolanaHelper):
     def get_transaction(
         self,
         tx_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
         raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
         Get the transaction for a transaction digest.
 
         :param tx_digest: the digest associated to the transaction.
+        :param max_supported_transaction_version: The max transaction version to return in responses.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx, if present
         """
-        tx = self._try_get_transaction(tx_digest, raise_on_try=raise_on_try)
+        tx = self._try_get_transaction(
+            tx_digest,
+            max_supported_transaction_version=max_supported_transaction_version,
+            raise_on_try=raise_on_try,
+        )
         return tx
 
     @try_decorator("Error when attempting getting tx: {}", logger_method="debug")
     def _try_get_transaction(
-        self, tx_digest: str, **_kwargs: Any
+        self,
+        tx_digest: str,
+        max_supported_transaction_version: Optional[int] = None,
+        **_kwargs: Any,
     ) -> Optional[JSONLike]:
         """
         Get the transaction.
 
         :param tx_digest: the transaction digest.
+        :param max_supported_transaction_version: The max transaction version to return in responses.
         :param _kwargs: the keyword arguments. Possible kwargs are:
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx, if found
         """
-        tx = self._api.get_transaction(Signature.from_string(tx_digest))
+        tx = self._api.get_transaction(
+            Signature.from_string(tx_digest),
+            max_supported_transaction_version=(
+                max_supported_transaction_version
+                or DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION
+            ),
+        )
 
         # pylint: disable=no-member
         return json.loads(tx.value.to_json())
@@ -705,15 +752,14 @@ class SolanaApi(LedgerApi, SolanaHelper):
             return tx
         if isinstance(tx, SolanaTransaction):
             return json.loads(cast(SolanaTransaction, tx).to_solders().to_json())
+        if isinstance(tx, BaseSolanaTransaction):
+            return json.loads(tx.to_solders().to_json())
         if isinstance(tx, SoldersTransaction):
             return json.loads(cast(SoldersTransaction, tx).to_json())
         if isinstance(tx, SoldersVersionedTransaction):
-            return json.loads(
-                cast(SoldersVersionedTransaction, tx)
-                .into_legacy_transaction()
-                .to_json()
-            )
-        raise ValueError(f"Unknown transction type found `{type(tx)}`")
+            tx = json.loads(cast(SoldersVersionedTransaction, tx).to_json())
+            return tx
+        raise ValueError(f"Unknown transction type found `{type(tx)}` ")
 
     def deserialize_tx(
         self,
@@ -731,9 +777,21 @@ class SolanaApi(LedgerApi, SolanaHelper):
         if not isinstance(tx, Dict):
             raise ValueError(f"Unknown transction type found `{type(tx)}`")
 
+        if isinstance(tx["message"], list):
+            _, tx["message"] = tx["message"]
+            _, tx["signatures"] = tx["signatures"]
+            return SolanaTransaction.from_solders(
+                SoldersVersionedTransaction.populate(
+                    message=MessageV0.from_json(json.dumps(tx["message"])),
+                    signatures=[Signature.from_bytes(tx["signatures"])],
+                )
+            )
+
         # TODO: Safeguard for tx serialized to solders
         return SolanaTransaction.from_solders(
-            SoldersTransaction.from_json(json.dumps(tx))
+            SoldersTransaction.from_json(
+                json.dumps(tx),
+            )
         )
 
     def serialize_ix(self, ix: Instruction) -> Dict:
@@ -748,6 +806,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         self,
         contract_instance: Any,
         tx_hash: str,
+        max_supported_transaction_version: Optional[int] = None,
         target_address: Optional[str] = None,
     ) -> Optional[JSONLike]:
         """
@@ -755,11 +814,15 @@ class SolanaApi(LedgerApi, SolanaHelper):
 
         :param contract_instance: contract instance
         :param tx_hash: the transaction hash
+        :param max_supported_transaction_version: The max transaction version to return in responses.
         :param target_address: optional address to filter tranfer events to just those that affect it
         :return: the transfer logs
         """
         try:
-            tx_receipt = self.get_transaction_receipt(tx_hash)
+            tx_receipt = self.get_transaction_receipt(
+                tx_hash,
+                max_supported_transaction_version=max_supported_transaction_version,
+            )
             if tx_receipt is None:
                 raise ValueError  # pragma: nocover
 
