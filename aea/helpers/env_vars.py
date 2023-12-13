@@ -50,6 +50,29 @@ def export_path_to_env_var_string(export_path: List[str]) -> str:
 NotSet = object()
 
 
+def parse_list(var_prefix: str, env_variables: dict) -> str:
+    """Parse list object."""
+    values = {}
+    _vars = list(filter(lambda x: x.startswith(var_prefix), env_variables.keys()))
+    for var in _vars:
+        _, idx, *sub_var = var.replace(var_prefix, "").split("_")
+        if len(sub_var) > 0:
+            values[idx] = json.loads(
+                parse_list(
+                    var_prefix=f"{var_prefix}_{idx}",
+                    env_variables=env_variables,
+                )
+            )
+            continue
+        try:
+            values[idx] = json.loads(str(env_variables[var]))
+        except (json.JSONDecodeError, ValueError):
+            values[idx] = env_variables[var]
+    if all(map(lambda x: isinstance(json.loads(x), int), values.keys())):
+        return json.dumps([values[idx] for idx in sorted(values)])
+    return json.dumps({json.loads(key): val for key, val in values.items()})
+
+
 def replace_with_env_var(
     value: str,
     env_variables: dict,
@@ -68,6 +91,11 @@ def replace_with_env_var(
 
     if var_name in env_variables:
         var_value = env_variables[var_name]
+    elif type_str == "list":
+        var_value = parse_list(
+            var_prefix=var_name,
+            env_variables=env_variables,
+        )
     elif default is not None:
         var_value = default
     elif default_value is not NotSet:
@@ -233,7 +261,7 @@ def generate_env_vars_recursively(
         if is_strict_list(data=data):
             env_var_dict[
                 export_path_to_env_var_string(export_path=export_path)
-            ] = json.dumps(data)
+            ] = json.dumps(data, separators=(",", ":"))
         else:
             for key, value in enumerate(data):
                 env_var_dict.update(
