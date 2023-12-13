@@ -46,6 +46,7 @@ from solders import system_program as ssp  # type: ignore
 from solders.hash import Hash
 from solders.instruction import AccountMeta, Instruction
 from solders.keypair import Keypair
+from solders.message import MessageV0
 from solders.pubkey import Pubkey  # type: ignore
 from solders.pubkey import Pubkey as PublicKey
 from solders.signature import Signature  # type: ignore
@@ -778,8 +779,12 @@ class SolanaApi(LedgerApi, SolanaHelper):
 
         if isinstance(tx["message"], list):
             _, tx["message"] = tx["message"]
+            _, tx["signatures"] = tx["signatures"]
             return SolanaTransaction.from_solders(
-                SoldersTransaction.from_json(json.dumps(tx))
+                SoldersVersionedTransaction.populate(
+                    message=MessageV0.from_json(json.dumps(tx["message"])),
+                    signatures=[Signature.from_bytes(tx["signatures"])],
+                )
             )
 
         # TODO: Safeguard for tx serialized to solders
