@@ -1,5 +1,15 @@
 # Release History - open AEA
 
+## 1.43.0 (2023-12-14)
+
+AEA:
+- Adds `--timeout` flag on aea install command
+- Fixes circular import issues on package manager
+- Fixes nested list environment variable parsing
+
+Plugins:
+- Adds support for versioned transactions on `solana` plugin
+
 ## 1.42.0 (2023-11-20)
 
 AEA:
