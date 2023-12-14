@@ -1,6 +1,6 @@
 # Release History - open AEA
 
-## 1.42.0 (2023-11-20)
+## 1.43.0 (2023-12-14)
 
 AEA:
 - Adds `--timeout` flag on aea install command
