@@ -24,6 +24,16 @@ def export_path_to_env_var_string(export_path: List[str]) -> str
 
 Conver export path to environment variable string.
 
+<a id="aea.helpers.env_vars.parse_list"></a>
+
+#### parse`_`list
+
+```python
+def parse_list(var_prefix: str, env_variables: dict) -> str
+```
+
+Parse list object.
+
 <a id="aea.helpers.env_vars.replace_with_env_var"></a>
 
 #### replace`_`with`_`env`_`var

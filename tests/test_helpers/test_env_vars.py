@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2023 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -182,6 +182,33 @@ def test_env_var_string_generator(export_path: List[str], var_string: str) -> No
                     {"dict": "${str}"},
                     {"dict": "${str}"},
                 ]
+            },
+        ),
+        (
+            {
+                "stratagies_kwargs": [
+                    ["bet_kelly_fraction", 0.25],
+                    ["floor_balance", 500000000000000000],
+                    [
+                        "bet_amount_per_threshold",
+                        {
+                            "0.0": 0,
+                            "0.1": 0,
+                            "0.2": 0,
+                            "0.3": 0,
+                            "0.4": 0,
+                            "0.5": 0,
+                            "0.6": 60000000000000000,
+                            "0.7": 90000000000000000,
+                            "0.8": 100000000000000000,
+                            "0.9": 1000000000000000000,
+                            "1.0": 10000000000000000000,
+                        },
+                    ],
+                ],
+            },
+            {
+                "stratagies_kwargs": "${list:[]}",
             },
         ),
     ],
