@@ -3,6 +3,16 @@
 ## 1.42.0 (2023-11-20)
 
 AEA:
+- Adds `--timeout` flag on aea install command
+- Fixes circular import issues on package manager
+- Fixes nested list environment variable parsing
+
+Plugins:
+- Adds support for versioned transactions on `solana` plugin
+
+## 1.42.0 (2023-11-20)
+
+AEA:
 - Pins `openapi-core==0.15.0`, `openapi-spec-validator<0.5.0,>=0.4.0` and `jsonschema<4.4.0,>=4.3.0`
 
 Chore:
