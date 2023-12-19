@@ -91,7 +91,7 @@ def replace_with_env_var(
 
     if var_name in env_variables:
         var_value = env_variables[var_name]
-    elif type_str == "list":
+    elif type_str == "list" and var_name == default_var_name:
         var_value = parse_list(
             var_prefix=var_name,
             env_variables=env_variables,

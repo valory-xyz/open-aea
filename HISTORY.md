@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.43.0.post1 (2023-12-19)
+
+AEA:
+- Fixes the default environment variable parsing
+
 ## 1.43.0 (2023-12-14)
 
 AEA:
