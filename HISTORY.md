@@ -1,9 +1,14 @@
 # Release History - open AEA
 
+## 1.43.0.post2 (2023-12-26)
+
+AEA:
+- Fixes the default environment variable parsing for the base types
+
 ## 1.43.0.post1 (2023-12-19)
 
 AEA:
-- Fixes the default environment variable parsing
+- Fixes the default environment variable parsing for the list types
 
 ## 1.43.0 (2023-12-14)
 
