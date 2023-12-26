@@ -226,6 +226,37 @@ def test_match_export_parse_consistency(export_data, template) -> None:
     assert parsed_data == export_data
 
 
+@pytest.mark.parametrize(
+    ("template", "parsed"),
+    argvalues=[
+        (
+            {"value": "${str:john}"},
+            {"value": "john"},
+        ),
+        (
+            {"value": "${int:3}"},
+            {"value": 3},
+        ),
+        (
+            {"value": "${bool:false}"},
+            {"value": False},
+        ),
+        (
+            {"value": '${list:["foo","bar"]}'},
+            {"value": ["foo", "bar"]},
+        ),
+        (
+            {"value": '${dict:{"foo":"bar"}}'},
+            {"value": {"foo": "bar"}},
+        ),
+    ],
+)
+def test_parse_defaults(template, parsed) -> None:
+    """Test default value parsing."""
+    parsed_data = apply_env_variables(template, env_variables={})
+    assert parsed_data == parsed
+
+
 def test_apply_env_variables_on_agent_config():
     """Test apply_env_variables_on_agent_config function."""
     result = apply_env_variables_on_agent_config(
