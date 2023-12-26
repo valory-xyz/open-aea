@@ -91,11 +91,12 @@ def replace_with_env_var(
 
     if var_name in env_variables:
         var_value = env_variables[var_name]
-    elif type_str == "list" and var_name == default_var_name:
+    elif type_str == "list":
         var_value = parse_list(
             var_prefix=var_name,
             env_variables=env_variables,
         )
+        var_value = (default or var_value) if var_value == "[]" else var_value
     elif default is not None:
         var_value = default
     elif default_value is not NotSet:
@@ -107,7 +108,6 @@ def replace_with_env_var(
 
     if type_str is not None:
         var_value = convert_value_str_to_type(var_value, type_str)
-
     return var_value
 
 
