@@ -20,13 +20,13 @@ fingerprint:
   tests/test_models.py: bafybeihabrc22zqssit3fmqhxptosy6qz6mx65ukhf5iayvirfv42xrhoq
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeieoahvy6g47seh25dqrszyskx2wkumrqndqcznjclbw74go6tszze
+- valory/ledger:0.19.0:bafybeic3ft7l7ca3qgnderm4xupsfmyoihgi27ukotnz7b5hdczla2enya
 contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeihdvtmnz7fzy7kwi3wlo6rfl27f6q3g5entplgvq7y23i3v5uoz24
 - fetchai/fipa:1.0.0:bafybeidbt5dwzdeywi723n3wendidxfbzheovb4dheb6h7mcsrkmlkwkh4
 - fetchai/oef_search:1.0.0:bafybeid3eokuse7uiwmhdb4vx7yvev35cccvzo2xuhwuy7lernfupjymwm
-- valory/ledger_api:1.0.0:bafybeib5v3lxr4clit7h26fpijgt2vesblbjanzesnnjjhowpnmqw6w34y
+- valory/ledger_api:1.0.0:bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni
 skills: []
 behaviours:
   service_registration:

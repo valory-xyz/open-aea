@@ -85,6 +85,8 @@ class LedgerApiSerializer(Serializer):
             SignedTransaction.encode(
                 performative.signed_transaction, signed_transaction
             )
+            kwargs = msg.kwargs
+            Kwargs.encode(performative.kwargs, kwargs)
             ledger_api_msg.send_signed_transaction.CopyFrom(performative)
         elif performative_id == LedgerApiMessage.Performative.SEND_SIGNED_TRANSACTIONS:
             performative = ledger_api_pb2.LedgerApiMessage.Send_Signed_Transactions_Performative()  # type: ignore
@@ -220,6 +222,9 @@ class LedgerApiSerializer(Serializer):
             )
             signed_transaction = SignedTransaction.decode(pb2_signed_transaction)
             performative_content["signed_transaction"] = signed_transaction
+            pb2_kwargs = ledger_api_pb.send_signed_transaction.kwargs
+            kwargs = Kwargs.decode(pb2_kwargs)
+            performative_content["kwargs"] = kwargs
         elif performative_id == LedgerApiMessage.Performative.SEND_SIGNED_TRANSACTIONS:
             pb2_signed_transactions = (
                 ledger_api_pb.send_signed_transactions.signed_transactions

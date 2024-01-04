@@ -23,6 +23,7 @@ speech_acts:
     terms: ct:Terms
   send_signed_transaction:
     signed_transaction: ct:SignedTransaction
+    kwargs: ct:Kwargs
   send_signed_transactions:
     signed_transactions: ct:SignedTransactions
     kwargs: ct:Kwargs

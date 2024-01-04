@@ -395,11 +395,17 @@ class LedgerApiMessage(Message):
                 self.performative
                 == LedgerApiMessage.Performative.SEND_SIGNED_TRANSACTION
             ):
-                expected_nb_of_contents = 1
+                expected_nb_of_contents = 2
                 enforce(
                     isinstance(self.signed_transaction, CustomSignedTransaction),
                     "Invalid type for content 'signed_transaction'. Expected 'SignedTransaction'. Found '{}'.".format(
                         type(self.signed_transaction)
+                    ),
+                )
+                enforce(
+                    isinstance(self.kwargs, CustomKwargs),
+                    "Invalid type for content 'kwargs'. Expected 'Kwargs'. Found '{}'.".format(
+                        type(self.kwargs)
                     ),
                 )
             elif (

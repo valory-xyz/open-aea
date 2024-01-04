@@ -180,6 +180,7 @@ def test_send_signed_transaction_serialization():
         signed_transaction=LedgerApiMessage.SignedTransaction(
             "some_ledger_id", {"body": "some_body"}
         ),
+        kwargs=Kwargs({}),
     )
     msg.to = "receiver"
     envelope = Envelope(
@@ -714,6 +715,7 @@ class TestSendSignedTransaction(BaseTestMessageConstruction):
             signed_transaction=LedgerApiMessage.SignedTransaction(
                 ledger_id=self.ledger_id, body={}
             ),
+            kwargs=Kwargs({}),
         )
 
 
