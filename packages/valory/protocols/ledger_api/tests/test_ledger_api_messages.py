@@ -71,6 +71,7 @@ class TestMessageLedgerApi(BaseProtocolMessagesTestCase):
                 signed_transaction=SignedTransaction(
                     "some_ledger_id", {"body": "some_body"}
                 ),
+                kwargs=Kwargs({}),
             ),
             LedgerApiMessage(
                 performative=LedgerApiMessage.Performative.GET_TRANSACTION_RECEIPT,
