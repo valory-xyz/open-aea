@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 1.44.0 (2024-01-04)
+
+Packages:
+- Regenerates the protocols to update the copyright header
+- Updates the date range for issuing the certificates
+
 ## 1.43.0.post2 (2023-12-26)
 
 AEA:
