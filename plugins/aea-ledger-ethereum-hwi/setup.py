@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2024 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="open-aea-ledger-ethereum-hwi",
-    version="1.43.0.post2",
+    version="1.44.0",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and support for hardware wallet interactions.",
@@ -42,7 +42,7 @@ setup(
         "web3>=6.0.0,<7",
         "ipfshttpclient==0.8.0a2",
         "eth-account>=0.8.0,<0.9.0",
-        "open-aea-ledger-ethereum~=1.43.0.post2",
+        "open-aea-ledger-ethereum~=1.44.0",
         "ledgerwallet==0.1.3",
         "protobuf<4.25.0,>=4.21.6",
         "construct<=2.10.61",

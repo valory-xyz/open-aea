@@ -8,10 +8,10 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeiapuowiqkverwcuzbdbqf2u3aixc3vgcfzsy6ckl27m5dxwtmaz3e
-  __init__.py: bafybeibsiwhh6shbtmvl3s5xmbsxyamohh7geewxtzdxc3jhk54z5exzmm
-  dialogues.py: bafybeialxh6rperez5hpn3z27ecxqcl3e5pslhked76gqegxipgrrqkvwi
-  message.py: bafybeiectudfpllanfbsktou44wdhccvmsun6bb6funlnsccr4ayn266oy
-  serialization.py: bafybeihnocktzigawqujdnsyirckj3vryj4c4u733k4wnwefiik2umxxaq
+  __init__.py: bafybeiaw2xv64eo5vrkgzuseotzkzciaos7ai5whwqrne357wcjn3wxnli
+  dialogues.py: bafybeiheegdd4plet6w2qs4spyyf4757glckd4d55vp5ihyie3hrtjewii
+  message.py: bafybeihvnaglqsg5ovzjcqfn6cbn2lg47qbwjdusdlx6x6wzfa2bkhtai4
+  serialization.py: bafybeibaejybksikjc4ydq5xdrmp5xnarz34nghbbudhj26zbeigqdghaa
   t_protocol_no_ct.proto: bafybeietptuflcrk6bh3zc4kn5efqt2ygpmtmpv66m7pmkmf3renn3yujy
   t_protocol_no_ct_pb2.py: bafybeicpanqktvtfjkigvgp65qja7xewlxsuxqcrkximns3nsiry5bqmmy
   tests/test_t_protocol_no_ct_dialogues.py: bafybeiaxlzdqlexxvdexe6kjom3zgweqe4yofl55fvnff2ym6a5ourbaxa

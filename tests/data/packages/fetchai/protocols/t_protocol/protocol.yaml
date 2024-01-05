@@ -8,11 +8,11 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeib74jwgkmfjbcpson5lbh2gefkybu23bm46j7jkzeep4rbe5x276m
-  __init__.py: bafybeicachv7r7mdadvjpx6gpgamztnkbxn4oqvzh7skobjaq3h2pb3mse
+  __init__.py: bafybeihfrjpz2pqkox3m44zz6lcfk7rtg6vozbliuptp3zcukmir5sqvni
   custom_types.py: bafybeiaqxtoq6b4xnve3p2uiw55povolzg3yon3ptvzxbeg2wtssiumxkq
-  dialogues.py: bafybeihms4z37odeus6tfzxsdyd75vrhpuzcomg5mhrcvhckoewkpyn6wm
-  message.py: bafybeigabl7xrxcdaourzdeshgaoydhbclhnye5dvdyv2nihsjplisn3v4
-  serialization.py: bafybeickih4w2ikj2q7okosahqt2d6gjhwyloeb5prolbc7mgy3nwlg5ky
+  dialogues.py: bafybeidtme5fqmciwdfqm7ilw6p74bahlmtsetp26lx2pzaqr32fmq7j7m
+  message.py: bafybeifjhdnxtci6fxuuwwm4unwcluu7mpv4n75utg6j6w4c2hdros7tce
+  serialization.py: bafybeiarjk2lfqcgjbpyuow3zzfwsujx6dgjseryobor2qc66sy6lmfh7y
   t_protocol.proto: bafybeiapaievom3jzw3vjdzcoo3bok7tecznwgccbbjc6thmseeww5fp2m
   t_protocol_pb2.py: bafybeicbg2hmmd776v3m7bir5iwm6rtmawei54vwcvaf2ozmp4shza4sra
   tests/test_t_protocol_dialogues.py: bafybeidxzkiqbbyo5zu37udk6v6jcwrvwsm6eqznurvmljxjia7xk3qgcy
