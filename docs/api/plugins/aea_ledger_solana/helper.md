@@ -187,24 +187,6 @@ Generate a unique hash to distinguish transactions with the same terms.
 
 return the hash in hex.
 
-<a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.SolanaHelper.add_nonce"></a>
-
-#### add`_`nonce
-
-```python
-def add_nonce(tx: dict) -> JSONLike
-```
-
-Check whether a transaction is valid or not.
-
-**Arguments**:
-
-- `tx`: the transaction.
-
-**Returns**:
-
-True if the random_message is equals to tx['input']
-
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.SolanaHelper.to_transaction_format"></a>
 
 #### to`_`transaction`_`format

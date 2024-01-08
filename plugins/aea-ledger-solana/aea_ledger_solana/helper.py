@@ -231,19 +231,6 @@ class SolanaHelper(Helper):
         )
         return aggregate_hash.hexdigest()
 
-    def add_nonce(self, tx: dict) -> JSONLike:
-        """
-        Check whether a transaction is valid or not.
-
-        :param tx: the transaction.
-        :return: True if the random_message is equals to tx['input']
-        """
-        stxn = SolanaTransaction.from_json(tx)
-        nonce = self._generate_tx_nonce()
-        txn = stxn.to_json()
-        txn["recentBlockhash"] = nonce
-        return txn
-
     @staticmethod
     def to_transaction_format(tx: dict) -> Any:
         """Check whether a transaction is valid or not."""
