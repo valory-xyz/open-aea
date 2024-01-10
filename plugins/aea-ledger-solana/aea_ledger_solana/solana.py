@@ -429,7 +429,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
             )
         stxn = self.deserialize_tx(tx=tx_signed)
         txn_resp = self._api.send_raw_transaction(bytes(stxn.serialize()))
-        retries = 2
+        retries = 15
         while True and retries > 0:
             try:
                 tx_digest = str(txn_resp.value)
