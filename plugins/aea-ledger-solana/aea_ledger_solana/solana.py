@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2024 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -207,6 +207,19 @@ class SolanaApi(LedgerApi, SolanaHelper):
         txn = Transaction().add(createPDAInstruction)
         tx = txn._solders.to_json()  # pylint: disable=protected-access
         return json.loads(tx)
+
+    def add_nonce(self, tx: dict) -> JSONLike:
+        """
+        Check whether a transaction is valid or not.
+
+        :param tx: the transaction.
+        :return: True if the random_message is equals to tx['input']
+        """
+        stxn = self.deserialize_tx(tx=tx)
+        nonce = self._generate_tx_nonce()
+        txn = stxn.to_json()
+        txn["recentBlockhash"] = nonce
+        return txn
 
     def wait_get_receipt(
         self,
@@ -757,8 +770,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         if isinstance(tx, SoldersTransaction):
             return json.loads(cast(SoldersTransaction, tx).to_json())
         if isinstance(tx, SoldersVersionedTransaction):
-            tx = json.loads(cast(SoldersVersionedTransaction, tx).to_json())
-            return tx
+            return json.loads(cast(SoldersVersionedTransaction, tx).to_json())
         raise ValueError(f"Unknown transction type found `{type(tx)}` ")
 
     def deserialize_tx(

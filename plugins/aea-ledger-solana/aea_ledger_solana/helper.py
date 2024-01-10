@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2024 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -230,19 +230,6 @@ class SolanaHelper(Helper):
             b"".join([seller.encode(), client.encode(), time_stamp.to_bytes(32, "big")])
         )
         return aggregate_hash.hexdigest()
-
-    def add_nonce(self, tx: dict) -> JSONLike:
-        """
-        Check whether a transaction is valid or not.
-
-        :param tx: the transaction.
-        :return: True if the random_message is equals to tx['input']
-        """
-        stxn = SolanaTransaction.from_json(tx)
-        nonce = self._generate_tx_nonce()
-        txn = stxn.to_json()
-        txn["recentBlockhash"] = nonce
-        return txn
 
     @staticmethod
     def to_transaction_format(tx: dict) -> Any:
