@@ -444,6 +444,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         self,
         tx_digest: str,
         max_supported_transaction_version: Optional[int] = None,
+        retries: Optional[int] = None,
         raise_on_try: bool = False,
     ) -> Optional[JSONLike]:
         """
@@ -451,12 +452,14 @@ class SolanaApi(LedgerApi, SolanaHelper):
 
         :param tx_digest: the digest associated to the transaction.
         :param max_supported_transaction_version: The max transaction version to return in responses.
+        :param retries: The max amount of retries for fetching the receipt.
         :param raise_on_try: whether the method will raise or log on error
         :return: the tx receipt, if present
         """
         tx_receipt = self._try_get_transaction_receipt(
             tx_digest,
             max_supported_transaction_version=max_supported_transaction_version,
+            retries=retries,
             raise_on_try=raise_on_try,
         )
 
