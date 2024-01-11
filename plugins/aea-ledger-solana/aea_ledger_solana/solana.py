@@ -429,14 +429,16 @@ class SolanaApi(LedgerApi, SolanaHelper):
             )
         stxn = self.deserialize_tx(tx=tx_signed)
         txn_resp = self._api.send_raw_transaction(bytes(stxn.serialize()))
-        retries = 2
+        retries = 15
         while True and retries > 0:
             try:
                 tx_digest = str(txn_resp.value)
-                self.get_transaction_receipt(
+                receipt = self.get_transaction_receipt(
                     tx_digest,
                     max_supported_transaction_version=max_supported_transaction_version,
                 )
+                if receipt is None:
+                    raise ValueError("Transaction receipt not found.")
                 break
             except ValueError:
                 time.sleep(1)
