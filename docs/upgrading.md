@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.44.0` to `v1.45.0`
+
+- No backwards incompatible changes
+ 
 ## `v1.43.0.post2` to `v1.44.0`
 
 - No backwards incompatible changes

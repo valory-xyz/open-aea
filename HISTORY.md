@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 1.45.0 (2024-01-11)
+
+Plugins:
+- Fixes transaction deserialisation for adding nonce on the solana ledger
+- Increases the number of retries for fetching transaction receipt
+
 ## 1.44.0 (2024-01-04)
 
 Packages:
