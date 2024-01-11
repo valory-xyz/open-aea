@@ -67,6 +67,7 @@ from aea.helpers.base import try_decorator
 
 
 DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 0
+DEFAULT_MAX_RETRIES = 3
 
 
 class SolanaApi(LedgerApi, SolanaHelper):
@@ -406,9 +407,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         :param raise_on_try: whether the method will raise or log on error
         :return: tx_digest, if present
         """
-        tx_digest = self._try_send_signed_transaction(tx_signed, raise_on_try=True)
-        tx = json.loads(tx_digest)
-        return tx["result"]
+        return self._try_send_signed_transaction(tx_signed, raise_on_try=raise_on_try)
 
     @try_decorator("Unable to send transaction: {}", logger_method="warning")
     def _try_send_signed_transaction(
@@ -422,29 +421,9 @@ class SolanaApi(LedgerApi, SolanaHelper):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: tx_digest, if present
         """
-        max_supported_transaction_version: Optional[int] = None
-        if isinstance(tx_signed, dict):
-            max_supported_transaction_version = tx_signed.pop(
-                "max_supported_transaction_version", None
-            )
         stxn = self.deserialize_tx(tx=tx_signed)
         txn_resp = self._api.send_raw_transaction(bytes(stxn.serialize()))
-        retries = 15
-        while True and retries > 0:
-            try:
-                tx_digest = str(txn_resp.value)
-                receipt = self.get_transaction_receipt(
-                    tx_digest,
-                    max_supported_transaction_version=max_supported_transaction_version,
-                )
-                if receipt is None:
-                    raise ValueError("Transaction receipt not found.")
-                break
-            except ValueError:
-                time.sleep(1)
-            retries -= 1
-
-        return txn_resp.to_json()
+        return str(txn_resp.value)
 
     def send_signed_transactions(
         self,
@@ -490,6 +469,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         self,
         tx_digest: str,
         max_supported_transaction_version: Optional[int] = None,
+        retries: Optional[int] = None,
         **_kwargs: Any,
     ) -> Optional[JSONLike]:
         """
@@ -497,21 +477,25 @@ class SolanaApi(LedgerApi, SolanaHelper):
 
         :param tx_digest: the digest associated to the transaction.
         :param max_supported_transaction_version: The max transaction version to return in responses.
+        :param retries: The max amount of retries for fetching the receipt.
         :param _kwargs: the keyword arguments. Possible kwargs are:
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-
-        tx_receipt = self._api.get_transaction(
-            Signature.from_string(tx_digest),
-            max_supported_transaction_version=(
-                max_supported_transaction_version
-                or DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION
-            ),
-        )  # pylint: disable=no-member
-
-        tx = json.loads(tx_receipt.to_json())
-        return tx["result"]
+        retries = retries or DEFAULT_MAX_RETRIES
+        while retries > 0:
+            receipt = self._api.get_transaction(
+                Signature.from_string(tx_digest),
+                max_supported_transaction_version=(
+                    max_supported_transaction_version
+                    or DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION
+                ),
+            )
+            if receipt is not None:
+                return json.loads(receipt.to_json())
+            retries -= 1
+            time.sleep(1)
+        raise ValueError("Transaction receipt not found")
 
     def get_transaction(
         self,
