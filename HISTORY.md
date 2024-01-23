@@ -2,6 +2,11 @@
 
 ## 1.45.0 (2024-01-11)
 
+AEA:
+- Updates the `generate-key` command to include ledger specifier when writing keys in a JSON file
+
+## 1.45.0 (2024-01-11)
+
 Plugins:
 - Fixes transaction deserialisation for adding nonce on the solana ledger
 - Increases the number of retries for fetching transaction receipt

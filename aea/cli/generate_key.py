@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ from aea.cli.utils.click_utils import LedgerChoice, password_option
 from aea.cli.utils.decorators import _check_aea_project
 from aea.configurations.constants import (
     ADDRESS,
+    LEDGER,
     MULTIKEY_FILENAME,
     PRIVATE_KEY,
     PRIVATE_KEY_PATH_SCHEMA,
@@ -165,7 +166,9 @@ def _generate_multiple_keys(
             if password is not None
             else crypto.private_key
         )
-        key_pairs.append({ADDRESS: crypto.address, PRIVATE_KEY: priv_key})
+        key_pairs.append(
+            {ADDRESS: crypto.address, PRIVATE_KEY: priv_key, LEDGER: type_}
+        )
 
     file = file or MULTIKEY_FILENAME
     if _can_write(file):
