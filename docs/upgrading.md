@@ -9,6 +9,11 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+
+## `v1.45.0` to `v1.46.0`
+
+- No backwards incompatible changes
+ 
 ## `v1.44.0` to `v1.45.0`
 
 - No backwards incompatible changes
