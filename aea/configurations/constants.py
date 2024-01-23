@@ -37,6 +37,7 @@ PRIVATE_KEY_PATH_SCHEMA = "{}_private_key.txt"
 MULTIKEY_FILENAME = "keys.json"
 PRIVATE_KEY = "private_key"
 ADDRESS = "address"
+LEDGER = "ledger"
 DEFAULT_PRIVATE_KEY_FILE = PRIVATE_KEY_PATH_SCHEMA.format(DEFAULT_LEDGER)
 DEFAULT_LICENSE = "Apache-2.0"
 DISTRIBUTED_PACKAGES: List[str] = []
