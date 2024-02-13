@@ -1,6 +1,12 @@
 # Release History - open AEA
 
-## 1.45.0 (2024-01-11)
+## 1.47.0 (2024-02-13)
+
+Plugins:
+- Bumps `cosmpy@0.9.2`
+- Fixes the `_try_send_signed_transaction` on the solana plugin to separate the transaction receipt retrieval
+
+## 1.46.0 (2024-01-23)
 
 AEA:
 - Updates the `generate-key` command to include ledger specifier when writing keys in a JSON file
