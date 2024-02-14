@@ -25,7 +25,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="open-aea-ledger-solana",
-    version="1.46.0",
+    version="1.47.0",
     author="dassy23",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of solana.",
@@ -39,7 +39,7 @@ setup(
         "PyNaCl==1.5.0",
         "solders>=0.14.0",
         "solana>=0.29.0",
-        "anchorpy>=0.17.0",
+        "anchorpy>=0.17.0,<0.19.0",
     ],
     tests_require=["pytest"],
     entry_points={

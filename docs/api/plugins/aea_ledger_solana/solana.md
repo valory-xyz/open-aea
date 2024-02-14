@@ -313,6 +313,7 @@ Atomically send multiple of transactions.
 def get_transaction_receipt(
         tx_digest: str,
         max_supported_transaction_version: Optional[int] = None,
+        retries: Optional[int] = None,
         raise_on_try: bool = False) -> Optional[JSONLike]
 ```
 
@@ -322,6 +323,7 @@ Get the transaction receipt for a transaction digest.
 
 - `tx_digest`: the digest associated to the transaction.
 - `max_supported_transaction_version`: The max transaction version to return in responses.
+- `retries`: The max amount of retries for fetching the receipt.
 - `raise_on_try`: whether the method will raise or log on error
 
 **Returns**:
