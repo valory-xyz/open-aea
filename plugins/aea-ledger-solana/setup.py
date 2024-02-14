@@ -39,7 +39,7 @@ setup(
         "PyNaCl==1.5.0",
         "solders>=0.14.0",
         "solana>=0.29.0",
-        "anchorpy>=0.17.0",
+        "anchorpy>=0.17.0,<0.19.0",
     ],
     tests_require=["pytest"],
     entry_points={
