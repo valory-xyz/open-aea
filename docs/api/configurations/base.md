@@ -1131,6 +1131,25 @@ class CustomComponentConfig(PackageConfiguration)
 
 Custom component configuratiopn.
 
+<a id="aea.configurations.base.CustomComponentConfig.__init__"></a>
+
+#### `__`init`__`
+
+```python
+def __init__(name: SimpleIdOrStr,
+             author: SimpleIdOrStr,
+             version: str = "",
+             license_: str = "",
+             aea_version: str = "",
+             description: str = "",
+             fingerprint: Optional[Dict[str, str]] = None,
+             fingerprint_ignore_patterns: Optional[Sequence[str]] = None,
+             dependencies: Optional[Dependencies] = None,
+             **kwargs: Any) -> None
+```
+
+Initialize a custom configuration object.
+
 <a id="aea.configurations.base.CustomComponentConfig.get"></a>
 
 #### get
