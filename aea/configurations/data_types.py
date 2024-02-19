@@ -48,6 +48,7 @@ from aea.configurations.constants import (
     PROTOCOL,
     SERVICE,
     SKILL,
+    CUSTOM,
 )
 from aea.helpers.base import (
     IPFSHash,
@@ -170,6 +171,7 @@ class PackageType(Enum):
     PROTOCOL = PROTOCOL
     CONNECTION = CONNECTION
     CONTRACT = CONTRACT
+    CUSTOM = CUSTOM
     SKILL = SKILL
     SERVICE = SERVICE
 
@@ -204,6 +206,7 @@ class ComponentType(Enum):
     CONNECTION = CONNECTION
     SKILL = SKILL
     CONTRACT = CONTRACT
+    CUSTOM = CUSTOM
 
     def to_package_type(self) -> PackageType:
         """Get package type for component type."""
@@ -559,13 +562,14 @@ class PublicId(JSONSerializable):
 class PackageId:
     """A package identifier."""
 
-    PACKAGE_TYPE_REGEX = r"({}|{}|{}|{}|{}|{})".format(
+    PACKAGE_TYPE_REGEX = r"({}|{}|{}|{}|{}|{}|{})".format(
         PackageType.AGENT,
         PackageType.PROTOCOL,
         PackageType.SKILL,
         PackageType.CONNECTION,
         PackageType.CONTRACT,
         PackageType.SERVICE,
+        PackageType.CUSTOM,
     )
     PACKAGE_ID_URI_REGEX = r"{}/{}".format(
         PACKAGE_TYPE_REGEX, PublicId.PUBLIC_ID_URI_REGEX[1:-1]

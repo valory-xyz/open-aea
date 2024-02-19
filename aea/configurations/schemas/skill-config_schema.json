@@ -34,9 +34,7 @@
       "$ref": "definitions.json#/definitions/package_version"
     },
     "type": {
-      "enum": [
-        "skill"
-      ]
+      "enum": ["skill"]
     },
     "license": {
       "$ref": "definitions.json#/definitions/license"
@@ -73,6 +71,14 @@
       }
     },
     "contracts": {
+      "type": "array",
+      "additionalProperties": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "definitions.json#/definitions/public_id"
+      }
+    },
+    "customs": {
       "type": "array",
       "additionalProperties": false,
       "uniqueItems": true,

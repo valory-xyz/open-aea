@@ -98,11 +98,15 @@
         "$ref": "definitions.json#/definitions/public_id"
       }
     },
+    "customs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "definitions.json#/definitions/public_id"
+      }
+    },
     "default_connection": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "protocols": {
       "type": "array",
