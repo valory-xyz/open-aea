@@ -155,6 +155,13 @@ class Context:
             PackageType.CONTRACT, skip_aea_validation=self.skip_aea_validation
         )
 
+    @property
+    def custom_loader(self) -> ConfigLoader:
+        """Get the custom loader."""
+        return ConfigLoader.from_configuration_type(
+            PackageType.CUSTOM, skip_aea_validation=self.skip_aea_validation
+        )
+
     def set_config(self, key: str, value: Any) -> None:
         """
         Set a config.

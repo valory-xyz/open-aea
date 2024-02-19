@@ -41,18 +41,17 @@ from aea.cli.utils.package_utils import (
     validate_package_name,
 )
 from aea.configurations.base import PackageType, PublicId
-from aea.configurations.constants import (  # noqa: F401  # pylint: disable=unused-import
+from aea.configurations.constants import (
     BUILD,
     CONNECTION,
     CONTRACT,
     CONTRACTS,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
-    DEFAULT_CONNECTION_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
-    DEFAULT_PROTOCOL_CONFIG_FILE,
-    DEFAULT_SKILL_CONFIG_FILE,
     DEFAULT_VERSION,
     DOTTED_PATH_MODULE_ELEMENT_SEPARATOR,
+    PACKAGE_TYPE_TO_CONFIG_FILE,
     PROTOCOL,
     SCAFFOLD_PUBLIC_ID,
     SKILL,
@@ -156,6 +155,14 @@ def contract(
 
 
 @scaffold.command()
+@click.argument("name", type=str, required=True)
+@pass_ctx
+def custom(ctx: Context, name: str) -> None:
+    """Scaffold a custom component package."""
+    scaffold_item(ctx, CUSTOM, name)
+
+
+@scaffold.command()
 @click.argument("protocol_name", type=str, required=True)
 @click.option("-y", "--yes", is_flag=True, default=False)
 @pass_ctx
@@ -205,7 +212,7 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
     validate_package_name(item_name)
     author_name = ctx.agent_config.author
     loader = getattr(ctx, f"{item_type}_loader")
-    default_config_filename = globals()[f"DEFAULT_{item_type.upper()}_CONFIG_FILE"]
+    default_config_filename = PACKAGE_TYPE_TO_CONFIG_FILE[item_type]
 
     to_local_registry = ctx.config.get("to_local_registry")
 
