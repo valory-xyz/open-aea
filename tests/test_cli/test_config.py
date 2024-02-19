@@ -264,7 +264,7 @@ class TestConfigGet:
             standalone_mode=False,
         )
         assert result.exit_code == 1
-        s = "'component_type_not_correct' is not a valid component type. Please use one of ['protocols', 'connections', 'skills', 'contracts']."
+        s = "'component_type_not_correct' is not a valid component type. Please use one of ['protocols', 'connections', 'skills', 'contracts', 'customs']."
         assert result.exception.message == s
 
     @classmethod

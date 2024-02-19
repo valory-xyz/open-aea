@@ -50,6 +50,7 @@ class AgentConfigMock:
         )
         self.connections: List[str] = kwargs.get("connections", [])
         self.contracts: List[str] = kwargs.get("contracts", [])
+        self.customs: List[str] = kwargs.get("customs", [])
         self.description: str = kwargs.get("description", "")
         self.version: str = kwargs.get("version", "")
         self.protocols: List[str] = kwargs.get("protocols", [])
