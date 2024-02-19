@@ -48,6 +48,7 @@ from aea.configurations.constants import (
     DEFAULT_AEA_CONFIG_FILE,
     PROTOCOL,
     SKILL,
+    CUSTOM,
 )
 from aea.exceptions import enforce
 from aea.helpers.io import open_file
@@ -266,7 +267,7 @@ def _fetch_agent_deps(ctx: Context) -> None:
 
     :param ctx: context object.
     """
-    for item_type in (PROTOCOL, CONTRACT, CONNECTION, SKILL):
+    for item_type in (PROTOCOL, CONTRACT, CUSTOM, CONNECTION, SKILL):
         item_type_plural = "{}s".format(item_type)
         required_items = cast(set, getattr(ctx.agent_config, item_type_plural))
         required_items_check = required_items.copy()

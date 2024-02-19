@@ -263,6 +263,7 @@ class Context:
         for item_type in (
             PackageType.PROTOCOL,
             PackageType.CONTRACT,
+            PackageType.CUSTOM,
             PackageType.CONNECTION,
             PackageType.SKILL,
             PackageType.AGENT,
