@@ -44,11 +44,11 @@ from aea.configurations.constants import (
     AGENT,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_GIT_REF,
     PROTOCOL,
     SERVICE,
     SKILL,
-    CUSTOM,
 )
 from aea.helpers.base import (
     IPFSHash,

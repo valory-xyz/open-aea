@@ -45,10 +45,10 @@ from aea.configurations.constants import (
     AGENTS,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
     PROTOCOL,
     SKILL,
-    CUSTOM,
 )
 from aea.exceptions import enforce
 from aea.helpers.io import open_file

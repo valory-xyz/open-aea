@@ -27,9 +27,11 @@ from aea.configurations.constants import (
     AGENT,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_CONNECTION_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_PROTOCOL_CONFIG_FILE,
     DEFAULT_SERVICE_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,
@@ -38,8 +40,6 @@ from aea.configurations.constants import (
     SERVICE,
     SKILL,
     VENDOR,
-    CUSTOM,
-    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
 )
 from aea.configurations.data_types import PackageId, PublicId
 from aea.exceptions import AEAPackageLoadingError

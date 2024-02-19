@@ -49,11 +49,10 @@ from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
     CUSTOMS,
-    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_CONNECTION_CONFIG_FILE,
-    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_FINGERPRINT_IGNORE_PATTERNS,
     DEFAULT_LICENSE,
     DEFAULT_LOGGING_CONFIG,
@@ -1917,6 +1916,7 @@ class CustomComponentConfig(PackageConfiguration):
 
     default_configuration_filename = DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE
     package_type = PackageType.CUSTOM
+    component_type = ComponentType.CUSTOM
     schema = "custom-config_schema.json"
 
     FIELDS_ALLOWED_TO_UPDATE: FrozenSet[str] = frozenset(
@@ -1936,6 +1936,7 @@ class CustomComponentConfig(PackageConfiguration):
         dependencies: Optional[Dependencies] = None,
         **kwargs: Any,
     ) -> None:
+        """Initialize a custom configuration object."""
         super().__init__(
             name,
             author,
