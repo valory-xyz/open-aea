@@ -38,6 +38,8 @@ from aea.configurations.constants import (
     SERVICE,
     SKILL,
     VENDOR,
+    CUSTOM,
+    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
 )
 from aea.configurations.data_types import PackageId, PublicId
 from aea.exceptions import AEAPackageLoadingError
@@ -50,6 +52,7 @@ COMPONENTS = [
     (CONTRACT, DEFAULT_CONTRACT_CONFIG_FILE),
     (CONNECTION, DEFAULT_CONNECTION_CONFIG_FILE),
     (PROTOCOL, DEFAULT_PROTOCOL_CONFIG_FILE),
+    (CUSTOM, DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE),
     (SERVICE, DEFAULT_SERVICE_CONFIG_FILE),
 ]
 

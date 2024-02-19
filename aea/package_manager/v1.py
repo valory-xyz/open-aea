@@ -55,6 +55,16 @@ PACKAGE_FILE_REMOTE_URL = (
     "https://raw.githubusercontent.com/{repo}/{tag}/packages/packages.json"
 )
 
+_PACKAGE_ORDER = [
+    PackageType.CUSTOM,
+    PackageType.PROTOCOL,
+    PackageType.CONTRACT,
+    PackageType.CONNECTION,
+    PackageType.SKILL,
+    PackageType.AGENT,
+    PackageType.SERVICE,
+]
+
 
 class PackageManagerV1(BasePackageManager):
     """Package manager V1"""
@@ -421,10 +431,16 @@ class PackageManagerV1(BasePackageManager):
         data["dev"] = OrderedDict()
         data["third_party"] = OrderedDict()
 
-        for package_id, package_hash in self._dev_packages.items():
+        for package_id, package_hash in sorted(
+            self._dev_packages.items(),
+            key=lambda x: _PACKAGE_ORDER.index(x[0].package_type),
+        ):
             data["dev"][package_id.to_uri_path] = package_hash
 
-        for package_id, package_hash in self._third_party_packages.items():
+        for package_id, package_hash in sorted(
+            self._third_party_packages.items(),
+            key=lambda x: _PACKAGE_ORDER.index(x[0].package_type),
+        ):
             data["third_party"][package_id.to_uri_path] = package_hash
 
         return data
