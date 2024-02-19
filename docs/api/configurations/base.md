@@ -734,6 +734,7 @@ def __init__(name: SimpleIdOrStr,
              connections: Optional[Set[PublicId]] = None,
              protocols: Optional[Set[PublicId]] = None,
              contracts: Optional[Set[PublicId]] = None,
+             customs: Optional[Set[PublicId]] = None,
              skills: Optional[Set[PublicId]] = None,
              dependencies: Optional[Dependencies] = None,
              description: str = "",
@@ -1119,6 +1120,47 @@ def package_dependencies() -> Set[ComponentId]
 ```
 
 Get the contract dependencies.
+
+<a id="aea.configurations.base.CustomComponentConfig"></a>
+
+## CustomComponentConfig Objects
+
+```python
+class CustomComponentConfig(PackageConfiguration)
+```
+
+Custom component configuratiopn.
+
+<a id="aea.configurations.base.CustomComponentConfig.get"></a>
+
+#### get
+
+```python
+def get(name: str) -> Any
+```
+
+Get parameter.
+
+<a id="aea.configurations.base.CustomComponentConfig.set"></a>
+
+#### set
+
+```python
+def set(name: str, value: Any) -> None
+```
+
+Set extra parameter value.
+
+<a id="aea.configurations.base.CustomComponentConfig.json"></a>
+
+#### json
+
+```python
+@property
+def json() -> Dict
+```
+
+Return the JSON representation.
 
 <a id="aea.configurations.base.AEAVersionError"></a>
 
