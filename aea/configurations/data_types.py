@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,7 @@ from aea.configurations.constants import (
     AGENT,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_GIT_REF,
     PROTOCOL,
     SERVICE,
@@ -170,6 +171,7 @@ class PackageType(Enum):
     PROTOCOL = PROTOCOL
     CONNECTION = CONNECTION
     CONTRACT = CONTRACT
+    CUSTOM = CUSTOM
     SKILL = SKILL
     SERVICE = SERVICE
 
@@ -204,6 +206,7 @@ class ComponentType(Enum):
     CONNECTION = CONNECTION
     SKILL = SKILL
     CONTRACT = CONTRACT
+    CUSTOM = CUSTOM
 
     def to_package_type(self) -> PackageType:
         """Get package type for component type."""
@@ -215,7 +218,7 @@ class ComponentType(Enum):
         Get the collection of type names, plural.
 
         >>> ComponentType.plurals()
-        ['protocols', 'connections', 'skills', 'contracts']
+        ['protocols', 'connections', 'skills', 'contracts', 'customs']
 
         :return: list of all pluralised component types
         """
@@ -559,13 +562,14 @@ class PublicId(JSONSerializable):
 class PackageId:
     """A package identifier."""
 
-    PACKAGE_TYPE_REGEX = r"({}|{}|{}|{}|{}|{})".format(
+    PACKAGE_TYPE_REGEX = r"({}|{}|{}|{}|{}|{}|{})".format(
         PackageType.AGENT,
         PackageType.PROTOCOL,
         PackageType.SKILL,
         PackageType.CONNECTION,
         PackageType.CONTRACT,
         PackageType.SERVICE,
+        PackageType.CUSTOM,
     )
     PACKAGE_ID_URI_REGEX = r"{}/{}".format(
         PACKAGE_TYPE_REGEX, PublicId.PUBLIC_ID_URI_REGEX[1:-1]

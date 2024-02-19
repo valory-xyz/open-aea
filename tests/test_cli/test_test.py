@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ from textwrap import dedent
 from typing import Any, Sequence, Type
 from unittest import mock
 
+import _strptime  # noqa: F401
 import click.testing
 import pytest
 from _pytest.config import ExitCode  # type: ignore
@@ -47,6 +48,7 @@ from aea.test_tools.test_cases import AEATestCaseEmpty, CLI_LOG_OPTION
 
 OK_PYTEST_EXIT_CODE = ExitCode.OK
 NO_TESTS_COLLECTED_PYTEST_EXIT_CODE = ExitCode.NO_TESTS_COLLECTED
+PACKAGE_TYPES = [t for t in ComponentType if t != ComponentType.CUSTOM]
 
 
 def _parametrize_class(test_cls: Type) -> Type:
@@ -266,7 +268,7 @@ class TestAgentTestByPathSingleTest(BaseAEATestCommand):
 class TestPackageTestByTypeEmptyTestSuite(BaseAEATestCommand):
     """Test that the command 'aea test item_type public_id' works as expected (with an empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(self, package_type: ComponentType, mock_sys_modules) -> None:
         """Assert that the exit code is equal to 5 (empty test suite)."""
         self._scaffold_item(package_type)
@@ -279,7 +281,7 @@ class TestPackageTestByTypeEmptyTestSuite(BaseAEATestCommand):
 class TestPackageTestByType(BaseAEATestCommand):
     """Test that the command 'aea test item_type public_id' works as expected (with a non-empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(
         self, package_type: ComponentType, mock_sys_modules, *_mocks: Any
     ) -> None:
@@ -295,7 +297,7 @@ class TestPackageTestByType(BaseAEATestCommand):
 class TestVendorPackageTestByTypeEmptyTestSuite(BaseAEATestCommand):
     """Test that the command 'aea test item_type public_id' for vendor packages works as expected (with an empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(self, package_type: ComponentType, mock_sys_modules) -> None:
         """Assert that the exit code is equal to 5 (empty test suite)."""
         self._scaffold_item(package_type)
@@ -309,7 +311,7 @@ class TestVendorPackageTestByTypeEmptyTestSuite(BaseAEATestCommand):
 class TestVendorPackageTestByType(BaseAEATestCommand):
     """Test that the command 'aea test item_type public_id' for vendor packages works as expected (with a non-empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(
         self, package_type: ComponentType, mock_sys_modules, *_mocks: Any
     ) -> None:
@@ -331,7 +333,7 @@ class TestVendorPackageTestByType(BaseAEATestCommand):
 class TestPackageTestByPathEmptyTestSuite(BaseAEATestCommand):
     """Test that the command 'aea test by-path path-to-package' works as expected (empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(self, package_type: ComponentType, mock_sys_modules) -> None:
         """Assert that the exit code is equal to 0 (tests are run successfully)."""
         self._scaffold_item(package_type)
@@ -349,7 +351,7 @@ class TestPackageTestByPathEmptyTestSuite(BaseAEATestCommand):
 class TestPackageTestByPath(BaseAEATestCommand):
     """Test that the command 'aea test by-path path-to-package' works as expected (non-empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(
         self, package_type: ComponentType, mock_sys_modules, *_mocks: Any
     ) -> None:
@@ -369,7 +371,7 @@ class TestPackageTestByPath(BaseAEATestCommand):
 class TestPackageTestByPathWithCov(BaseAEATestCommand):
     """Test that the command 'aea test by-path path-to-package' works as expected (non-empty test suite)."""
 
-    @pytest.mark.parametrize("package_type", list(ComponentType))
+    @pytest.mark.parametrize("package_type", PACKAGE_TYPES)
     def test_run(
         self, package_type: ComponentType, mock_sys_modules, *_mocks: Any
     ) -> None:

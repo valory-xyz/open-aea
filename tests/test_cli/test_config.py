@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -264,7 +264,7 @@ class TestConfigGet:
             standalone_mode=False,
         )
         assert result.exit_code == 1
-        s = "'component_type_not_correct' is not a valid component type. Please use one of ['protocols', 'connections', 'skills', 'contracts']."
+        s = "'component_type_not_correct' is not a valid component type. Please use one of ['protocols', 'connections', 'skills', 'contracts', 'customs']."
         assert result.exception.message == s
 
     @classmethod

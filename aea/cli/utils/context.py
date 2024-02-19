@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -155,6 +155,13 @@ class Context:
             PackageType.CONTRACT, skip_aea_validation=self.skip_aea_validation
         )
 
+    @property
+    def custom_loader(self) -> ConfigLoader:
+        """Get the custom loader."""
+        return ConfigLoader.from_configuration_type(
+            PackageType.CUSTOM, skip_aea_validation=self.skip_aea_validation
+        )
+
     def set_config(self, key: str, value: Any) -> None:
         """
         Set a config.
@@ -263,6 +270,7 @@ class Context:
         for item_type in (
             PackageType.PROTOCOL,
             PackageType.CONTRACT,
+            PackageType.CUSTOM,
             PackageType.CONNECTION,
             PackageType.SKILL,
             PackageType.AGENT,

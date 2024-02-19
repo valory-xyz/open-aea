@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,9 +48,11 @@ from aea.__version__ import __version__ as __aea_version__
 from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_CONNECTION_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_FINGERPRINT_IGNORE_PATTERNS,
     DEFAULT_LICENSE,
     DEFAULT_LOGGING_CONFIG,
@@ -146,6 +148,8 @@ def _get_default_configuration_file_name_from_type(
         return DEFAULT_CONTRACT_CONFIG_FILE
     if item_type == PackageType.SERVICE:
         return DEFAULT_SERVICE_CONFIG_FILE
+    if item_type == PackageType.CUSTOM:
+        return DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE
     raise ValueError(  # pragma: no cover
         "Item type not valid: {}".format(str(item_type))
     )
@@ -964,6 +968,7 @@ class SkillConfig(ComponentConfiguration):
         "connections",
         "protocols",
         "contracts",
+        "customs",
         "skills",
         "dependencies",
         "description",
@@ -987,6 +992,7 @@ class SkillConfig(ComponentConfiguration):
         connections: Optional[Set[PublicId]] = None,
         protocols: Optional[Set[PublicId]] = None,
         contracts: Optional[Set[PublicId]] = None,
+        customs: Optional[Set[PublicId]] = None,
         skills: Optional[Set[PublicId]] = None,
         dependencies: Optional[Dependencies] = None,
         description: str = "",
@@ -1008,6 +1014,7 @@ class SkillConfig(ComponentConfiguration):
         self.connections = connections if connections is not None else set()
         self.protocols = protocols if protocols is not None else set()
         self.contracts = contracts if contracts is not None else set()
+        self.customs = customs if customs is not None else set()
         self.skills = skills if skills is not None else set()
         self.dependencies = dependencies if dependencies is not None else {}
         self.description = description
@@ -1040,6 +1047,12 @@ class SkillConfig(ComponentConfiguration):
                     for connection_id in self.connections
                 }
             )
+            .union(
+                {
+                    ComponentId(ComponentType.CUSTOM, custom_id)
+                    for custom_id in self.customs
+                }
+            )
         )
 
     @property
@@ -1063,6 +1076,7 @@ class SkillConfig(ComponentConfiguration):
                 "fingerprint_ignore_patterns": self.fingerprint_ignore_patterns,
                 CONNECTIONS: sorted(map(str, self.connections)),
                 CONTRACTS: sorted(map(str, self.contracts)),
+                CUSTOMS: sorted(map(str, self.customs)),
                 PROTOCOLS: sorted(map(str, self.protocols)),
                 SKILLS: sorted(map(str, self.skills)),
                 "behaviours": {key: b.json for key, b in self.behaviours.read_all()},
@@ -1097,6 +1111,7 @@ class SkillConfig(ComponentConfiguration):
         connections = {PublicId.from_str(id_) for id_ in obj.get(CONNECTIONS, set())}
         protocols = {PublicId.from_str(id_) for id_ in obj.get(PROTOCOLS, set())}
         contracts = {PublicId.from_str(id_) for id_ in obj.get(CONTRACTS, set())}
+        customs = {PublicId.from_str(id_) for id_ in obj.get(CUSTOMS, set())}
         skills = {PublicId.from_str(id_) for id_ in obj.get(SKILLS, set())}
         dependencies = dependencies_from_json(obj.get("dependencies", {}))
         description = cast(str, obj.get("description", ""))
@@ -1112,6 +1127,7 @@ class SkillConfig(ComponentConfiguration):
             connections=connections,
             protocols=protocols,
             contracts=contracts,
+            customs=customs,
             skills=skills,
             dependencies=dependencies,
             description=description,
@@ -1211,6 +1227,7 @@ class AgentConfig(PackageConfiguration):
         "protocols",
         "skills",
         "contracts",
+        "customs",
         "period",
         "execution_timeout",
         "max_reactions",
@@ -1294,6 +1311,7 @@ class AgentConfig(PackageConfiguration):
         )
         self.connections = set()  # type: Set[PublicId]
         self.contracts = set()  # type: Set[PublicId]
+        self.customs = set()  # type: Set[PublicId]
         self.protocols = set()  # type: Set[PublicId]
         self.skills = set()  # type: Set[PublicId]
 
@@ -1341,6 +1359,7 @@ class AgentConfig(PackageConfiguration):
             PackageType.PROTOCOL: {epid.without_hash() for epid in self.protocols},
             PackageType.CONNECTION: {epid.without_hash() for epid in self.connections},
             PackageType.CONTRACT: {epid.without_hash() for epid in self.contracts},
+            PackageType.CUSTOM: {epid.without_hash() for epid in self.customs},
             PackageType.SKILL: {epid.without_hash() for epid in self.skills},
         }
         for component_id, component_configuration in d.items():
@@ -1368,13 +1387,14 @@ class AgentConfig(PackageConfiguration):
         skills = set(
             ComponentId(ComponentType.SKILL, public_id) for public_id in self.skills
         )
-
         contracts = set(
             ComponentId(ComponentType.CONTRACT, public_id)
             for public_id in self.contracts
         )
-
-        return set.union(protocols, contracts, connections, skills)
+        customs = set(
+            ComponentId(ComponentType.CUSTOM, public_id) for public_id in self.customs
+        )
+        return set.union(protocols, contracts, customs, connections, skills)
 
     @property
     def private_key_paths_dict(self) -> Dict[str, str]:
@@ -1421,9 +1441,12 @@ class AgentConfig(PackageConfiguration):
                 CONTRACTS: sorted(map(str, self.contracts)),
                 PROTOCOLS: sorted(map(str, self.protocols)),
                 SKILLS: sorted(map(str, self.skills)),
-                "default_connection": str(self.default_connection)
-                if self.default_connection is not None
-                else None,
+                CUSTOMS: sorted(map(str, self.customs)),
+                "default_connection": (
+                    str(self.default_connection)
+                    if self.default_connection is not None
+                    else None
+                ),
                 "default_ledger": self.default_ledger,
                 "required_ledgers": self.required_ledgers or [],
                 "default_routing": {
@@ -1540,6 +1563,14 @@ class AgentConfig(PackageConfiguration):
             )
         )
 
+        # parse custom public ids
+        agent_config.customs = set(
+            map(
+                PublicId.from_str,
+                obj.get(CUSTOMS, []),
+            )
+        )
+
         # parse protocol public ids
         agent_config.protocols = set(
             map(
@@ -1575,6 +1606,7 @@ class AgentConfig(PackageConfiguration):
             ComponentType.PROTOCOL: self.protocols,
             ComponentType.CONNECTION: self.connections,
             ComponentType.CONTRACT: self.contracts,
+            ComponentType.CUSTOM: self.customs,
             ComponentType.SKILL: self.skills,
         }
         result = []
@@ -1879,6 +1911,87 @@ class ContractConfig(ComponentConfiguration):
         }
 
 
+class CustomComponentConfig(PackageConfiguration):
+    """Custom component configuratiopn."""
+
+    default_configuration_filename = DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE
+    package_type = PackageType.CUSTOM
+    component_type = ComponentType.CUSTOM
+    schema = "custom-config_schema.json"
+
+    FIELDS_ALLOWED_TO_UPDATE: FrozenSet[str] = frozenset(
+        ["config", "cert_requests", "is_abstract", "build_directory"]
+    )
+
+    def __init__(
+        self,
+        name: SimpleIdOrStr,
+        author: SimpleIdOrStr,
+        version: str = "",
+        license_: str = "",
+        aea_version: str = "",
+        description: str = "",
+        fingerprint: Optional[Dict[str, str]] = None,
+        fingerprint_ignore_patterns: Optional[Sequence[str]] = None,
+        dependencies: Optional[Dependencies] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize a custom configuration object."""
+        super().__init__(
+            name,
+            author,
+            version,
+            license_,
+            aea_version,
+            fingerprint,
+            fingerprint_ignore_patterns,
+        )
+        self.dependencies = dependencies if dependencies is not None else {}
+        self.description = description
+        self.kwargs = kwargs
+
+    def get(self, name: str) -> Any:
+        """Get parameter."""
+        return self.kwargs.get(name)
+
+    def set(self, name: str, value: Any) -> None:
+        """Set extra parameter value."""
+        self.kwargs[name] = value
+
+    @property
+    def json(self) -> Dict:
+        """Return the JSON representation."""
+        result = OrderedDict(
+            {
+                "name": self.name,
+                "author": self.author,
+                "version": self.version,
+                "type": self.component_type.value,
+                "description": self.description,
+                "license": self.license,
+                "aea_version": self.aea_version,
+                "fingerprint": self.fingerprint,
+                "fingerprint_ignore_patterns": self.fingerprint_ignore_patterns,
+                "dependencies": dependencies_to_json(self.dependencies),
+                **self.kwargs,
+            }
+        )
+        return result
+
+    @classmethod
+    def _create_or_update_from_json(
+        cls, obj: Dict, instance: Optional["CustomComponentConfig"] = None
+    ) -> "CustomComponentConfig":
+        """Initialize from a JSON object."""
+        params = {**(instance.json if instance else {}), **copy(obj)}
+        params["dependencies"] = cast(
+            Dependencies, dependencies_from_json(obj.get("dependencies", {}))
+        )
+        return cast(
+            CustomComponentConfig, cls._apply_params_to_instance(params, instance)
+        )
+
+
 """The following functions are called from aea.cli.utils."""
 
 
@@ -2045,4 +2158,5 @@ PACKAGE_TYPE_TO_CONFIG_CLASS: Dict[PackageType, Type[PackageConfiguration]] = {
     PackageType.CONNECTION: ConnectionConfig,
     PackageType.SKILL: SkillConfig,
     PackageType.CONTRACT: ContractConfig,
+    PackageType.CUSTOM: CustomComponentConfig,
 }

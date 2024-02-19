@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +45,7 @@ from aea.configurations.constants import (
     AGENTS,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
     PROTOCOL,
     SKILL,
@@ -266,7 +267,7 @@ def _fetch_agent_deps(ctx: Context) -> None:
 
     :param ctx: context object.
     """
-    for item_type in (PROTOCOL, CONTRACT, CONNECTION, SKILL):
+    for item_type in (PROTOCOL, CONTRACT, CUSTOM, CONNECTION, SKILL):
         item_type_plural = "{}s".format(item_type)
         required_items = cast(set, getattr(ctx.agent_config, item_type_plural))
         required_items_check = required_items.copy()

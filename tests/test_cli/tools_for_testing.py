@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,7 @@ class AgentConfigMock:
         )
         self.connections: List[str] = kwargs.get("connections", [])
         self.contracts: List[str] = kwargs.get("contracts", [])
+        self.customs: List[str] = kwargs.get("customs", [])
         self.description: str = kwargs.get("description", "")
         self.version: str = kwargs.get("version", "")
         self.protocols: List[str] = kwargs.get("protocols", [])
