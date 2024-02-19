@@ -192,7 +192,7 @@ def plurals() -> Collection[str]
 Get the collection of type names, plural.
 
 >>> ComponentType.plurals()
-['protocols', 'connections', 'skills', 'contracts']
+['protocols', 'connections', 'skills', 'contracts', 'customs']
 
 **Returns**:
 
