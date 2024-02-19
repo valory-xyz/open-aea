@@ -1563,7 +1563,7 @@ class AgentConfig(PackageConfiguration):
             )
         )
 
-        # parse contracts public ids
+        # parse custom public ids
         agent_config.customs = set(
             map(
                 PublicId.from_str,
