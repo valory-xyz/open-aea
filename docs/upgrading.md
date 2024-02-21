@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.47.0` to `v1.48.0`
+
+- No backwards incompatible changes
+
 ## `v1.46.0` to `v1.47.0`
 
 The `send_signed_transaction` method implementation is been updated to follow the ledger plugin pattern, which means it will return transaction digest not the transaction receipt. To retrieve the transaction receipt use `get_transaction_receipt` method.

@@ -2,6 +2,11 @@
 
 ## 1.47.0 (2024-02-13)
 
+AEA:
+- Adds support for scaffolding and managing [custom packages](https://github.com/valory-xyz/open-aea/pull/717#pullrequestreview-1887581886)
+
+## 1.47.0 (2024-02-13)
+
 Plugins:
 - Bumps `cosmpy@0.9.2`
 - Fixes the `_try_send_signed_transaction` on the solana plugin to separate the transaction receipt retrieval
