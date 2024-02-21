@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.48.0 (2024-02-21)
+
+AEA:
+- Adds support for scaffolding and managing [custom packages](https://github.com/valory-xyz/open-aea/pull/717#pullrequestreview-1887581886)
+
 ## 1.47.0 (2024-02-13)
 
 Plugins:
