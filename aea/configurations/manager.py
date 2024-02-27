@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,8 +37,10 @@ from aea.configurations.constants import (
     AGENTS,
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     DEFAULT_CONNECTION_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
     DEFAULT_PROTOCOL_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,
     PROTOCOLS,
@@ -59,6 +61,7 @@ ALLOWED_PATH_ROOTS = [
     AGENT,
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     PROTOCOLS,
     SKILLS,
     VENDOR,
@@ -70,6 +73,7 @@ RESOURCE_TYPE_TO_CONFIG_FILE = {
     PROTOCOLS: DEFAULT_PROTOCOL_CONFIG_FILE,
     CONNECTIONS: DEFAULT_CONNECTION_CONFIG_FILE,
     CONTRACTS: DEFAULT_CONTRACT_CONFIG_FILE,
+    CUSTOMS: DEFAULT_CUSTOM_COMPONENT_CONFIG_FILE,
 }  # type: Dict[str, str]
 
 

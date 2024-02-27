@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.48.0.post1 (2024-02-27)
+
+AEA:
+- Fixes custom file references in the CLI commands
+
 ## 1.48.0 (2024-02-21)
 
 AEA:
