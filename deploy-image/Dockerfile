@@ -16,7 +16,7 @@ RUN apk add --no-cache go
 
 # aea installation
 RUN pip install --upgrade pip
-RUN pip install --upgrade --force-reinstall open-aea[all]==1.48.0.post1.post1.post1.post1 "open-aea1.48.0.post11.48.0.post11.48.0.post11.48.0.post1"
+RUN pip install --upgrade --force-reinstall open-aea[all]==1.49.0 "open-aea1.49.01.49.01.49.01.49.0"
 
 # directories and aea cli config
 WORKDIR /home/agents
