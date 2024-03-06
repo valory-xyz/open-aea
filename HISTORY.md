@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.49.0 (2024-03-06)
+
+AEA:
+- Pins `python-dotenv>=0.14.0,<0.22.0`
+
 ## 1.48.0.post1 (2024-02-27)
 
 AEA:
