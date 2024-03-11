@@ -64,12 +64,12 @@ def __init__() -> None
 
 Package cache helper.
 
-<a id="aea.package_manager.base.Cache.exitst"></a>
+<a id="aea.package_manager.base.Cache.exists"></a>
 
-#### exitst
+#### exists
 
 ```python
-def exitst(package_hash: str) -> bool
+def exists(package_hash: str) -> bool
 ```
 
 Check if package exists in the cache.

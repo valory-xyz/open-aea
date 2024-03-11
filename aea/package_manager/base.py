@@ -94,7 +94,7 @@ class Cache:
         self.path = Path.home() / ".aea" / "cache" / "packages"
         self.path.mkdir(parents=True, exist_ok=True)
 
-    def exitst(self, package_hash: str) -> bool:
+    def exists(self, package_hash: str) -> bool:
         """Check if package exists in the cache."""
         return (self.path / package_hash).exists()
 
@@ -418,7 +418,7 @@ class BasePackageManager(ABC):
 
         download_path = package_type_collection / package_id.name
         fetched = False
-        if self.cache.exitst(package_id.package_hash):
+        if self.cache.exists(package_id.package_hash):
             fetched = self.cache.copy(
                 package_hash=package_id.package_hash,
                 destination_path=download_path,
