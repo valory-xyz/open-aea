@@ -289,7 +289,8 @@ class TestVerifyFailure(BaseAEATestCase):
 
 
 @mock.patch("aea.package_manager.base.load_fetch_ipfs")
-def test_package_manager_add_item_dependency_support_mock(fetch_mock):
+@mock.patch("aea.package_manager.base.Cache")
+def test_package_manager_add_item_dependency_support_mock(*mocks):
     """Check PackageManager.add_packages works with dependencies on mocks."""
     FAKE_PACKAGES = [
         PackageId(

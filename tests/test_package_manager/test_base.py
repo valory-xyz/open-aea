@@ -94,6 +94,7 @@ class DummyPackageManager(BasePackageManager):
         self.path = path
         self.packages = packages
         self.config_loader = config_loader
+        self.cache = mock.Mock(exists=lambda *x: False)
         self._logger = logging.getLogger()
 
     @classmethod
@@ -190,9 +191,12 @@ class TestBaseManager(BaseAEATestCase):
         )
         dummy_package = PackageId(
             package_type=PackageType.SKILL,
-            public_id=PublicId(author="dummy", name="skill"),
+            public_id=PublicId(
+                author="dummy",
+                name="skill",
+                package_hash="bafybeicoawiackcbgqo3na3e56tpdc62atag4yxknur77py37caqq4mmya",
+            ),
         )
-
         with mock.patch(
             "aea.package_manager.base.load_fetch_ipfs", new=lambda: _fetch_ipfs_mock
         ):

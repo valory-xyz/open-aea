@@ -708,7 +708,8 @@ def test_package_manager_add_item_dependency_support():
 
 
 @mock.patch("aea.package_manager.base.load_fetch_ipfs")
-def test_package_manager_add_item_dependency_support_mock(fetch_mock):
+@mock.patch("aea.package_manager.base.Cache")
+def test_package_manager_add_item_dependency_support_mock(*mocks):
     """Check PackageManager.add_packages works with dependencies on mocks."""
     FAKE_PACKAGES = [
         PackageId(
@@ -770,7 +771,8 @@ def test_package_manager_add_package_already_installed(fetch_mock: mock.Mock):
 
 
 @mock.patch("aea.package_manager.base.load_fetch_ipfs")
-def test_package_manager_add_package_can_be_updated(fetch_mock: mock.Mock):
+@mock.patch("aea.package_manager.base.Cache")
+def test_package_manager_add_package_can_be_updated(*mocks: mock.Mock):
     """Test package update on add_package."""
     # version already installed
     data = TEST_SKILL_ID.public_id.json
@@ -795,7 +797,7 @@ def test_package_manager_add_package_can_be_updated(fetch_mock: mock.Mock):
                 match="Required package and package in the registry does not match",
             ):
                 package_manager.add_package(TEST_SKILL_ID)
-            fetch_mock.assert_not_called()
+            mocks[1].assert_not_called()
 
             package_manager.add_package(TEST_SKILL_ID, allow_update=True)
             remove_mock.assert_called_once_with(TEST_SKILL_ID)
