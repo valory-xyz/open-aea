@@ -44,6 +44,76 @@ class DepedencyMismatchErrors(Enum)
 
 Dependency mismatch errors.
 
+<a id="aea.package_manager.base.Cache"></a>
+
+## Cache Objects
+
+```python
+class Cache()
+```
+
+Cache manager.
+
+<a id="aea.package_manager.base.Cache.__init__"></a>
+
+#### `__`init`__`
+
+```python
+def __init__() -> None
+```
+
+Package cache helper.
+
+<a id="aea.package_manager.base.Cache.exitst"></a>
+
+#### exitst
+
+```python
+def exitst(package_hash: str) -> bool
+```
+
+Check if package exists in the cache.
+
+<a id="aea.package_manager.base.Cache.add"></a>
+
+#### add
+
+```python
+def add(package_path: Path, package_hash: str) -> None
+```
+
+Add package to cache.
+
+<a id="aea.package_manager.base.Cache.remove"></a>
+
+#### remove
+
+```python
+def remove(package_hash: str) -> None
+```
+
+Remove package.
+
+<a id="aea.package_manager.base.Cache.valid"></a>
+
+#### valid
+
+```python
+def valid(package_hash: str) -> bool
+```
+
+Validate a package.
+
+<a id="aea.package_manager.base.Cache.copy"></a>
+
+#### copy
+
+```python
+def copy(package_hash: str, destination_path: Path) -> bool
+```
+
+Copy package from cache.
+
 <a id="aea.package_manager.base.BasePackageManager"></a>
 
 ## BasePackageManager Objects
