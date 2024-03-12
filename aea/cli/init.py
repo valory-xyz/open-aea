@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 """Implementation of the 'aea init' subcommand."""
 
+import platform
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -138,11 +139,25 @@ def _registry_init_remote(
         _registry_init_http(username=author, no_subscribe=no_subscribe)
 
 
+def _clean_ipfs_node_url(ipfs_node: Optional[str]) -> str:
+    """Clean IPFS node URL."""
+    if ipfs_node is None:
+        return DEFAULT_IPFS_URL
+    if platform.system() != "Windows":
+        return ipfs_node
+    if not ipfs_node.startswith("C:/"):
+        return ipfs_node
+    *_, ipfs_node = ipfs_node.split("/dns/")
+    return f"/dns/{ipfs_node}"
+
+
 def _registry_init_ipfs(ipfs_node: Optional[str]) -> None:
     """Initialize ipfs registry"""
 
     registry_config = _set_registries(REGISTRY_REMOTE, REMOTE_IPFS)
-    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS]["ipfs_node"] = ipfs_node
+    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS][
+        "ipfs_node"
+    ] = _clean_ipfs_node_url(ipfs_node=ipfs_node)
     update_cli_config({REGISTRY_CONFIG_KEY: registry_config})
 
 
