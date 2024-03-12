@@ -142,7 +142,7 @@ def _registry_init_remote(
 def _clean_ipfs_node_url(ipfs_node: Optional[str]) -> str:
     """Clean IPFS node URL."""
     if ipfs_node is None:
-        return ipfs_node
+        return DEFAULT_IPFS_URL
     if platform.system() != "Windows":
         return ipfs_node
     if not ipfs_node.startswith("C:/"):

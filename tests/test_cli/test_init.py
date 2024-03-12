@@ -28,6 +28,7 @@ from unittest.mock import patch
 import yaml
 
 from aea.cli import cli
+from aea.cli.init import _clean_ipfs_node_url
 
 from tests.conftest import CLI_LOG_OPTION, CliRunner, random_string
 
@@ -135,3 +136,12 @@ class TestDoInit:
         self.cli_config_patch.stop()
         os.chdir(self.cwd)
         shutil.rmtree(self.t)
+
+
+def test_node_addr_cleanup() -> None:
+    """Test node address clean up method."""
+
+    original_addr = "/dns/to/some/node"
+    consoled_parsed_addr = f"C:/Git/bin/{original_addr}"
+    with patch("platform.system", return_value="Windows"):
+        assert _clean_ipfs_node_url(ipfs_node=consoled_parsed_addr) == original_addr
