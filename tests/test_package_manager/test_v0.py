@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -289,7 +289,8 @@ class TestVerifyFailure(BaseAEATestCase):
 
 
 @mock.patch("aea.package_manager.base.load_fetch_ipfs")
-def test_package_manager_add_item_dependency_support_mock(fetch_mock):
+@mock.patch("aea.package_manager.base.Cache")
+def test_package_manager_add_item_dependency_support_mock(*mocks):
     """Check PackageManager.add_packages works with dependencies on mocks."""
     FAKE_PACKAGES = [
         PackageId(

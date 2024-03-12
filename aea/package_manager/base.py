@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -86,6 +86,53 @@ class DepedencyMismatchErrors(Enum):
     HASH_DOES_NOT_MATCH: int = 2
 
 
+class Cache:
+    """Cache manager."""
+
+    def __init__(self) -> None:
+        """Package cache helper."""
+        self.path = Path.home() / ".aea" / "cache" / "packages"
+        self.path.mkdir(parents=True, exist_ok=True)
+
+    def exists(self, package_hash: str) -> bool:
+        """Check if package exists in the cache."""
+        return (self.path / package_hash).exists()
+
+    def add(self, package_path: Path, package_hash: str) -> None:
+        """Add package to cache."""
+        path = self.path / package_hash
+        if path.exists() and self.valid(package_hash=package_hash):
+            return
+
+        if path.exists():
+            shutil.rmtree(path=path)
+
+        path.mkdir()
+        shutil.copytree(package_path, path / package_path.name)
+
+    def remove(self, package_hash: str) -> None:
+        """Remove package."""
+        path = self.path / package_hash
+        if path.exists():
+            shutil.rmtree(path=path)
+
+    def valid(self, package_hash: str) -> bool:
+        """Validate a package."""
+        (package_path,) = (self.path / package_hash).iterdir()
+        cache_hash = IPFSHashOnly.hash_directory(dir_path=str(package_path))
+        return cache_hash == package_hash
+
+    def copy(self, package_hash: str, destination_path: Path) -> bool:
+        """Copy package from cache."""
+        if not self.valid(package_hash=package_hash):
+            self.remove(package_hash=package_hash)
+            return False
+
+        (package_path,) = (self.path / package_hash).iterdir()
+        shutil.copytree(package_path, destination_path)
+        return True
+
+
 class BasePackageManager(ABC):
     """AEA package manager"""
 
@@ -102,6 +149,8 @@ class BasePackageManager(ABC):
         self.path = path
         self.config_loader = config_loader
         self._packages_file = path / PACKAGES_FILE
+
+        self.cache = Cache()
 
         self._logger = logger or logging.getLogger(name="PackageManager")
         self._logger.setLevel(logging.INFO)
@@ -368,12 +417,24 @@ class BasePackageManager(ABC):
             (package_type_collection / "__init__.py").touch()
 
         download_path = package_type_collection / package_id.name
-        load_fetch_ipfs()(
-            str(package_id.package_type),
-            package_id.public_id,
-            str(download_path),
-            True,
-        )
+        fetched = False
+        if self.cache.exists(package_id.package_hash):
+            fetched = self.cache.copy(
+                package_hash=package_id.package_hash,
+                destination_path=download_path,
+            )
+
+        if not fetched:
+            load_fetch_ipfs()(
+                str(package_id.package_type),
+                package_id.public_id,
+                str(download_path),
+                True,
+            )
+            self.cache.add(
+                package_path=download_path,
+                package_hash=package_id.package_hash,
+            )
         self._logger.debug(f"Downloaded {package_id.without_hash()}")
 
     def add_dependencies_for_package(
