@@ -1,5 +1,12 @@
 # Release History - open AEA
 
+## 1.50.0 (2024-03-13)
+
+AEA:
+
+- Fixes IPFS node address parsing on Git console 
+- Adds support for caching and reusing packages 
+
 ## 1.49.0 (2024-03-06)
 
 AEA:
