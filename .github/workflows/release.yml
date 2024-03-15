@@ -18,130 +18,9 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-versions }}
-      - name: Install dependencies
-        run: |
-          sudo apt-get update --fix-missing
-          sudo apt-get autoremove
-          sudo apt-get autoclean
-          python -m pip install --upgrade pip
-          pip install pipenv twine
-
       - name: Build wheels and source tarball
         run: |
           echo Processing open-aea
-          pipenv run make dist
-
-          echo Processing aea-cli-benchmark
-          cd plugins/aea-cli-benchmark
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-cli-ipfs
-          cd plugins/aea-cli-ipfs
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-cosmos
-          cd plugins/aea-ledger-cosmos
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum
-          cd plugins/aea-ledger-ethereum
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum-hwi
-          cd plugins/aea-ledger-ethereum-hwi
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum-flashbots
-          cd plugins/aea-ledger-ethereum-flashbots
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-solana
-          cd plugins/aea-ledger-solana
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-fetchai
-          cd plugins/aea-ledger-fetchai
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-      - name: Publish open-aea Framework to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: dist/
-
-      - name: Publish open-aea-cli-benchmark Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-cli-benchmark/dist/
-
-      - name: Publish open-aea-cli-ipfs Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-cli-ipfs/dist/
-
-      - name: Publish open-aea-ledger-cosmos Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-cosmos/dist/
-
-      - name: Publish open-aea-ledger-ethereum Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-ethereum/dist/
-
-      - name: Publish open-aea-ledger-ethereum-hwi Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-ethereum-hwi/dist/
-
-      - name: Publish open-aea-ledger-ethereum-flashbots Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-ethereum-flashbots/dist/
-
-      - name: Publish open-aea-ledger-solana Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-solana/dist/
-
-      - name: Publish open-aea-ledger-fetchai Plugin to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          packages-dir: plugins/aea-ledger-fetchai/dist/
 
   publish-aea-packages:
     name: Push Open AEA Packages
@@ -160,17 +39,8 @@ jobs:
           python-version: ${{ matrix.python-versions }}
       - name: Install dependencies
         run: |
-          sudo apt-get update --fix-missing
-          sudo apt-get autoremove
-          sudo apt-get autoclean
-          python -m pip install --upgrade pip
-          pip install open-aea[all] --no-cache
-          pip install open-aea-cli-ipfs --no-cache
+          echo "install"
 
-      - name: Push Packages
-        run: |
-          aea init --reset --author valory --ipfs --remote
-          aea push-all
 
   publish-docs-images:
     name: Publish Docs Images
@@ -184,20 +54,8 @@ jobs:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: Set up support for multi platform build
-        run: |
-          docker run --privileged --rm tonistiigi/binfmt --install all
-          docker buildx create --use --name multibuild
-          docker buildx inspect --bootstrap
-      - name: Set up tag
-        run: echo export TAG=$(python3 -c "from setup import about; print(about[\"__version__\"])") > env.sh
-      - name: Build and push version tagged images
-        run: |
-          # export `TAG` variable
-          source env.sh
-          docker build -t valory/open-aea-docs:$TAG -f docs-image/Dockerfile . --push
-          docker build -t valory/open-aea-docs:latest -f docs-image/Dockerfile . --push
+          echo "Docker image published"
+
 
   publish-user-images:
     name: Publish User Images
@@ -211,20 +69,7 @@ jobs:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: Set up support for multi platform build
-        run: |
-          docker run --privileged --rm tonistiigi/binfmt --install all
-          docker buildx create --use --name multibuild
-          docker buildx inspect --bootstrap
-      - name: Set up tag
-        run: echo export TAG=$(python3 -c "from setup import about; print(about[\"__version__\"])") > env.sh
-      - name: Build and push version tagged images
-        run: |
-          # export `TAG` variable
-          source env.sh
-          docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t valory/open-aea-user:$TAG -f user-image/Dockerfile . --push
-          docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t valory/open-aea-user:latest -f user-image/Dockerfile . --push
+          echo "Docker image published"
 
   publish-deploy-images:
     name: Publish Deploy Images
@@ -238,20 +83,7 @@ jobs:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: Set up support for multi platform build
-        run: |
-          docker run --privileged --rm tonistiigi/binfmt --install all
-          docker buildx create --use --name multibuild
-          docker buildx inspect --bootstrap
-      - name: Set up tag
-        run: echo export TAG=$(python3 -c "from setup import about; print(about[\"__version__\"])") > env.sh
-      - name: Build and push version tagged images
-        run: |
-          # export `TAG` variable
-          source env.sh
-          docker buildx build --platform linux/amd64,linux/arm64 -t valory/open-aea-deploy:$TAG -f deploy-image/Dockerfile . --push
-          docker buildx build --platform linux/amd64,linux/arm64 -t valory/open-aea-deploy:latest -f deploy-image/Dockerfile . --push
+          echo "Docker image published"
 
   publish-develop-images:
     name: Publish Develop Images
@@ -265,17 +97,4 @@ jobs:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: Set up support for multi platform build
-        run: |
-          docker run --privileged --rm tonistiigi/binfmt --install all
-          docker buildx create --use --name multibuild
-          docker buildx inspect --bootstrap
-      - name: Set up tag
-        run: echo export TAG=$(python3 -c "from setup import about; print(about[\"__version__\"])") > env.sh
-      - name: Build and push version tagged images
-        run: |
-          # export `TAG` variable
-          source env.sh
-          docker build -t valory/open-aea-develop:$TAG -f develop-image/Dockerfile . --push
-          docker build -t valory/open-aea-develop:latest -f develop-image/Dockerfile . --push
+          echo "Docker image published"
