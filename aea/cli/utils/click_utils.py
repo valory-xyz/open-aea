@@ -40,6 +40,7 @@ from aea.configurations.constants import (
     CONFIG_FILE_TO_PACKAGE_TYPE,
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
     PROTOCOL,
     SKILL,
@@ -382,7 +383,7 @@ def component_flag(
 
         f = argument(
             "component_type",
-            type=click.Choice((CONNECTION, CONTRACT, PROTOCOL, SKILL)),
+            type=click.Choice((CONNECTION, CONTRACT, PROTOCOL, CUSTOM, SKILL)),
             required=True,
         )(f)
 
