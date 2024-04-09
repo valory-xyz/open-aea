@@ -20,6 +20,7 @@ class_name: HTTPClientConnection
 config:
   host: 127.0.0.1
   port: 8000
+  timeout: 300
 excluded_protocols: []
 restricted_to_protocols:
 - valory/http:1.0.0
