@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,9 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """HTTP client connection and channel."""
+
 import asyncio
 import email
 import logging
@@ -30,6 +32,7 @@ from typing import Any, Optional, Set, Tuple, Union, cast
 
 import aiohttp
 import certifi  # pylint: disable=wrong-import-order
+from aiohttp import ClientTimeout
 from aiohttp.client_reqrep import ClientResponse  # pylint: disable=wrong-import-order
 from multidict import (  # pylint: disable=wrong-import-order
     CIMultiDict,
@@ -107,7 +110,6 @@ class HttpDialogues(BaseHttpDialogues):
 class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
     """A wrapper for a HTTPClient."""
 
-    DEFAULT_TIMEOUT = 300  # default timeout in seconds
     DEFAULT_EXCEPTION_CODE = (
         600  # custom code to indicate there was exception during request
     )
@@ -117,19 +119,22 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
         agent_address: Address,
         address: str,
         port: int,
+        timeout: int,
         connection_id: PublicId,
     ):
         """
         Initialize an http client channel.
 
         :param agent_address: the address of the agent.
-        :param address: server hostname / IP address
-        :param port: server port number
-        :param connection_id: the id of the connection
+        :param address: server hostname / IP address.
+        :param port: server port number.
+        :param timeout: the time to wait for a response.
+        :param connection_id: the id of the connection.
         """
         self.agent_address = agent_address
         self.address = address
         self.port = port
+        self.timeout = timeout
         self.connection_id = connection_id
         self._dialogues = HttpDialogues()
 
@@ -189,7 +194,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
         try:
             resp = await asyncio.wait_for(
                 self._perform_http_request(request_http_message),
-                timeout=self.DEFAULT_TIMEOUT,
+                timeout=self.timeout,
             )
             envelope = self.to_envelope(
                 request_http_message,
@@ -231,7 +236,8 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 )
             else:
                 headers = None
-            async with aiohttp.ClientSession() as session:
+            session_timeout = ClientTimeout(self.timeout)
+            async with aiohttp.ClientSession(timeout=session_timeout) as session:
                 async with session.request(
                     method=request_http_message.method,
                     url=request_http_message.url,
@@ -373,6 +379,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
 class HTTPClientConnection(Connection):
     """Proxy to the functionality of the web client."""
 
+    DEFAULT_TIMEOUT = 300  # default timeout in seconds
     connection_id = PUBLIC_ID
 
     def __init__(self, **kwargs: Any) -> None:
@@ -384,12 +391,14 @@ class HTTPClientConnection(Connection):
         super().__init__(**kwargs)
         host = cast(str, self.configuration.config.get("host"))
         port = cast(int, self.configuration.config.get("port"))
+        timeout = int(self.configuration.config.get("timeout", self.DEFAULT_TIMEOUT))
         if host is None or port is None:  # pragma: nocover
             raise ValueError("host and port must be set!")
         self.channel = HTTPClientAsyncChannel(
             self.address,
             host,
             port,
+            timeout,
             connection_id=self.connection_id,
         )
 
