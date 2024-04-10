@@ -1,5 +1,14 @@
 # Release History - open AEA
 
+## 1.51.0 (2024-04-10)
+
+AEA:
+- Adds support for pushing custom components to the IPFS registry
+
+Packages:
+- Make timeout configurable on the http client connection
+- Adds `Celo` to ledger connection configurations
+
 ## 1.50.0 (2024-03-13)
 
 AEA:
