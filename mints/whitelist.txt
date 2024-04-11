@@ -1,3 +1,4 @@
+# To skip
 agent/fetchai/error_test
 agent/fetchai/gym_aea
 agent/fetchai/my_first_aea
@@ -26,6 +27,8 @@ skill/fetchai/generic_seller
 skill/fetchai/gym
 skill/fetchai/http_echo
 skill/fetchai/task_test_skill
+
+# Already minted on other repos
 connection/valory/http_client
 connection/valory/http_server
 connection/valory/ledger
