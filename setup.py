@@ -31,18 +31,20 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 def get_all_extras() -> Dict:
     cli_deps = [
-        "click==8.0.2",
-        "pyyaml==6.0.1",
+        "click>=8.0.2,<9",
+        "pyyaml>=6.0.1,<9",
         "packaging>=23.1,<24.0",
-        "pytest>=7.0.0,<7.3.0",
         "coverage>=6.4.4,<8.0.0",
         "jsonschema<4.4.0,>=4.3.0",
         "semver>=2.9.1,<3.0.0",
     ]
+    test_deps = [
+        "pytest>=7.0.0,<8",
+    ]
 
     extras = {
         "cli": cli_deps,
-        "test_tools": cli_deps,
+        "test_tools": test_deps,
     }
 
     # add "all" extras
@@ -58,9 +60,9 @@ base_deps = [
     "jsonschema<4.4.0,>=4.3.0",
     "packaging>=23.1,<24.0",
     "protobuf<4.25.0,>=4.21.6",
-    "pymultihash==0.8.2",
-    "pyyaml==6.0.1",
-    "requests==2.28.1",
+    "pymultihash>=0.8.2",
+    "pyyaml>=6.0.1,<7",
+    "requests>=2.28.1,<3",
     "python-dotenv>=0.14.0,<0.22.0",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",
