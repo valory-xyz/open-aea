@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -1561,6 +1561,34 @@ class _CosmosApi(LedgerApi):
         """
         raise NotImplementedError(  # pragma: nocover
             f"Sending a bundle of transactions is not supported for the {self.identifier} plugin"
+        )
+
+    def filter_event(
+        self,
+        event: Any,
+        match_single: Dict[str, Any],
+        match_any: Dict[str, Any],
+        to_block: int,
+        from_block: int,
+        batch_size: int,
+        max_retries: int,
+        reduce_factor: float,
+        timeout: int,
+    ) -> Optional[JSONLike]:
+        """Filter an event using batching to avoid RPC timeouts.
+
+        :param event: the event to filter for.
+        :param match_single: the filter parameters with value checking against the event abi. It allows for defining a single match value.
+        :param match_any: the filter parameters with value checking against the event abi. It allows for defining multiple match values.
+        :param to_block: the block to which to filter.
+        :param from_block: the block from which to start filtering.
+        :param batch_size: the blocks' batch size of the filtering.
+        :param max_retries: the maximum number of retries.
+        :param reduce_factor: the percentage by which the batch size is reduced in case of a timeout.
+        :param timeout: a timeout in seconds to interrupt the operation in case the RPC request hangs.
+        """
+        raise NotImplementedError(  # pragma: nocover
+            f"Custom events' filtering is not supported for the {self.identifier} plugin"
         )
 
 

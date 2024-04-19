@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 """Ethereum module wrapping the public and private key cryptography and ledger api."""
 
+import concurrent.futures
 import decimal
 import json
 import logging
@@ -39,11 +40,15 @@ from eth_account.datastructures import HexBytes, SignedTransaction
 from eth_account.messages import _hash_eip191_message, encode_defunct
 from eth_account.signers.local import LocalAccount
 from eth_keys import keys
-from eth_typing import HexStr
+from eth_typing import BlockNumber, HexStr
 from eth_utils.currency import from_wei, to_wei  # pylint: disable=import-error
 from requests import HTTPError
+from requests.exceptions import ReadTimeout as RequestsReadTimeoutError
+from urllib3.exceptions import ReadTimeoutError as Urllib3ReadTimeoutError
 from web3 import HTTPProvider, Web3
+from web3._utils.events import EventFilterBuilder
 from web3._utils.request import SimpleCache
+from web3.contract.contract import ContractEvent
 from web3.datastructures import AttributeDict
 from web3.exceptions import ContractLogicError, TransactionNotFound
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
@@ -76,6 +81,7 @@ AVAILABLE_STRATEGIES = (EIP1559, GAS_STATION, EIP1559_POLYGON)
 SPEED_FAST = "fast"  # safeLow, standard, fast
 POLYGON_GAS_ENDPOINT = "https://gasstation-mainnet.matic.network/v2"
 MAX_GAS_FAST = 1500
+RPC_CALL_MAX_WORKERS = 1
 
 # How many blocks to consider for priority fee estimation
 FEE_HISTORY_BLOCKS = 10
@@ -125,6 +131,10 @@ DEFAULT_GAS_PRICE_STRATEGIES = {
 
 # The tip increase is the minimum required of 10%.
 TIP_INCREASE = 1.1
+
+# the `web3` methods' names for logs filtering operations
+MATCH_SINGLE = "match_single"
+MATCH_ANY = "match_any"
 
 
 def wei_to_gwei(number: Type[int]) -> Union[int, decimal.Decimal]:
@@ -359,6 +369,50 @@ def get_gas_price_strategy(
         return {"gasPrice": wei_result}
 
     return gas_station_gas_price_strategy
+
+
+def rpc_call_with_timeout(func: Callable, timeout: int) -> Any:
+    """Execute an RPC call with a timeout."""
+
+    with concurrent.futures.ThreadPoolExecutor(RPC_CALL_MAX_WORKERS) as executor:
+        # submit the function with the RPC call to the executor
+        future = executor.submit(func)
+
+        try:
+            # wait for the result with a timeout
+            data = future.result(timeout=timeout)
+        except TimeoutError:
+            # handle the case where the execution times out
+            err = f"The RPC didn't respond within {timeout} seconds."
+            return None, err
+
+        # check if an error occurred
+        if isinstance(data, str):
+            # handle the case where the execution fails
+            return None, data
+
+        return data, None
+
+
+def match_items(
+    filter_: EventFilterBuilder,
+    event_name: str,
+    method_to_matches: Dict[str, Dict[str, Any]],
+):
+    """Build filters for the given match dictionary."""
+    for method, matches in method_to_matches.items():
+        for arg, value in matches.items():
+            arg_filter = filter_.args.get(arg, None)
+            if arg_filter is None:
+                raise ValueError(
+                    f"There is no argument {arg!r} in the event {event_name}!"
+                )
+            filtering_method = getattr(arg_filter, method, None)
+            if filtering_method is None:
+                raise ValueError(
+                    f"There is no filtering method named {filtering_method}!"
+                )
+            filtering_method(value)
 
 
 class SignedTransactionTranslator:
@@ -1542,6 +1596,95 @@ class EthereumApi(LedgerApi, EthereumHelper):
         raise NotImplementedError(  # pragma: nocover
             f"Sending a bundle of transactions is not supported for the {self.identifier} plugin"
         )
+
+    def batch_filter_wrapper(
+        self,
+        event: ContractEvent,
+        match_single: Dict[str, Any],
+        match_any: Dict[str, Any],
+        to_block: BlockNumber,
+        from_block: BlockNumber,
+    ) -> Any:
+        """A wrapper for a single batch's event filtering operation."""
+
+        def batch_filter() -> Any:
+            """Filter events for a specific batch."""
+            filter_ = event.build_filter()
+            filter_.fromBlock = from_block
+            filter_.toBlock = to_block
+            method_to_match_dict = {
+                MATCH_SINGLE: match_single,
+                MATCH_ANY: match_any,
+            }
+            match_items(filter_, event.event_name, method_to_match_dict)
+
+            try:
+                return list(filter_.deploy(self.api).get_all_entries())
+            except (Urllib3ReadTimeoutError, RequestsReadTimeoutError):
+                msg = (
+                    "The RPC timed out! This usually happens if the filtering is too wide. "
+                    f"The service tried to filter the blocks in the range [{from_block} - {to_block}]. "
+                    f"If this issue persists, please try lowering the batch size!"
+                )
+                return msg
+
+        return batch_filter
+
+    def filter_event(
+        self,
+        event: ContractEvent,
+        match_single: Dict[str, Any],
+        match_any: Dict[str, Any],
+        to_block: BlockNumber,
+        from_block: BlockNumber = 0,
+        batch_size: int = 5_000,
+        max_retries: int = 5,
+        reduce_factor: float = 0.25,
+        timeout: int = 5 * 60,
+    ) -> Optional[JSONLike]:
+        """Filter an event using batching to avoid RPC timeouts.
+
+        :param event: the event to filter for.
+        :param match_single: the filter parameters with value checking against the event abi. It allows for defining a single match value.
+        :param match_any: the filter parameters with value checking against the event abi. It allows for defining multiple match values.
+        :param to_block: the block to which to filter.
+        :param from_block: the block from which to start filtering.
+        :param batch_size: the blocks' batch size of the filtering.
+        :param max_retries: the maximum number of retries.
+        :param reduce_factor: the percentage by which the batch size is reduced in case of a timeout.
+        :param timeout: a timeout in seconds to interrupt the operation in case the RPC request hangs.
+        :return: the filtering result.
+        """
+
+        filtering_result = []
+        n_retries = 0
+        while from_block < to_block:
+            max_to_block = from_block + batch_size
+            to_block_adj = BlockNumber(min(max_to_block, to_block))
+            filtering_operation = self.batch_filter_wrapper(
+                event, match_single, match_any, to_block_adj, from_block
+            )
+            batch_result, err = rpc_call_with_timeout(filtering_operation, timeout)
+            if err is not None:
+                _default_logger.warning(err)
+
+            if not batch_result and n_retries == max_retries:
+                err = "Skipping the filtering operation as the RPC is misbehaving."
+                raise ValueError(err)
+
+            if not batch_result:
+                n_retries += 1
+                keep_fraction = 1 - reduce_factor
+                batch_size = int(batch_size * keep_fraction)
+                _default_logger.warning(
+                    f"Repeating this call with a decreased batch size of {batch_size}."
+                )
+                continue
+
+            from_block += batch_size
+            filtering_result.extend(batch_result)
+
+        return dict(filtering_result=filtering_result)
 
 
 class EthereumFaucetApi(FaucetApi):
