@@ -559,3 +559,28 @@ Get all transfer events derived from a transaction.
 
 the transfer logs
 
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.solana.SolanaApi.filter_event"></a>
+
+#### filter`_`event
+
+```python
+def filter_event(event: Any, match_single: Dict[str, Any],
+                 match_any: Dict[str, Any], to_block: int, from_block: int,
+                 batch_size: int, max_retries: int, reduce_factor: float,
+                 timeout: int) -> Optional[JSONLike]
+```
+
+Filter an event using batching to avoid RPC timeouts.
+
+**Arguments**:
+
+- `event`: the event to filter for.
+- `match_single`: the filter parameters with value checking against the event abi. It allows for defining a single match value.
+- `match_any`: the filter parameters with value checking against the event abi. It allows for defining multiple match values.
+- `to_block`: the block to which to filter.
+- `from_block`: the block from which to start filtering.
+- `batch_size`: the blocks' batch size of the filtering.
+- `max_retries`: the maximum number of retries.
+- `reduce_factor`: the percentage by which the batch size is reduced in case of a timeout.
+- `timeout`: a timeout in seconds to interrupt the operation in case the RPC request hangs.
+

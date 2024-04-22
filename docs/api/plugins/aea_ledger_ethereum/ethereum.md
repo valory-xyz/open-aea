@@ -119,6 +119,27 @@ def get_gas_price_strategy(
 
 Get the gas price strategy.
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.rpc_call_with_timeout"></a>
+
+#### rpc`_`call`_`with`_`timeout
+
+```python
+def rpc_call_with_timeout(func: Callable, timeout: int) -> Any
+```
+
+Execute an RPC call with a timeout.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.match_items"></a>
+
+#### match`_`items
+
+```python
+def match_items(filter_: EventFilterBuilder, event_name: str,
+                method_to_matches: Dict[str, Dict[str, Any]])
+```
+
+Build filters for the given match dictionary.
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.SignedTransactionTranslator"></a>
 
 ## SignedTransactionTranslator Objects
@@ -941,6 +962,52 @@ This operation is not supported for ethereum. Please use the ethereum_flashbots 
 - `signed_transactions`: the signed transactions to bundle together and send.
 - `raise_on_try`: whether the method will raise or log on error
 - `kwargs`: the keyword arguments.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.batch_filter_wrapper"></a>
+
+#### batch`_`filter`_`wrapper
+
+```python
+def batch_filter_wrapper(event: ContractEvent, match_single: Dict[str, Any],
+                         match_any: Dict[str, Any], to_block: BlockNumber,
+                         from_block: BlockNumber) -> Any
+```
+
+A wrapper for a single batch's event filtering operation.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.filter_event"></a>
+
+#### filter`_`event
+
+```python
+def filter_event(event: ContractEvent,
+                 match_single: Dict[str, Any],
+                 match_any: Dict[str, Any],
+                 to_block: BlockNumber,
+                 from_block: BlockNumber = 0,
+                 batch_size: int = 5_000,
+                 max_retries: int = 5,
+                 reduce_factor: float = 0.25,
+                 timeout: int = 5 * 60) -> Optional[JSONLike]
+```
+
+Filter an event using batching to avoid RPC timeouts.
+
+**Arguments**:
+
+- `event`: the event to filter for.
+- `match_single`: the filter parameters with value checking against the event abi. It allows for defining a single match value.
+- `match_any`: the filter parameters with value checking against the event abi. It allows for defining multiple match values.
+- `to_block`: the block to which to filter.
+- `from_block`: the block from which to start filtering.
+- `batch_size`: the blocks' batch size of the filtering.
+- `max_retries`: the maximum number of retries.
+- `reduce_factor`: the percentage by which the batch size is reduced in case of a timeout.
+- `timeout`: a timeout in seconds to interrupt the operation in case the RPC request hangs.
+
+**Returns**:
+
+the filtering result.
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumFaucetApi"></a>
 
