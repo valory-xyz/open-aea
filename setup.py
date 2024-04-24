@@ -34,17 +34,15 @@ def get_all_extras() -> Dict:
         "click>=8.0.2,<9",
         "pyyaml>=6.0.1,<9",
         "packaging>=23.1,<24.0",
+        "pytest>=7.0.0,<7.3.0",
         "coverage>=6.4.4,<8.0.0",
         "jsonschema<4.4.0,>=4.3.0",
         "semver>=2.9.1,<3.0.0",
     ]
-    test_deps = [
-        "pytest>=7.0.0,<8",
-    ]
 
     extras = {
         "cli": cli_deps,
-        "test_tools": test_deps,
+        "test_tools": cli_deps,
     }
 
     # add "all" extras
