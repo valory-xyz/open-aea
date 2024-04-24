@@ -43,7 +43,7 @@ setup(
         "ecdsa>=0.15,<0.17.0",
         "bech32>=1.2.0,<2",
         "pycryptodome>=3.10.1,<4.0.0",
-        "cosmpy>0.9.2,<1",
+        "cosmpy==0.9.2",
     ],
     tests_require=["pytest"],
     entry_points={
