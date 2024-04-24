@@ -41,8 +41,8 @@ setup(
     },
     python_requires=">=3.9,<4.0",
     install_requires=[
-        "open-aea-ledger-ethereum>=1.51.0,<2",
-        "open-aea-flashbots>=1.4.0,<2",
+        "open-aea-ledger-ethereum~=1.51.0",
+        "open-aea-flashbots==1.4.0",
     ],
     tests_require=["pytest"],
     entry_points={
