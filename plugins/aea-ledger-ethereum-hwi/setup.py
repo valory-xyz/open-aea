@@ -43,7 +43,7 @@ setup(
         "ipfshttpclient==0.8.0a2",
         "eth-account>=0.8.0,<0.9.0",
         "open-aea-ledger-ethereum>=1.51.0,<2",
-        "ledgerwallet~=0.1.3",
+        "ledgerwallet==0.1.3",
         "protobuf<4.25.0,>=4.21.6",
         "construct<=2.10.61",
     ],
