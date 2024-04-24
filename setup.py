@@ -58,7 +58,7 @@ base_deps = [
     "jsonschema<4.4.0,>=4.3.0",
     "packaging>=23.1,<24.0",
     "protobuf<4.25.0,>=4.21.6",
-    "pymultihash>=0.8.2",
+    "pymultihash==0.8.2",
     "pyyaml>=6.0.1,<7",
     "requests>=2.28.1,<3",
     "python-dotenv>=0.14.0,<0.22.0",
