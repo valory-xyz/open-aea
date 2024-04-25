@@ -21,7 +21,7 @@ IPFS Commands
 #### process`_`result
 
 ```python
-@ipfs.resultcallback()
+@ipfs.result_callback()
 @click.pass_context
 def process_result(click_context: click.Context, *_: Any, **__: Any) -> None
 ```
