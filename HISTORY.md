@@ -6,7 +6,7 @@ AEA:
 - Loosens up the version range for several dependencies to allow better integration with other frameworks
 
 Plugins:
-- Implements a custom filtering method to handle RPC timeouts.
+- Implements a custom filtering method to handle RPC timeouts and hanging.
 
 Packages:
 - Adds `Celo` to ledger connection configurations
