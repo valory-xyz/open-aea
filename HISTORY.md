@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.52.0 (2024-04-18)
+
+AEA:
+- Relax dependencies
+
 ## 1.51.0 (2024-04-10)
 
 AEA:

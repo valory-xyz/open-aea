@@ -41,7 +41,7 @@ setup(
     install_requires=[
         "open-aea>=1.0.0, <2.0.0",
         "ecdsa>=0.15,<0.17.0",
-        "bech32==1.2.0",
+        "bech32>=1.2.0,<2",
         "pycryptodome>=3.10.1,<4.0.0",
         "cosmpy==0.9.2",
     ],

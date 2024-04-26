@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -105,7 +105,7 @@ def test_click_version():
     When this tests fails you need to ensure that the current versions implementation
     of the click.testing.CliRunner remains compatible with our monkey-patched version
     """
-    assert click.__version__ == "8.0.2", message
+    assert click.__version__ == "8.1.7", message
 
 
 @pytest.mark.parametrize("mix_stderr", [True, False])

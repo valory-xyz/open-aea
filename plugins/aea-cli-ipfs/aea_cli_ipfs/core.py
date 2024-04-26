@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ def ipfs(click_context: click.Context) -> None:
         ipfs_tool.daemon.start()
 
 
-@ipfs.resultcallback()
+@ipfs.result_callback()
 @click.pass_context
 def process_result(click_context: click.Context, *_: Any, **__: Any) -> None:
     """Tear down command group."""
