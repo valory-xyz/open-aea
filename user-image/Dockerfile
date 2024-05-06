@@ -7,7 +7,7 @@ ENV LANG C.UTF-8
 RUN apt update && apt install -y python3.11-dev python3-pip -y && apt autoremove && apt autoclean
 
 RUN pip3 install --upgrade pip
-RUN pip3 install "open-aea[all]==1.51.0" open-aea-cli-ipfs==1.51.0
+RUN pip3 install "open-aea[all]==1.52.0" open-aea-cli-ipfs==1.52.0
 
 COPY user-image/openssl.cnf /etc/ssl
 
