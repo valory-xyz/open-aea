@@ -61,7 +61,7 @@ base_deps = [
     "pymultihash==0.8.2",
     "pyyaml>=6.0.1,<7",
     "requests>=2.28.1,<3",
-    "python-dotenv>=0.14.0,<0.22.0",
+    "python-dotenv>=0.14.0,<1.0.1",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",
     "py-multibase>=1.0.0",
