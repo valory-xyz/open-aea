@@ -11,7 +11,14 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ## `v1.51.0` to `v1.52.0`
 
-- No backwards incompatible changes
+This release contains updated version range for several dependencies so please update you environments with following dependency versions
+
+- `psutil>=5.7.0,<6.0.0`
+- `bech32>=1.2.0,<2`
+- `PyNaCl>=1.5.0,<2`
+- `click>=8.1.0,<9`
+- `pyyaml>=6.0.1,<9`
+- `requests>=2.28.1,<3`
 
 ## `v1.50.0` to `v1.51.0`
 

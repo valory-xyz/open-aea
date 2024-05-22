@@ -1,9 +1,19 @@
 # Release History - open AEA
 
-## 1.52.0 (2024-04-18)
+## 1.52.0 (2024-04-26)
 
 AEA:
-- Relax dependencies
+- Loosens up the version range for several dependencies to allow better integration with other frameworks
+
+Plugins:
+- Implements a custom filtering method to handle RPC timeouts and hanging.
+
+Packages:
+- Adds `Celo` to ledger connection configurations
+
+Chore:
+- Adds whitelist for component mint check
+
 
 ## 1.51.0 (2024-04-10)
 
