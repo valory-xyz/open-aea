@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.52.0` to `v1.53.0`
+
+- No backwards incompatible changes
+
 ## `v1.51.0` to `v1.52.0`
 
 This release contains updated version range for several dependencies so please update you environments with following dependency versions
