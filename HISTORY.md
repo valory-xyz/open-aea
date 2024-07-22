@@ -1,5 +1,13 @@
 # Release History - open AEA
 
+## 1.54.0 (2024-05-27)
+
+Plugins:
+- Adds optimism config to the ledger connection. #744
+
+Chore:
+- Updates the release process document. #743
+ 
 ## 1.53.0 (2024-05-27)
 
 AEA:
