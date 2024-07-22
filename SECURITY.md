@@ -6,10 +6,10 @@ This document outlines security procedures and general policies for the `open-ae
 
 The following table shows which versions of `open-aea` are currently being supported with security updates.
 
-| Version   | Supported          |
-| --------- | ------------------ |
-| `1.53.x`   | :white_check_mark: |
-| `< 1.53.0` | :x:                |
+| Version    | Supported          |
+|------------| ------------------ |
+| `1.54.x`   | :white_check_mark: |
+| `< 1.54.0` | :x:                |
 
 ## Reporting a Vulnerability
 
