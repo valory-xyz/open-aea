@@ -128,7 +128,7 @@ config:
     polygon:
       address: http://127.0.0.1:8545
       chain_id: 137
-      default_gas_price_strategy: eip1559
+      default_gas_price_strategy: eip1559_polygon
       gas_price_strategies: *id001
       is_gas_estimation_enabled: true
       poa_chain: false
