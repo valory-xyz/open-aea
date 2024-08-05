@@ -1,6 +1,11 @@
 # Release History - open AEA
 
-## 1.54.0 (2024-05-27)
+## 1.55.0 (2024-08-05)
+
+Plugins:
+- Adds support for polygon, fraxtal, base and mode. #746 && #747
+
+## 1.54.0 (2024-07-27)
 
 Plugins:
 - Adds optimism config to the ledger connection. #744
