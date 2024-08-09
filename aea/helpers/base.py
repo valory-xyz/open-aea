@@ -711,10 +711,14 @@ def dict_to_path_value(
     """Convert dict to sequence of terminal path build of  keys and value."""
     path = path or []
     for key, value in data.items():
+        # terminal value
         if isinstance(value, Mapping) and value:
-            # terminal value
+            # yielding here allows for higher level dict overriding
+            yield path + [key], value
+            # recursing to the next level of the dict
             for p, v in dict_to_path_value(value, path + [key]):
                 yield p, v
+        # non-terminal value
         else:
             yield path + [key], value
 
