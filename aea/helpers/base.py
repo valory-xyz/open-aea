@@ -1091,3 +1091,13 @@ def prepend_if_not_absolute(path: PathLike, prefix: PathLike) -> PathLike:
     :return: the same path if absolute, else the prepended path.
     """
     return path if Path(path).is_absolute() else Path(prefix) / path
+
+
+def update_nested_dict(dict_: dict, nested_update: dict) -> dict:
+    """Update a nested dictionary."""
+    for key, value in nested_update.items():
+        if isinstance(value, dict):
+            dict_[key] = update_nested_dict(dict_.get(key, {}), value)
+        else:
+            dict_[key] = value
+    return dict_

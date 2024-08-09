@@ -18,11 +18,13 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the configuration validation."""
+
 import inspect
 import json
 import os
 from collections import OrderedDict
 from copy import deepcopy
+from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
@@ -36,7 +38,7 @@ from jsonschema.validators import extend
 from aea.configurations.constants import AGENT
 from aea.configurations.data_types import ComponentId, ComponentType, PublicId
 from aea.exceptions import AEAValidationError
-from aea.helpers.base import dict_to_path_value
+from aea.helpers.base import dict_to_path_value, update_nested_dict
 from aea.helpers.env_vars import is_env_variable
 from aea.helpers.io import open_file
 
@@ -300,6 +302,20 @@ def validate_data_with_pattern(
     }
     overrides = {tuple(path): value for path, value in dict_to_path_value(data)}
     errors = []
+
+    # this is a workaround to fix the type of numeric keys as they can only be represented as strs in the json overrides
+    for path in original_config:
+        path_as_str = tuple(map(str, path))
+        if path_as_str in overrides and path not in overrides:
+            value = overrides[path_as_str]
+            del overrides[path_as_str]
+            up_to_last_key = data
+            for key in path_as_str[:-1]:
+                up_to_last_key = up_to_last_key[key]
+            del up_to_last_key[path_as_str[-1]]
+            overrides[path] = value
+            vals = reduce(lambda d, key: {key: d}, reversed(path), value)
+            update_nested_dict(data, vals)
 
     def check_excludes(path: Tuple[str, ...]) -> bool:
         for exclude in excludes_:
