@@ -57,6 +57,7 @@ connection_private_key_paths:
   fetchai: fetchai_private_key.txt
 default_routing: {}
 dependencies: {}
+customs: []
 ---
 public_id: dummy_author/test_skill:0.1.0
 type: skill

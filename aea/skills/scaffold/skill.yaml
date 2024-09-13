@@ -32,3 +32,4 @@ models:
     class_name: MyModel
 dependencies: {}
 is_abstract: false
+customs: []
