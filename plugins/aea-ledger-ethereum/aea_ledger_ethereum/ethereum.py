@@ -1320,7 +1320,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             self.api.eth.call(replay_tx, tx["blockNumber"] - 1)
         except ContractLogicError as e:
             # execution reverted exception
-            return str(e)
+            return e.message
         except HTTPError as e:
             # http exception
             raise e
