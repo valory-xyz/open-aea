@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,11 +56,13 @@ from aea_ledger_ethereum.ethereum import (
     get_base_fee_multiplier,
     get_gas_price_strategy_eip1559_polygon,
 )
+from eth_typing import BlockNumber
 from requests import HTTPError
 from web3 import Web3
 from web3._utils.request import _session_cache as session_cache
 from web3.datastructures import AttributeDict
 from web3.exceptions import ContractLogicError
+from web3.types import FeeHistory, Wei
 
 from aea.common import JSONLike
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
@@ -876,6 +878,15 @@ def test_revert_reason(
             assert transaction_receipt["revert_reason"] == "test revert reason"
 
 
+@mock.patch(
+    "web3.eth.Eth.fee_history",
+    return_value=FeeHistory(
+        baseFeePerGas=[Wei(0)],
+        gasUsedRatio=[0],
+        oldestBlock=BlockNumber(0),
+        reward=[[Wei(0)]],
+    ),
+)
 @pytest.mark.parametrize(
     "strategy",
     (
@@ -885,6 +896,7 @@ def test_revert_reason(
     ),
 )
 def test_try_get_gas_pricing(
+    _fee_history_mock: Mock,
     strategy: Dict[str, Union[str, Tuple[str, ...]]],
     ethereum_testnet_config: dict,
     ganache: Generator,
@@ -899,7 +911,7 @@ def test_try_get_gas_pricing(
         gas_price[param] > 0 and isinstance(gas_price[param], int)
         for param in strategy["params"]
     )
-    expteced_reprice = {
+    expected_reprice = {
         param: math.ceil(value * TIP_INCREASE) for param, value in gas_price.items()
     }
 
@@ -911,7 +923,7 @@ def test_try_get_gas_pricing(
         gas_reprice[param] > 0 and isinstance(gas_reprice[param], int)
         for param in strategy["params"]
     )
-    assert gas_reprice == expteced_reprice, "The repricing was performed incorrectly!"
+    assert gas_reprice == expected_reprice, "The repricing was performed incorrectly!"
 
 
 @pytest.mark.parametrize(
@@ -1024,12 +1036,15 @@ def test_estimate_priority_fee() -> None:
     # return none on no rewards
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
-    assert estimate_priority_fee(web3_mock, 1, 1, 1, 1, 11, 1, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) is None
 
     # If we have big increase in value, we could be considering "outliers" in our estimate
     # Skip the low elements and take a new median
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [10], [10000]]})
-    assert estimate_priority_fee(web3_mock, 1, 1, 1, 1, 11, 1, 1) == 10000
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) == 10000
+
+    # test the default priority fee
+    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1) == 20
 
 
 def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) -> None:

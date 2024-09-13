@@ -37,8 +37,7 @@ config:
           max_gas_fast: 1500
           fee_history_blocks: 10
           fee_history_percentile: 5
-          priority_fee_estimation_trigger: 100
-          default_priority_fee: 3
+          default_priority_fee: null
           fallback_estimate:
             maxFeePerGas: 20000000000
             maxPriorityFeePerGas: 3000000000

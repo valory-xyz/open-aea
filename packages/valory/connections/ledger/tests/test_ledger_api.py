@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,9 @@ from aea_ledger_ethereum.test_tools.fixture_helpers import (  # noqa: F401 pylin
     DEFAULT_GANACHE_CHAIN_ID,
     ganache,
 )
+from eth_typing import BlockNumber
 from web3.eth import Eth
+from web3.types import FeeHistory, Wei
 
 from aea.common import Address
 from aea.configurations.data_types import PublicId
@@ -96,6 +98,16 @@ gas_strategies = pytest.mark.parametrize(
             "max_priority_fee_per_gas": 1_000_000_000,
         },
     ],
+)
+
+fee_history_mock = patch(
+    "web3.eth.Eth.fee_history",
+    return_value=FeeHistory(
+        baseFeePerGas=[Wei(0)],
+        gasUsedRatio=[0],
+        oldestBlock=BlockNumber(0),
+        reward=[[Wei(0)]],
+    ),
 )
 
 
@@ -220,10 +232,12 @@ class TestLedgerDispatcher:
         )
         assert actual_block == expected_block
 
+    @fee_history_mock
     @pytest.mark.asyncio
     @gas_strategies
     async def test_get_raw_transaction(
         self,
+        _fee_history_mock: Mock,
         gas_strategies: Dict,
         ledger_apis_connection: Connection,
         update_default_ethereum_ledger_api: None,
@@ -281,10 +295,14 @@ class TestLedgerDispatcher:
         assert isinstance(response_message.raw_transaction, RawTransaction)
         assert response_message.raw_transaction.ledger_id == request.terms.ledger_id
 
+    @fee_history_mock
     @pytest.mark.asyncio
     @gas_strategies
     async def test_send_signed_transaction_ethereum(
-        self, gas_strategies: Dict, ledger_apis_connection: LedgerConnection
+        self,
+        _fee_history_mock: Mock,
+        gas_strategies: Dict,
+        ledger_apis_connection: LedgerConnection,
     ) -> None:
         """Test send signed transaction with Ethereum APIs."""
         ledger_api_dialogues = LedgerApiDialogues(SOME_SKILL_ID)
