@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.56.0 (2024-09-17)
+
+Plugins:
+- Fixes the pricing logic. #756
+
 ## 1.55.0 (2024-08-05)
 
 Plugins:
