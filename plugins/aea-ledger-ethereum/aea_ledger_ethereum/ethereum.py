@@ -151,7 +151,7 @@ def round_to_whole_gwei(number: Type[int]) -> Wei:
 def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float:
     """Returns multiplier value."""
     valid_fees = {fee for fee in BASE_FEE_MULTIPLIER if base_fee_gwei <= fee}
-    # add the base fee in case the valid fees set is empty
+    # add negative fee in case the valid fees set is empty, to trigger the default value
     if not valid_fees:
         valid_fees.add(-1)
     return BASE_FEE_MULTIPLIER[min(valid_fees)]
