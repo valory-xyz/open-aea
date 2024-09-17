@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,9 @@ from aea_ledger_ethereum.test_tools.fixture_helpers import (  # noqa: F401 pylin
     DEFAULT_GANACHE_CHAIN_ID,
     ganache,
 )
+from eth_typing import BlockNumber
 from web3.eth import Eth
+from web3.types import FeeHistory, Wei
 
 from aea.common import Address
 from aea.configurations.data_types import PublicId
@@ -85,7 +87,7 @@ ledger_ids = pytest.mark.parametrize(
     ],
 )
 # TODO: uncomment gas station strategy config after the gasstation API start
-gas_strategies = pytest.mark.parametrize(
+gas_strategies_parametrization = pytest.mark.parametrize(
     "gas_strategies",
     [
         {"gas_price_strategy": None},
@@ -96,6 +98,66 @@ gas_strategies = pytest.mark.parametrize(
             "max_priority_fee_per_gas": 1_000_000_000,
         },
     ],
+)
+
+fee_history_mock = patch("web3.eth.Eth.fee_history")
+
+fee_history_parametrization = pytest.mark.parametrize(
+    "fee_history",
+    (
+        FeeHistory(
+            baseFeePerGas=[Wei(0)],
+            gasUsedRatio=[0],
+            oldestBlock=BlockNumber(0),
+            reward=[[Wei(0)]],
+        ),
+        FeeHistory(
+            baseFeePerGas=[
+                Wei(int("0x180b5d502", 16)),
+                Wei(int("0x18f9534de", 16)),
+                Wei(int("0x18367e3a6", 16)),
+                Wei(int("0x17e4519ed", 16)),
+                Wei(int("0x179eb57e1", 16)),
+                Wei(int("0x178ac8e88", 16)),
+                Wei(int("0x177434776", 16)),
+                Wei(int("0x17b4c8c2d", 16)),
+                Wei(int("0x173695e84", 16)),
+                Wei(int("0x1706c1f66", 16)),
+                Wei(int("0x155600bc6", 16)),
+            ],
+            gasUsedRatio=[
+                0.6546364333333333,
+                0.37810266666666664,
+                0.44697146666666665,
+                0.4544759666666667,
+                0.48681983333333334,
+                0.4850136666666667,
+                0.5430227,
+                0.4168211333333333,
+                0.46780666666666665,
+                0.206346,
+            ],
+            oldestBlock=BlockNumber(int("0x13cd298", 16)),
+            reward=[
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0x0", 16))],
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0xf4240", 16))],
+                [Wei(int("0x124f80", 16))],
+                [Wei(int("0x919f8", 16))],
+                [Wei(int("0xf4240", 16))],
+            ],
+        ),
+        FeeHistory(
+            baseFeePerGas=[],
+            gasUsedRatio=[],
+            oldestBlock=BlockNumber(0),
+            reward=[],
+        ),
+    ),
 )
 
 
@@ -220,16 +282,22 @@ class TestLedgerDispatcher:
         )
         assert actual_block == expected_block
 
+    @fee_history_mock
     @pytest.mark.asyncio
-    @gas_strategies
+    @gas_strategies_parametrization
+    @fee_history_parametrization
     async def test_get_raw_transaction(
         self,
+        fee_history_mock_: Mock,
         gas_strategies: Dict,
+        fee_history: FeeHistory,
         ledger_apis_connection: Connection,
         update_default_ethereum_ledger_api: None,
     ) -> None:
         """Test get raw transaction with Ethereum APIs."""
         import aea  # noqa # to load registries
+
+        fee_history_mock_.return_value = fee_history
 
         crypto1 = make_crypto(
             EthereumCrypto.identifier, private_key_path=ETHEREUM_PRIVATE_KEY_PATH
@@ -281,12 +349,19 @@ class TestLedgerDispatcher:
         assert isinstance(response_message.raw_transaction, RawTransaction)
         assert response_message.raw_transaction.ledger_id == request.terms.ledger_id
 
+    @fee_history_mock
     @pytest.mark.asyncio
-    @gas_strategies
+    @gas_strategies_parametrization
+    @fee_history_parametrization
     async def test_send_signed_transaction_ethereum(
-        self, gas_strategies: Dict, ledger_apis_connection: LedgerConnection
+        self,
+        fee_history_mock_: Mock,
+        gas_strategies: Dict,
+        fee_history: FeeHistory,
+        ledger_apis_connection: LedgerConnection,
     ) -> None:
         """Test send signed transaction with Ethereum APIs."""
+        fee_history_mock_.return_value = fee_history
         ledger_api_dialogues = LedgerApiDialogues(SOME_SKILL_ID)
 
         crypto1 = make_crypto(

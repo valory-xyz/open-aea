@@ -9,6 +9,13 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.55.0` to `v1.56.0`
+
+- The `priority_fee_estimation_trigger` has been removed from the `eip1559` configuration of the ledger.
+- The `default_priority_fee` is now optional. 
+  If it is set to `None`, dynamic pricing will be applied. 
+  Otherwise, the specified value will be used.
+
 ## `v1.54.0` to `v1.55.0`
 
 - No backwards incompatible changes

@@ -27,6 +27,7 @@ import logging
 import math
 import threading
 import warnings
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
@@ -89,16 +90,13 @@ FEE_HISTORY_BLOCKS = 10
 # Which percentile of effective priority fees to include
 FEE_HISTORY_PERCENTILE = 5
 
-# Which base fee to trigger priority fee estimation at (GWEI)
-PRIORITY_FEE_ESTIMATION_TRIGGER = 100
-
 # Returned if above trigger is not met (GWEI)
-DEFAULT_PRIORITY_FEE = 3
+DEFAULT_PRIORITY_FEE = None
 
 # In case something goes wrong fall back to this estimate
 FALLBACK_ESTIMATE = {
     "maxFeePerGas": to_wei(20, "gwei"),
-    "maxPriorityFeePerGas": to_wei(DEFAULT_PRIORITY_FEE, "gwei"),
+    "maxPriorityFeePerGas": to_wei(3, "gwei"),
 }
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
@@ -107,7 +105,6 @@ DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
     "fee_history_blocks": FEE_HISTORY_BLOCKS,
     "fee_history_percentile": FEE_HISTORY_PERCENTILE,
-    "priority_fee_estimation_trigger": PRIORITY_FEE_ESTIMATION_TRIGGER,
     "default_priority_fee": DEFAULT_PRIORITY_FEE,
     "fallback_estimate": FALLBACK_ESTIMATE,
     "priority_fee_increase_boundary": PRIORITY_FEE_INCREASE_BOUNDARY,
@@ -129,6 +126,8 @@ DEFAULT_GAS_PRICE_STRATEGIES = {
     EIP1559_POLYGON: DEFAULT_EIP1559_STRATEGY_POLYGON,
 }
 
+BASE_FEE_MULTIPLIER = defaultdict(lambda: 1.2, {40: 2.0, 100: 1.6, 200: 1.4})
+
 # The tip increase is the minimum required of 10%.
 TIP_INCREASE = 1.1
 
@@ -149,32 +148,26 @@ def round_to_whole_gwei(number: Type[int]) -> Wei:
     return cast(Wei, to_wei(rounded, "gwei"))
 
 
-def get_base_fee_multiplier(base_fee_gwei: int) -> float:
+def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float:
     """Returns multiplier value."""
-
-    if base_fee_gwei <= 40:  # pylint: disable=no-else-return
-        return 2.0
-    elif base_fee_gwei <= 100:  # pylint: disable=no-else-return
-        return 1.6
-    elif base_fee_gwei <= 200:  # pylint: disable=no-else-return
-        return 1.4
-    else:  # pylint: disable=no-else-return
-        return 1.2
+    valid_fees = {fee for fee in BASE_FEE_MULTIPLIER if base_fee_gwei <= fee}
+    # add negative fee in case the valid fees set is empty, to trigger the default value
+    if not valid_fees:
+        valid_fees.add(-1)
+    return BASE_FEE_MULTIPLIER[min(valid_fees)]
 
 
 def estimate_priority_fee(
     web3_object: Web3,
-    base_fee_gwei: int,
     block_number: int,
-    priority_fee_estimation_trigger: int,
-    default_priority_fee: int,
+    default_priority_fee: Optional[int],
     fee_history_blocks: int,
     fee_history_percentile: int,
     priority_fee_increase_boundary: int,
 ) -> Optional[int]:
     """Estimate priority fee from base fee."""
 
-    if base_fee_gwei < priority_fee_estimation_trigger:
+    if default_priority_fee is not None:
         return default_priority_fee
 
     fee_history = web3_object.eth.fee_history(
@@ -189,7 +182,7 @@ def estimate_priority_fee(
 
     # Calculate percentage increases from between ordered list of fees
     percentage_increases = [
-        ((j - i) / i) * 100 for i, j in zip(rewards[:-1], rewards[1:])
+        ((j - i) / i) * 100 if i != 0 else 0 for i, j in zip(rewards[:-1], rewards[1:])
     ]
     highest_increase = max(*percentage_increases)
     highest_increase_index = percentage_increases.index(highest_increase)
@@ -210,8 +203,7 @@ def get_gas_price_strategy_eip1559(
     max_gas_fast: int,
     fee_history_blocks: int,
     fee_history_percentile: int,
-    priority_fee_estimation_trigger: int,
-    default_priority_fee: int,
+    default_priority_fee: Optional[int],
     fallback_estimate: Dict[str, Optional[int]],
     priority_fee_increase_boundary: int,
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]:
@@ -239,9 +231,7 @@ def get_gas_price_strategy_eip1559(
 
         estimated_priority_fee = estimate_priority_fee(
             web3,
-            cast(int, base_fee_gwei),
             block_number,
-            priority_fee_estimation_trigger=priority_fee_estimation_trigger,
             default_priority_fee=default_priority_fee,
             fee_history_blocks=fee_history_blocks,
             fee_history_percentile=fee_history_percentile,
@@ -255,9 +245,12 @@ def get_gas_price_strategy_eip1559(
             return fallback_estimate
 
         max_priority_fee_per_gas = max(
-            estimated_priority_fee, to_wei(default_priority_fee, "gwei")
+            estimated_priority_fee,
+            to_wei(default_priority_fee, "gwei")
+            if default_priority_fee is not None
+            else -1,
         )
-        multiplier = get_base_fee_multiplier(cast(int, base_fee_gwei))
+        multiplier = get_base_fee_multiplier(base_fee_gwei)
 
         potential_max_fee = base_fee * multiplier
         max_fee_per_gas = (
@@ -1327,7 +1320,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             self.api.eth.call(replay_tx, tx["blockNumber"] - 1)
         except ContractLogicError as e:
             # execution reverted exception
-            return str(e)
+            return e.message
         except HTTPError as e:
             # http exception
             raise e

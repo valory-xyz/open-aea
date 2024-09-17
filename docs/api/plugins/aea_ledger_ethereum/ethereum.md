@@ -47,7 +47,8 @@ Round WEI to equivalent GWEI
 #### get`_`base`_`fee`_`multiplier
 
 ```python
-def get_base_fee_multiplier(base_fee_gwei: int) -> float
+def get_base_fee_multiplier(
+        base_fee_gwei: Union[int, decimal.Decimal]) -> float
 ```
 
 Returns multiplier value.
@@ -58,9 +59,9 @@ Returns multiplier value.
 
 ```python
 def estimate_priority_fee(
-        web3_object: Web3, base_fee_gwei: int, block_number: int,
-        priority_fee_estimation_trigger: int, default_priority_fee: int,
-        fee_history_blocks: int, fee_history_percentile: int,
+        web3_object: Web3, block_number: int,
+        default_priority_fee: Optional[int], fee_history_blocks: int,
+        fee_history_percentile: int,
         priority_fee_increase_boundary: int) -> Optional[int]
 ```
 
@@ -73,7 +74,7 @@ Estimate priority fee from base fee.
 ```python
 def get_gas_price_strategy_eip1559(
     max_gas_fast: int, fee_history_blocks: int, fee_history_percentile: int,
-    priority_fee_estimation_trigger: int, default_priority_fee: int,
+    default_priority_fee: Optional[int],
     fallback_estimate: Dict[str,
                             Optional[int]], priority_fee_increase_boundary: int
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]
