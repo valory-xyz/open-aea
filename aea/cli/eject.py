@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,7 @@ from aea.configurations.base import (
 from aea.configurations.constants import (
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_VERSION,
     PROTOCOL,
     SKILL,
@@ -134,6 +135,16 @@ def skill(ctx: Context, public_id: PublicId) -> None:
     quiet = ctx.config.get("quiet")
     with_symlinks = ctx.config.get("with_symlinks")
     _eject_item(ctx, SKILL, public_id, quiet=quiet, with_symlinks=with_symlinks)
+
+
+@eject.command()
+@click.argument("public_id", type=PublicIdParameter(), required=True)
+@pass_ctx
+def custom(ctx: Context, public_id: PublicId) -> None:
+    """Eject a vendor custom component."""
+    quiet = ctx.config.get("quiet")
+    with_symlinks = ctx.config.get("with_symlinks")
+    _eject_item(ctx, CUSTOM, public_id, quiet=quiet, with_symlinks=with_symlinks)
 
 
 @clean_after

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,7 @@ from aea.cli.publish import (
 )
 from aea.cli.registry.settings import REMOTE_HTTP, REMOTE_IPFS
 from aea.configurations.base import PublicId
+from aea.configurations.constants import CUSTOMS, SKILLS
 from aea.helpers.base import cd
 from aea.test_tools.test_cases import AEATestCaseEmpty, BaseAEATestCase
 
@@ -251,6 +252,8 @@ class TestPublishLocallyWithDeps(AEATestCaseEmpty):
 
     NEW_ITEM_TYPE = "skill"
     NEW_ITEM_NAME = "my_test_skill"
+    CUSTOM_ITEM_TYPE = "custom"
+    CUSTOM_ITEM_NAME = "test"
 
     @classmethod
     def setup_class(cls):
@@ -258,6 +261,7 @@ class TestPublishLocallyWithDeps(AEATestCaseEmpty):
         super(TestPublishLocallyWithDeps, cls).setup_class()
         cls.add_item(cls.ITEM_TYPE, str(cls.ITEM_PUBLIC_ID), local=True)
         cls.scaffold_item(cls.NEW_ITEM_TYPE, cls.NEW_ITEM_NAME)
+        cls.scaffold_item(cls.CUSTOM_ITEM_TYPE, cls.CUSTOM_ITEM_NAME)
 
     def test_publish_ok_with_missing_push(
         self,
@@ -268,9 +272,11 @@ class TestPublishLocallyWithDeps(AEATestCaseEmpty):
         assert "use --push-missing" in str(e)
 
         self.invoke("publish", "--local", "--push-missing")
+        packages_dir = self.t / self.packages_dir_path  # type: ignore
+        assert (packages_dir / self.author / SKILLS / self.NEW_ITEM_NAME).exists()
+        assert (packages_dir / self.author / CUSTOMS / self.CUSTOM_ITEM_NAME).exists()
 
         # remove agents published and publish again
-        packages_dir = self.t / self.packages_dir_path  # type: ignore
         rmtree(Path(packages_dir) / self.author / "agents")
         self.invoke("publish", "--local")
 

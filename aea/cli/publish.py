@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,6 +54,7 @@ from aea.configurations.constants import (
     AGENTS,
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_README_FILE,
     ITEM_TYPE_PLURAL_TO_TYPE,
@@ -330,7 +331,7 @@ def _check_dependencies_in_registry(
     registry: BaseRegistry, agent_config: AgentConfig, push_missing: bool
 ) -> None:
     """Check all agent dependencies present in registry."""
-    for item_type_plural in (PROTOCOLS, CONTRACTS, CONNECTIONS, SKILLS):
+    for item_type_plural in (PROTOCOLS, CONTRACTS, CONNECTIONS, SKILLS, CUSTOMS):
         dependencies = getattr(agent_config, item_type_plural)
         for public_id in dependencies:
             if push_missing:
