@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 """This test module contains the tests for commands in aea.cli.eject module."""
 
 import os
+import shutil
 from pathlib import Path
 from unittest import mock
 
@@ -54,6 +55,11 @@ class TestEjectCommands(AEATestCaseMany):
         self.add_item("connection", str(GYM_CONNECTION_PUBLIC_ID))
         self.add_item("skill", str(GYM_SKILL_PUBLIC_ID))
         self.add_item("contract", str(ERC1155_PUBLIC_ID))
+        self.scaffold_item("custom", "test")
+        shutil.move(
+            os.path.join(cwd, "customs"),
+            os.path.join(cwd, "vendor", self.author, "customs"),
+        )
 
         # the order must be kept as is, because of recursive ejects
         self.eject_item("skill", str(GYM_SKILL_PUBLIC_ID))
@@ -78,6 +84,12 @@ class TestEjectCommands(AEATestCaseMany):
             (os.path.join(cwd, "vendor", "fetchai", "contracts"))
         )
         assert "erc1155" in os.listdir((os.path.join(cwd, "contracts")))
+
+        self.eject_item("custom", f"{self.author}/test:0.1.0")
+        assert f"{self.author}/test:0.1.0" not in os.listdir(
+            (os.path.join(cwd, "vendor", self.author, "customs"))
+        )
+        assert "test" in os.listdir((os.path.join(cwd, "customs")))
 
 
 class TestRecursiveEject(AEATestCaseEmpty):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +40,7 @@ from aea.configurations.base import PublicId
 from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
+    CUSTOM,
     DEFAULT_README_FILE,
     ITEM_TYPE_PLURAL_TO_TYPE,
     PROTOCOLS,
@@ -61,7 +62,8 @@ def _compress_dir(output_filename: str, source_dir: str) -> None:
 
 def load_component_public_id(source_path: str, item_type: str) -> PublicId:
     """Get component version from source path."""
-    config = load_yaml(os.path.join(source_path, item_type + ".yaml"))
+    config_file = "component" if item_type == CUSTOM else item_type
+    config = load_yaml(os.path.join(source_path, config_file + ".yaml"))
     item_author = config.get("author", "")
     item_name = config.get("name", "")
     item_version = config.get("version", "")
