@@ -30,7 +30,7 @@ import warnings
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 import ipfshttpclient  # noqa: F401 # pylint: disable=unused-import
@@ -72,6 +72,7 @@ TESTNET_NAME = "ganache"
 DEFAULT_ADDRESS = "http://127.0.0.1:8545"
 DEFAULT_CHAIN_ID = 1337
 DEFAULT_CURRENCY_DENOM = "wei"
+GWEI = "gwei"
 ETH_GASSTATION_URL = "https://ethgasstation.info/api/ethgasAPI.json"
 _ABI = "abi"
 _BYTECODE = "bytecode"
@@ -95,8 +96,8 @@ DEFAULT_PRIORITY_FEE = None
 
 # In case something goes wrong fall back to this estimate
 FALLBACK_ESTIMATE = {
-    "maxFeePerGas": to_wei(20, "gwei"),
-    "maxPriorityFeePerGas": to_wei(3, "gwei"),
+    "maxFeePerGas": to_wei(20, GWEI),
+    "maxPriorityFeePerGas": to_wei(3, GWEI),
 }
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
@@ -136,16 +137,19 @@ MATCH_SINGLE = "match_single"
 MATCH_ANY = "match_any"
 
 
-def wei_to_gwei(number: Type[int]) -> Union[int, decimal.Decimal]:
-    """Covert WEI to GWEI"""
-    return from_wei(cast(int, number), unit="gwei")
+def to_eth_unit(
+    number: Union[int, float, str, decimal.Decimal],
+    unit_in: str = DEFAULT_CURRENCY_DENOM,
+    unit_out: str = GWEI,
+) -> Union[int, Wei, decimal.Decimal]:
+    """Covert a number to the given unit."""
+    if not (isinstance(number, int) and unit_in == DEFAULT_CURRENCY_DENOM):
+        number = to_wei(number, unit_in)
 
+    if unit_out == DEFAULT_CURRENCY_DENOM:
+        return number
 
-def round_to_whole_gwei(number: Type[int]) -> Wei:
-    """Round WEI to equivalent GWEI"""
-    gwei = wei_to_gwei(number)
-    rounded = math.ceil(gwei)
-    return cast(Wei, to_wei(rounded, "gwei"))
+    return from_wei(number, unit_out)
 
 
 def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float:
@@ -204,10 +208,17 @@ def get_gas_price_strategy_eip1559(
     fee_history_blocks: int,
     fee_history_percentile: int,
     default_priority_fee: Optional[int],
-    fallback_estimate: Dict[str, Optional[int]],
+    fallback_estimate: Dict[str, Wei],
     priority_fee_increase_boundary: int,
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]:
     """Get the gas price strategy."""
+
+    def fallback(
+        warning: str = "An error occurred while estimating gas price. Falling back.",
+    ) -> Dict[str, Wei]:
+        """Return the fallback estimate and log a warning."""
+        _default_logger.warning(warning)
+        return fallback_estimate
 
     def eip1559_price_strategy(
         web3: Web3,  # pylint: disable=redefined-outer-name
@@ -227,7 +238,11 @@ def get_gas_price_strategy_eip1559(
         latest_block = web3.eth.get_block("latest")
         base_fee = latest_block.get("baseFeePerGas")
         block_number = latest_block.get("number")
-        base_fee_gwei = wei_to_gwei(base_fee)
+
+        if base_fee is None or block_number is None:
+            return fallback()
+
+        base_fee_gwei = to_eth_unit(base_fee)
 
         estimated_priority_fee = estimate_priority_fee(
             web3,
@@ -239,29 +254,32 @@ def get_gas_price_strategy_eip1559(
         )
 
         if estimated_priority_fee is None:
-            _default_logger.warning(
-                "An error occurred while estimating priority fee, falling back"
-            )
-            return fallback_estimate
+            return fallback()
 
         multiplier = get_base_fee_multiplier(base_fee_gwei)
 
         potential_max_fee = base_fee * multiplier
         max_fee_per_gas = (
-            (potential_max_fee + max_priority_fee_per_gas)
-            if max_priority_fee_per_gas > potential_max_fee
+            (potential_max_fee + estimated_priority_fee)
+            if estimated_priority_fee > potential_max_fee
             else potential_max_fee
         )
 
         if (
-            wei_to_gwei(max_fee_per_gas) >= max_gas_fast
-            or wei_to_gwei(max_priority_fee_per_gas) >= max_gas_fast
+            to_eth_unit(max_fee_per_gas) >= max_gas_fast
+            or to_eth_unit(estimated_priority_fee) >= max_gas_fast
         ):
-            return fallback_estimate
+            return fallback(
+                "The estimated gas price is larger than the `max_gas_fast`. Falling back."
+            )
 
+        estimate = {
+            "maxFeePerGas": max_fee_per_gas,
+            "maxPriorityFeePerGas": estimated_priority_fee,
+        }
         return {
-            "maxFeePerGas": round_to_whole_gwei(max_fee_per_gas),
-            "maxPriorityFeePerGas": round_to_whole_gwei(max_priority_fee_per_gas),
+            fee: to_eth_unit(amount, unit_out=DEFAULT_CURRENCY_DENOM)
+            for fee, amount in estimate.items()
         }
 
     return eip1559_price_strategy
@@ -269,7 +287,7 @@ def get_gas_price_strategy_eip1559(
 
 def get_gas_price_strategy_eip1559_polygon(
     gas_endpoint: str,
-    fallback_estimate: Dict[str, Optional[int]],
+    fallback_estimate: Dict[str, Wei],
     speed: Optional[str] = SPEED_FAST,
 ) -> Callable[[Any, Any], Dict[str, Wei]]:
     """Get the gas price strategy."""
@@ -283,8 +301,8 @@ def get_gas_price_strategy_eip1559_polygon(
             if response.status_code == 200:
                 data = response.json()[speed]
                 return {
-                    "maxFeePerGas": Wei(to_wei(data["maxFee"], "gwei")),
-                    "maxPriorityFeePerGas": Wei(to_wei(data["maxPriorityFee"], "gwei")),
+                    "maxFeePerGas": Wei(to_wei(data["maxFee"], GWEI)),
+                    "maxPriorityFeePerGas": Wei(to_wei(data["maxPriorityFee"], GWEI)),
                 }
             return fallback_estimate
         except requests.exceptions.RequestException:
@@ -345,14 +363,14 @@ def get_gas_price_strategy(
             _default_logger.error(
                 f"Gas station API response: {response.status_code}, {response.text}, using fallback gas price."
             )
-            return {"gasPrice": web3.to_wei(GAS_STATION_FALLBACK_ESTIMATE, "gwei")}
+            return {"gasPrice": web3.to_wei(GAS_STATION_FALLBACK_ESTIMATE, GWEI)}
         response_dict = response.json()
         _default_logger.debug("Gas station API response: {}".format(response_dict))
         result = response_dict.get(gas_price_strategy, None)
         if type(result) not in [int, float]:  # pragma: nocover
             raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")
         gwei_result = result / 10  # adjustment (see api documentation)
-        wei_result = web3.to_wei(gwei_result, "gwei")
+        wei_result = web3.to_wei(gwei_result, GWEI)
         return {"gasPrice": wei_result}
 
     return gas_station_gas_price_strategy
