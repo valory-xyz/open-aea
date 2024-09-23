@@ -244,12 +244,6 @@ def get_gas_price_strategy_eip1559(
             )
             return fallback_estimate
 
-        max_priority_fee_per_gas = max(
-            estimated_priority_fee,
-            to_wei(default_priority_fee, "gwei")
-            if default_priority_fee is not None
-            else -1,
-        )
         multiplier = get_base_fee_multiplier(base_fee_gwei)
 
         potential_max_fee = base_fee * multiplier
