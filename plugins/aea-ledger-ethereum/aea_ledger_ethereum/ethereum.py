@@ -180,7 +180,9 @@ def estimate_priority_fee(
 
     # This is going to break if more percentiles are introduced in the future,
     # i.e., `fee_history_percentile` param becomes a `List[int]`.
-    rewards = sorted([reward[0] for reward in fee_history["reward"] if reward[0] > 0])
+    rewards = sorted(
+        [reward[0] for reward in fee_history.get("reward", []) if reward[0] > 0]
+    )
     if len(rewards) == 0:
         return None
 
