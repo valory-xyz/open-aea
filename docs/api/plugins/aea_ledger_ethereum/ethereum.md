@@ -22,25 +22,17 @@ percentage
 
 gwei
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.wei_to_gwei"></a>
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.to_eth_unit"></a>
 
-#### wei`_`to`_`gwei
-
-```python
-def wei_to_gwei(number: Type[int]) -> Union[int, decimal.Decimal]
-```
-
-Covert WEI to GWEI
-
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.round_to_whole_gwei"></a>
-
-#### round`_`to`_`whole`_`gwei
+#### to`_`eth`_`unit
 
 ```python
-def round_to_whole_gwei(number: Type[int]) -> Wei
+def to_eth_unit(number: Union[int, float, str, decimal.Decimal],
+                unit_in: str = DEFAULT_CURRENCY_DENOM,
+                unit_out: str = GWEI) -> Union[int, Wei, decimal.Decimal]
 ```
 
-Round WEI to equivalent GWEI
+Covert a number to the given unit.
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.get_base_fee_multiplier"></a>
 
@@ -74,9 +66,8 @@ Estimate priority fee from base fee.
 ```python
 def get_gas_price_strategy_eip1559(
     max_gas_fast: int, fee_history_blocks: int, fee_history_percentile: int,
-    default_priority_fee: Optional[int],
-    fallback_estimate: Dict[str,
-                            Optional[int]], priority_fee_increase_boundary: int
+    default_priority_fee: Optional[int], fallback_estimate: Dict[str, Wei],
+    priority_fee_increase_boundary: int
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]
 ```
 
@@ -89,7 +80,7 @@ Get the gas price strategy.
 ```python
 def get_gas_price_strategy_eip1559_polygon(
         gas_endpoint: str,
-        fallback_estimate: Dict[str, Optional[int]],
+        fallback_estimate: Dict[str, Wei],
         speed: Optional[str] = SPEED_FAST
 ) -> Callable[[Any, Any], Dict[str, Wei]]
 ```
