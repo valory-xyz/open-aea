@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.56.0` to `v1.57.0`
+
+- No backwards incompatible changes
+
 ## `v1.55.0` to `v1.56.0`
 
 - The `priority_fee_estimation_trigger` has been removed from the `eip1559` configuration of the ledger.
@@ -61,7 +65,7 @@ This release contains updated version range for several dependencies so please u
 
 ## `v1.46.0` to `v1.47.0`
 
-The `send_signed_transaction` method implementation is been updated to follow the ledger plugin pattern, which means it will return transaction digest not the transaction receipt. To retrieve the transaction receipt use `get_transaction_receipt` method.
+The `send_signed_transaction` method implementation has been updated to follow the ledger plugin pattern, which means it will return the transaction digest, not the transaction receipt. To retrieve the transaction receipt use the `get_transaction_receipt` method.
 
 ## `v1.45.0` to `v1.46.0`
 
