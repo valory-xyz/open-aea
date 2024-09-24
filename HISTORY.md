@@ -1,5 +1,13 @@
 # Release History - open AEA
 
+## 1.57.0 (2024-09-24)
+
+AEA:
+- Adds support for custom components in `publish` and `eject` commands. #758
+
+Plugins:
+- Improves the EIP1559 strategy #759
+
 ## 1.56.0 (2024-09-17)
 
 Plugins:
