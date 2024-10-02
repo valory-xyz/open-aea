@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.58.0 (2024-10-03)
+
+AEA:
+- Adds support for dictionary overrides #750, #761
+
 ## 1.57.0 (2024-09-24)
 
 AEA:
