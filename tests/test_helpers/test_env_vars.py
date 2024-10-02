@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@ def test_convert_value_str_to_type():
 def test_env_var_string_generator(export_path: List[str], var_string: str) -> None:
     """Test `export_path_to_env_var_string` method"""
 
-    assert export_path_to_env_var_string(export_path=export_path) == var_string
+    assert export_path_to_env_var_string(export_path=export_path)[1] == var_string
 
 
 @pytest.mark.parametrize(
