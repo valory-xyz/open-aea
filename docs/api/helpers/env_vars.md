@@ -14,15 +14,26 @@ def is_env_variable(value: Any) -> bool
 
 Check is variable string with env variable pattern.
 
+<a id="aea.helpers.env_vars.restrict_model_args"></a>
+
+#### restrict`_`model`_`args
+
+```python
+def restrict_model_args(export_path: List[str]) -> Tuple[List[str], List[str]]
+```
+
+Do not allow more levels than one for a model's argument.
+
 <a id="aea.helpers.env_vars.export_path_to_env_var_string"></a>
 
 #### export`_`path`_`to`_`env`_`var`_`string
 
 ```python
-def export_path_to_env_var_string(export_path: List[str]) -> str
+def export_path_to_env_var_string(
+        export_path: List[str]) -> Tuple[List[str], str]
 ```
 
-Conver export path to environment variable string.
+Convert export path to environment variable string.
 
 <a id="aea.helpers.env_vars.parse_list"></a>
 
@@ -114,6 +125,46 @@ parameters:
 **Returns**:
 
 Boolean specifying whether it's a strict list or not
+
+<a id="aea.helpers.env_vars.list_to_nested_dict"></a>
+
+#### list`_`to`_`nested`_`dict
+
+```python
+def list_to_nested_dict(lst: list, val: Any) -> dict
+```
+
+Convert a list to a nested dict.
+
+<a id="aea.helpers.env_vars.ensure_dict"></a>
+
+#### ensure`_`dict
+
+```python
+def ensure_dict(dict_: Dict[str, Union[dict, str]]) -> dict
+```
+
+Return the given dictionary converting any values which are json strings as dicts.
+
+<a id="aea.helpers.env_vars.ensure_json_content"></a>
+
+#### ensure`_`json`_`content
+
+```python
+def ensure_json_content(dict_: dict) -> dict
+```
+
+Return the given dictionary converting any nested dictionary values as json strings.
+
+<a id="aea.helpers.env_vars.merge_dicts"></a>
+
+#### merge`_`dicts
+
+```python
+def merge_dicts(a: dict, b: dict) -> dict
+```
+
+Merge two dictionaries.
 
 <a id="aea.helpers.env_vars.generate_env_vars_recursively"></a>
 

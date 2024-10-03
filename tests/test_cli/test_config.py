@@ -462,7 +462,7 @@ class TestConfigSet:
         assert result.exit_code == 1
         assert (
             result.exception.message
-            == "Attribute `behaviours.dummy.config.behaviour_arg_1` is not allowed to be updated!"
+            == "Attribute `behaviours.dummy.config` is not allowed to be updated!"
         )
 
     def test_no_recognized_root(self):
@@ -542,10 +542,11 @@ class TestConfigSet:
                 catch_exceptions=False,
             )
 
-    def test_set_fails_when_setting_non_primitive_type(self):
+    def test_incorrect_data_type(self):
         """Test that setting the 'dummy' skill behaviours fails because not a primitive type."""
         with pytest.raises(
-            ClickException, match="Attribute `behaviours` is not allowed to be updated!"
+            ClickException,
+            match="For attribute `behaviours` `dict` data type is expected, but `str` was provided!",
         ):
             self.runner.invoke(
                 cli,
@@ -558,7 +559,7 @@ class TestConfigSet:
         """Test that setting a nested object in 'dummy' skill fails because path is not valid."""
         with pytest.raises(
             ClickException,
-            match=r"Attribute `non_existing_attribute.dummy` is not allowed to be updated!",
+            match=r"Attribute `non_existing_attribute` is not allowed to be updated!",
         ):
             self.runner.invoke(
                 cli,

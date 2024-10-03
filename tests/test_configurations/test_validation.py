@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,14 +46,15 @@ def test_compare_data_pattern():
     assert not validate_data_with_pattern(
         {"a": "${var}"}, {"a": "string"}, skip_env_vars=True
     )
+    assert not validate_data_with_pattern({"a": {}}, {"a": {"b": 12}})
 
     errors = validate_data_with_pattern({"a": 12}, {"b": 12})
     assert errors
     assert errors[0] == "Attribute `a` is not allowed to be updated!"
 
-    errors = validate_data_with_pattern({"a": {}}, {"a": {"b": 12}})
+    errors = validate_data_with_pattern({"a": {"b": 12}}, {"a": {}})
     assert errors
-    assert errors[0] == "Attribute `a` is not allowed to be updated!"
+    assert errors[0] == "Attribute `a.b` is not allowed to be updated!"
 
 
 def test_filter_data():
