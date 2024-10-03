@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -298,7 +298,7 @@ class TestSkillConfig:
 
         with pytest.raises(
             ValueError,
-            match="Attribute `behaviours.new_behaviour.args` is not allowed to be updated!",
+            match="Attribute `behaviours.new_behaviour` is not allowed to be updated!",
         ):
             skill_config.update(new_configurations)
 

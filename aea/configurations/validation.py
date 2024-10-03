@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,13 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the configuration validation."""
+
 import inspect
 import json
 import os
 from collections import OrderedDict
 from copy import deepcopy
+from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
@@ -36,7 +38,7 @@ from jsonschema.validators import extend
 from aea.configurations.constants import AGENT
 from aea.configurations.data_types import ComponentId, ComponentType, PublicId
 from aea.exceptions import AEAValidationError
-from aea.helpers.base import dict_to_path_value
+from aea.helpers.base import dict_to_path_value, update_nested_dict
 from aea.helpers.env_vars import is_env_variable
 from aea.helpers.io import open_file
 
@@ -295,11 +297,25 @@ def validate_data_with_pattern(
         excludes_: List[Tuple[str]] = []
     else:
         excludes_ = excludes
-    pattern_path_value = {
+    original_config = {
         tuple(path): value for path, value in dict_to_path_value(pattern)
     }
-    data_path_value = {tuple(path): value for path, value in dict_to_path_value(data)}
+    overrides = {tuple(path): value for path, value in dict_to_path_value(data)}
     errors = []
+
+    # this is a workaround to fix the type of numeric keys as they can only be represented as strs in the json overrides
+    for path in original_config:
+        path_as_str = tuple(map(str, path))
+        if path_as_str in overrides and path not in overrides:
+            value = overrides[path_as_str]
+            del overrides[path_as_str]
+            up_to_last_key = data
+            for key in path_as_str[:-1]:
+                up_to_last_key = up_to_last_key[key]
+            del up_to_last_key[path_as_str[-1]]
+            overrides[path] = value
+            vals = reduce(lambda d, key: {key: d}, reversed(path), value)
+            update_nested_dict(data, vals)
 
     def check_excludes(path: Tuple[str, ...]) -> bool:
         for exclude in excludes_:
@@ -315,17 +331,17 @@ def validate_data_with_pattern(
         flag = False
         while len(path) > 0:
             path = path[:-1]
-            if path in pattern_path_value:
-                pattern_value = pattern_path_value[path]
+            if path in original_config:
+                pattern_value = original_config[path]
                 flag = isinstance(pattern_value, OrderedDict)
                 break
         return flag
 
-    for path, new_value in data_path_value.items():
+    for path, new_value in overrides.items():
         if check_excludes(path):
             continue
 
-        if path not in pattern_path_value:
+        if path not in original_config:
             if not is_a_dict_override(path=(*path,)):
                 errors.append(
                     f"Attribute `{'.'.join(path)}` is not allowed to be updated!"
@@ -333,7 +349,7 @@ def validate_data_with_pattern(
 
             continue
 
-        pattern_value = pattern_path_value[path]
+        pattern_value = original_config[path]
 
         if pattern_value is None:
             # not possible to determine data type for optional value not set

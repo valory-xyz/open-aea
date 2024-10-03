@@ -838,3 +838,13 @@ Prepend a path with a prefix, but only if not absolute
 
 the same path if absolute, else the prepended path.
 
+<a id="aea.helpers.base.update_nested_dict"></a>
+
+#### update`_`nested`_`dict
+
+```python
+def update_nested_dict(dict_: dict, nested_update: dict) -> dict
+```
+
+Update a nested dictionary.
+
