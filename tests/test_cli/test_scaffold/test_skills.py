@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ import json
 import os
 import re
 import shutil
+import subprocess  # nosec
 import tempfile
 import unittest.mock
 from pathlib import Path
@@ -37,6 +38,7 @@ from aea import AEA_DIR
 from aea.cli import cli
 from aea.cli.packages import get_package_manager
 from aea.configurations.base import DEFAULT_SKILL_CONFIG_FILE, DEFAULT_VERSION
+from aea.configurations.constants import DEFAULT_AEA_CONFIG_FILE, PACKAGES, SKILL
 from aea.configurations.data_types import PackageId
 from aea.configurations.loader import make_jsonschema_base_uri
 from aea.package_manager.v1 import PackageManagerV1
@@ -548,6 +550,62 @@ class TestScaffoldSkillFailsWhenExceptionOccurs:
     def teardown_class(cls):
         """Tear the test down."""
         cls.patch.stop()
+        os.chdir(cls.cwd)
+        try:
+            shutil.rmtree(cls.t)
+        except (OSError, IOError):
+            pass
+
+
+class TestScaffoldSkillHelpWithInvalidDirectory:
+    """Test --help works when validation fails."""
+
+    @classmethod
+    def setup_class(cls):
+        """Set the test up."""
+        cls.runner = CliRunner()
+        cls.agent_name = "myagent"
+        cls.resource_name = "myresource"
+        cls.cwd = os.getcwd()
+        cls.t = tempfile.mkdtemp()
+        dir_path = Path(PACKAGES)
+        tmp_dir = cls.t / dir_path
+        src_dir = cls.cwd / Path(ROOT_DIR, dir_path)
+        shutil.copytree(str(src_dir), str(tmp_dir))
+
+        os.chdir(cls.t)
+        result = cls.runner.invoke(
+            cli,
+            [*CLI_LOG_OPTION, "init", "--local", "--author", AUTHOR],
+        )
+        assert result.exit_code == 0
+        result = cls.runner.invoke(
+            cli,
+            [*CLI_LOG_OPTION, "create", "--local", cls.agent_name],
+            standalone_mode=False,
+        )
+        assert result.exit_code == 0
+
+        os.remove(Path(cls.t) / cls.agent_name / DEFAULT_AEA_CONFIG_FILE)
+
+    def test_exit_code_equal_to_0(self):
+        """Test that --help works."""
+        result = subprocess.run(  # nosec
+            [
+                "aea",
+                "scaffold",
+                SKILL,
+                "--help",
+            ],
+            cwd=self.t,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert result.returncode == 0, result.stderr
+
+    @classmethod
+    def teardown_class(cls):
+        """Tear the test down."""
         os.chdir(cls.cwd)
         try:
             shutil.rmtree(cls.t)
