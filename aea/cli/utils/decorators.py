@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@
 
 import os
 import shutil
+import sys
 from functools import update_wrapper
 from pathlib import Path
 from typing import Any, Callable, Dict, Tuple, Union, cast
@@ -178,12 +179,13 @@ def check_aea_project(
 
     def wrapper(*args: Any, **kwargs: Any) -> Callable:
         to_local_registry = cast(bool, kwargs.get("to_local_registry"))
-        _check_aea_project(
-            args,
-            check_aea_version=check_aea_version,
-            check_finger_prints=check_finger_prints,
-            to_local_registry=to_local_registry,
-        )
+        if not ("--help" in sys.argv or "-h" in sys.argv):
+            _check_aea_project(
+                args,
+                check_aea_version=check_aea_version,
+                check_finger_prints=check_finger_prints,
+                to_local_registry=to_local_registry,
+            )
         return f(*args, **kwargs)
 
     return update_wrapper(wrapper, f)
