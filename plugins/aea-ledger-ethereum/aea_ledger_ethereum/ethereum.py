@@ -1003,6 +1003,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         if nonce is None:
             return transaction
         transaction = {
+            "from": sender_address,
             "nonce": nonce,
             "chainId": chain_id,
             "to": destination_address,
