@@ -5,6 +5,9 @@
 Plugins:
 - Fixes the gas estimation #766
 
+AEA
+- Avoids validation failures with --help #764
+
 ## 1.58.0 (2024-10-03)
 
 AEA:
