@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.59.0 (2024-10-29)
+
+Plugins:
+- Fixes the gas estimation #766
+
 ## 1.58.0 (2024-10-03)
 
 AEA:
