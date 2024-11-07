@@ -190,7 +190,7 @@ def estimate_priority_fee(
     percentage_increases = [
         ((j - i) / i) * 100 if i != 0 else 0 for i, j in zip(rewards[:-1], rewards[1:])
     ]
-    highest_increase = max(*percentage_increases)
+    highest_increase = max(percentage_increases)
     highest_increase_index = percentage_increases.index(highest_increase)
 
     values = rewards.copy()
