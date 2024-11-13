@@ -111,9 +111,8 @@ class TestLibp2pClientConnectionFailureNodeNotConnected(BaseP2PLibp2pTest):
         ) as connect_mock, patch.object(
             self.connection, "_ensure_valid_envelope_for_external_comms"
         ):
-            with pytest.raises(Exception, match="oops"):
-                await self.connection._send_envelope_with_node_client(Mock())
-            connect_mock.assert_called()
+            await self.connection._send_envelope_with_node_client(Mock())
+            assert connect_mock.call_count == 2
 
 
 @pytest.mark.asyncio
