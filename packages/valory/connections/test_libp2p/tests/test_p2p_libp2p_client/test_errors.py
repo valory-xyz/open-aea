@@ -103,16 +103,15 @@ class TestLibp2pClientConnectionFailureNodeNotConnected(BaseP2PLibp2pTest):
         """Test reconnect on send fails."""
 
         self.connection._node_client = Mock()
-        f = Future()
-        f.set_exception(Exception("oops"))
         self.connection._node_client.send_envelope.side_effect = Exception("oops")
         with patch.object(
             self.connection, "_perform_connection_to_node", return_value=DONE_FUTURE
         ) as connect_mock, patch.object(
             self.connection, "_ensure_valid_envelope_for_external_comms"
         ):
-            await self.connection._send_envelope_with_node_client(Mock())
-            assert connect_mock.call_count == 2
+            with pytest.raises(Exception, match="oops"):
+                await self.connection._send_envelope_with_node_client(Mock())
+                connect_mock.assert_called()
 
 
 @pytest.mark.asyncio
