@@ -30,7 +30,7 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/__init__.py: bafybeiad64wftnugaahubhqc6bcqzg7om4435dzojdv7oeq4zdmn7kxzui
   tests/test_p2p_libp2p_mailbox/test_aea_cli.py: bafybeievjaiacpvcpabemtrmmeejbf4cbkrqzhu2ekxzyfyeg42ityxn5q
   tests/test_p2p_libp2p_mailbox/test_communication.py: bafybeiaiwlqxuzp34nu33s5pz6sudvwmdi3h2ckfa4mmwyvd6wqn2elo4m
-  tests/test_p2p_libp2p_mailbox/test_errors.py: bafybeie2t3zjjjjbyfd3lno2f6p4fa6jdttq2gluwfe5mmny5g6r5zp2oi
+  tests/test_p2p_libp2p_mailbox/test_errors.py: bafybeia7lhpakt6tv3jaskm7edawleyw4oxm3qcife7n3zlvr56zeo5x4m
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
