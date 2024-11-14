@@ -180,17 +180,14 @@ def estimate_priority_fee(
         fee_history = web3_object.eth.fee_history(
             fee_history_blocks, block_number, [fee_history_percentile]  # type: ignore
         )
-        
         # This is going to break if more percentiles are introduced in the future,
         # i.e., `fee_history_percentile` param becomes a `List[int]`.
         rewards = sorted(
             [reward[0] for reward in fee_history.get("reward", []) if reward[0] > 0]
         )
-
         # we need atleast 2 rewards to proceed further
         if len(rewards) >= 2:
             break
-        
         # Increment percentile for next attempt
         fee_history_percentile = min(100, fee_history_percentile + PERCENTILE_INCREASE)
 
