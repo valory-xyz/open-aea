@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.60.0 (2024-11-15)
+
+Plugins:
+- Fixes an edge case in the gas estimation #770
+
 ## 1.59.0 (2024-10-29)
 
 Plugins:
