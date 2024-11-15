@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains negative tests for Libp2p tcp client connection."""
-
-# pylint: skip-file
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -32,11 +31,17 @@ from packages.valory.connections.test_libp2p.tests.base import (
     _make_libp2p_mailbox_connection,
 )
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_errors import (
+    DONE_FUTURE,
+)
+from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_errors import (
     TestLibp2pClientConnectionFailureConnectionSetup as BaseFailureConnectionSetup,
 )
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_errors import (
     TestLibp2pClientConnectionFailureNodeNotConnected as BaseFailureNodeNotConnected,
 )
+
+
+# pylint: skip-file
 
 
 @pytest.mark.asyncio
@@ -47,6 +52,21 @@ class TestLibp2pMailboxConnectionFailureNodeNotConnected(BaseFailureNodeNotConne
     connection = _make_libp2p_mailbox_connection(peer_public_key=public_key)  # type: ignore
     # overwrite, no mailbox equivalent of P2PLibp2pClientConnection (TCPSocketChannelClient)
     test_connect_attempts = None
+
+    @pytest.mark.asyncio
+    async def test_reconnect_on_send_fail(self):
+        """Test reconnect on send fails."""
+
+        self.connection._node_client = Mock()
+        self.connection._node_client.send_envelope.side_effect = Exception("oops")
+        with patch.object(
+            self.connection, "_perform_connection_to_node", return_value=DONE_FUTURE
+        ) as connect_mock, patch.object(
+            self.connection, "_ensure_valid_envelope_for_external_comms"
+        ):
+            with pytest.raises(Exception, match="oops"):
+                await self.connection._send_envelope_with_node_client(Mock())
+                connect_mock.assert_called()
 
 
 class TestLibp2pMailboxConnectionFailureConnectionSetup(BaseFailureConnectionSetup):
