@@ -283,7 +283,7 @@ This copies the <code>fetchai/echo:0.19.0</code> skill code containing the "beha
 
 Just like humans, AEAs can have _skills_ to achieve their tasks. As an agent developer, you can create skills to add to your own AEAs. You can also choose to publish your skills so others add them to their AEAs. More details on skills can be found on <a href="../skill/"> this page </a>.
 
-The above agent has an <a href="https://aea-registry.fetch.ai/details/skill/fetchai/echo/latest" target="_blank">echo skill</a>, fetched from <a href="https://aea-registry.fetch.ai" target="_blank">the registry</a>, which simply echoes any messages it receives back to its sender.
+The above agent has an echo skill, fetched from the registry, which simply echoes any messages it receives back to its sender.
 
 ### Communication via envelopes and messages
 
