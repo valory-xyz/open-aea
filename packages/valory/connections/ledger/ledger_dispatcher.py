@@ -267,10 +267,9 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
         )
 
         transaction_receipt = None
-        is_settled = False
         attempts = 0
         while (
-            not is_settled
+            transaction_receipt is None
             and attempts < retry_attempts
             and self.connection_state.get() == ConnectionStates.connected
         ):
@@ -286,12 +285,10 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                 self.logger.warning(e)
                 transaction_receipt = None
 
-            if transaction_receipt is not None:
-                is_settled = api.is_transaction_settled(transaction_receipt)
             attempts += 1
             await asyncio.sleep(retry_timeout * attempts)
         self.logger.debug(
-            f"Transaction receipt: {transaction_receipt}, settled: {is_settled}"
+            f"Transaction receipt: {transaction_receipt}"
         )
 
         attempts = 0
@@ -317,14 +314,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             await asyncio.sleep(retry_timeout * attempts)
         self.logger.debug(f"Transaction: {transaction}")
 
-        if not is_settled:
-            response = self.get_error_message(
-                ValueError("Transaction not settled within timeout"),
-                api,
-                message,
-                dialogue,
-            )
-        elif transaction_receipt is None:  # pragma: nocover
+        if transaction_receipt is None:  # pragma: nocover
             response = self.get_error_message(
                 ValueError("No transaction_receipt returned"), api, message, dialogue
             )
