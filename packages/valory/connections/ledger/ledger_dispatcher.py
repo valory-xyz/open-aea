@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -267,10 +267,9 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
         )
 
         transaction_receipt = None
-        is_settled = False
         attempts = 0
         while (
-            not is_settled
+            transaction_receipt is None
             and attempts < retry_attempts
             and self.connection_state.get() == ConnectionStates.connected
         ):
@@ -286,13 +285,9 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                 self.logger.warning(e)
                 transaction_receipt = None
 
-            if transaction_receipt is not None:
-                is_settled = api.is_transaction_settled(transaction_receipt)
             attempts += 1
             await asyncio.sleep(retry_timeout * attempts)
-        self.logger.debug(
-            f"Transaction receipt: {transaction_receipt}, settled: {is_settled}"
-        )
+        self.logger.debug(f"Transaction receipt: {transaction_receipt}")
 
         attempts = 0
         transaction = None
@@ -317,14 +312,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
             await asyncio.sleep(retry_timeout * attempts)
         self.logger.debug(f"Transaction: {transaction}")
 
-        if not is_settled:
-            response = self.get_error_message(
-                ValueError("Transaction not settled within timeout"),
-                api,
-                message,
-                dialogue,
-            )
-        elif transaction_receipt is None:  # pragma: nocover
+        if transaction_receipt is None:  # pragma: nocover
             response = self.get_error_message(
                 ValueError("No transaction_receipt returned"), api, message, dialogue
             )
