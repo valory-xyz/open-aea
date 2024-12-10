@@ -34,12 +34,12 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/p2p_libp2p:0.1.0:bafybeig7hziqdv5zlpgccn5m6b4kifjycbx57c7vpmxgcncyxlyz7xwuau
-- valory/p2p_libp2p_client:0.1.0:bafybeig53m7fvlepz7wrs2nebdgiddacydpqwc2ksj57bymsqaumiohi3y
-- valory/p2p_libp2p_mailbox:0.1.0:bafybeigtub7x4idh7crlfmkamdrkg7hzqpepngxhgizczvxjmh7dctx4ry
+- valory/p2p_libp2p:0.1.0:bafybeic2u7azbwjny2nhaltqnbohlvysx3x6ectzbege7sxwrbzcz4lcma
+- valory/p2p_libp2p_client:0.1.0:bafybeihs5zlwa5wlozct3rjlxsirm3ve3e4buse5nfehiky6ymnnfrobne
+- valory/p2p_libp2p_mailbox:0.1.0:bafybeiecclc65ogngs3piaxpwhiyl77mlpqun5ejlyv4kamwzrrh746guq
 protocols:
 - fetchai/default:1.0.0:bafybeihdvtmnz7fzy7kwi3wlo6rfl27f6q3g5entplgvq7y23i3v5uoz24
-- valory/acn:1.1.0:bafybeie3x5gdca6b65do4iea6drnmtmvjudqnuehl4zfyg7efcup4p7ye4
+- valory/acn:1.1.0:bafybeidluaoeakae3exseupaea4i3yvvk5vivyt227xshjlffywwxzcxqe
 class_name: MyScaffoldAsyncConnection
 config:
   foo: bar
