@@ -287,9 +287,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
 
             attempts += 1
             await asyncio.sleep(retry_timeout * attempts)
-        self.logger.debug(
-            f"Transaction receipt: {transaction_receipt}"
-        )
+        self.logger.debug(f"Transaction receipt: {transaction_receipt}")
 
         attempts = 0
         transaction = None
