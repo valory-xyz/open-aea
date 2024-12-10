@@ -14,7 +14,7 @@
 | contract/fetchai/erc1155/0.22.0                               | `bafybeiff7a6xncyad53o2r7lekpnhexcspze6ocy55xtpzqeuacnlpunm4` |
 | connection/fetchai/gym/0.19.0                                 | `bafybeicqqvl4tt3qbulnkoffciagmfd6p3hxxi3i2mrrqtnbycv757pn6y` |
 | connection/fetchai/stub/0.21.0                                | `bafybeibybboiwgklfiqpkkcw6rwj65s5jalzfzf6mh6fstxdlt6habzwvy` |
-| connection/valory/ledger/0.19.0                               | `bafybeigntoericenpzvwejqfuc3kqzo2pscs76qoygg5dbj6f4zxusru5e` |
+| connection/valory/ledger/0.19.0                               | `bafybeicmb2twoim4duq3xlmxy2tigrz7nctmqqkyv6m5vjnjqiha5txfxu` |
 | connection/valory/http_server/0.22.0                          | `bafybeihpgu56ovmq4npazdbh6y6ru5i7zuv6wvdglpxavsckyih56smu7m` |
 | connection/valory/p2p_libp2p/0.1.0                            | `bafybeic2u7azbwjny2nhaltqnbohlvysx3x6ectzbege7sxwrbzcz4lcma` |
 | connection/valory/p2p_libp2p_client/0.1.0                     | `bafybeihs5zlwa5wlozct3rjlxsirm3ve3e4buse5nfehiky6ymnnfrobne` |
@@ -26,12 +26,12 @@
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeihsbtlpe7h6fsvoxban5rilkmwviwkokul5cqym6atoolirontiyu` |
 | skill/fetchai/gym/0.20.0                                      | `bafybeie7y2fsxfuhsqxqcaluo5exskmrm5q3a6e2hfcskcuvzvxjjhijh4` |
 | skill/fetchai/http_echo/0.20.0                                | `bafybeicfiri2juaqh3azeit3z3rf44kgxdo6oj4lgxjgvnowq6m7j47qrm` |
-| skill/fetchai/erc1155_client/0.28.0                           | `bafybeih7q6b2lcqcbh7rln3mgcnbtzlw7cpzjl23znnz6jj74cc4noahvq` |
-| skill/fetchai/erc1155_deploy/0.30.0                           | `bafybeigoarj6k2czdhhfqzry5w5jn2ux7chszem37zxiqy3232jr2mxs64` |
+| skill/fetchai/erc1155_client/0.28.0                           | `bafybeif6b2dcigsxzoggofuyqo7xzv45mykn2modoxag7ss4qkuppzpzti` |
+| skill/fetchai/erc1155_deploy/0.30.0                           | `bafybeielryponhgq23u6ktkfoxliqst26bpqrcfylnhsu6ri6z6xftinte` |
 | skill/fetchai/error/0.17.0                                    | `bafybeicboomvykqhel3otyv4qg5t3hzpo6kmn5bk4ljluithhuieu7flsm` |
 | skill/fetchai/fipa_dummy_buyer/0.2.0                          | `bafybeidgso7lo5ay44mbxsp3lxilrgeek3ye44e6wus2ayq6kyxfvc3vjm` |
-| skill/fetchai/generic_buyer/0.26.0                            | `bafybeihzzcbki3p5l4nt5spbddx6nzbejv7b6nruhycwaxfrstjwmrfucq` |
-| skill/fetchai/generic_seller/0.27.0                           | `bafybeig3ffbcefeandebzepxabztob5sdkumydzla52k7pvztmjfegwflq` |
+| skill/fetchai/generic_buyer/0.26.0                            | `bafybeiadajkdrjfcweckxx75rv3vrt3fjd2fka26lxgfen6c4mkb7xoy4q` |
+| skill/fetchai/generic_seller/0.27.0                           | `bafybeidtmbb4izan6ea3tyaelvz75lst7zlyxcc2rewdgm3x7upra25sj4` |
 | skill/fetchai/task_test_skill/0.1.0                           | `bafybeidv77u2xl52mnxakwvh7fuh46aiwfpteyof4eaptfd4agoi6cdble` |
 | agent/fetchai/error_test/0.1.0                                | `bafybeiecm675ndzbh35jkejtxn4ughoutztltjhgwzfbp57okabedjmnpq` |
 | agent/fetchai/gym_aea/0.25.0                                  | `bafybeibzn3qomqmkaksgpd3gn6aijffvvw7rojswhoytiovohuc737fvfm` |
