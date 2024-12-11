@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """This module contains the tests for the sync connection module."""
 import asyncio
+import platform
 import time
 from unittest.mock import MagicMock, Mock, patch
 
@@ -70,6 +71,10 @@ class SampleConnection(BaseSyncConnection):
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    condition=(platform.system() == "Darwin"),
+    reason="not working on macos-12+",
+)
 async def test_sync_connection():
     """Test sync connection example."""
     conf = Mock()

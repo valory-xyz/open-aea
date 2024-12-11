@@ -64,6 +64,7 @@ from packages.valory.connections.p2p_libp2p.consts import (
 )
 from packages.valory.connections.p2p_libp2p.tests.base import (
     MockDefaultMessageProtocol,
+    SKIP_MACOS,
     SKIP_WINDOWS,
     TEMP_LIBP2P_TEST_DIR,
     TIMEOUT,
@@ -276,6 +277,7 @@ def _make_libp2p_connection(
 
 
 @SKIP_WINDOWS
+@SKIP_MACOS
 class BaseP2PLibp2pTest:
     """Base class for ACN p2p libp2p tests"""
 

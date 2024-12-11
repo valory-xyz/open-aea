@@ -16,7 +16,7 @@ fingerprint:
   tests/conftest.py: bafybeid7vo7e2m76ey5beeadtbxywxx5ukefd5slwbc362rwmhht6i45ou
   tests/test_contract_dispatcher.py: bafybeiag5lnpc7h25w23ash4hk4cowxsy5buxgpr474l3tfewnhf56eqyq
   tests/test_ledger.py: bafybeigcedfr3yv3jse3xwrerrgwbelgb56uhgrvdus527d3daekh6dx4m
-  tests/test_ledger_api.py: bafybeibdhjxhsavs2fax4rgvsptd6a2tcnv6fq75wqqxpcwwk6zujw3e7e
+  tests/test_ledger_api.py: bafybeiaicxq56bujtdqxy5czakzr5wpnf23q7ya4fc6oaimh5b5ydjhahi
 fingerprint_ignore_patterns: []
 connections: []
 protocols:

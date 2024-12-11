@@ -47,6 +47,10 @@ SKIP_WINDOWS = pytest.mark.skipif(
     condition=(platform.system() == "Windows"),
     reason="https://github.com/golang/go/issues/51007",
 )
+SKIP_MACOS = pytest.mark.skipif(
+    condition=(platform.system() == "Darwin"),
+    reason="go-ethereum not working on macos-12+",
+)
 
 
 def libp2p_log_on_failure(fn: Callable) -> Callable:

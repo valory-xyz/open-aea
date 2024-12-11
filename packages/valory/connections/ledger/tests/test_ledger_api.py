@@ -667,16 +667,10 @@ class TestLedgerDispatcher:
         assert dialogue is not None
         assert isinstance(dialogue, LedgerApiDialogue)
 
-        mock_api.is_transaction_settled.return_value = (
-            True if failing_ledger_method_name == "get_transaction" else False
-        )
         failing_ledger_method = getattr(mock_api, failing_ledger_method_name)
-        if (
-            ledger_raise_error
-            and failing_ledger_method_name != "is_transaction_settled"
-        ):
+        if ledger_raise_error:
             failing_ledger_method.side_effect = ValueError()
-        elif failing_ledger_method_name != "is_transaction_settled":
+        else:
             failing_ledger_method.return_value = None
 
         with patch.object(dispatcher, "retry_attempts", retries):
