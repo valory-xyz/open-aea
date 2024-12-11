@@ -21,7 +21,7 @@
 | connection/valory/p2p_libp2p_mailbox/0.1.0                    | `bafybeiecclc65ogngs3piaxpwhiyl77mlpqun5ejlyv4kamwzrrh746guq` |
 | connection/fetchai/local/0.20.0                               | `bafybeiema4rnxi54luhzbrccb27pfrwlohemka45eqf4nidgmtkwwmxeyi` |
 | connection/valory/http_client/0.23.0                          | `bafybeihi772xgzpqeipp3fhmvpct4y6e6tpjp4sogwqrnf3wqspgeilg4u` |
-| connection/valory/test_libp2p/0.1.0                           | `bafybeiasj7ppsmn24mes2yw3o72nlmcircscalpl3j5ujzxstknlassa3q` |
+| connection/valory/test_libp2p/0.1.0                           | `bafybeibjjdc3sj326rvtjjrzpbvshjp6nu6zqm4m7wswpo2ei7dzsmhecm` |
 | skill/fetchai/echo/0.19.0                                     | `bafybeicoawiackcbgqo3na3e56tpdc62atag4yxknur77py37caqq4mmya` |
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeihsbtlpe7h6fsvoxban5rilkmwviwkokul5cqym6atoolirontiyu` |
 | skill/fetchai/gym/0.20.0                                      | `bafybeie7y2fsxfuhsqxqcaluo5exskmrm5q3a6e2hfcskcuvzvxjjhijh4` |
