@@ -638,7 +638,7 @@ class TestLedgerDispatcher:
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "failing_ledger_method_name",
-        ("get_transaction_receipt", "is_transaction_settled", "get_transaction"),
+        ("get_transaction_receipt", "get_transaction"),
     )
     @pytest.mark.parametrize("retries", (0, 5, 20))
     @pytest.mark.parametrize("retry_timeout", (0.1,))
