@@ -361,35 +361,22 @@ def check_public_id(configuration_file: Path) -> None:
     content = module_path_to_load.read_text()
 
     # check number of definitions of PUBLIC_ID. Required exactly one match.
-    assignments_to_public_id = re.findall("^PUBLIC_ID = (.*)", content, re.MULTILINE)
+    assignments_to_public_id = find_public_id_assignments(content)
     if len(assignments_to_public_id) != 1:
         raise PublicIdDefinitionError(
             package_type, expected_public_id, len(assignments_to_public_id)
         )
 
-    # check first pattern of public id: PublicId.from_str(...)
-    matches = re.findall(
-        r"^PUBLIC_ID = PublicId.from_str\( *(\"(.*)\"|'(.*)') *\)$",
-        content,
-        re.MULTILINE,
-    )
-    if len(matches) == 1:
-        # process the result
-        _, match1, match2 = matches[0]
-        match = match1 if match1 != "" else match2
-        if str(expected_public_id) != match:
-            raise WrongPublicIdError(package_type, expected_public_id, match)
+    # check for valid PUBLIC_ID patterns
+    public_id_match = find_public_id_from_str(content)
+    if public_id_match:
+        if str(expected_public_id) != public_id_match:
+            raise WrongPublicIdError(package_type, expected_public_id, public_id_match)
         return
 
-    # check second pattern of public id: PublicId('...', '...', '...')
-    matches = re.findall(
-        r"^PUBLIC_ID = PublicId\( *['\"](.*)['\"] *, *['\"](.*)['\"] *, *['\"](.*)['\"] *\)$",
-        content,
-        re.MULTILINE,
-    )
-    if len(matches) == 1:
-        # process the result
-        author, name, version = matches[0]
+    public_id_components = find_public_id_components(content)
+    if public_id_components:
+        author, name, version = public_id_components
         actual_public_id_str = f"{author}/{name}:{version}"
         if str(expected_public_id) != actual_public_id_str:
             raise WrongPublicIdError(
@@ -397,9 +384,39 @@ def check_public_id(configuration_file: Path) -> None:
             )
         return
 
-    public_id_code = matches[0]
-    if str(expected_public_id) not in public_id_code:
-        raise WrongPublicIdError(package_type, expected_public_id, public_id_code)
+    # if no valid pattern is found
+    raise WrongPublicIdError(package_type, expected_public_id, content)
+
+
+def find_public_id_assignments(content: str) -> list:
+    """Find assignments to PUBLIC_ID."""
+    return re.findall(r"^PUBLIC_ID = (.*)", content, re.MULTILINE)
+
+
+def find_public_id_from_str(content: str) -> Optional[str]:
+    """Find public_id using the `PublicId.from_str` pattern."""
+    matches = re.findall(
+        r"^PUBLIC_ID = PublicId.from_str\( *(\"(.*)\"|'(.*)') *\)$",
+        content,
+        re.MULTILINE,
+    )
+    if len(matches) == 1:
+        _, match1, match2 = matches[0]
+        # return the non-empty match
+        return match1 or match2
+    return None
+
+
+def find_public_id_components(content: str) -> Optional[tuple]:
+    """Find public_id components using the `PublicId('...', '...', '...')` pattern."""
+    matches = re.findall(
+        r"^PUBLIC_ID = PublicId\( *['\"](.*)['\"] *, *['\"](.*)['\"] *, *['\"](.*)['\"] *\)$",
+        content,
+        re.MULTILINE,
+    )
+    if len(matches) == 1:
+        return matches[0]
+    return None
 
 
 class DependenciesTool:
