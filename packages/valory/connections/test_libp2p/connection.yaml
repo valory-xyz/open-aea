@@ -34,9 +34,9 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/p2p_libp2p:0.1.0:bafybeic2u7azbwjny2nhaltqnbohlvysx3x6ectzbege7sxwrbzcz4lcma
-- valory/p2p_libp2p_client:0.1.0:bafybeihs5zlwa5wlozct3rjlxsirm3ve3e4buse5nfehiky6ymnnfrobne
-- valory/p2p_libp2p_mailbox:0.1.0:bafybeiecclc65ogngs3piaxpwhiyl77mlpqun5ejlyv4kamwzrrh746guq
+- valory/p2p_libp2p:0.1.0:bafybeids2klbqpy4jthkicihe2pqhod4auhn5jky7lrmb67if2sbzfmlii
+- valory/p2p_libp2p_client:0.1.0:bafybeih7pvq77opagofmt2xfhjgbbxl2y7woyggwkymcbozzmwckniek3u
+- valory/p2p_libp2p_mailbox:0.1.0:bafybeieixcoi3ubueert4byn6tpqesz2b4jnpyn6xz2nieo5ejmrm4qat4
 protocols:
 - fetchai/default:1.0.0:bafybeihdvtmnz7fzy7kwi3wlo6rfl27f6q3g5entplgvq7y23i3v5uoz24
 - valory/acn:1.1.0:bafybeidluaoeakae3exseupaea4i3yvvk5vivyt227xshjlffywwxzcxqe
