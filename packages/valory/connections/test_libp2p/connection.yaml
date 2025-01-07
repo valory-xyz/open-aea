@@ -12,7 +12,7 @@ fingerprint:
   readme.md: bafybeihg5yfzgqvg5ngy7r2o5tfeqnelx2ffxw4po5hmheqjfhumpmxpoq
   tests/__init__.py: bafybeiarz6mhky6pnkdihibcuqrfpx3qo55roygneoaoq2mndi5lzdlcj4
   tests/acn_image.py: bafybeidkaavxkfocmg5c6y3i32fmbdf5i77jmqteoylmutifoh4zig3pr4
-  tests/base.py: bafybeicnngqp7pw6thjf4yjewk6kazaezpfumiob6mfwupdvwxaij6xwwm
+  tests/base.py: bafybeif2xbemtlfvwcb45lp62xuav4rknkfif34vrlv6xmcdfnciar4xyi
   tests/conftest.py: bafybeifkjrvsysdb7ujp2wxurzgytzy3ecu6fv247zfszfymdvb7y7klpu
   tests/test_certificate_dates.py: bafybeif4t76wsvsfvvplkmi4gecgod6ijff3bbqgtaqmpep6ywfapfptfm
   tests/test_dht.py: bafybeienykwwpdjlbjzxzttxjhgas2edp2f657gbsexjtkztehoq4yfb7m
@@ -34,12 +34,12 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/p2p_libp2p:0.1.0:bafybeids2klbqpy4jthkicihe2pqhod4auhn5jky7lrmb67if2sbzfmlii
-- valory/p2p_libp2p_client:0.1.0:bafybeih7pvq77opagofmt2xfhjgbbxl2y7woyggwkymcbozzmwckniek3u
-- valory/p2p_libp2p_mailbox:0.1.0:bafybeieixcoi3ubueert4byn6tpqesz2b4jnpyn6xz2nieo5ejmrm4qat4
+- valory/p2p_libp2p:0.1.0:bafybeig2atkjnrz7lsboubaque567ndtzog6k53dnmrrq3eeqgbqmmcq5y
+- valory/p2p_libp2p_client:0.1.0:bafybeic6ayusdwy4dks75njwk32ac7ur7salgllwf4fdc34ue5z2k5iz4q
+- valory/p2p_libp2p_mailbox:0.1.0:bafybeigxmh7muuesebuia3wi7lpmnbzvxzojpacnhwtab4zbmupru3zbdu
 protocols:
-- fetchai/default:1.0.0:bafybeihdvtmnz7fzy7kwi3wlo6rfl27f6q3g5entplgvq7y23i3v5uoz24
-- valory/acn:1.1.0:bafybeidluaoeakae3exseupaea4i3yvvk5vivyt227xshjlffywwxzcxqe
+- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
+- valory/acn:1.1.0:bafybeic6h55ov5lrzbah6fate54c4u6spopcexxspw3abotbmffabfddeu
 class_name: MyScaffoldAsyncConnection
 config:
   foo: bar
