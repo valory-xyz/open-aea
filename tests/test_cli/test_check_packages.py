@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,14 +20,21 @@
 
 """Test check packages command module."""
 
+from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Dict, List, Union
 from unittest import mock
 
 import pytest
 
-from aea.cli.check_packages import find_all_configuration_files, get_public_id_from_yaml
+from aea.cli.check_packages import (
+    find_all_configuration_files,
+    find_public_id_assignments,
+    find_public_id_components,
+    find_public_id_from_str,
+    get_public_id_from_yaml,
+)
 from aea.test_tools.test_cases import BaseAEATestCase
 
 
@@ -56,7 +63,7 @@ def _find_all_configuration_files_patch(config_files: List) -> Any:
 class _TestPublicIdParameters:
     """Dataclass to store parameters for a public id check test."""
 
-    side_effect: List
+    mocked_values: Dict[str, Union[List, str, None]]
     exit_code: int
     message: str
 
@@ -187,39 +194,54 @@ class TestCheckPackagesCommand(BaseAEATestCase):
         "test_param",
         [
             _TestPublicIdParameters(
-                side_effect=[
-                    [(None,)],
-                    [(None, None, None)],
-                ],
+                mocked_values={
+                    "find_public_id_assignments": "",
+                },
                 exit_code=1,
-                message="found 'None'",
+                message="expected unique definition of PUBLIC_ID for package fetchai/gym:0.19.0 of type connection; found 0",
             ),
             _TestPublicIdParameters(
-                side_effect=[
-                    [(None,)],
-                    [],
-                    [(None, None, None)],
-                ],
+                mocked_values={
+                    "find_public_id_assignments": [None],
+                    "find_public_id_from_str": "match",
+                },
                 exit_code=1,
-                message="found 'None/None:None'",
+                message="expected fetchai/gym:0.19.0 for package of type connection; found 'match'",
             ),
             _TestPublicIdParameters(
-                side_effect=[
-                    [(None,)],
-                    [],
-                    [("fetchai", "gym", "0.19.0")],
-                ],
+                mocked_values={
+                    "find_public_id_assignments": [None],
+                    "find_public_id_from_str": "fetchai/gym:0.19.0",
+                },
                 exit_code=0,
                 message="OK!",
             ),
             _TestPublicIdParameters(
-                side_effect=[
-                    [(None,)],
-                    [],
-                    ["", ()],
-                ],
+                mocked_values={
+                    "find_public_id_assignments": [None],
+                    "find_public_id_from_str": None,
+                    "find_public_id_components": [None, None, None],
+                },
                 exit_code=1,
-                message="found ''",
+                message="expected fetchai/gym:0.19.0 for package of type connection; found 'None/None:None'",
+            ),
+            _TestPublicIdParameters(
+                mocked_values={
+                    "find_public_id_assignments": [None],
+                    "find_public_id_from_str": None,
+                    "find_public_id_components": ["fetchai", "gym", "0.19.0"],
+                },
+                exit_code=0,
+                message="OK!",
+            ),
+            _TestPublicIdParameters(
+                mocked_values={
+                    "find_public_id_assignments": [None],
+                    "find_public_id_from_str": None,
+                    "find_public_id_components": None,
+                },
+                exit_code=1,
+                message="expected fetchai/gym:0.19.0 for package of type connection; found ",
             ),
         ],
     )
@@ -228,12 +250,18 @@ class TestCheckPackagesCommand(BaseAEATestCase):
     ) -> None:
         """Test `check_public_id` failure."""
 
-        with mock.patch(
-            "re.findall",
-            side_effect=test_param.side_effect,
-        ), _find_all_configuration_files_patch(
-            [self.test_connection_config]
-        ), check_dependencies_patch:
+        patches = [
+            mock.patch(f"aea.cli.check_packages.{method}", return_value=mocked_value)
+            for method, mocked_value in test_param.mocked_values.items()
+        ]
+        patches.extend(
+            [
+                _find_all_configuration_files_patch([self.test_connection_config]),
+                check_dependencies_patch,
+            ]
+        )
+        with ExitStack() as stack:
+            [stack.enter_context(patch) for patch in patches]
             result = self.invoke(
                 "--registry-path",
                 str(self.packages_dir_path),
@@ -242,6 +270,24 @@ class TestCheckPackagesCommand(BaseAEATestCase):
 
         assert result.exit_code == test_param.exit_code, result.output
         assert test_param.message in result.output
+
+    def test_find_public_id_assignments(self):
+        """Test `find_public_id_assignments`."""
+        content = "PUBLIC_ID = PublicId('author', 'name', '0.1.0')"
+        result = find_public_id_assignments(content)
+        assert result == ["PublicId('author', 'name', '0.1.0')"]
+
+    def test_find_public_id_from_str(self):
+        """Test `find_public_id_from_str`."""
+        content = "PUBLIC_ID = PublicId.from_str('author/name:0.1.0')"
+        result = find_public_id_from_str(content)
+        assert result == "author/name:0.1.0"
+
+    def test_find_public_id_components(self):
+        """Test `find_public_id_components`."""
+        content = "PUBLIC_ID = PublicId('author', 'name', '0.1.0')"
+        result = find_public_id_components(content)
+        assert result == ("author", "name", "0.1.0")
 
     def test_check_pypi_dependencies_failure(
         self,

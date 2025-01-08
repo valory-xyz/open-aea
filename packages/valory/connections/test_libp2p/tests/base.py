@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -64,7 +64,6 @@ from packages.valory.connections.p2p_libp2p.consts import (
 )
 from packages.valory.connections.p2p_libp2p.tests.base import (
     MockDefaultMessageProtocol,
-    SKIP_MACOS,
     SKIP_WINDOWS,
     TEMP_LIBP2P_TEST_DIR,
     TIMEOUT,
@@ -277,7 +276,6 @@ def _make_libp2p_connection(
 
 
 @SKIP_WINDOWS
-@SKIP_MACOS
 class BaseP2PLibp2pTest:
     """Base class for ACN p2p libp2p tests"""
 
