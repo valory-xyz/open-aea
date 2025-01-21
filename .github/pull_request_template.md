@@ -48,7 +48,7 @@ Describe in short the main changes with the new release.
 _Put an `x` in the boxes that apply._
 
 - [ ] I have read the [CONTRIBUTING](../CONTRIBUTING.md) doc
-- [ ] I am making a pull request against the `main` branch (left side), from a feature/fix branch
+- [ ] I am making a pull request against the `main` branch (left side), from a fix/feat/refactor/docs/chore branch
 - [ ] Lint and unit tests pass locally and in CI
 - [ ] I have checked the fingerprint hashes are correct by running (`aea packages lock --check`)
 - [ ] I have regenerated the latest API docs
