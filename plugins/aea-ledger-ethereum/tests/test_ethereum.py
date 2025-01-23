@@ -422,7 +422,7 @@ def test_ethereum_api_get_transfer_transaction_2(*args):
         "max_fee_per_gas": 10,
     }
     with patch.object(ethereum_api.api.eth, "estimate_gas", return_value=1):
-        assert len(ethereum_api.get_transfer_transaction(**args)) == 8
+        assert len(ethereum_api.get_transfer_transaction(**args)) == 9
 
 
 @patch.object(EthereumApi, "_try_get_transaction_count", return_value=1)
@@ -441,7 +441,7 @@ def test_ethereum_api_get_transfer_transaction_3(*args):
         "max_fee_per_gas": 10,
     }
     with patch.object(ethereum_api.api.eth, "_max_priority_fee", return_value=1):
-        assert len(ethereum_api.get_transfer_transaction(**args)) == 8
+        assert len(ethereum_api.get_transfer_transaction(**args)) == 9
 
 
 def test_ethereum_api_get_deploy_transaction(ethereum_testnet_config):

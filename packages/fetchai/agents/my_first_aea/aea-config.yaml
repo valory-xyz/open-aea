@@ -8,14 +8,14 @@ fingerprint:
   README.md: bafybeiftiqiqpxn7ghrurhepquzqzk3su3x6wanlnolt2uj772fzgz574m
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/stub:0.21.0:bafybeibybboiwgklfiqpkkcw6rwj65s5jalzfzf6mh6fstxdlt6habzwvy
+- fetchai/stub:0.21.0:bafybeibqrgcch7dufgvzoxi43vxbbhx6isfn3njhq5q3eud6yhhyjdnthm
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeihdvtmnz7fzy7kwi3wlo6rfl27f6q3g5entplgvq7y23i3v5uoz24
-- fetchai/state_update:1.0.0:bafybeiftntpyadajwnse25qwpvpidmahkn5qksg7jdzuemuqc7zsuek5xy
-- open_aea/signing:1.0.0:bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi
+- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
+- fetchai/state_update:1.0.0:bafybeig66he5ndtkb3j7z3woy3dtdvpwmbz3z4omlv6q6eih6r7kceq55e
+- open_aea/signing:1.0.0:bafybeig2d36zxy65vd7fwhs7scotuktydcarm74aprmrb5nioiymr3yixm
 skills:
-- fetchai/echo:0.19.0:bafybeicoawiackcbgqo3na3e56tpdc62atag4yxknur77py37caqq4mmya
+- fetchai/echo:0.19.0:bafybeigcllaxn4ycjjvika3zd6eicksuriez2wtg67gx7pamhcazl3tv54
 default_connection: fetchai/stub:0.21.0
 default_ledger: fetchai
 required_ledgers:

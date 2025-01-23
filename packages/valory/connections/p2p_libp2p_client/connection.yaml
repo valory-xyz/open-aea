@@ -10,14 +10,15 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeiaf5kdnfdc2jifojgniib76zl2c4utnx7ofewc3szqkrxsby62ulu
   __init__.py: bafybeid2azroxglu6fl7bxdfcsv3j77vyzgpikjnfwpxg73zeb5orez6ju
-  connection.py: bafybeiauso3ectgdvbhkt5j6wstfev5mnxiuj6hrkczyqgxurnvva3loqm
+  connection.py: bafybeihcwyo5nhxmsjxw7qrrvkvp7qu6izbgzgipmmnrpdvc6jtwmw7vgy
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/acn:1.1.0:bafybeidluaoeakae3exseupaea4i3yvvk5vivyt227xshjlffywwxzcxqe
+- valory/acn:1.1.0:bafybeic6h55ov5lrzbah6fate54c4u6spopcexxspw3abotbmffabfddeu
 class_name: P2PLibp2pClientConnection
 config:
   connect_retries: 3
+  resend_envelope_retry: 1
   ledger_id: cosmos
   nodes:
   - uri: acn.staging.autonolas.tech:9005
@@ -29,15 +30,15 @@ cert_requests:
 - identifier: acn
   ledger_id: ethereum
   message_format: '{public_key}'
-  not_after: '2025-01-01'
-  not_before: '2024-01-01'
+  not_after: '2026-01-01'
+  not_before: '2025-01-01'
   public_key: 02d3a830c9d6ea1ae91936951430dee11f4662f33118b02190693be835359a9d77
   save_path: .certs/acn_cosmos_9005.txt
 - identifier: acn
   ledger_id: ethereum
   message_format: '{public_key}'
-  not_after: '2025-01-01'
-  not_before: '2024-01-01'
+  not_after: '2026-01-01'
+  not_before: '2025-01-01'
   public_key: 02e741c62d706e1dcf6986bf37fa74b98681bc32669623ac9ee6ff72488d4f59e8
   save_path: .certs/acn_cosmos_9006.txt
 excluded_protocols: []

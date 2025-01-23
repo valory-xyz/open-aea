@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,16 +103,13 @@ class TestLibp2pClientConnectionFailureNodeNotConnected(BaseP2PLibp2pTest):
         """Test reconnect on send fails."""
 
         self.connection._node_client = Mock()
-        f = Future()
-        f.set_exception(Exception("oops"))
         self.connection._node_client.send_envelope.side_effect = Exception("oops")
         with patch.object(
             self.connection, "_perform_connection_to_node", return_value=DONE_FUTURE
         ) as connect_mock, patch.object(
             self.connection, "_ensure_valid_envelope_for_external_comms"
         ):
-            with pytest.raises(Exception, match="oops"):
-                await self.connection._send_envelope_with_node_client(Mock())
+            await self.connection._send_envelope_with_node_client(Mock())
             connect_mock.assert_called()
 
 

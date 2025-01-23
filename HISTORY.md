@@ -1,5 +1,19 @@
 # Release History - open AEA
 
+## 1.60.0 (2024-11-15)
+
+Plugins:
+- Fixes the handling of dropped ACN node connection #769
+- Fixes an edge case in the gas estimation #770
+
+## 1.59.0 (2024-10-29)
+
+Plugins:
+- Fixes the gas estimation #766
+
+AEA
+- Avoids validation failures with --help #764
+
 ## 1.58.0 (2024-10-03)
 
 AEA:

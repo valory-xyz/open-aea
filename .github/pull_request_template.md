@@ -20,7 +20,7 @@ _Put an `x` in the boxes that apply_
 _Put an `x` in the boxes that apply._
 
 - [ ] I have read the [CONTRIBUTING](../CONTRIBUTING.md) doc
-- [ ] I am making a pull request against the `develop` branch (left side). Also you should start your branch off our `develop`.
+- [ ] I am making a pull request against the `main` branch (left side). Also you should start your branch off our `main`.
 - [ ] Lint and unit tests pass locally with my changes and CI passes too
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have checked that code coverage does not decrease.
@@ -48,7 +48,7 @@ Describe in short the main changes with the new release.
 _Put an `x` in the boxes that apply._
 
 - [ ] I have read the [CONTRIBUTING](../CONTRIBUTING.md) doc
-- [ ] I am making a pull request against the `main` branch (left side), from `develop`
+- [ ] I am making a pull request against the `main` branch (left side), from a fix/feat/refactor/docs/chore branch
 - [ ] Lint and unit tests pass locally and in CI
 - [ ] I have checked the fingerprint hashes are correct by running (`aea packages lock --check`)
 - [ ] I have regenerated the latest API docs

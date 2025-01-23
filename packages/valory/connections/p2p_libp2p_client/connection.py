@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -279,6 +279,7 @@ class P2PLibp2pClientConnection(Connection):
     connection_id = PUBLIC_ID
 
     DEFAULT_CONNECT_RETRIES = 3
+    DEFAULT_RESEND_ENVELOPE_RETRY = 1
     DEFAULT_TLS_CONNECTION_SIGNATURE_TIMEOUT = 5.0
 
     def __init__(self, **kwargs: Any) -> None:
@@ -291,6 +292,9 @@ class P2PLibp2pClientConnection(Connection):
         )
         self.connect_retries = self.configuration.config.get(
             "connect_retries", self.DEFAULT_CONNECT_RETRIES
+        )
+        self.resend_envelope_retry = self.configuration.config.get(
+            "resend_envelope_retry", self.DEFAULT_RESEND_ENVELOPE_RETRY
         )
         ledger_id = self.configuration.config.get("ledger_id", DEFAULT_LEDGER)
         if ledger_id not in SUPPORTED_LEDGER_IDS:
@@ -386,11 +390,17 @@ class P2PLibp2pClientConnection(Connection):
             )
             await asyncio.shield(self.disconnect())
 
-    async def _send_envelope_with_node_client(self, envelope: Envelope) -> None:
+    async def _send_envelope_with_node_client(
+        self, envelope: Envelope, retry_counter: int = 0
+    ) -> None:
         """Send envelope with node client, reconnect and retry on fail."""
         if not self._node_client:  # pragma: nocover
             raise ValueError("Connection not connected to node!")
-
+        if retry_counter > self.resend_envelope_retry:
+            self.logger.warning(
+                f"Dropping envelope {envelope}. It failed after retry. "
+            )
+            return
         self._ensure_valid_envelope_for_external_comms(envelope)
         try:
             await self._node_client.send_envelope(envelope)
@@ -399,7 +409,7 @@ class P2PLibp2pClientConnection(Connection):
                 "Exception raised on message send. Try reconnect and send again."
             )
             await self._perform_connection_to_node()
-            await self._node_client.send_envelope(envelope)
+            await self._send_envelope_with_node_client(envelope, retry_counter + 1)
 
     async def connect(self) -> None:
         """Set up the connection."""
@@ -584,9 +594,14 @@ class P2PLibp2pClientConnection(Connection):
             envelope = await self._read_envelope_from_node()
             if self._in_queue is None:
                 raise ValueError("Input queue not initialized.")  # pragma: nocover
-            self._in_queue.put_nowait(envelope)
+            self.logger.debug(f"Received envelope: {envelope}")
             if envelope is None:
-                break  # pragma: no cover
+                # give it time to recover
+                # twice the amount what we wait for ACK timeouts
+                timeout = NodeClient.ACN_ACK_TIMEOUT * 2
+                await asyncio.sleep(timeout)
+                continue  # pragma: no cover
+            self._in_queue.put_nowait(envelope)
 
 
 class TCPSocketChannelClientTLS(TCPSocketChannelClient):
