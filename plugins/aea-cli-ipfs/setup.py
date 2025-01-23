@@ -28,7 +28,7 @@ from setuptools import setup  # type: ignore
 
 setup(
     name="open-aea-cli-ipfs",
-    version="1.60.0",
+    version="1.61.0",
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for open AEA framework wrapping IPFS functionality.",
