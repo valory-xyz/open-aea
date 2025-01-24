@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2024 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,7 @@ from aea.exceptions import AEAEnforceError, AEAPackageLoadingError, enforce
 from aea.helpers.logging import WithLogger
 
 
+ENCODING = "utf-8"
 _default_logger = logging.getLogger(__name__)
 
 
@@ -225,7 +226,7 @@ class _CheckUsedDependencies:
 
         used_packages: Dict[PackageIdPrefix, Set[Path]] = defaultdict(set)
         for python_module in aea_package_root_dir.rglob("*.py"):
-            module_content = python_module.read_text()
+            module_content = python_module.read_text(encoding=ENCODING)
             module_package_id_prefixes = cls._extract_imported_packages_as_ids(
                 module_content
             )
