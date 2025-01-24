@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,10 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """This module contains the tests for the sync connection module."""
+
 import asyncio
-import platform
 import time
 from unittest.mock import MagicMock, Mock, patch
 
@@ -71,10 +72,6 @@ class SampleConnection(BaseSyncConnection):
 
 
 @pytest.mark.asyncio
-@pytest.mark.skipif(
-    condition=(platform.system() == "Darwin"),
-    reason="not working on macos-12+",
-)
 async def test_sync_connection():
     """Test sync connection example."""
     conf = Mock()

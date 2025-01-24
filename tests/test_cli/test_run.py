@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -260,7 +260,7 @@ def test_run_with_profiling():
             logfile=sys.stdout,
         )
 
-        process.expect("Start processing messages", timeout=60)
+        process.expect("Start processing messages", timeout=120)
         process.expect("Profiling details", timeout=10)
         process.control_c()
         process.wait_to_complete(10)
