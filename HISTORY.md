@@ -1,5 +1,21 @@
 # Release History - open AEA
 
+## 1.61.0 (2025-01-24)
+
+AEA:
+- Fixes encoding #779
+
+Plugins:
+- Removes incorrect key from the fallback estimate #779
+- Fixes the transaction receipt's retrieval on the ledger dispatcher #773
+
+Chores:
+- Upgrades macOS in workflow #772
+
+Docs:
+- Adds explicit reference to the version of `mkdocs-mermaid-plugin` #776
+- Fixes reference to the multiplexer image #778
+
 ## 1.60.0 (2024-11-15)
 
 Plugins:
