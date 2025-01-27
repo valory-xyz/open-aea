@@ -84,8 +84,6 @@ SPEED_FAST = "fast"  # safeLow, standard, fast
 POLYGON_GAS_ENDPOINT = "https://gasstation-mainnet.matic.network/v2"
 MAX_GAS_FAST = 1500
 RPC_CALL_MAX_WORKERS = 1
-N_RETRIES = 3
-PERCENTILE_INCREASE = 5
 
 # How many blocks to consider for priority fee estimation
 FEE_HISTORY_BLOCKS = 10
@@ -176,23 +174,16 @@ def estimate_priority_fee(
     if default_priority_fee is not None:
         return default_priority_fee
 
-    for _ in range(N_RETRIES):
-        fee_history = web3_object.eth.fee_history(
-            fee_history_blocks, block_number, [fee_history_percentile]  # type: ignore
-        )
-        # This is going to break if more percentiles are introduced in the future,
-        # i.e., `fee_history_percentile` param becomes a `List[int]`.
-        rewards = sorted(
-            [reward[0] for reward in fee_history.get("reward", []) if reward[0] > 0]
-        )
-        # we need atleast 2 rewards to proceed further
-        if len(rewards) >= 2:
-            break
-        # Increment percentile for next attempt
-        fee_history_percentile = min(100, fee_history_percentile + PERCENTILE_INCREASE)
+    fee_history = web3_object.eth.fee_history(
+        fee_history_blocks, block_number, [fee_history_percentile]  # type: ignore
+    )
 
-    # Return None if fewer than 2 rewards after retries
-    if len(rewards) < 2:
+    # This is going to break if more percentiles are introduced in the future,
+    # i.e., `fee_history_percentile` param becomes a `List[int]`.
+    rewards = sorted(
+        [reward[0] for reward in fee_history.get("reward", []) if reward[0] > 0]
+    )
+    if len(rewards) == 0:
         return None
 
     # Calculate percentage increases from between ordered list of fees
