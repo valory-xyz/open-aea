@@ -1037,15 +1037,29 @@ def test_estimate_priority_fee() -> None:
     # return none on no rewards
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
+
+    # test a single reward
+    web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 1
+
+    # test 2 rewards
+    web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [2]]})
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 2
 
     # If we have big increase in value, we could be considering "outliers" in our estimate
     # Skip the low elements and take a new median
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [10], [10000]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) == 10000
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 10000
 
     # test the default priority fee
-    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1) == 20
+    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1, 1) == 20
+
+    # set the fee history for block 38255060 on Gnosis as an example,
+    # which was causing issues with the gas estimation in `v1.61.0`:
+    # `EffectivePriorityFeePerGas too low 999999976 < 1000000000`
+    web3_mock.eth.fee_history = Mock(return_value={"reward": [[999999946], [999999943], [1454999904], [999999976], [1454999872], [1000000011], [5], [1300000021], [1000000000], [1000000000], [999999888], [1000000000], [5], [1000000000], [5], [999999876], [5], [1000000000], [999999900], [5]]})
+    assert estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
 
 
 def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) -> None:
