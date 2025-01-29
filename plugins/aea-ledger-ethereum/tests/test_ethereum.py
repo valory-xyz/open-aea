@@ -508,8 +508,9 @@ def test_gas_price_strategy_eip1559() -> None:
     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
 
     web3 = Web3()
+    base_fee_per_gas_mock = 15e10
     get_block_mock = mock.patch.object(
-        web3.eth, "get_block", return_value={"baseFeePerGas": 15e10, "number": 1}
+        web3.eth, "get_block", return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1}
     )
 
     mock_hist_data = get_history_data(n_blocks=5)
@@ -525,8 +526,8 @@ def test_gas_price_strategy_eip1559() -> None:
             gas_stregy = callable_(web3, "tx_params")
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-    assert gas_stregy["maxFeePerGas"] == 21e10
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
+    assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock + gas_stregy["maxPriorityFeePerGas"]
 
 
 def test_gas_price_strategy_eip1559_estimate_none() -> None:
