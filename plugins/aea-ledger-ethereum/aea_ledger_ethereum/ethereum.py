@@ -102,12 +102,16 @@ FALLBACK_ESTIMATE = {
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
+# this is the minimum allowed max fee per gas on Gnosis
+DEFAULT_MIN_ALLOWED_TIP = to_wei(1, "gwei")
+
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
     "fee_history_blocks": FEE_HISTORY_BLOCKS,
     "fee_history_percentile": FEE_HISTORY_PERCENTILE,
     "default_priority_fee": DEFAULT_PRIORITY_FEE,
     "fallback_estimate": FALLBACK_ESTIMATE,
+    "min_allowed_tip": DEFAULT_MIN_ALLOWED_TIP,
     "priority_fee_increase_boundary": PRIORITY_FEE_INCREASE_BOUNDARY,
 }
 
@@ -167,6 +171,7 @@ def estimate_priority_fee(
     default_priority_fee: Optional[int],
     fee_history_blocks: int,
     fee_history_percentile: int,
+    min_allowed_tip: int,
     priority_fee_increase_boundary: int,
 ) -> Optional[int]:
     """Estimate priority fee from base fee."""
@@ -181,7 +186,7 @@ def estimate_priority_fee(
     # This is going to break if more percentiles are introduced in the future,
     # i.e., `fee_history_percentile` param becomes a `List[int]`.
     rewards = sorted(
-        [reward[0] for reward in fee_history.get("reward", []) if reward[0] > 0]
+        [reward[0] for reward in fee_history.get("reward", []) if reward[0] >= min_allowed_tip]
     )
     if len(rewards) == 0:
         return None
@@ -211,6 +216,7 @@ def get_gas_price_strategy_eip1559(
     fee_history_percentile: int,
     default_priority_fee: Optional[int],
     fallback_estimate: Dict[str, Wei],
+    min_allowed_tip: int,
     priority_fee_increase_boundary: int,
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]:
     """Get the gas price strategy."""
@@ -252,6 +258,7 @@ def get_gas_price_strategy_eip1559(
             default_priority_fee=default_priority_fee,
             fee_history_blocks=fee_history_blocks,
             fee_history_percentile=fee_history_percentile,
+            min_allowed_tip=min_allowed_tip,
             priority_fee_increase_boundary=priority_fee_increase_boundary,
         )
 

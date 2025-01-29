@@ -37,6 +37,7 @@ config:
           max_gas_fast: 1500
           fee_history_blocks: 10
           fee_history_percentile: 5
+          min_allowed_tip: 1000000000
           default_priority_fee: null
           fallback_estimate:
             maxFeePerGas: 20000000000
