@@ -1,5 +1,13 @@
 # Release History - open AEA
 
+## 1.62.0 (2025-01-29)
+
+Packages:
+- Updates tasks.py log level to debug #774
+
+Plugins:
+- Accounts for the minimum allowed tip on chains #782
+
 ## 1.61.0 (2025-01-24)
 
 AEA:

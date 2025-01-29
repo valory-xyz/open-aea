@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,7 +87,7 @@ def get_history_data(n_blocks: int, base_multiplier: int = 100) -> Dict:
     return {
         "oldestBlock": 1,
         "reward": [
-            [math.ceil(random.random() * base_multiplier) * 1e1]
+            [math.ceil(random.random() * base_multiplier) * 1e9]
             for _ in range(n_blocks)
         ],
         "baseFeePerGas": [
@@ -508,8 +508,11 @@ def test_gas_price_strategy_eip1559() -> None:
     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
 
     web3 = Web3()
+    base_fee_per_gas_mock = 15e10
     get_block_mock = mock.patch.object(
-        web3.eth, "get_block", return_value={"baseFeePerGas": 15e10, "number": 1}
+        web3.eth,
+        "get_block",
+        return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1},
     )
 
     mock_hist_data = get_history_data(n_blocks=5)
@@ -525,8 +528,11 @@ def test_gas_price_strategy_eip1559() -> None:
             gas_stregy = callable_(web3, "tx_params")
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-    assert gas_stregy["maxFeePerGas"] == 21e10
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
+    assert (
+        gas_stregy["maxFeePerGas"]
+        == base_fee_per_gas_mock + gas_stregy["maxPriorityFeePerGas"]
+    )
 
 
 def test_gas_price_strategy_eip1559_estimate_none() -> None:
@@ -1037,15 +1043,56 @@ def test_estimate_priority_fee() -> None:
     # return none on no rewards
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
+
+    # test a single reward
+    web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 1
+
+    # test 2 rewards
+    web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [2]]})
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 2
 
     # If we have big increase in value, we could be considering "outliers" in our estimate
     # Skip the low elements and take a new median
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [10], [10000]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1) == 10000
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 10000
 
     # test the default priority fee
-    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1) == 20
+    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1, 1) == 20
+
+    # set the fee history for block 38255060 on Gnosis as an example,
+    # which was causing issues with the gas estimation in `v1.61.0`:
+    # `EffectivePriorityFeePerGas too low 999999976 < 1000000000`
+    web3_mock.eth.fee_history = Mock(
+        return_value={
+            "reward": [
+                [999999946],
+                [999999943],
+                [1454999904],
+                [999999976],
+                [1454999872],
+                [1000000011],
+                [5],
+                [1300000021],
+                [1000000000],
+                [1000000000],
+                [999999888],
+                [1000000000],
+                [5],
+                [1000000000],
+                [5],
+                [999999876],
+                [5],
+                [1000000000],
+                [999999900],
+                [5],
+            ]
+        }
+    )
+    assert (
+        estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
+    )
 
 
 def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) -> None:
