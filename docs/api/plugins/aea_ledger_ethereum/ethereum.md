@@ -53,7 +53,7 @@ Returns multiplier value.
 def estimate_priority_fee(
         web3_object: Web3, block_number: int,
         default_priority_fee: Optional[int], fee_history_blocks: int,
-        fee_history_percentile: int,
+        fee_history_percentile: int, min_allowed_tip: int,
         priority_fee_increase_boundary: int) -> Optional[int]
 ```
 
@@ -67,7 +67,7 @@ Estimate priority fee from base fee.
 def get_gas_price_strategy_eip1559(
     max_gas_fast: int, fee_history_blocks: int, fee_history_percentile: int,
     default_priority_fee: Optional[int], fallback_estimate: Dict[str, Wei],
-    priority_fee_increase_boundary: int
+    min_allowed_tip: int, priority_fee_increase_boundary: int
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]
 ```
 

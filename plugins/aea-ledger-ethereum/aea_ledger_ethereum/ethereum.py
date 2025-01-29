@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -186,7 +186,11 @@ def estimate_priority_fee(
     # This is going to break if more percentiles are introduced in the future,
     # i.e., `fee_history_percentile` param becomes a `List[int]`.
     rewards = sorted(
-        [reward[0] for reward in fee_history.get("reward", []) if reward[0] >= min_allowed_tip]
+        [
+            reward[0]
+            for reward in fee_history.get("reward", [])
+            if reward[0] >= min_allowed_tip
+        ]
     )
     if len(rewards) == 0:
         return None

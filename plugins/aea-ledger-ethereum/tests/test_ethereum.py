@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -510,7 +510,9 @@ def test_gas_price_strategy_eip1559() -> None:
     web3 = Web3()
     base_fee_per_gas_mock = 15e10
     get_block_mock = mock.patch.object(
-        web3.eth, "get_block", return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1}
+        web3.eth,
+        "get_block",
+        return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1},
     )
 
     mock_hist_data = get_history_data(n_blocks=5)
@@ -527,7 +529,10 @@ def test_gas_price_strategy_eip1559() -> None:
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
-    assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock + gas_stregy["maxPriorityFeePerGas"]
+    assert (
+        gas_stregy["maxFeePerGas"]
+        == base_fee_per_gas_mock + gas_stregy["maxPriorityFeePerGas"]
+    )
 
 
 def test_gas_price_strategy_eip1559_estimate_none() -> None:
@@ -1059,8 +1064,35 @@ def test_estimate_priority_fee() -> None:
     # set the fee history for block 38255060 on Gnosis as an example,
     # which was causing issues with the gas estimation in `v1.61.0`:
     # `EffectivePriorityFeePerGas too low 999999976 < 1000000000`
-    web3_mock.eth.fee_history = Mock(return_value={"reward": [[999999946], [999999943], [1454999904], [999999976], [1454999872], [1000000011], [5], [1300000021], [1000000000], [1000000000], [999999888], [1000000000], [5], [1000000000], [5], [999999876], [5], [1000000000], [999999900], [5]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
+    web3_mock.eth.fee_history = Mock(
+        return_value={
+            "reward": [
+                [999999946],
+                [999999943],
+                [1454999904],
+                [999999976],
+                [1454999872],
+                [1000000011],
+                [5],
+                [1300000021],
+                [1000000000],
+                [1000000000],
+                [999999888],
+                [1000000000],
+                [5],
+                [1000000000],
+                [5],
+                [999999876],
+                [5],
+                [1000000000],
+                [999999900],
+                [5],
+            ]
+        }
+    )
+    assert (
+        estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
+    )
 
 
 def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) -> None:
