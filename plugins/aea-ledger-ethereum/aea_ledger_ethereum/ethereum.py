@@ -140,6 +140,16 @@ DEFAULT_GAS_PRICE_STRATEGIES = {
 BASE_FEE_MULTIPLIER = defaultdict(lambda: 1.2, {40: 2.0, 100: 1.6, 200: 1.4})
 
 GAS_PRICE_ORACLE_ADDRESS = "0x420000000000000000000000000000000000000F"
+GET_L1_FEE_ABI = [
+    {
+        "inputs": [{"internalType": "bytes", "name": "_data", "type": "bytes"}],
+        "name": "getL1Fee",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function",
+    }
+]
+MAX_OP_L1_FEE_INCREASE_RELATIVE_PER_BLOCK = 1.125
 
 # The tip increase is the minimum required of 10%.
 TIP_INCREASE = 1.1
@@ -197,7 +207,7 @@ def estimate_priority_fee(
         [
             reward[0]
             for reward in fee_history.get("reward", [])
-            if reward[0] >= min_allowed_tip.get(web3_object.eth.chain_id, 0)
+            if reward[0] >= min_allowed_tip.get(web3_object.eth.chain_id, 1)
         ]
     )
     if len(rewards) == 0:
@@ -1218,6 +1228,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param transaction: the transaction
         :return: the data fee in wei
         """
+        transaction = deepcopy(transaction)
         del transaction["from"]
         try:
             unsigned_raw_tx = serializable_unsigned_transaction_from_dict(transaction)
@@ -1228,19 +1239,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             unsigned_raw_tx_hex = encode_transaction(unsigned_raw_tx, (0, "0", "0"))
             gas_oracle = self.api.eth.contract(
                 address=GAS_PRICE_ORACLE_ADDRESS,
-                abi=[
-                    {
-                        "inputs": [
-                            {"internalType": "bytes", "name": "_data", "type": "bytes"}
-                        ],
-                        "name": "getL1Fee",
-                        "outputs": [
-                            {"internalType": "uint256", "name": "", "type": "uint256"}
-                        ],
-                        "stateMutability": "view",
-                        "type": "function",
-                    }
-                ],
+                abi=GET_L1_FEE_ABI,
             )
 
             l1_fee_estimate = gas_oracle.functions.getL1Fee(unsigned_raw_tx_hex).call()
@@ -1253,7 +1252,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
         # increase it by 12.5% because that's the max it can increase in the next block
         # docs: https://docs.optimism.io/builders/app-developers/transactions/fees#mechanism
-        return int(l1_fee_estimate * 1.125)
+        return int(l1_fee_estimate * MAX_OP_L1_FEE_INCREASE_RELATIVE_PER_BLOCK)
 
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False

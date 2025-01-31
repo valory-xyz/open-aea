@@ -507,13 +507,14 @@ def test_gas_price_strategy_eip1559() -> None:
 
     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
 
-    web3 = Web3()
+    web3 = Mock()
     base_fee_per_gas_mock = 15e10
     get_block_mock = mock.patch.object(
         web3.eth,
         "get_block",
         return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1},
     )
+    get_chain_id_mock = mock.patch.object(web3.eth, "chain_id", return_value=1)
 
     mock_hist_data = get_history_data(n_blocks=5)
     rewards = [rew[0] for rew in mock_hist_data["reward"]]
@@ -523,9 +524,8 @@ def test_gas_price_strategy_eip1559() -> None:
         return_value=mock_hist_data,
     )
 
-    with get_block_mock:
-        with fee_history_mock:
-            gas_stregy = callable_(web3, "tx_params")
+    with get_block_mock, fee_history_mock, get_chain_id_mock:
+        gas_stregy = callable_(web3, "tx_params")
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
