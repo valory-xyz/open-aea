@@ -1002,6 +1002,42 @@ def test_gas_estimation(
             ), f"Cannot find message in output: {caplog.text}"
 
 
+@pytest.mark.parametrize("mock_exception", (True, False))
+def test_get_l1_data_fee(
+    mock_exception,
+    ethereum_testnet_config: dict,
+    caplog,
+) -> None:
+    """Test gas estimation."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 1337,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
+        with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+            contract_instance = contract_mock.return_value
+            gas_oracle_function = contract_instance.functions.getL1Fee
+            gas_oracle_function.return_value.call.return_value = 100
+
+            if mock_exception:
+                # raise exception on first call only
+                gas_oracle_function.return_value.call.side_effect = [
+                    ValueError("triggered exception"),
+                    None,
+                ]
+                assert ethereum_api.get_l1_data_fee(tx) == 0
+            else:
+                assert ethereum_api.get_l1_data_fee(tx) == 112
+
+
 @patch.object(EthereumApi, "_try_get_transaction_count", return_value=1)
 @patch.object(EthereumApi, "_try_get_max_priority_fee", return_value=1)
 def test_ethereum_api_get_transfer_transaction_estimate_gas(*args) -> None:
@@ -1043,23 +1079,24 @@ def test_estimate_priority_fee() -> None:
     # return none on no rewards
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
+    web3_mock.eth.chain_id = 100
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) is None
 
     # test a single reward
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 1
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 1
 
     # test 2 rewards
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [2]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 2
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 2
 
     # If we have big increase in value, we could be considering "outliers" in our estimate
     # Skip the low elements and take a new median
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [10], [10000]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 10000
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 10000
 
     # test the default priority fee
-    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1, 1) == 20
+    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, {100: 1}, 1) == 20
 
     # set the fee history for block 38255060 on Gnosis as an example,
     # which was causing issues with the gas estimation in `v1.61.0`:
@@ -1091,7 +1128,8 @@ def test_estimate_priority_fee() -> None:
         }
     )
     assert (
-        estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
+        estimate_priority_fee(web3_mock, 1, None, 20, 5, {100: 1000000000}, 200)
+        == 1000000000
     )
 
 

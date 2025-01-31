@@ -53,7 +53,7 @@ Returns multiplier value.
 def estimate_priority_fee(
         web3_object: Web3, block_number: int,
         default_priority_fee: Optional[int], fee_history_blocks: int,
-        fee_history_percentile: int, min_allowed_tip: int,
+        fee_history_percentile: int, min_allowed_tip: Dict[int, int],
         priority_fee_increase_boundary: int) -> Optional[int]
 ```
 
@@ -67,7 +67,7 @@ Estimate priority fee from base fee.
 def get_gas_price_strategy_eip1559(
     max_gas_fast: int, fee_history_blocks: int, fee_history_percentile: int,
     default_priority_fee: Optional[int], fallback_estimate: Dict[str, Wei],
-    min_allowed_tip: int, priority_fee_increase_boundary: int
+    min_allowed_tip: Dict[int, int], priority_fee_increase_boundary: int
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]
 ```
 
@@ -740,6 +740,26 @@ Attempts to update the transaction with a gas estimate
 **Returns**:
 
 the updated transaction
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.get_l1_data_fee"></a>
+
+#### get`_`l1`_`data`_`fee
+
+```python
+def get_l1_data_fee(transaction: JSONLike) -> int
+```
+
+Get the L1 data fee for the transaction on OP stack chains.
+
+Docs: https://docs.optimism.io/builders/app-developers/transactions/estimates#l1-data-fee
+
+**Arguments**:
+
+- `transaction`: the transaction
+
+**Returns**:
+
+the data fee in wei
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.send_signed_transaction"></a>
 

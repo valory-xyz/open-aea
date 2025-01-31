@@ -36,6 +36,10 @@ from uuid import uuid4
 import ipfshttpclient  # noqa: F401 # pylint: disable=unused-import
 import web3._utils.request
 from eth_account import Account
+from eth_account._utils.legacy_transactions import (
+    encode_transaction,
+    serializable_unsigned_transaction_from_dict,
+)
 from eth_account._utils.signing import to_standard_signature_bytes
 from eth_account.datastructures import HexBytes, SignedTransaction
 from eth_account.messages import _hash_eip191_message, encode_defunct
@@ -102,8 +106,10 @@ FALLBACK_ESTIMATE = {
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
-# this is the minimum allowed max fee per gas on Gnosis
-DEFAULT_MIN_ALLOWED_TIP = to_wei(1, "gwei")
+DEFAULT_MIN_ALLOWED_TIP = {
+    # this is the minimum allowed max fee per gas on Gnosis
+    100: to_wei(1, "gwei"),
+}
 
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
@@ -132,6 +138,8 @@ DEFAULT_GAS_PRICE_STRATEGIES = {
 }
 
 BASE_FEE_MULTIPLIER = defaultdict(lambda: 1.2, {40: 2.0, 100: 1.6, 200: 1.4})
+
+GAS_PRICE_ORACLE_ADDRESS = "0x420000000000000000000000000000000000000F"
 
 # The tip increase is the minimum required of 10%.
 TIP_INCREASE = 1.1
@@ -171,7 +179,7 @@ def estimate_priority_fee(
     default_priority_fee: Optional[int],
     fee_history_blocks: int,
     fee_history_percentile: int,
-    min_allowed_tip: int,
+    min_allowed_tip: Dict[int, int],
     priority_fee_increase_boundary: int,
 ) -> Optional[int]:
     """Estimate priority fee from base fee."""
@@ -189,7 +197,7 @@ def estimate_priority_fee(
         [
             reward[0]
             for reward in fee_history.get("reward", [])
-            if reward[0] >= min_allowed_tip
+            if reward[0] >= min_allowed_tip.get(web3_object.eth.chain_id, 0)
         ]
     )
     if len(rewards) == 0:
@@ -223,7 +231,7 @@ def get_gas_price_strategy_eip1559(
     fee_history_percentile: int,
     default_priority_fee: Optional[int],
     fallback_estimate: Dict[str, Wei],
-    min_allowed_tip: int,
+    min_allowed_tip: Dict[int, int],
     priority_fee_increase_boundary: int,
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]:
     """Get the gas price strategy."""
@@ -1200,6 +1208,52 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
 
         return gas_estimate
+
+    def get_l1_data_fee(self, transaction: JSONLike) -> int:
+        """
+        Get the L1 data fee for the transaction on OP stack chains.
+
+        Docs: https://docs.optimism.io/builders/app-developers/transactions/estimates#l1-data-fee
+
+        :param transaction: the transaction
+        :return: the data fee in wei
+        """
+        del transaction["from"]
+        try:
+            unsigned_raw_tx = serializable_unsigned_transaction_from_dict(transaction)
+            # the GasPriceOracle contract expects an unsigned transaction bytes, and returns
+            # the amount of fee in wei, that is the cost of storing this tx bytes on L1
+            # since the size of the trasaction will be the same regardless of the signature,
+            # here the v, r, s doesn't matter, because we only need to get the size of the unsigned tx
+            unsigned_raw_tx_hex = encode_transaction(unsigned_raw_tx, (0, "0", "0"))
+            gas_oracle = self.api.eth.contract(
+                address=GAS_PRICE_ORACLE_ADDRESS,
+                abi=[
+                    {
+                        "inputs": [
+                            {"internalType": "bytes", "name": "_data", "type": "bytes"}
+                        ],
+                        "name": "getL1Fee",
+                        "outputs": [
+                            {"internalType": "uint256", "name": "", "type": "uint256"}
+                        ],
+                        "stateMutability": "view",
+                        "type": "function",
+                    }
+                ],
+            )
+
+            l1_fee_estimate = gas_oracle.functions.getL1Fee(unsigned_raw_tx_hex).call()
+        except (ContractLogicError, ValueError) as e:
+            _default_logger.warning(
+                f"Unable to estimate L1 data fee with default state , "
+                f"{type(e).__name__}: {e.__str__()}"
+            )
+            l1_fee_estimate = 0
+
+        # increase it by 12.5% because that's the max it can increase in the next block
+        # docs: https://docs.optimism.io/builders/app-developers/transactions/fees#mechanism
+        return int(l1_fee_estimate * 1.125)
 
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False
