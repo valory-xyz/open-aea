@@ -45,6 +45,16 @@ def get_base_fee_multiplier(
 
 Returns multiplier value.
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.get_default_gas_strategy"></a>
+
+#### get`_`default`_`gas`_`strategy
+
+```python
+def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]
+```
+
+Get default gas strategy for the given chain ID.
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.estimate_priority_fee"></a>
 
 #### estimate`_`priority`_`fee
@@ -740,6 +750,26 @@ Attempts to update the transaction with a gas estimate
 **Returns**:
 
 the updated transaction
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.get_l1_data_fee"></a>
+
+#### get`_`l1`_`data`_`fee
+
+```python
+def get_l1_data_fee(transaction: JSONLike) -> int
+```
+
+Get the L1 data fee for the transaction on OP stack chains.
+
+Docs: https://docs.optimism.io/builders/app-developers/transactions/estimates#l1-data-fee
+
+**Arguments**:
+
+- `transaction`: the transaction
+
+**Returns**:
+
+the data fee in wei
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.send_signed_transaction"></a>
 

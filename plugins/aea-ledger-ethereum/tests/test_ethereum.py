@@ -507,13 +507,14 @@ def test_gas_price_strategy_eip1559() -> None:
 
     callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
 
-    web3 = Web3()
+    web3 = Mock()
     base_fee_per_gas_mock = 15e10
     get_block_mock = mock.patch.object(
         web3.eth,
         "get_block",
         return_value={"baseFeePerGas": base_fee_per_gas_mock, "number": 1},
     )
+    get_chain_id_mock = mock.patch.object(web3.eth, "chain_id", return_value=1)
 
     mock_hist_data = get_history_data(n_blocks=5)
     rewards = [rew[0] for rew in mock_hist_data["reward"]]
@@ -523,9 +524,8 @@ def test_gas_price_strategy_eip1559() -> None:
         return_value=mock_hist_data,
     )
 
-    with get_block_mock:
-        with fee_history_mock:
-            gas_stregy = callable_(web3, "tx_params")
+    with get_block_mock, fee_history_mock, get_chain_id_mock:
+        gas_stregy = callable_(web3, "tx_params")
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
@@ -1002,6 +1002,42 @@ def test_gas_estimation(
             ), f"Cannot find message in output: {caplog.text}"
 
 
+@pytest.mark.parametrize("mock_exception", (True, False))
+def test_get_l1_data_fee(
+    mock_exception,
+    ethereum_testnet_config: dict,
+    caplog,
+) -> None:
+    """Test gas estimation."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 1337,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
+        with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+            contract_instance = contract_mock.return_value
+            gas_oracle_function = contract_instance.functions.getL1Fee
+            gas_oracle_function.return_value.call.return_value = 100
+
+            if mock_exception:
+                # raise exception on first call only
+                gas_oracle_function.return_value.call.side_effect = [
+                    ValueError("triggered exception"),
+                    None,
+                ]
+                assert ethereum_api.get_l1_data_fee(tx) == 0
+            else:
+                assert ethereum_api.get_l1_data_fee(tx) == 112
+
+
 @patch.object(EthereumApi, "_try_get_transaction_count", return_value=1)
 @patch.object(EthereumApi, "_try_get_max_priority_fee", return_value=1)
 def test_ethereum_api_get_transfer_transaction_estimate_gas(*args) -> None:
@@ -1043,6 +1079,7 @@ def test_estimate_priority_fee() -> None:
     # return none on no rewards
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
+    web3_mock.eth.chain_id = 100
     assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
 
     # test a single reward
