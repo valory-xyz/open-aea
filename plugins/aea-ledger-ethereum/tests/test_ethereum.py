@@ -1080,23 +1080,23 @@ def test_estimate_priority_fee() -> None:
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
     web3_mock.eth.chain_id = 100
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
 
     # test a single reward
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 1
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 1
 
     # test 2 rewards
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [2]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 2
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 2
 
     # If we have big increase in value, we could be considering "outliers" in our estimate
     # Skip the low elements and take a new median
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1], [10], [10000]]})
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, {100: 1}, 1) == 10000
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) == 10000
 
     # test the default priority fee
-    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, {100: 1}, 1) == 20
+    assert estimate_priority_fee(web3_mock, 1, 20, 11, 1, 1, 1) == 20
 
     # set the fee history for block 38255060 on Gnosis as an example,
     # which was causing issues with the gas estimation in `v1.61.0`:
@@ -1128,8 +1128,7 @@ def test_estimate_priority_fee() -> None:
         }
     )
     assert (
-        estimate_priority_fee(web3_mock, 1, None, 20, 5, {100: 1000000000}, 200)
-        == 1000000000
+        estimate_priority_fee(web3_mock, 1, None, 20, 5, 1000000000, 200) == 1000000000
     )
 
 

@@ -45,6 +45,16 @@ def get_base_fee_multiplier(
 
 Returns multiplier value.
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.get_default_gas_strategy"></a>
+
+#### get`_`default`_`gas`_`strategy
+
+```python
+def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]
+```
+
+Get default gas strategy for the given chain ID.
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.estimate_priority_fee"></a>
 
 #### estimate`_`priority`_`fee
@@ -53,7 +63,7 @@ Returns multiplier value.
 def estimate_priority_fee(
         web3_object: Web3, block_number: int,
         default_priority_fee: Optional[int], fee_history_blocks: int,
-        fee_history_percentile: int, min_allowed_tip: Dict[int, int],
+        fee_history_percentile: int, min_allowed_tip: int,
         priority_fee_increase_boundary: int) -> Optional[int]
 ```
 
@@ -67,7 +77,7 @@ Estimate priority fee from base fee.
 def get_gas_price_strategy_eip1559(
     max_gas_fast: int, fee_history_blocks: int, fee_history_percentile: int,
     default_priority_fee: Optional[int], fallback_estimate: Dict[str, Wei],
-    min_allowed_tip: Dict[int, int], priority_fee_increase_boundary: int
+    min_allowed_tip: int, priority_fee_increase_boundary: int
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]
 ```
 

@@ -106,10 +106,7 @@ FALLBACK_ESTIMATE = {
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
-DEFAULT_MIN_ALLOWED_TIP = {
-    # this is the minimum allowed max fee per gas on Gnosis
-    100: to_wei(1, "gwei"),
-}
+DEFAULT_MIN_ALLOWED_TIP = 1
 
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
@@ -131,7 +128,7 @@ DEFAULT_GAS_STATION_STRATEGY = {"gas_price_api_key": "", "gas_price_strategy": "
 
 GAS_STATION_FALLBACK_ESTIMATE = 20  # gwei
 
-DEFAULT_GAS_PRICE_STRATEGIES = {
+DEFAULT_GAS_PRICE_STRATEGIES: Dict[str, Dict[str, Any]] = {
     EIP1559: DEFAULT_EIP1559_STRATEGY,
     GAS_STATION: DEFAULT_GAS_STATION_STRATEGY,
     EIP1559_POLYGON: DEFAULT_EIP1559_STRATEGY_POLYGON,
@@ -183,13 +180,23 @@ def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float
     return BASE_FEE_MULTIPLIER[min(valid_fees)]
 
 
+def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
+    """Get default gas strategy for the given chain ID."""
+    default_strategy = deepcopy(DEFAULT_GAS_PRICE_STRATEGIES)
+    if chain_id == 100:
+        # this is the minimum allowed max fee per gas on Gnosis
+        default_strategy[EIP1559]["min_allowed_tip"] = to_wei(1, "gwei")
+
+    return default_strategy
+
+
 def estimate_priority_fee(
     web3_object: Web3,
     block_number: int,
     default_priority_fee: Optional[int],
     fee_history_blocks: int,
     fee_history_percentile: int,
-    min_allowed_tip: Dict[int, int],
+    min_allowed_tip: int,
     priority_fee_increase_boundary: int,
 ) -> Optional[int]:
     """Estimate priority fee from base fee."""
@@ -207,7 +214,7 @@ def estimate_priority_fee(
         [
             reward[0]
             for reward in fee_history.get("reward", [])
-            if reward[0] >= min_allowed_tip.get(web3_object.eth.chain_id, 1)
+            if reward[0] >= min_allowed_tip
         ]
     )
     if len(rewards) == 0:
@@ -241,7 +248,7 @@ def get_gas_price_strategy_eip1559(
     fee_history_percentile: int,
     default_priority_fee: Optional[int],
     fallback_estimate: Dict[str, Wei],
-    min_allowed_tip: Dict[int, int],
+    min_allowed_tip: int,
     priority_fee_increase_boundary: int,
 ) -> Callable[[Web3, TxParams], Dict[str, Wei]]:
     """Get the gas price strategy."""
@@ -913,7 +920,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )  # pragma: nocover
 
         self._gas_price_strategies: Dict[str, Dict] = kwargs.pop(
-            "gas_price_strategies", DEFAULT_GAS_PRICE_STRATEGIES
+            "gas_price_strategies", get_default_gas_strategy(self._chain_id)
         )
 
         self._poa_chain = kwargs.pop("poa_chain", False)
@@ -1093,7 +1100,9 @@ class EthereumApi(LedgerApi, EthereumHelper):
             gas_price_strategy
         ]
 
-        parameters = cast(dict, DEFAULT_GAS_PRICE_STRATEGIES.get(gas_price_strategy))
+        parameters = cast(
+            dict, get_default_gas_strategy(self._chain_id).get(gas_price_strategy)
+        )
         parameters.update(self._gas_price_strategies.get(gas_price_strategy, {}))
         parameters.update(extra_config or {})
         return gas_price_strategy, gas_price_strategy_getter(**parameters)
