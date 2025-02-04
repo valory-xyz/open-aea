@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 1.63.0 (2025-02-03)
+
+Plugins:
+- Defaults the minimum allowed tip as 1000000000 for Gnosis chain, and 1 for the rest.  #784
+- Adds a new function `get_l1_data_fee` to the `EthereumApi` class, to get the L1 data fee for a transaction.  #784
+
 ## 1.62.0 (2025-01-29)
 
 Packages:

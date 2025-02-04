@@ -9,9 +9,13 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
-## `v1.61.0` to `v1.62.0`
+## `v1.62.0` to `v1.63.0`
 
 - No backwards incompatible changes
+
+## `v1.61.0` to `v1.62.0`
+
+- If `EthereumApi` is used for chains other than Gnosis then `min_allowed_tip` must be set to `1` through `gas_price_strategies` parameter. The default value is only suitable for Gnosis.
 
 ## `v1.60.0` to `v1.61.0`
 
