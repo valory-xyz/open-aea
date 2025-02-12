@@ -44,6 +44,7 @@ from aea_ledger_ethereum import (
     get_gas_price_strategy_eip1559,
     requests,
     rpc_gas_price_strategy_wrapper,
+    to_eth_unit,
 )
 from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
@@ -529,10 +530,8 @@ def test_gas_price_strategy_eip1559() -> None:
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
     assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
-    assert (
-        gas_stregy["maxFeePerGas"]
-        == base_fee_per_gas_mock + gas_stregy["maxPriorityFeePerGas"]
-    )
+    base_fee_per_gas_mock *= get_base_fee_multiplier(to_eth_unit(base_fee_per_gas_mock))
+    assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock
 
 
 def test_gas_price_strategy_eip1559_estimate_none() -> None:

@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.64.0 (2025-02-12)
+
+Plugins:
+- `open-aea-ethereum` now multiplies the base gas fee as before.  #786
+
 ## 1.63.0 (2025-02-03)
 
 Plugins:
