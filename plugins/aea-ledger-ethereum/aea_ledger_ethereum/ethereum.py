@@ -282,6 +282,8 @@ def get_gas_price_strategy_eip1559(
         if base_fee is None or block_number is None:
             return fallback()
 
+        base_fee_gwei = to_eth_unit(base_fee)
+
         estimated_priority_fee = estimate_priority_fee(
             web3,
             block_number,
@@ -295,9 +297,19 @@ def get_gas_price_strategy_eip1559(
         if estimated_priority_fee is None:
             return fallback()
 
-        max_fee_per_gas = base_fee + estimated_priority_fee
+        multiplier = get_base_fee_multiplier(base_fee_gwei)
 
-        if to_eth_unit(max_fee_per_gas) >= max_gas_fast:
+        potential_max_fee = base_fee * multiplier
+        max_fee_per_gas = (
+            (potential_max_fee + estimated_priority_fee)
+            if estimated_priority_fee > potential_max_fee
+            else potential_max_fee
+        )
+
+        if (
+            to_eth_unit(max_fee_per_gas) >= max_gas_fast
+            or to_eth_unit(estimated_priority_fee) >= max_gas_fast
+        ):
             return fallback(
                 "The estimated gas price is larger than the `max_gas_fast`. Falling back."
             )
