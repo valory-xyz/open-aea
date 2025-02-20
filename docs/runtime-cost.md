@@ -41,7 +41,9 @@ docker run -p 8545:8545 -it valory/consensus-algorithms-hardhat:0.1.0
 Run the deployment. You can check the logs using ```docker logs <container> -f``` or even copy them from the container like this:
 
 ```bash
+{% raw %}
 sudo cp $(docker inspect --format='{{.LogPath}}' <container>) /tmp/docker_log && sudo chown <user> /tmp/docker_log
+{% endraw %}
 ```
 
 If you used the profiling flag, the logs will contain information about the memory used and object count for certain predefined classes. You can even plot that information using the script in open-aea's repository at `scripts/profile-log-parser.py`.
