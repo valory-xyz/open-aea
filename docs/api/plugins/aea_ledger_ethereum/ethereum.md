@@ -60,11 +60,11 @@ Get default gas strategy for the given chain ID.
 #### estimate`_`priority`_`fee
 
 ```python
-def estimate_priority_fee(
-        web3_object: Web3, block_number: int,
-        default_priority_fee: Optional[int], fee_history_blocks: int,
-        fee_history_percentile: int, min_allowed_tip: int,
-        priority_fee_increase_boundary: int) -> Optional[int]
+def estimate_priority_fee(web3_object: Web3, block_number: int,
+                          default_priority_fee: Optional[int],
+                          fee_history_blocks: int, fee_history_percentile: int,
+                          min_allowed_tip: int,
+                          priority_fee_increase_boundary: int) -> int
 ```
 
 Estimate priority fee from base fee.
