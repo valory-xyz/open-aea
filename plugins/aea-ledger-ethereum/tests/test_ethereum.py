@@ -1079,7 +1079,7 @@ def test_estimate_priority_fee() -> None:
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
     web3_mock.eth.chain_id = 100
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 145, 1) == 145
 
     # test a single reward
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
