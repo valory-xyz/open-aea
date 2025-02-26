@@ -534,42 +534,70 @@ def test_gas_price_strategy_eip1559() -> None:
     assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock
 
 
-def test_gas_price_strategy_eip1559_estimate_none() -> None:
-    """Test eip1559 based gas price strategy."""
-
-    callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
-
-    web3 = Web3()
-    get_block_mock = mock.patch.object(
-        web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
-    )
-
-    fee_history_mock = mock.patch.object(
-        web3.eth,
-        "fee_history",
-        return_value=get_history_data(
-            n_blocks=5,
-        ),
-    )
-    with get_block_mock:
-        with fee_history_mock:
-            with mock.patch(
-                "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-                new_callable=lambda: lambda *args, **kwargs: None,
-            ):
-                gas_stregy = callable_(web3, "tx_params")
-
-    assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-
-
-def test_gas_price_strategy_eip1559_fallback() -> None:
+@pytest.mark.parametrize(
+    "get_block_mock",
+    [
+        {"baseFeePerGas": None, "number": 1},
+        {"baseFeePerGas": 150e9, "number": None},
+        {"baseFeePerGas": None, "number": None},
+    ],
+)
+def test_gas_price_strategy_eip1559_fallback_get_block(
+    get_block_mock: Dict[str, Optional[int]]
+) -> None:
     """Test eip1559 based gas price strategy."""
 
     strategy_kwargs = DEFAULT_EIP1559_STRATEGY.copy()
     strategy_kwargs["max_gas_fast"] = -1
+    max_fee_per_gas = 1
+    max_priority_fee_per_gas = 2
+    strategy_kwargs["fallback_estimate"] = {
+        "maxFeePerGas": max_fee_per_gas,
+        "maxPriorityFeePerGas": max_priority_fee_per_gas,
+    }
 
     callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
     web3 = Web3()
+
+    get_block_mock = mock.patch.object(
+        web3.eth,
+        "get_block",
+        return_value=get_block_mock,
+    )
+
+    fee_history_mock = mock.patch.object(
+        web3.eth,
+        "fee_history",
+        return_value=get_history_data(
+            n_blocks=5,
+        ),
+    )
+    with get_block_mock:
+        with fee_history_mock:
+            with mock.patch(
+                "aea_ledger_ethereum.ethereum.estimate_priority_fee",
+                new_callable=lambda: lambda *args, **kwargs: 1,
+            ):
+                gas_stregy = callable_(web3, "tx_params")
+
+    assert gas_stregy == strategy_kwargs["fallback_estimate"]
+
+
+def test_gas_price_strategy_eip1559_fallback_max_gas_fast() -> None:
+    """Test eip1559 based gas price strategy."""
+
+    strategy_kwargs = DEFAULT_EIP1559_STRATEGY.copy()
+    strategy_kwargs["max_gas_fast"] = -1
+    max_fee_per_gas = 1
+    max_priority_fee_per_gas = 2
+    strategy_kwargs["fallback_estimate"] = {
+        "maxFeePerGas": max_fee_per_gas,
+        "maxPriorityFeePerGas": max_priority_fee_per_gas,
+    }
+
+    callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
+    web3 = Web3()
+
     get_block_mock = mock.patch.object(
         web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
     )
@@ -585,11 +613,11 @@ def test_gas_price_strategy_eip1559_fallback() -> None:
         with fee_history_mock:
             with mock.patch(
                 "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-                new_callable=lambda: lambda *args, **kwargs: None,
+                new_callable=lambda: lambda *args, **kwargs: 1,
             ):
                 gas_stregy = callable_(web3, "tx_params")
 
-    assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
+    assert gas_stregy == strategy_kwargs["fallback_estimate"]
 
 
 def test_gas_price_strategy_eth_gasstation():
