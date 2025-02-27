@@ -107,6 +107,7 @@ FALLBACK_ESTIMATE = {
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
 DEFAULT_MIN_ALLOWED_TIP = 1
+DEFAULT_GNOSIS_MIN_ALLOWED_TIP = to_wei(1, GWEI)
 
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
@@ -185,7 +186,7 @@ def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     default_strategy = deepcopy(DEFAULT_GAS_PRICE_STRATEGIES)
     if chain_id == 100:
         # this is the minimum allowed max fee per gas on Gnosis
-        default_strategy[EIP1559]["min_allowed_tip"] = to_wei(1, "gwei")
+        default_strategy[EIP1559]["min_allowed_tip"] = DEFAULT_GNOSIS_MIN_ALLOWED_TIP
 
     return default_strategy
 
