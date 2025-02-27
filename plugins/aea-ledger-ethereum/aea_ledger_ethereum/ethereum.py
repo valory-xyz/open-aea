@@ -198,7 +198,7 @@ def estimate_priority_fee(
     fee_history_percentile: int,
     min_allowed_tip: int,
     priority_fee_increase_boundary: int,
-) -> Optional[int]:
+) -> int:
     """Estimate priority fee from base fee."""
 
     if default_priority_fee is not None:
@@ -218,7 +218,11 @@ def estimate_priority_fee(
         ]
     )
     if len(rewards) == 0:
-        return None
+        _default_logger.warning(
+            f"Network activity has been very low for the past {fee_history_blocks} blocks "
+            f"(current block: {block_number}). Tipping with {min_allowed_tip=}."
+        )
+        return min_allowed_tip
 
     if len(rewards) == 1:
         return rewards[0]
@@ -294,11 +298,7 @@ def get_gas_price_strategy_eip1559(
             priority_fee_increase_boundary=priority_fee_increase_boundary,
         )
 
-        if estimated_priority_fee is None:
-            return fallback()
-
         multiplier = get_base_fee_multiplier(base_fee_gwei)
-
         potential_max_fee = base_fee * multiplier
         max_fee_per_gas = (
             (potential_max_fee + estimated_priority_fee)
