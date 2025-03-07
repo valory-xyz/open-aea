@@ -27,7 +27,7 @@ config:
   ledger_apis:
     ethereum:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 1
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: &id001
@@ -47,7 +47,7 @@ config:
       poa_chain: false
     ethereum_flashbots:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 1
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -70,7 +70,7 @@ config:
       chain_id: 1
     arbitrum:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 42161
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -88,7 +88,7 @@ config:
       poa_chain: false
     zksync:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 324
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -106,7 +106,7 @@ config:
       poa_chain: false
     bnb:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 56
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -124,7 +124,7 @@ config:
       poa_chain: true
     gnosis:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 100
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
