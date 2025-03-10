@@ -27,7 +27,7 @@ config:
   ledger_apis:
     ethereum:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 1
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: &id001
@@ -47,7 +47,7 @@ config:
       poa_chain: false
     ethereum_flashbots:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 1
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -67,25 +67,10 @@ config:
       flashbots_builders: []
     solana:
       address: http://127.0.0.1:8545
-      chain_id: 1337
-      default_gas_price_strategy: eip1559
-      gas_price_strategies:
-        gas_station: *id001
-        eip1559:
-          max_gas_fast: 1500
-          fee_history_blocks: 10
-          fee_history_percentile: 5
-          min_allowed_tip: 1
-          default_priority_fee: null
-          fallback_estimate:
-            maxFeePerGas: 20000000000
-            maxPriorityFeePerGas: 3000000000
-          priority_fee_increase_boundary: 200
-      is_gas_estimation_enabled: true
-      poa_chain: false
+      chain_id: 1
     arbitrum:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 42161
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -103,7 +88,7 @@ config:
       poa_chain: false
     zksync:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 324
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -121,7 +106,7 @@ config:
       poa_chain: false
     bnb:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 56
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -136,10 +121,10 @@ config:
             maxPriorityFeePerGas: 3000000000
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
-      poa_chain: false
+      poa_chain: true
     gnosis:
       address: http://127.0.0.1:8545
-      chain_id: 1337
+      chain_id: 100
       default_gas_price_strategy: eip1559
       gas_price_strategies:
         gas_station: *id001
@@ -148,24 +133,6 @@ config:
           fee_history_blocks: 10
           fee_history_percentile: 5
           min_allowed_tip: 1000000000
-          default_priority_fee: null
-          fallback_estimate:
-            maxFeePerGas: 20000000000
-            maxPriorityFeePerGas: 3000000000
-          priority_fee_increase_boundary: 200
-      is_gas_estimation_enabled: true
-      poa_chain: false
-    consensys:
-      address: http://127.0.0.1:8545
-      chain_id: 1337
-      default_gas_price_strategy: eip1559
-      gas_price_strategies:
-        gas_station: *id001
-        eip1559:
-          max_gas_fast: 1500
-          fee_history_blocks: 10
-          fee_history_percentile: 5
-          min_allowed_tip: 1
           default_priority_fee: null
           fallback_estimate:
             maxFeePerGas: 20000000000

@@ -49,8 +49,11 @@ from aea_ledger_ethereum import (
 from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
     DEFAULT_GAS_STATION_STRATEGY,
+    DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
+    DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
+    FALLBACK_ESTIMATE,
     GAS_STATION,
     TIP_INCREASE,
     estimate_priority_fee,
@@ -958,6 +961,84 @@ def test_try_get_gas_pricing(
         for param in strategy["params"]
     )
     assert gas_reprice == expected_reprice, "The repricing was performed incorrectly!"
+
+
+@pytest.mark.parametrize(
+    "chain_config, strategy_config_overrides, poa_chain",
+    (
+        # Celo cannot be tested yet (https://www.bitget.com/news/detail/12560604619224),
+        # and the gas fee estimation does not work for it as `eth_feeHistory` is not supported at the moment:
+        # https://docs.metamask.io/services/reference/celo/json-rpc-methods
+        # flake8: noqa: E800(
+        # flake8: noqa: E800    {
+        # flake8: noqa: E800        "address": "https://celo.drpc.org",
+        # flake8: noqa: E800        "chain_id": 42220,
+        # flake8: noqa: E800    },
+        # flake8: noqa: E800    None,
+        # flake8: noqa: E800    True,
+        # flake8: noqa: E800),
+        ({"address": "https://eth.drpc.org", "chain_id": 1}, None, False),
+        ({"address": "https://arbitrum.drpc.org", "chain_id": 42161}, None, False),
+        ({"address": "https://mainnet.era.zksync.io/", "chain_id": 324}, None, False),
+        ({"address": "https://binance.llamarpc.com", "chain_id": 56}, None, True),
+        (
+            {"address": "https://gnosis.drpc.org", "chain_id": 100},
+            {"min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP},
+            False,
+        ),
+        ({"address": "https://optimism.drpc.org", "chain_id": 10}, None, False),
+        ({"address": "https://base.drpc.org", "chain_id": 8453}, None, False),
+        (
+            {"address": "https://mode.drpc.org", "chain_id": 34443},
+            {
+                "fee_history_blocks": 20,
+                "fallback_estimate": {
+                    "maxFeePerGas": 2000000000,
+                    "maxPriorityFeePerGas": 300000000,
+                },
+            },
+            False,
+        ),
+        ({"address": "https://polygon.drpc.org", "chain_id": 137}, None, True),
+        ({"address": "https://fraxtal.drpc.org", "chain_id": 252}, None, False),
+    ),
+)
+def test_eip1559_on_network(
+    chain_config: Dict[str, Union[str, int]],
+    strategy_config_overrides: Optional[Dict[str, int]],
+    poa_chain: bool,
+) -> None:
+    """Test the `try_get_gas_pricing` using the eip1559 strategy on multiple chains."""
+    config = {
+        **chain_config,
+        "denom": "wei",
+        "default_gas_price_strategy": "eip1559",
+        "gas_price_strategies": {
+            "eip1559": DEFAULT_EIP1559_STRATEGY,
+        },
+        "poa_chain": poa_chain,
+    }
+    ethereum_api = EthereumApi(**config)
+    latest_block = ethereum_api.api.eth.get_block("latest")
+    base_fee = latest_block.get("baseFeePerGas")
+    gas_price = ethereum_api.try_get_gas_pricing(
+        gas_price_strategy=EIP1559, extra_config=strategy_config_overrides
+    )
+    min_allowed_tip = (
+        strategy_config_overrides.get("min_allowed_tip", DEFAULT_MIN_ALLOWED_TIP)
+        if strategy_config_overrides
+        else DEFAULT_MIN_ALLOWED_TIP
+    )
+    assert {"maxFeePerGas", "maxPriorityFeePerGas"} == set(gas_price.keys())
+    max_priority_fee = gas_price["maxPriorityFeePerGas"]
+    assert max_priority_fee >= min_allowed_tip
+    assert (
+        gas_price["maxFeePerGas"] > max_priority_fee
+        if base_fee
+        else gas_price["maxFeePerGas"] == max_priority_fee
+    )
+    assert max_priority_fee != FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
+    assert gas_price["maxFeePerGas"] != FALLBACK_ESTIMATE["maxFeePerGas"]
 
 
 @pytest.mark.parametrize(
