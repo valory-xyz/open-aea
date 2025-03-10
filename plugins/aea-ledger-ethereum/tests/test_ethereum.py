@@ -1017,6 +1017,7 @@ def test_eip1559_on_network(
             "eip1559": DEFAULT_EIP1559_STRATEGY,
         },
         "poa_chain": poa_chain,
+        "timeout": 30,
     }
     ethereum_api = EthereumApi(**config)
     latest_block = ethereum_api.api.eth.get_block("latest")
