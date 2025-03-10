@@ -45,6 +45,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     ethereum_flashbots:
       address: http://127.0.0.1:8545
       chain_id: 1
@@ -65,6 +66,7 @@ config:
       poa_chain: false
       authentication_private_key: null
       flashbots_builders: []
+      timeout: 10
     solana:
       address: http://127.0.0.1:8545
       chain_id: 1
@@ -86,6 +88,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     zksync:
       address: http://127.0.0.1:8545
       chain_id: 324
@@ -104,6 +107,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     bnb:
       address: http://127.0.0.1:8545
       chain_id: 56
@@ -122,6 +126,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: true
+      timeout: 10
     gnosis:
       address: http://127.0.0.1:8545
       chain_id: 100
@@ -140,6 +145,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     celo:
       address: http://127.0.0.1:8545
       chain_id: 42220
@@ -158,6 +164,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: true
+      timeout: 10
     optimism:
       address: http://127.0.0.1:8545
       chain_id: 10
@@ -176,6 +183,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     base:
       address: http://127.0.0.1:8545
       chain_id: 8453
@@ -194,6 +202,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     mode:
       address: http://127.0.0.1:8545
       chain_id: 34443
@@ -212,6 +221,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     polygon:
       address: http://127.0.0.1:8545
       chain_id: 137
@@ -230,6 +240,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
     fraxtal:
       address: http://127.0.0.1:8545
       chain_id: 252
@@ -248,6 +259,7 @@ config:
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
+      timeout: 10
   retry_attempts: 240
   retry_timeout: 3
 excluded_protocols: []
