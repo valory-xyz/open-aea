@@ -53,6 +53,7 @@ from aea_ledger_ethereum.ethereum import (
     DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
+    FALLBACK_ESTIMATE,
     GAS_STATION,
     TIP_INCREASE,
     estimate_priority_fee,
@@ -1036,6 +1037,8 @@ def test_eip1559_on_network(
         if base_fee
         else gas_price["maxFeePerGas"] == max_priority_fee
     )
+    assert max_priority_fee != FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
+    assert gas_price["maxFeePerGas"] != FALLBACK_ESTIMATE["maxFeePerGas"]
 
 
 @pytest.mark.parametrize(
