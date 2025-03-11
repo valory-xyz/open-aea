@@ -52,7 +52,7 @@ from requests.exceptions import ReadTimeout as RequestsReadTimeoutError
 from urllib3.exceptions import ReadTimeoutError as Urllib3ReadTimeoutError
 from web3 import HTTPProvider, Web3
 from web3._utils.events import EventFilterBuilder
-from web3._utils.request import SimpleCache
+from web3._utils.request import DEFAULT_TIMEOUT, SimpleCache
 from web3.contract.contract import ContractEvent
 from web3.datastructures import AttributeDict
 from web3.exceptions import ContractLogicError, TransactionNotFound
@@ -155,6 +155,8 @@ TIP_INCREASE = 1.1
 # the `web3` methods' names for logs filtering operations
 MATCH_SINGLE = "match_single"
 MATCH_ANY = "match_any"
+
+REQUESTS_TIMEOUT_KEY = "timeout"
 
 
 def to_eth_unit(
@@ -919,7 +921,14 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param kwargs: keyword arguments
         """
         self._api = Web3(
-            HTTPProvider(endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS))
+            HTTPProvider(
+                endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS),
+                request_kwargs={
+                    REQUESTS_TIMEOUT_KEY: kwargs.pop(
+                        REQUESTS_TIMEOUT_KEY, DEFAULT_TIMEOUT
+                    )
+                },
+            )
         )
         self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
         self._is_gas_estimation_enabled = kwargs.pop("is_gas_estimation_enabled", False)
