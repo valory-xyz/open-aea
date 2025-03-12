@@ -17,16 +17,19 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """This module contains the tests of the ethereum module."""
 
 import copy
 import hashlib
 import logging
 import math
+import os
 import random
 import re
 import tempfile
 import time
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Generator, Optional, Tuple, Union, cast
 from unittest import mock
@@ -72,6 +75,32 @@ from aea.common import JSONLike
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
 
 from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
+
+
+RPC_ENV_VAR_PREFIX = "RPC_"
+
+
+class EIP1559Networks(Enum):
+    """The supported networks upgraded with EIP-1559."""
+
+    ETHEREUM = "https://eth.drpc.org"
+    ARBITRUM = "https://arbitrum.drpc.org"
+    ZKSYNC = "https://mainnet.era.zksync.io"
+    BINANCE = "https://binance.llamarpc.com"
+    GNOSIS = "https://gnosis.drpc.org"
+    OPTIMISM = "https://optimism.drpc.org"
+    BASE = "https://base.drpc.org"
+    MODE = "https://mode.drpc.org"
+    POLYGON = "https://polygon.drpc.org"
+    FRAXTAL = "https://fraxtal.drpc.org"
+
+
+def __get_rpc(network: EIP1559Networks) -> str:
+    """Get RPC with override from environment variables, or default value."""
+    return os.getenv(f"{RPC_ENV_VAR_PREFIX}{network.name}", network.value)
+
+
+RPCS = {network: __get_rpc(network) for network in EIP1559Networks}
 
 
 def get_default_gas_strategies() -> Dict:
@@ -977,19 +1006,19 @@ def test_try_get_gas_pricing(
         # flake8: noqa: E800    None,
         # flake8: noqa: E800    True,
         # flake8: noqa: E800),
-        ({"address": "https://eth.drpc.org", "chain_id": 1}, None, False),
-        ({"address": "https://arbitrum.drpc.org", "chain_id": 42161}, None, False),
-        ({"address": "https://mainnet.era.zksync.io/", "chain_id": 324}, None, False),
-        ({"address": "https://binance.llamarpc.com", "chain_id": 56}, None, True),
+        ({"address": RPCS[EIP1559Networks.ETHEREUM], "chain_id": 1}, None, False),
+        ({"address": RPCS[EIP1559Networks.ARBITRUM], "chain_id": 42161}, None, False),
+        ({"address": RPCS[EIP1559Networks.ZKSYNC], "chain_id": 324}, None, False),
+        ({"address": RPCS[EIP1559Networks.BINANCE], "chain_id": 56}, None, True),
         (
-            {"address": "https://gnosis.drpc.org", "chain_id": 100},
+            {"address": RPCS[EIP1559Networks.GNOSIS], "chain_id": 100},
             {"min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP},
             False,
         ),
-        ({"address": "https://optimism.drpc.org", "chain_id": 10}, None, False),
-        ({"address": "https://base.drpc.org", "chain_id": 8453}, None, False),
+        ({"address": RPCS[EIP1559Networks.OPTIMISM], "chain_id": 10}, None, False),
+        ({"address": RPCS[EIP1559Networks.BASE], "chain_id": 8453}, None, False),
         (
-            {"address": "https://mode.drpc.org", "chain_id": 34443},
+            {"address": RPCS[EIP1559Networks.MODE], "chain_id": 34443},
             {
                 "fee_history_blocks": 20,
                 "fallback_estimate": {
@@ -999,8 +1028,8 @@ def test_try_get_gas_pricing(
             },
             False,
         ),
-        ({"address": "https://polygon.drpc.org", "chain_id": 137}, None, True),
-        ({"address": "https://fraxtal.drpc.org", "chain_id": 252}, None, False),
+        ({"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137}, None, True),
+        ({"address": RPCS[EIP1559Networks.FRAXTAL], "chain_id": 252}, None, False),
     ),
 )
 def test_eip1559_on_network(
