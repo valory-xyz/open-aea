@@ -88,6 +88,7 @@ class EIP1559Networks(Enum):
     ZKSYNC = "https://mainnet.era.zksync.io"
     BINANCE = "https://binance.llamarpc.com"
     GNOSIS = "https://gnosis.drpc.org"
+    CELO = "https://rpc.ankr.com/celo"
     OPTIMISM = "https://optimism.drpc.org"
     BASE = "https://base.drpc.org"
     MODE = "https://mode.drpc.org"
@@ -995,17 +996,6 @@ def test_try_get_gas_pricing(
 @pytest.mark.parametrize(
     "chain_config, strategy_config_overrides, poa_chain",
     (
-        # Celo cannot be tested yet (https://www.bitget.com/news/detail/12560604619224),
-        # and the gas fee estimation does not work for it as `eth_feeHistory` is not supported at the moment:
-        # https://docs.metamask.io/services/reference/celo/json-rpc-methods
-        # flake8: noqa: E800(
-        # flake8: noqa: E800    {
-        # flake8: noqa: E800        "address": "https://celo.drpc.org",
-        # flake8: noqa: E800        "chain_id": 42220,
-        # flake8: noqa: E800    },
-        # flake8: noqa: E800    None,
-        # flake8: noqa: E800    True,
-        # flake8: noqa: E800),
         ({"address": RPCS[EIP1559Networks.ETHEREUM], "chain_id": 1}, None, False),
         ({"address": RPCS[EIP1559Networks.ARBITRUM], "chain_id": 42161}, None, False),
         ({"address": RPCS[EIP1559Networks.ZKSYNC], "chain_id": 324}, None, False),
@@ -1014,6 +1004,14 @@ def test_try_get_gas_pricing(
             {"address": RPCS[EIP1559Networks.GNOSIS], "chain_id": 100},
             {"min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP},
             False,
+        ),
+        (
+            {
+                "address": RPCS[EIP1559Networks.CELO],
+                "chain_id": 42220,
+            },
+            None,
+            True,
         ),
         ({"address": RPCS[EIP1559Networks.OPTIMISM], "chain_id": 10}, None, False),
         ({"address": RPCS[EIP1559Networks.BASE], "chain_id": 8453}, None, False),
