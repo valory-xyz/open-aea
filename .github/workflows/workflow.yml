@@ -533,6 +533,7 @@ jobs:
           RPC_ZKSYNC: ${{ secrets.RPC_ZKSYNC || 'https://mainnet.era.zksync.io' }}
           RPC_BINANCE: ${{ secrets.RPC_BINANCE || 'https://binance.llamarpc.com' }}
           RPC_GNOSIS: ${{ secrets.RPC_GNOSIS || 'https://gnosis.drpc.org' }}
+          RPC_CELO: ${{ secrets.RPC_CELO || 'https://rpc.ankr.com/celo' }}
           RPC_OPTIMISM: ${{ secrets.RPC_OPTIMISM || 'https://optimism.drpc.org' }}
           RPC_BASE: ${{ secrets.RPC_BASE || 'https://base.drpc.org' }}
           RPC_MODE: ${{ secrets.RPC_MODE || 'https://mode.drpc.org' }}
