@@ -21,9 +21,9 @@ For an example of how to use <a href="https://kubernetes.io" target="_blank">Kub
 
 ## Deployment using a binary
 
-For making an executable binary of your aea agent:
+For making an executable binary of your `aea` agent:
 
-1. Create a python file which imports the necessary aea modules, and executes the CLI aea entrypoint. For example `aea_entrypoint.py`:
+1. Create a python file which imports the necessary `aea` modules, and executes the CLI `aea` entrypoint. For example `aea_entrypoint.py`:
 ```python
 """Script for building the AEA responsible for running an agent."""
 import os
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
 3. Use `pyinstaller` to generate the binary. For example:
 ```bash
-pyinstaller --collect-all gql --collect-all hypothesis --collect-all pycoingecko --collect-all scipy --hidden-import numpy --collect-all pandas --collect-all pyfolio --collect-all twitter_text --collect-all google.generativeai --collect-all peewee --collect-data eth_account --collect-all aea --collect-all autonomy --collect-all operate --collect-all aea_ledger_ethereum --collect-all aea_ledger_cosmos --collect-all aea_ledger_ethereum_flashbots --hidden-import aea_ledger_ethereum --hidden-import aea_ledger_cosmos --hidden-import aea_ledger_ethereum_flashbots --hidden-import grpc --hidden-import openapi_core --collect-all google.protobuf --collect-all openapi_core --collect-all openapi_spec_validator --collect-all asn1crypto --hidden-import py_ecc --hidden-import pytz --collect-all twikit --collect-all twitter_text_parser --collect-all textblob --collect-all backports.tarfile --collect-all js2py --onefile aea_entrypoint.py --name aea_bin
+pyinstaller --collect-all gql --collect-all hypothesis --collect-all pycoingecko --collect-all scipy --hidden-import numpy --collect-all pandas --collect-all pyfolio --collect-all twitter_text --collect-all google.generativeai --collect-all peewee --collect-data eth_account --collect-all autonomy --collect-all operate --collect-all aea_ledger_ethereum --collect-all aea_ledger_cosmos --collect-all aea_ledger_ethereum_flashbots --hidden-import aea_ledger_ethereum --hidden-import aea_ledger_cosmos --hidden-import aea_ledger_ethereum_flashbots --hidden-import grpc --hidden-import openapi_core --collect-all google.protobuf --collect-all openapi_core --collect-all openapi_spec_validator --collect-all asn1crypto --hidden-import py_ecc --hidden-import pytz --collect-all twikit --collect-all twitter_text_parser --collect-all textblob --collect-all backports.tarfile --collect-all js2py --onefile aea_entrypoint.py --name aea_bin --collect-all aea
 ```
 
 Refer to <a href="https://pyinstaller.org/en/stable/usage.html" target="_blank">pyinstaller docs</a> for more details, or check the <a href="https://github.com/valory-xyz/olas-operate-app/blob/v0.2.0-rc137/Makefile#L24-L27" target="_blank">Pearl's example</a>.
