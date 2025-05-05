@@ -390,3 +390,6 @@ macOS
 tasks.py
 entrypoint
 docs
+EIP-1559
+RPCs
+pyinstaller

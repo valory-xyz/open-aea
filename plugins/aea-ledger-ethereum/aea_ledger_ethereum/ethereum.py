@@ -52,7 +52,7 @@ from requests.exceptions import ReadTimeout as RequestsReadTimeoutError
 from urllib3.exceptions import ReadTimeoutError as Urllib3ReadTimeoutError
 from web3 import HTTPProvider, Web3
 from web3._utils.events import EventFilterBuilder
-from web3._utils.request import SimpleCache
+from web3._utils.request import DEFAULT_TIMEOUT, SimpleCache
 from web3.contract.contract import ContractEvent
 from web3.datastructures import AttributeDict
 from web3.exceptions import ContractLogicError, TransactionNotFound
@@ -107,6 +107,7 @@ FALLBACK_ESTIMATE = {
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
 DEFAULT_MIN_ALLOWED_TIP = 1
+DEFAULT_GNOSIS_MIN_ALLOWED_TIP = to_wei(1, GWEI)
 
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
@@ -155,6 +156,8 @@ TIP_INCREASE = 1.1
 MATCH_SINGLE = "match_single"
 MATCH_ANY = "match_any"
 
+REQUESTS_TIMEOUT_KEY = "timeout"
+
 
 def to_eth_unit(
     number: Union[int, float, str, decimal.Decimal],
@@ -185,7 +188,7 @@ def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     default_strategy = deepcopy(DEFAULT_GAS_PRICE_STRATEGIES)
     if chain_id == 100:
         # this is the minimum allowed max fee per gas on Gnosis
-        default_strategy[EIP1559]["min_allowed_tip"] = to_wei(1, "gwei")
+        default_strategy[EIP1559]["min_allowed_tip"] = DEFAULT_GNOSIS_MIN_ALLOWED_TIP
 
     return default_strategy
 
@@ -198,7 +201,7 @@ def estimate_priority_fee(
     fee_history_percentile: int,
     min_allowed_tip: int,
     priority_fee_increase_boundary: int,
-) -> Optional[int]:
+) -> int:
     """Estimate priority fee from base fee."""
 
     if default_priority_fee is not None:
@@ -218,7 +221,11 @@ def estimate_priority_fee(
         ]
     )
     if len(rewards) == 0:
-        return None
+        _default_logger.warning(
+            f"Network activity has been very low for the past {fee_history_blocks} blocks "
+            f"(current block: {block_number}). Tipping with {min_allowed_tip=}."
+        )
+        return min_allowed_tip
 
     if len(rewards) == 1:
         return rewards[0]
@@ -294,11 +301,7 @@ def get_gas_price_strategy_eip1559(
             priority_fee_increase_boundary=priority_fee_increase_boundary,
         )
 
-        if estimated_priority_fee is None:
-            return fallback()
-
         multiplier = get_base_fee_multiplier(base_fee_gwei)
-
         potential_max_fee = base_fee * multiplier
         max_fee_per_gas = (
             (potential_max_fee + estimated_priority_fee)
@@ -918,7 +921,14 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param kwargs: keyword arguments
         """
         self._api = Web3(
-            HTTPProvider(endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS))
+            HTTPProvider(
+                endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS),
+                request_kwargs={
+                    REQUESTS_TIMEOUT_KEY: kwargs.pop(
+                        REQUESTS_TIMEOUT_KEY, DEFAULT_TIMEOUT
+                    )
+                },
+            )
         )
         self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
         self._is_gas_estimation_enabled = kwargs.pop("is_gas_estimation_enabled", False)

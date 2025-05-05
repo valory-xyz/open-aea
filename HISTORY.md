@@ -1,5 +1,21 @@
 # Release History - open AEA
 
+## 1.65.0 (2025-03-13)
+
+Packages:
+- Refines the default EIP-1559 values in the ledger connection's configuration #788 && #791
+
+Plugins:
+- Uses the minimum tip as a fallback #789
+- Makes the timeout of RPC requests configurable #792
+
+Docs:
+- Fixes broken submodule and Macro syntax error #787
+
+Tests:
+- Creates a test for the EIP-1559 fee calculation #791
+- Makes the public RPCs overridable via environment variables #793
+
 ## 1.64.0 (2025-02-12)
 
 Plugins:

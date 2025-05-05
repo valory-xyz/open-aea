@@ -17,16 +17,19 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """This module contains the tests of the ethereum module."""
 
 import copy
 import hashlib
 import logging
 import math
+import os
 import random
 import re
 import tempfile
 import time
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Generator, Optional, Tuple, Union, cast
 from unittest import mock
@@ -49,8 +52,11 @@ from aea_ledger_ethereum import (
 from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
     DEFAULT_GAS_STATION_STRATEGY,
+    DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
+    DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
+    FALLBACK_ESTIMATE,
     GAS_STATION,
     TIP_INCREASE,
     estimate_priority_fee,
@@ -69,6 +75,33 @@ from aea.common import JSONLike
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
 
 from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
+
+
+RPC_ENV_VAR_PREFIX = "RPC_"
+
+
+class EIP1559Networks(Enum):
+    """The supported networks upgraded with EIP-1559."""
+
+    ETHEREUM = "https://eth.drpc.org"
+    ARBITRUM = "https://arbitrum.drpc.org"
+    ZKSYNC = "https://mainnet.era.zksync.io"
+    BINANCE = "https://binance.llamarpc.com"
+    GNOSIS = "https://gnosis.drpc.org"
+    CELO = "https://rpc.ankr.com/celo"
+    OPTIMISM = "https://optimism.drpc.org"
+    BASE = "https://base.drpc.org"
+    MODE = "https://mode.drpc.org"
+    POLYGON = "https://polygon.drpc.org"
+    FRAXTAL = "https://fraxtal.drpc.org"
+
+
+def __get_rpc(network: EIP1559Networks) -> str:
+    """Get RPC with override from environment variables, or default value."""
+    return os.getenv(f"{RPC_ENV_VAR_PREFIX}{network.name}", network.value)
+
+
+RPCS = {network: __get_rpc(network) for network in EIP1559Networks}
 
 
 def get_default_gas_strategies() -> Dict:
@@ -534,42 +567,70 @@ def test_gas_price_strategy_eip1559() -> None:
     assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock
 
 
-def test_gas_price_strategy_eip1559_estimate_none() -> None:
-    """Test eip1559 based gas price strategy."""
-
-    callable_ = get_gas_price_strategy_eip1559(**DEFAULT_EIP1559_STRATEGY)
-
-    web3 = Web3()
-    get_block_mock = mock.patch.object(
-        web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
-    )
-
-    fee_history_mock = mock.patch.object(
-        web3.eth,
-        "fee_history",
-        return_value=get_history_data(
-            n_blocks=5,
-        ),
-    )
-    with get_block_mock:
-        with fee_history_mock:
-            with mock.patch(
-                "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-                new_callable=lambda: lambda *args, **kwargs: None,
-            ):
-                gas_stregy = callable_(web3, "tx_params")
-
-    assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-
-
-def test_gas_price_strategy_eip1559_fallback() -> None:
+@pytest.mark.parametrize(
+    "get_block_mock",
+    [
+        {"baseFeePerGas": None, "number": 1},
+        {"baseFeePerGas": 150e9, "number": None},
+        {"baseFeePerGas": None, "number": None},
+    ],
+)
+def test_gas_price_strategy_eip1559_fallback_get_block(
+    get_block_mock: Dict[str, Optional[int]]
+) -> None:
     """Test eip1559 based gas price strategy."""
 
     strategy_kwargs = DEFAULT_EIP1559_STRATEGY.copy()
     strategy_kwargs["max_gas_fast"] = -1
+    max_fee_per_gas = 1
+    max_priority_fee_per_gas = 2
+    strategy_kwargs["fallback_estimate"] = {
+        "maxFeePerGas": max_fee_per_gas,
+        "maxPriorityFeePerGas": max_priority_fee_per_gas,
+    }
 
     callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
     web3 = Web3()
+
+    get_block_mock = mock.patch.object(
+        web3.eth,
+        "get_block",
+        return_value=get_block_mock,
+    )
+
+    fee_history_mock = mock.patch.object(
+        web3.eth,
+        "fee_history",
+        return_value=get_history_data(
+            n_blocks=5,
+        ),
+    )
+    with get_block_mock:
+        with fee_history_mock:
+            with mock.patch(
+                "aea_ledger_ethereum.ethereum.estimate_priority_fee",
+                new_callable=lambda: lambda *args, **kwargs: 1,
+            ):
+                gas_stregy = callable_(web3, "tx_params")
+
+    assert gas_stregy == strategy_kwargs["fallback_estimate"]
+
+
+def test_gas_price_strategy_eip1559_fallback_max_gas_fast() -> None:
+    """Test eip1559 based gas price strategy."""
+
+    strategy_kwargs = DEFAULT_EIP1559_STRATEGY.copy()
+    strategy_kwargs["max_gas_fast"] = -1
+    max_fee_per_gas = 1
+    max_priority_fee_per_gas = 2
+    strategy_kwargs["fallback_estimate"] = {
+        "maxFeePerGas": max_fee_per_gas,
+        "maxPriorityFeePerGas": max_priority_fee_per_gas,
+    }
+
+    callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
+    web3 = Web3()
+
     get_block_mock = mock.patch.object(
         web3.eth, "get_block", return_value={"baseFeePerGas": 150e9, "number": 1}
     )
@@ -585,11 +646,11 @@ def test_gas_price_strategy_eip1559_fallback() -> None:
         with fee_history_mock:
             with mock.patch(
                 "aea_ledger_ethereum.ethereum.estimate_priority_fee",
-                new_callable=lambda: lambda *args, **kwargs: None,
+                new_callable=lambda: lambda *args, **kwargs: 1,
             ):
                 gas_stregy = callable_(web3, "tx_params")
 
-    assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
+    assert gas_stregy == strategy_kwargs["fallback_estimate"]
 
 
 def test_gas_price_strategy_eth_gasstation():
@@ -933,6 +994,82 @@ def test_try_get_gas_pricing(
 
 
 @pytest.mark.parametrize(
+    "chain_config, strategy_config_overrides, poa_chain",
+    (
+        ({"address": RPCS[EIP1559Networks.ETHEREUM], "chain_id": 1}, None, False),
+        ({"address": RPCS[EIP1559Networks.ARBITRUM], "chain_id": 42161}, None, False),
+        ({"address": RPCS[EIP1559Networks.ZKSYNC], "chain_id": 324}, None, False),
+        ({"address": RPCS[EIP1559Networks.BINANCE], "chain_id": 56}, None, True),
+        (
+            {"address": RPCS[EIP1559Networks.GNOSIS], "chain_id": 100},
+            {"min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP},
+            False,
+        ),
+        (
+            {
+                "address": RPCS[EIP1559Networks.CELO],
+                "chain_id": 42220,
+            },
+            None,
+            True,
+        ),
+        ({"address": RPCS[EIP1559Networks.OPTIMISM], "chain_id": 10}, None, False),
+        ({"address": RPCS[EIP1559Networks.BASE], "chain_id": 8453}, None, False),
+        (
+            {"address": RPCS[EIP1559Networks.MODE], "chain_id": 34443},
+            {
+                "fee_history_blocks": 20,
+                "fallback_estimate": {
+                    "maxFeePerGas": 2000000000,
+                    "maxPriorityFeePerGas": 300000000,
+                },
+            },
+            False,
+        ),
+        ({"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137}, None, True),
+        ({"address": RPCS[EIP1559Networks.FRAXTAL], "chain_id": 252}, None, False),
+    ),
+)
+def test_eip1559_on_network(
+    chain_config: Dict[str, Union[str, int]],
+    strategy_config_overrides: Optional[Dict[str, int]],
+    poa_chain: bool,
+) -> None:
+    """Test the `try_get_gas_pricing` using the eip1559 strategy on multiple chains."""
+    config = {
+        **chain_config,
+        "denom": "wei",
+        "default_gas_price_strategy": "eip1559",
+        "gas_price_strategies": {
+            "eip1559": DEFAULT_EIP1559_STRATEGY,
+        },
+        "poa_chain": poa_chain,
+        "timeout": 30,
+    }
+    ethereum_api = EthereumApi(**config)
+    latest_block = ethereum_api.api.eth.get_block("latest")
+    base_fee = latest_block.get("baseFeePerGas")
+    gas_price = ethereum_api.try_get_gas_pricing(
+        gas_price_strategy=EIP1559, extra_config=strategy_config_overrides
+    )
+    min_allowed_tip = (
+        strategy_config_overrides.get("min_allowed_tip", DEFAULT_MIN_ALLOWED_TIP)
+        if strategy_config_overrides
+        else DEFAULT_MIN_ALLOWED_TIP
+    )
+    assert {"maxFeePerGas", "maxPriorityFeePerGas"} == set(gas_price.keys())
+    max_priority_fee = gas_price["maxPriorityFeePerGas"]
+    assert max_priority_fee >= min_allowed_tip
+    assert (
+        gas_price["maxFeePerGas"] > max_priority_fee
+        if base_fee
+        else gas_price["maxFeePerGas"] == max_priority_fee
+    )
+    assert max_priority_fee != FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
+    assert gas_price["maxFeePerGas"] != FALLBACK_ESTIMATE["maxFeePerGas"]
+
+
+@pytest.mark.parametrize(
     "strategy",
     ({"name": EIP1559_POLYGON, "params": ("maxPriorityFeePerGas", "maxFeePerGas")},),
 )
@@ -1079,7 +1216,7 @@ def test_estimate_priority_fee() -> None:
     web3_mock = Mock()
     web3_mock.eth.fee_history = Mock(return_value={"reward": []})
     web3_mock.eth.chain_id = 100
-    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 1, 1) is None
+    assert estimate_priority_fee(web3_mock, 1, None, 11, 1, 145, 1) == 145
 
     # test a single reward
     web3_mock.eth.fee_history = Mock(return_value={"reward": [[1]]})
