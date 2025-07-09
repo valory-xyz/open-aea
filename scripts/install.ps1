@@ -4,9 +4,9 @@
 
 function install_python {
 	echo "Installing python"
-    Invoke-WebRequest https://www.python.org/ftp/python/3.8.6/python-3.8.6-amd64-webinstall.exe -OutFile python-3.8.6-amd64-webinstall.exe
-    ./python-3.8.6-amd64-webinstall.exe /install /passive PrependPath=1 Include_test=0 Include_tcltk=0| Out-Null
-    rm ./python-3.8.6-amd64-webinstall.exe
+    Invoke-WebRequest https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64-webinstall.exe -OutFile python-3.10.11-amd64-webinstall.exe
+    ./python-3.10.11-amd64-webinstall.exe /install /passive PrependPath=1 Include_test=0 Include_tcltk=0| Out-Null
+    rm ./python-3.10.11-amd64-webinstall.exe
 
 }
 
@@ -57,7 +57,7 @@ function refresh-path {
 
 function check_python {
 	try{
-	    if (((python -V)|Out-String) -match "Python 3\.[678]\.") {
+	    if (((python -V)|Out-String) -match "Python 3\.1[01]\.") {
 	        echo "Python installed and supported!"
 	    }else{
 	        install_python

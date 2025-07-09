@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -516,10 +516,10 @@ def test_fetch_local_no_local_registry():
                 ["fetch", "--local", "fetchai/my_first_aea"],
                 catch_exceptions=False,
             )
-            assert result.exit_code == 1, result.stdout
+            assert result.exit_code == 1, result.stderr
             assert (
                 "Registry path not provided and local registry `packages` not found in current (.) and parent directory."
-                in result.stdout
+                in result.stderr
             )
 
 

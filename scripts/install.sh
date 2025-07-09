@@ -27,9 +27,9 @@ function is_python_version_ok() {
 	if which python3 2>&1 >/dev/null;
 	then
 		version=`python3 -V 2>/dev/null`
-		if [[ -z `echo $version|grep -E 'Python 3\.(7|8|9|10)\.[0-9]+'` ]];
+		if [[ -z `echo $version|grep -E 'Python 3\.(10|11)\.[0-9]+'` ]];
 		then
-			echo "Python3 version: ${version} is not supported. Supported versions are 3.8, 3.9, 3.10, 3.11."
+			echo "Python3 version: ${version} is not supported. Supported versions are 3.10, 3.11."
 			return 1
 		fi
 		return 0
@@ -120,8 +120,8 @@ function mac_install_python(){
 	fi
 
 	ensure_brew
-	echo "Install python3.8. It takes long time."
-	output=$(brew install python@3.8 2>&1)
+	echo "Install python3.10. It takes long time."
+	output=$(brew install python@3.10 2>&1)
 	if [[ $? -eq 0 ]];
 	then
 		echo "Python was successfully installed!"

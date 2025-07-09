@@ -197,7 +197,7 @@ You will have to generate the protocols again since protocol generator will use 
 
 - No backwards incompatible changes
 
-**Note** The `Ethereum Flashbots` ledger plugin and `Solana` ledger plugin are only supported on the Python 3.9 or greater.
+**Note** The `Ethereum Flashbots` ledger plugin and `Solana` ledger plugin are only supported on Python 3.10 or greater.
 
 ## `v1.29.0` to `v1.30.0`
 

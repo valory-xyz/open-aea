@@ -79,23 +79,12 @@ def test_catch_exception():
 
 def test_mix_std_err_False():
     """Test stderr and stdout not mixed."""
-    cli_runner = CliRunner(mix_stderr=False)
+    cli_runner = CliRunner()
 
     result = cli_runner.invoke(cli, "-v DEBUG run")
     assert result.exit_code == 1
     # check for access, no exception should be raised
     assert result.stderr is not None
-
-
-def test_mix_std_err_True():
-    """Test stderr and stdout are mixed."""
-    cli_runner = CliRunner(mix_stderr=True)
-
-    result = cli_runner.invoke(cli, "-v DEBUG run")
-    assert result.exit_code == 1
-
-    with pytest.raises(ValueError, match="stderr not separately captured"):
-        assert result.stderr
 
 
 def test_click_version():
@@ -105,22 +94,18 @@ def test_click_version():
     When this tests fails you need to ensure that the current versions implementation
     of the click.testing.CliRunner remains compatible with our monkey-patched version
     """
-    assert click.__version__ == "8.1.8", message
+    assert click.__version__ == "8.2.1", message
 
 
-@pytest.mark.parametrize("mix_stderr", [True, False])
-def test_capfd_on_cli_runner(mix_stderr: bool, capfd: CaptureFixture):
+def test_capfd_on_cli_runner(capfd: CaptureFixture):
     """Test setting capfd on CliRunner to redirect streams"""
 
     def run_cli_command_and_assert() -> None:
         result = cli_runner.invoke(cli, ["--help"], standalone_mode=False)
         expected = "Command-line tool for setting up an Autonomous Economic Agent"
         assert expected in result.stdout
-        if mix_stderr:
-            with pytest.raises(ValueError, match="stderr not separately captured"):
-                assert result.stderr
 
-    cli_runner = CliRunner(mix_stderr=mix_stderr)
+    cli_runner = CliRunner()
 
     with patch.object(capfd, "readouterr", wraps=capfd.readouterr) as m:
         # streams captured via CliRunner.isolation context manager
@@ -218,7 +203,7 @@ class TestCliTest:
         test_instance = self.setup_test()
         result = test_instance.run_cli("non-existent-command")
         assert result.exit_code == 2
-        assert "No such command 'non-existent-command'" in result.stdout
+        assert "No such command 'non-existent-command'" in result.stderr
 
     def test_run_cli_subprocess_failure(self) -> None:
         """Test run_cli_subprocess failure"""

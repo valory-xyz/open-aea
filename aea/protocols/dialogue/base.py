@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,7 @@ import secrets
 import sys
 from collections import defaultdict, namedtuple
 from enum import Enum
+from functools import cached_property
 from inspect import signature
 from typing import (
     Any,
@@ -46,7 +47,6 @@ from typing import (
 
 from aea.common import Address
 from aea.exceptions import AEAEnforceError, enforce
-from aea.helpers.base import cached_property
 from aea.helpers.storage.generic_storage import SyncCollection
 from aea.protocols.base import Message
 from aea.skills.base import SkillComponent
@@ -1355,7 +1355,9 @@ class PersistDialoguesStorage(BasicDialoguesStorage):
             incomplete_dialogues_data = cast(List, incomplete_dialogues_data)
             self._set_incomplete_dialogues_labels_from_json(incomplete_dialogues_data)
 
-    def _load_dialogues(self, collection: SyncCollection) -> Iterable[Dialogue]:
+    def _load_dialogues(
+        self, collection: Optional[SyncCollection] = None
+    ) -> Iterable[Dialogue]:
         """Load dialogues from collection."""
         if not collection:  # pragma: nocover
             return
@@ -1475,7 +1477,9 @@ class PersistDialoguesStorageWithOffloading(PersistDialoguesStorage):
         return None
 
     def _get_dialogue_from_collection(
-        self, dialogue_label: "DialogueLabel", collection: SyncCollection
+        self,
+        dialogue_label: "DialogueLabel",
+        collection: Optional[SyncCollection] = None,
     ) -> Optional[Dialogue]:
         """
         Get dialogue by label from collection.
@@ -1496,7 +1500,7 @@ class PersistDialoguesStorageWithOffloading(PersistDialoguesStorage):
         """Skip terminated dialogues loading, cause it's offloaded."""
 
     def _get_dialogues_by_address_from_collection(
-        self, address: Address, collection: SyncCollection
+        self, address: Address, collection: Optional[SyncCollection] = None
     ) -> List["Dialogue"]:
         """
         Get all dialogues with opponent address from specified collection.

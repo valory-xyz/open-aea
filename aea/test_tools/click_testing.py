@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ import subprocess  # nosec
 import sys
 import tempfile
 from abc import ABC
-from contextlib import nullcontext, redirect_stderr
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any, ContextManager, Optional, Sequence, Union, cast
 
@@ -86,7 +86,7 @@ class CliRunner(ClickCliRunner):
                 back the newly assigned sys.stdin, sys.stdout and sys.stderr
                 immediately after they get initially re-assigned likely suffices"""
                 )
-            cm = redirect_stderr(sys.stdout) if self.mix_stderr else nullcontext()
+            cm = nullcontext()
         else:
             cm = self.isolation(input=input, env=env, color=color)
 
@@ -125,22 +125,19 @@ class CliRunner(ClickCliRunner):
                 if self.capfd:
                     out, err = self.capfd.readouterr()
                     stdout = out.encode()
-                    stderr = err.encode() if not self.mix_stderr else None
+                    stderr = err.encode()
                 else:
                     sys.stdout.flush()
                     stdout = outstreams[0].getvalue() if not outstreams[0].closed else b""  # type: ignore
-                    if self.mix_stderr:
-                        # when it mixed, stderr always empty cause all output goes to stdout
-                        stderr = None
-                    else:
-                        stderr = (
-                            outstreams[1].getvalue() if not outstreams[1].closed else b""  # type: ignore
-                        )
+                    stderr = (
+                        outstreams[1].getvalue() if not outstreams[1].closed else b""  # type: ignore
+                    )
 
         return Result(
             runner=self,
             stdout_bytes=stdout,
             stderr_bytes=stderr,  # type: ignore
+            output_bytes=stdout + stderr,
             exit_code=exit_code,
             exception=exception,
             exc_info=exc_info,  # type: ignore
@@ -170,10 +167,10 @@ class CliTest(ABC):
         return self._t
 
     @classmethod
-    def setup_class(cls, mix_stderr: bool = True) -> None:
+    def setup_class(cls) -> None:
         """Setup test class."""
 
-        cls.__cli_runner = CliRunner(mix_stderr=mix_stderr)
+        cls.__cli_runner = CliRunner()
         cls.__cwd = Path.cwd().absolute()
 
     @classmethod
@@ -212,7 +209,7 @@ class CliTest(ABC):
 
         cli_name = f"{self.__cli.name}.cli"  # pylint: disable=no-member
         args = (*self.cli_options, *commands)
-        stderr = subprocess.STDOUT if self.__cli_runner.mix_stderr else subprocess.PIPE
+        stderr = subprocess.PIPE
         process = subprocess.Popen(  # nosec
             [sys.executable, "-m", cli_name, *args],
             **kwargs,
@@ -226,6 +223,7 @@ class CliTest(ABC):
             runner=self.__cli_runner,
             stdout_bytes=stdout_bytes,
             stderr_bytes=stderr_bytes,
+            output_bytes=stdout_bytes + stderr_bytes,
             exit_code=process.returncode,
             exception=None,
             exc_info=None,

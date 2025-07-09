@@ -418,46 +418,6 @@ Find the reachable subgraph induced by a set of starting nodes.
 
 the adjacency list of the subgraph.
 
-<a id="aea.helpers.base.cached_property"></a>
-
-## cached`_`property Objects
-
-```python
-class cached_property()
-```
-
-Cached property from python3.8 functools.
-
-<a id="aea.helpers.base.cached_property.__init__"></a>
-
-#### `__`init`__`
-
-```python
-def __init__(func: Callable) -> None
-```
-
-Init cached property.
-
-<a id="aea.helpers.base.cached_property.__set_name__"></a>
-
-#### `__`set`_`name`__`
-
-```python
-def __set_name__(_: Any, name: Any) -> None
-```
-
-Set name.
-
-<a id="aea.helpers.base.cached_property.__get__"></a>
-
-#### `__`get`__`
-
-```python
-def __get__(instance: Any, _: Optional[Any] = None) -> Any
-```
-
-Get instance.
-
 <a id="aea.helpers.base.ensure_dir"></a>
 
 #### ensure`_`dir
