@@ -49,7 +49,7 @@ class FetchLedgerDockerImage(DockerImage):
 
     PORTS = {1317: 1317, 26657: 26657}
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         client: DockerClient,
         addr: str,

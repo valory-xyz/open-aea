@@ -137,7 +137,7 @@ class MyRLAgent(RLAgent):
 
         return action
 
-    def _update_model(  # pylint: disable=unused-argument
+    def _update_model(  # pylint: disable=unused-argument,too-many-positional-arguments
         self,
         observation: Any,
         reward: float,

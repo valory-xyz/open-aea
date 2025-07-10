@@ -118,7 +118,7 @@ def headers_to_string(headers: Dict) -> str:
 class Request:
     """Generic request object."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         host_url: str,
         path: str,
@@ -373,7 +373,7 @@ class HTTPChannel(BaseAsyncChannel):
 
     RESPONSE_TIMEOUT = 5.0
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         address: Address,
         host: str,

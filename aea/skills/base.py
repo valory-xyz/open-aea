@@ -425,7 +425,7 @@ class Behaviour(AbstractBehaviour, ABC):
         :return: None
         """
 
-    def is_done(self) -> bool:  # pylint: disable=no-self-use
+    def is_done(self) -> bool:
         """Return True if the behaviour is terminated, False otherwise."""
         return False
 
@@ -599,7 +599,7 @@ class Skill(Component):
 
     __slots__ = ("_skill_context", "_handlers", "_behaviours", "_models")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         configuration: SkillConfig,
         skill_context: Optional[SkillContext] = None,

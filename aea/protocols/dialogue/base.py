@@ -227,10 +227,10 @@ class _DialogueMeta(type):
     Creates class level Rules instance to share among instances
     """
 
-    def __new__(cls, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta":
+    def __new__(mcs, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta":
         """Construct a new type."""
         # set class level `_rules`
-        dialogue_cls: Type[Dialogue] = super().__new__(cls, name, bases, dct)  # type: ignore
+        dialogue_cls: Type[Dialogue] = super().__new__(mcs, name, bases, dct)  # type: ignore
         dialogue_cls._rules = dialogue_cls.Rules(
             dialogue_cls.INITIAL_PERFORMATIVES,
             dialogue_cls.TERMINAL_PERFORMATIVES,
@@ -982,7 +982,7 @@ class Dialogue(
         )
         self._dialogue_label = final_dialogue_label
 
-    def _custom_validation(  # pylint: disable=no-self-use,unused-argument
+    def _custom_validation(  # pylint: disable=unused-argument
         self, message: Message
     ) -> Tuple[bool, str]:
         """
@@ -1557,7 +1557,7 @@ class Dialogues:
 
     _keep_terminal_state_dialogues = False
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         self_address: Address,
         end_states: FrozenSet[Dialogue.EndState],

@@ -51,7 +51,7 @@ class Agent(AbstractAgent, WithLogger):
     _inbox: InBox
     _outbox: OutBox
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         identity: Identity,
         connections: List[Connection],

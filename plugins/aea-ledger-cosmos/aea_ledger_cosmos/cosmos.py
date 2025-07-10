@@ -144,7 +144,7 @@ class DataEncrypt:
         return key, salt  # type: ignore
 
     @classmethod
-    def _aes_decrypt(
+    def _aes_decrypt(  # pylint: disable=too-many-positional-arguments
         cls, password: str, encrypted_data: bytes, nonce: bytes, tag: bytes, salt: bytes
     ) -> bytes:
         """
@@ -802,7 +802,7 @@ class _CosmosApi(LedgerApi):
             **kwargs,
         )
 
-    def _get_storage_transaction(
+    def _get_storage_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         contract_interface: Dict[str, str],
         deployer_address: Address,
@@ -849,7 +849,7 @@ class _CosmosApi(LedgerApi):
         )
         return tx
 
-    def _get_init_transaction(
+    def _get_init_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         deployer_address: Address,
         denom: str,
@@ -915,7 +915,7 @@ class _CosmosApi(LedgerApi):
         )
         return tx
 
-    def get_handle_transaction(
+    def get_handle_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         sender_address: Address,
         contract_address: Address,
@@ -1036,7 +1036,7 @@ class _CosmosApi(LedgerApi):
         res = self.wasm_client.SmartContractState(request)
         return json.loads(res.data)
 
-    def get_transfer_transaction(  # pylint: disable=arguments-differ
+    def get_transfer_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         sender_address: Address,
         destination_address: Address,
@@ -1108,7 +1108,7 @@ class _CosmosApi(LedgerApi):
         )
         return tx
 
-    def get_packed_exec_msg(
+    def get_packed_exec_msg(  # pylint: disable=too-many-positional-arguments
         self,
         sender_address: Address,
         contract_address: str,
@@ -1180,7 +1180,7 @@ class _CosmosApi(LedgerApi):
 
         return send_msg_packed
 
-    def get_multi_transaction(
+    def get_multi_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         from_addresses: List[str],
         pub_keys: Optional[List[bytes]],
@@ -1246,7 +1246,7 @@ class _CosmosApi(LedgerApi):
         )
 
     @staticmethod
-    def _get_transaction(
+    def _get_transaction(  # pylint: disable=too-many-positional-arguments
         account_numbers: List[int],
         from_addresses: List[str],
         chain_id: str,
@@ -1511,7 +1511,7 @@ class _CosmosApi(LedgerApi):
         """
         raise NotImplementedError
 
-    def build_transaction(
+    def build_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         contract_instance: Any,
         method_name: str,
@@ -1563,7 +1563,7 @@ class _CosmosApi(LedgerApi):
             f"Sending a bundle of transactions is not supported for the {self.identifier} plugin"
         )
 
-    def filter_event(
+    def filter_event(  # pylint: disable=too-many-positional-arguments
         self,
         event: Any,
         match_single: Dict[str, Any],
@@ -1690,7 +1690,7 @@ class CosmosFaucetApi(FaucetApi):
             try:
                 uid = response.json()["uuid"]
             except KeyError:  # pragma: nocover
-                ValueError(f"key `uid` not found in response_json={response.json()}")
+                raise ValueError(f"key `uid` not found in response_json={response.json()}")
             _default_logger.info("Wealth claim generated, uid: {}".format(uid))
         else:  # pragma: no cover
             _default_logger.warning(

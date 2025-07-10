@@ -189,6 +189,14 @@ class GymChannel:
         elif gym_message.performative == GymMessage.Performative.CLOSE:
             await self._run_in_executor(self.gym_env.close)
             return
+        else:
+            self.logger.warning(
+                "Received message with unsupported performative: {}".format(
+                    gym_message.performative
+                )
+            )
+            return
+
         envelope = Envelope(
             to=msg.to,
             sender=msg.sender,

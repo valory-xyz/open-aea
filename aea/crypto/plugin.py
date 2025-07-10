@@ -152,10 +152,9 @@ def _get_faucet_apis() -> List[Plugin]:
 
 def _iter_plugins() -> Iterator[Plugin]:
     """Iterate over all the plugins."""
-    for plugin in itertools.chain(
+    yield from itertools.chain(
         _get_cryptos(), _get_ledger_apis(), _get_faucet_apis()
-    ):
-        yield plugin
+    )
 
 
 def _register_plugin(plugin: Plugin, is_raising_exception: bool = True) -> None:

@@ -75,7 +75,7 @@ class DependenciesTool:
         """Get package files list."""
         packages_info = list(search_packages_info([package_name]))
         if len(packages_info) == 0:
-            raise Exception(f"package {package_name} not found")
+            raise ValueError(f"package {package_name} not found")
         if isinstance(packages_info[0], dict):
             files = packages_info[0]["files"]
             location = packages_info[0]["location"]

@@ -342,7 +342,7 @@ class MultiAgentManager:
     VENV_BUILD_TIMEOUT = 240
     SAVE_FILENAME = "save.json"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         working_dir: str,
         mode: str = "async",
@@ -682,7 +682,7 @@ class MultiAgentManager:
         """
         return list(self._projects.keys())
 
-    def add_agent(
+    def add_agent(  # pylint: disable=too-many-positional-arguments
         self,
         public_id: PublicId,
         agent_name: Optional[str] = None,

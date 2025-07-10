@@ -672,7 +672,7 @@ def parse_datetime_from_str(date_string: str) -> datetime.datetime:
 class CertRequest:
     """Certificate request for proof of representation."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         public_key: str,
         identifier: SimpleIdOrStr,
@@ -850,11 +850,11 @@ class CertRequest:
             )
         if self.public_key is not None:
             result = self.public_key
-        elif self.key_identifier is not None:
+        else:
             result = self.key_identifier
         return result
 
-    def get_message(self, public_key: str) -> bytes:  # pylint: disable=no-self-use
+    def get_message(self, public_key: str) -> bytes:
         """Get the message to sign."""
         message = self.construct_message(
             public_key,
@@ -866,7 +866,7 @@ class CertRequest:
         return message
 
     @classmethod
-    def construct_message(
+    def construct_message(  # pylint: disable=too-many-positional-arguments
         cls,
         public_key: str,
         identifier: SimpleIdOrStr,
@@ -901,7 +901,7 @@ class CertRequest:
         """
         save_path = self.get_absolute_save_path(path_prefix)
         if not Path(save_path).is_file():
-            raise Exception(  # pragma: no cover
+            raise ValueError(  # pragma: no cover
                 f"cert_request 'save_path' field {save_path} is not a file. "
                 "Please ensure that 'issue-certificates' command is called beforehand."
             )

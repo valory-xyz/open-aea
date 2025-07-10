@@ -491,7 +491,7 @@ class Terms:
         "_counterparty_hash",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         ledger_id: str,
         sender_address: Address,
@@ -840,7 +840,7 @@ class Terms:
         return good_ids, sender_supplied_quantities, counterparty_supplied_quantities
 
     @staticmethod
-    def get_hash(
+    def get_hash(  # pylint: disable=too-many-positional-arguments
         ledger_id: str,
         sender_address: str,
         counterparty_address: str,

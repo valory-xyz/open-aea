@@ -368,7 +368,7 @@ class LedgerApi(Helper, ABC):
         """
 
     @abstractmethod
-    def get_transfer_transaction(
+    def get_transfer_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         sender_address: Address,
         destination_address: Address,
@@ -497,7 +497,7 @@ class LedgerApi(Helper, ABC):
         """
 
     @abstractmethod
-    def build_transaction(
+    def build_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         contract_instance: Any,
         method_name: str,
@@ -530,7 +530,7 @@ class LedgerApi(Helper, ABC):
         """
 
     @abstractmethod
-    def filter_event(
+    def filter_event(  # pylint: disable=too-many-positional-arguments
         self,
         event: Any,
         match_single: Dict[str, Any],

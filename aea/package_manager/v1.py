@@ -78,7 +78,7 @@ class PackageManagerV1(BasePackageManager):
         DEV = "dev"
         THIRD_PARTY = "third_party"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         path: Path,
         dev_packages: Optional[PackageIdToHashMapping] = None,
@@ -228,7 +228,7 @@ class PackageManagerV1(BasePackageManager):
         )
         return self
 
-    def sync(
+    def sync(  # pylint: disable=too-many-positional-arguments
         self,
         dev: bool = False,
         third_party: bool = True,

@@ -70,7 +70,7 @@ class AEA(Agent):
 
     DEFAULT_BUILD_DIR_NAME = DEFAULT_BUILD_DIR_NAME
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         identity: Identity,
         wallet: Wallet,

@@ -59,14 +59,14 @@ def run(agents: int) -> List[Tuple[str, Union[int, float]]]:
             .exit_code
             != 0
         ):
-            raise Exception("generate-key failed")
+            raise RuntimeError("generate-key failed")
         if (
             CliRunner()
             .invoke(cli, ["add-key", "fetchai"], catch_exceptions=False)
             .exit_code
             != 0
         ):
-            raise Exception("add-key failed")
+            raise RuntimeError("add-key failed")
         agents_list = []
         env_mem_usage = get_mem_usage_in_mb()
         for _ in range(agents):

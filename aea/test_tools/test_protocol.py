@@ -43,8 +43,8 @@ class BaseProtocolMessagesTestCase(ABC):
         """Test message encode/decode."""
         msg.to = "receiver"
         assert (
-            msg._is_consistent()
-        )  # pylint: disable=protected-access  # nosec - only for testing
+            msg._is_consistent()  # pylint: disable=protected-access
+        )  # nosec - only for testing
         envelope = Envelope(to=msg.to, sender="sender", message=msg)
         envelope_bytes = envelope.encode()
 
@@ -147,7 +147,7 @@ class BaseProtocolDialoguesTestCase(ABC):
 
         def new_init(self_: Dialogues, self_address: Address) -> None:
             """New init function."""
-            self.DIALOGUES_CLASS.__init__(  # type: ignore # pylint: disable=no-value-for-parameter
+            self.DIALOGUES_CLASS(  # type: ignore # pylint: disable=no-value-for-parameter
                 self_,
                 self_address=self_address,
                 role_from_first_message=self.role_from_first_message,

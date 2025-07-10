@@ -179,7 +179,7 @@ def fetch_ipfs(
         if not remote:
             ipfs_tool.daemon.start()
         else:
-            raise Exception(f"Cannot connect to node with addr: {ipfs_tool.addr}")
+            raise ConnectionError(f"Cannot connect to node with addr: {ipfs_tool.addr}")
 
     try:
         *_download_dir, _ = os.path.split(dest)
@@ -191,4 +191,4 @@ def fetch_ipfs(
 
     except DownloadError as e:  # pragma: nocover
         ipfs_tool.daemon.stop()
-        raise Exception(str(e)) from e
+        raise DownloadError(str(e)) from e

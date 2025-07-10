@@ -267,7 +267,7 @@ class AEALauncher(AbstractMultipleRunner):
         "multiprocess": ProcessExecutor,
     }
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent_dirs: Sequence[Union[PathLike, str]],
         mode: str,

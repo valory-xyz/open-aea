@@ -38,7 +38,7 @@ from aea.protocols.dialogue.base import Dialogue, Dialogues
 class RequestDispatcher(ABC):
     """Base class for a request dispatcher."""
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         logger: Logger,
         connection_state: AsyncState,
@@ -132,7 +132,7 @@ class RequestDispatcher(ABC):
         func_result = await asyncio.wait_for(running_func, timeout=timeout)
         return func_result
 
-    def set_extra_kwargs(  # pylint: disable=no-self-use, unused-argument
+    def set_extra_kwargs(  # pylint: disable=unused-argument
         self, message: Message
     ) -> None:
         """
@@ -177,7 +177,7 @@ class RequestDispatcher(ABC):
         """
         handler = getattr(self, performative.value, None)
         if handler is None:
-            raise Exception("Performative not recognized.")  # pragma: nocover
+            raise ValueError("Performative not recognized.")  # pragma: nocover
         return handler
 
     @abstractmethod

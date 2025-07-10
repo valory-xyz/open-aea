@@ -32,7 +32,7 @@ class RaiseErrorBehaviour(TickerBehaviour):
     def act(self) -> None:
         """Act according to the behaviour."""
         self.context.logger.info("Raise Error Behaviour: act method called.")
-        raise Exception("Expected exception!")
+        raise RuntimeError("Expected exception!")
 
     def teardown(self) -> None:
         """Teardown the behaviour."""

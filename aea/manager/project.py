@@ -90,7 +90,7 @@ class Project(_Base):
         self.builder.call_all_build_entrypoints()
 
     @classmethod
-    def load(
+    def load(  # pylint: disable=too-many-positional-arguments
         cls,
         working_dir: str,
         public_id: PublicId,

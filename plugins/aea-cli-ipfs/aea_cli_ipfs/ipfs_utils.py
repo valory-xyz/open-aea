@@ -132,7 +132,7 @@ class IPFSDaemon:
         """Check if IPFS node is running."""
         res = shutil.which("ipfs")
         if res is None:
-            raise Exception("Please install IPFS first!")
+            raise RuntimeError("Please install IPFS first!")
         process = subprocess.Popen(  # nosec
             ["ipfs", "--version"],
             stdout=subprocess.PIPE,
@@ -140,7 +140,7 @@ class IPFSDaemon:
         )
         output, _ = process.communicate()
         if b"0.6.0" not in output:
-            raise Exception(
+            raise RuntimeError(
                 "Please ensure you have version 0.6.0 of IPFS daemon installed."
             )
 

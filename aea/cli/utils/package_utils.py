@@ -530,7 +530,7 @@ def is_item_present_unified(
     )
 
 
-def is_item_present(
+def is_item_present(  # pylint: disable=too-many-positional-arguments
     path: str,
     agent_config: AgentConfig,
     item_type: str,

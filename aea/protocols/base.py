@@ -66,7 +66,7 @@ class Message:
             "target",
         )
 
-    _performatives: Set[str] = set()
+    _performatives: Set[str] = set()  # pylint: disable=used-before-assignment
 
     def __init__(self, _body: Optional[Dict] = None, **kwargs: Any) -> None:
         """
@@ -236,7 +236,7 @@ class Message:
         for key, value in data.items():
             self.set(key, value)
 
-    def _is_consistent(self) -> bool:  # pylint: disable=no-self-use
+    def _is_consistent(self) -> bool:
         """Check that the data is consistent."""
         return True
 

@@ -67,7 +67,7 @@ DEFAULT_SETTLE_TIMEOUT = 60
 @click.option("--sync", type=bool, is_flag=True, default=False)
 @click.pass_context
 @check_aea_project
-def transfer(
+def transfer(  # pylint: disable=too-many-positional-arguments
     click_context: click.Context,
     type_: str,
     address: str,
@@ -130,7 +130,7 @@ def wait_tx_settled(
         time.sleep(1)
 
 
-def do_transfer(
+def do_transfer(  # pylint: disable=too-many-positional-arguments
     ctx: Context,
     identifier: str,
     address: Address,

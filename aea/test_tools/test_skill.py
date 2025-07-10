@@ -182,7 +182,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
 
         return True, "The message has the provided expected attributes."
 
-    def build_incoming_message(
+    def build_incoming_message(  # pylint: disable=too-many-positional-arguments
         self,
         message_type: Type[Message],
         performative: Message.Performative,
@@ -245,7 +245,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         incoming_message.to = default_to if to is None else to
         return incoming_message
 
-    def build_incoming_message_for_skill_dialogue(
+    def build_incoming_message_for_skill_dialogue(  # pylint: disable=too-many-positional-arguments
         self,
         dialogue: Dialogue,
         performative: Message.Performative,

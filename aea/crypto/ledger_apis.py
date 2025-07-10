@@ -119,7 +119,7 @@ class LedgerApis:
         return balance
 
     @classmethod
-    def get_transfer_transaction(
+    def get_transfer_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         identifier: str,
         sender_address: str,
@@ -270,7 +270,7 @@ class LedgerApis:
         return is_settled
 
     @staticmethod
-    def is_transaction_valid(
+    def is_transaction_valid(  # pylint: disable=too-many-positional-arguments
         identifier: str,
         tx: Any,
         seller: Address,

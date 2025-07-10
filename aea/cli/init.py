@@ -57,8 +57,8 @@ from aea.cli.utils.package_utils import validate_author_name
     "--ipfs-node", type=str, default=DEFAULT_IPFS_URL, help="Multiaddr for IPFS node."
 )
 @pass_ctx
-def init(  # pylint: disable=unused-argument
-    ctx: Context,
+def init(  # pylint: disable=too-many-positional-arguments
+    ctx: Context,  # pylint: disable=unused-argument
     author: str,
     reset: bool,
     no_subscribe: bool,
@@ -77,7 +77,7 @@ def init(  # pylint: disable=unused-argument
     )
 
 
-def do_init(
+def do_init(  # pylint: disable=too-many-positional-arguments
     author: str,
     reset: bool,
     no_subscribe: bool,

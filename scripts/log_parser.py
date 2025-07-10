@@ -91,7 +91,7 @@ class LogParser:
         self.line_trackers: Dict[str, Dict] = {}
         self.figures: List = []
 
-    def add_tracker(
+    def add_tracker(  # pylint: disable=too-many-positional-arguments
         self,
         tracker_name: str,
         regex: str,

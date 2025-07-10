@@ -68,7 +68,7 @@ from aea.crypto.registries import crypto_registry, make_crypto
 )
 @click.option("-n", type=int, help="Number of keys to generate")
 @click.pass_context
-def generate_key(
+def generate_key(  # pylint: disable=too-many-positional-arguments
     click_context: click.core.Context,
     type_: str,
     file: str,
@@ -100,7 +100,7 @@ def generate_key(
     )
 
 
-def _generate_one(
+def _generate_one(  # pylint: disable=too-many-positional-arguments
     click_context: click.core.Context,
     type_: str,
     file: str,

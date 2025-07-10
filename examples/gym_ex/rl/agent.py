@@ -138,12 +138,12 @@ class RLAgent:
 
         return action
 
-    def _update_model(  # pylint: disable=unused-argument
+    def _update_model(  # pylint: disable=too-many-positional-arguments
         self,
-        observation: Observation,  # type: ignore
+        observation: Observation,  # pylint: disable=unused-argument
         reward: Reward,
-        done: Done,
-        info: Info,
+        done: Done,  # pylint: disable=unused-argument
+        info: Info,  # pylint: disable=unused-argument
         action: Action,
     ) -> None:
         """

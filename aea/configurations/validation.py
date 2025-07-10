@@ -245,8 +245,10 @@ class ConfigValidator:
     @staticmethod
     def _build_message_from_errors(errors: List[jsonschema.ValidationError]) -> str:
         """Build an error message from validation errors."""
-        path = lambda error: "::".join(map(str, error.path))  # noqa
-        result = [f"{path(error)}: {error.message}" for error in errors]
+        def get_path(error):
+            return "::".join(map(str, error.path))
+
+        result = [f"{get_path(error)}: {error.message}" for error in errors]
         return "The following errors occurred during validation:\n - " + "\n - ".join(
             result
         )

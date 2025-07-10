@@ -114,7 +114,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
         600  # custom code to indicate there was exception during request
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent_address: Address,
         address: str,
@@ -318,7 +318,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
             return None
 
     @staticmethod
-    def to_envelope(
+    def to_envelope(  # pylint: disable=too-many-positional-arguments
         http_request_message: HttpMessage,
         status_code: int,
         headers: CIMultiDictProxy,

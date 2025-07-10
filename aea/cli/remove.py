@@ -303,7 +303,7 @@ def remove_unused_component_configurations(ctx: Context) -> Generator:
 class RemoveItem:
     """Implementation of item remove from the project."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         ctx: Context,
         item_type: str,

@@ -85,7 +85,7 @@ class FetchAIApi(_CosmosApi, FetchAIHelper):
         """
         raise NotImplementedError  # pragma: nocover
 
-    def build_transaction(
+    def build_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         contract_instance: Any,
         method_name: str,
@@ -137,7 +137,7 @@ class FetchAIApi(_CosmosApi, FetchAIHelper):
             f"Sending a bundle of transactions is not supported for the {self.identifier} plugin"
         )
 
-    def filter_event(
+    def filter_event(  # pylint: disable=too-many-positional-arguments
         self,
         event: Any,
         match_single: Dict[str, Any],

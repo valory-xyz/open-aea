@@ -180,7 +180,7 @@ class PythonPackageVersionBumper:
 
     IGNORE_DIRS = (Path(".git"),)
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         root_dir: Path,
         python_pkg_dir: Path,

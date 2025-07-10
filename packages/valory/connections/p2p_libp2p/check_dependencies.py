@@ -224,7 +224,7 @@ def build_node(build_dir: str) -> None:
         copy_tree(LIBP2P_NODE_MODULE, dirname)
         err_str = _golang_module_build(dirname)
         if err_str:  # pragma: nocover
-            raise Exception(f"Node build failed: {err_str}")
+            raise RuntimeError(f"Node build failed: {err_str}")
         ensure_dir(build_dir)
         shutil.copy(
             os.path.join(dirname, LIBP2P_NODE_MODULE_NAME),

@@ -62,7 +62,7 @@ def get_auth_token() -> Optional[str]:
     )
 
 
-def request_api(
+def request_api(  # pylint: disable=too-many-positional-arguments
     method: str,
     path: str,
     params: Optional[Dict] = None,
@@ -109,7 +109,7 @@ def request_api(
         logger.debug("Successfully created!")
     elif resp.status_code == 403:
         raise click.ClickException(
-            "You are not authenticated. " 'Please sign in with "aea login" command.'
+            'You are not authenticated. Please sign in with "aea login" command.'
         )
     elif resp.status_code == 500:
         raise click.ClickException(
@@ -142,7 +142,7 @@ def request_api(
     return resp_json
 
 
-def _perform_registry_request(
+def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
     method: str,
     path: str,
     params: Optional[Dict] = None,
@@ -250,9 +250,9 @@ def clean_tarfiles(func: Callable) -> Callable:
         except Exception as e:
             _rm_tarfiles()
             raise e
-        else:
-            _rm_tarfiles()
-            return result
+
+        _rm_tarfiles()
+        return result
 
     return wrapper
 

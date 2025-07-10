@@ -55,7 +55,7 @@ class AgentContext:
         "_send_to_skill",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         identity: Identity,
         connection_status: MultiplexerStatus,

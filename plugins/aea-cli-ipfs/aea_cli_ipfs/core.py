@@ -168,7 +168,7 @@ def register_package(
     """
 
     click.echo(f"Processing package: {dir_path}")
-    name, package_hash, _ = ipfs_tool.add(dir_path, pin=(not no_pin))
+    name, package_hash, _ = ipfs_tool.add(dir_path, pin=not no_pin)
     package_hash = to_v1(package_hash)
     path_data = _get_path_data(dir_path)
     if path_data is not None:

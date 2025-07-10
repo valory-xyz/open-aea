@@ -59,8 +59,7 @@ DEFAULT_CONFIG_FILE_PATHS: List[Path] = []
 
 def default_config_file_paths() -> Generator:
     """Get (generator) the default config file paths."""
-    for item in DEFAULT_CONFIG_FILE_PATHS:
-        yield item
+    yield from DEFAULT_CONFIG_FILE_PATHS
 
 
 def unified_yaml_load(configuration_file: Path) -> Dict:

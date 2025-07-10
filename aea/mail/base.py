@@ -268,7 +268,7 @@ class Envelope:
 
     __slots__ = ("_to", "_sender", "_protocol_specification_id", "_message", "_context")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         to: Address,
         sender: Address,

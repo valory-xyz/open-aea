@@ -214,8 +214,7 @@ class BasePackageManager(ABC):
     ) -> Iterator[PackageId]:
         """Iterate dependency tree."""
         for level in DependencyTree.generate(packages_dir=self.path):
-            for package_id in level:
-                yield package_id
+            yield from level
 
     def check_dependencies(
         self,

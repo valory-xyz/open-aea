@@ -47,7 +47,7 @@ class Identity:
         "_default_address_key",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         address: Optional[str] = None,

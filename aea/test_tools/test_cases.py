@@ -875,7 +875,7 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
         return read_envelope_from_file(str(cls.t / agent / DEFAULT_OUTPUT_FILE_NAME))
 
     @classmethod
-    def missing_from_output(
+    def missing_from_output(  # pylint: disable=too-many-positional-arguments
         cls,
         process: subprocess.Popen,
         strings: Sequence[str],

@@ -268,8 +268,7 @@ def public_id_in_registry(type_: str, name: str) -> PublicId:
     for id_ in ids:
         p_id = PublicId.from_str(id_[0])
         p_ids.append(p_id)
-        if p_id > highest:
-            highest = p_id
+        highest = max(highest, p_id)
     return highest
 
 
@@ -462,7 +461,7 @@ def _can_disambiguate_from_context(
     return None
 
 
-def _ask_to_user(
+def _ask_to_user(  # pylint: disable=too-many-positional-arguments
     lines: List[str], line: str, idx: int, old_string: str, type_: str, lines_num: int
 ) -> str:
     print("=" * 50)
@@ -598,7 +597,7 @@ def bump_version_in_yaml(
 class Updater:
     """PAckage versions updter tool."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self, ask_version, update_version, replace_by_default, no_interactive, context
     ):
         """Init updater."""
@@ -613,14 +612,14 @@ class Updater:
         """Check svn tool installed."""
         res = shutil.which("svn")
         if res is None:
-            raise Exception("Install svn first!")
+            raise RuntimeError("Install svn first!")
 
     @staticmethod
     def run_hashing():
         """Run hashes update."""
         hashing_call = update_hashes(packages_dir=ROOT_DIR / "packages")
         if hashing_call == 1:
-            raise Exception("Problem when running IPFS script!")
+            raise RuntimeError("Problem when running IPFS script!")
 
     @staticmethod
     def check_if_running_allowed():
@@ -633,7 +632,7 @@ class Updater:
         (stdout, _) = git_call.communicate()
         git_call.wait()
         if len(stdout) > 0:
-            raise Exception("Cannot run script in unclean git state.")
+            raise RuntimeError("Cannot run script in unclean git state.")
 
     def _checks(self):
         self.check_if_svn_installed()
@@ -729,7 +728,7 @@ class Updater:
         elif self.option_update_version == "patch":
             new_version = ver.bump_patch()
         else:
-            raise Exception("unknown version update mode")
+            raise RuntimeError("unknown version update mode")
 
         return str(new_version)
 
@@ -773,7 +772,7 @@ class Updater:
         while self._run_once():
             self._run_hashing()
 
-    def inplace_change(
+    def inplace_change(  # pylint: disable=too-many-positional-arguments
         self,
         fp: Path,
         old_public_id: PublicId,

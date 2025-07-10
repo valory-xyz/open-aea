@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 class GanacheDockerImage(DockerImage):
     """Wrapper to Ganache Docker image."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         client: DockerClient,
         addr: str,

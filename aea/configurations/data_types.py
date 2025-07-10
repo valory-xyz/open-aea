@@ -811,7 +811,7 @@ class Dependency:
 
     __slots__ = ("_name", "_version", "_index", "_git", "_ref", "_extras")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: Union[PyPIPackageName, str],
         version: Union[str, SpecifierSet] = "",

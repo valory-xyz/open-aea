@@ -231,7 +231,7 @@ class P2PLibp2pMailboxConnection(Connection):
         try:
             nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
         except KeyError:
-            raise AEAEnforceError(f"Delegate 'public_key' should be provided for each node")
+            raise AEAEnforceError("Delegate 'public_key' should be provided for each node")
 
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,
@@ -246,7 +246,7 @@ class P2PLibp2pMailboxConnection(Connection):
         for cert_request in cert_requests:
             save_path = cert_request.get_absolute_save_path(Path(self.data_dir))
             if not save_path.is_file():
-                raise Exception(  # pragma: nocover
+                raise ValueError(  # pragma: nocover
                     "cert_request 'save_path' field is not a file. "
                     "Please ensure that 'issue-certificates' command is called beforehand"
                 )

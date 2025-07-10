@@ -193,7 +193,7 @@ def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     return default_strategy
 
 
-def estimate_priority_fee(
+def estimate_priority_fee(  # pylint: disable=too-many-positional-arguments
     web3_object: Web3,
     block_number: int,
     default_priority_fee: Optional[int],
@@ -249,7 +249,7 @@ def estimate_priority_fee(
     return values[len(values) // 2]
 
 
-def get_gas_price_strategy_eip1559(
+def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-arguments
     max_gas_fast: int,
     fee_history_blocks: int,
     fee_history_percentile: int,
@@ -1007,7 +1007,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             f"Response must be of types=int, float, bytes, str, list, dict. Found={type(response)}."
         )
 
-    def get_transfer_transaction(  # pylint: disable=arguments-differ
+    def get_transfer_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         sender_address: Address,
         destination_address: Address,
@@ -1235,7 +1235,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         except (ContractLogicError, ValueError) as e:
             _default_logger.warning(
                 f"Unable to estimate gas with default state , "
-                f"{type(e).__name__}: {e.__str__()}"
+                f"{type(e).__name__}: {str(e)}"
             )
             # gas estimation might fail when repricing txs
             # to avoid effects of pending txs when estimating gas
@@ -1277,7 +1277,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         except (ContractLogicError, ValueError) as e:
             _default_logger.warning(
                 f"Unable to estimate L1 data fee with default state , "
-                f"{type(e).__name__}: {e.__str__()}"
+                f"{type(e).__name__}: {str(e)}"
             )
             l1_fee_estimate = 0
 
@@ -1583,7 +1583,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         result = method(**method_args).call()
         return result
 
-    def build_transaction(  # pylint: disable=too-many-arguments
+    def build_transaction(  # pylint: disable=too-many-positional-arguments
         self,
         contract_instance: Any,
         method_name: str,
@@ -1691,7 +1691,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             f"Sending a bundle of transactions is not supported for the {self.identifier} plugin"
         )
 
-    def batch_filter_wrapper(
+    def batch_filter_wrapper(  # pylint: disable=too-many-positional-arguments
         self,
         event: ContractEvent,
         match_single: Dict[str, Any],
@@ -1724,7 +1724,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
         return batch_filter
 
-    def filter_event(
+    def filter_event(  # pylint: disable=too-many-positional-arguments
         self,
         event: ContractEvent,
         match_single: Dict[str, Any],

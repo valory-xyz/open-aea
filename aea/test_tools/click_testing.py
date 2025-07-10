@@ -62,7 +62,7 @@ class CliRunner(ClickCliRunner):
     # NOTE: always set on the instance, never the class
     capfd: Optional[CaptureFixture] = None
 
-    def invoke(  # type: ignore
+    def invoke(  # type: ignore  # pylint: disable=too-many-positional-arguments
         self,
         cli,
         args=None,

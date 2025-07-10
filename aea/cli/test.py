@@ -488,7 +488,7 @@ def load_package(
             )
 
 
-def test_package_by_path(
+def test_package_by_path(  # pylint: disable=too-many-positional-arguments
     package_dir: Path,
     pytest_arguments: Sequence[str],
     aea_project_path: Optional[Path] = None,
@@ -537,7 +537,7 @@ def test_package_by_path(
     sys.exit(exit_code)
 
 
-def test_package_collection(
+def test_package_collection(  # pylint: disable=too-many-positional-arguments
     available_packages: List[Tuple[str, Path]],
     packages_dir: Path,
     pytest_args: List[str],

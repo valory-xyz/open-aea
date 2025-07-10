@@ -190,7 +190,7 @@ class PeriodicCaller:
     Used for periodic function run using asyncio.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         callback: Callable,
         period: float,

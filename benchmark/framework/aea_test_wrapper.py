@@ -113,7 +113,7 @@ class AEATestWrapper:
         return skill
 
     @classmethod
-    def dummy_default_message(
+    def dummy_default_message(  # pylint: disable=too-many-positional-arguments
         cls,
         dialogue_reference: Tuple[str, str] = ("", ""),
         message_id: int = 1,
@@ -240,7 +240,7 @@ class AEATestWrapper:
         :param envelope: envelope to generate. dummy one created by default.
         """
         if self._fake_connection:
-            raise Exception("Fake connection is already set!")
+            raise RuntimeError("Fake connection is already set!")
 
         envelope = envelope or self.dummy_envelope()
         self._fake_connection = FakeConnection(
@@ -255,5 +255,5 @@ class AEATestWrapper:
         :return: bool
         """
         if not self._fake_connection:
-            raise Exception("Fake connection is not set!")
+            raise RuntimeError("Fake connection is not set!")
         return self._fake_connection.num != 0  # type: ignore # cause fake connection is used.

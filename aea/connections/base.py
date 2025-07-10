@@ -63,7 +63,7 @@ class Connection(Component, ABC):
 
     connection_id = None  # type: PublicId
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         configuration: ConnectionConfig,
         data_dir: str,
@@ -341,7 +341,7 @@ class BaseSyncConnection(Connection):
     _incoming_messages_queue: asyncio.Queue  # [Optional[Envelope]]
     _loop: asyncio.AbstractEventLoop
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         configuration: ConnectionConfig,
         data_dir: str,

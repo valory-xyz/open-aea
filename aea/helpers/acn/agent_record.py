@@ -42,7 +42,7 @@ class AgentRecord:
         "_public_key",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         address: str,
         representative_public_key: str,

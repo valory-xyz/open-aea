@@ -66,7 +66,7 @@ class BaseRuntime(Runnable, WithLogger):
     TASKMANAGERS = {"threaded": ThreadedTaskManager, "multiprocess": ProcessTaskManager}
     DEFAULT_TASKMANAGER = "threaded"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent: AbstractAgent,
         multiplexer_options: Dict,
@@ -263,7 +263,7 @@ class AsyncRuntime(BaseRuntime):
 
     AGENT_LOOP_STARTED_TIMEOUT: float = 5
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent: AbstractAgent,
         multiplexer_options: Dict,
