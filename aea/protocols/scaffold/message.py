@@ -60,5 +60,3 @@ class MyScaffoldMessage(Message):
             raise NotImplementedError
         except (AssertionError, ValueError):
             return False  # pragma: no cover
-
-        return True  # pragma: no cover
