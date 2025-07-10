@@ -282,7 +282,7 @@ class TestAEAToACA:
 class AEAHandler(Handler):
     """The handler for the AEA."""
 
-    SUPPORTED_PROTOCOL = HttpMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = HttpMessage.protocol_id
 
     def __init__(self, **kwargs):
         """Initialize the handler."""

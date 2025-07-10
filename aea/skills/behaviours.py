@@ -258,13 +258,13 @@ class FSMBehaviour(CompositeBehaviour, ABC):
         """Initialize the finite-state machine behaviour."""
         super().__init__(**kwargs)
 
-        self._name_to_state = {}  # type: Dict[str, State]
-        self._initial_state = None  # type: Optional[str]
-        self._final_states = set()  # type: Set[str]
-        self.current = None  # type: Optional[str]
+        self._name_to_state: Dict[str, State] = {}
+        self._initial_state: Optional[str] = None
+        self._final_states: Set[str] = set()
+        self.current: Optional[str] = None
 
         # mapping from state to mappings event-next_state
-        self.transitions = {}  # type: Dict[str, Dict[Optional[str], str]]
+        self.transitions: Dict[str, Dict[Optional[str], str]] = {}
 
     @property
     def is_started(self) -> bool:

@@ -328,7 +328,7 @@ class BaseTestFetchAgentError(BaseAEATestCase, ABC):
     )
     def test_fetch_negative(self, *_mocks) -> None:
         """Test fetch in mixed mode."""
-        if type(self) == BaseTestFetchAgentError:
+        if type(self) is BaseTestFetchAgentError:
             pytest.skip("Base test class.")
         with pytest.raises(
             Exception,

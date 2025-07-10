@@ -43,7 +43,7 @@ class TestStrategy(ERC1155ClientTestCase):
         """Test the get_location_and_service_query method of the Strategy class."""
         query = self.strategy.get_location_and_service_query()
 
-        assert type(query) == Query
+        assert type(query) is Query
         assert len(query.constraints) == 2
         assert query.model is None
 
@@ -68,7 +68,7 @@ class TestStrategy(ERC1155ClientTestCase):
         """Test the get_service_query method of the Strategy class."""
         query = self.strategy.get_service_query()
 
-        assert type(query) == Query
+        assert type(query) is Query
         assert len(query.constraints) == 1
 
         assert query.model == SIMPLE_SERVICE_MODEL

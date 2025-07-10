@@ -61,7 +61,7 @@ LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 class FipaHandler(Handler):
     """This class implements a FIPA handler."""
 
-    SUPPORTED_PROTOCOL = FipaMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = FipaMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -222,7 +222,7 @@ class FipaHandler(Handler):
 class LedgerApiHandler(Handler):
     """Implement the ledger api handler."""
 
-    SUPPORTED_PROTOCOL = LedgerApiMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = LedgerApiMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -398,7 +398,7 @@ class LedgerApiHandler(Handler):
 class ContractApiHandler(Handler):
     """Implement the contract api handler."""
 
-    SUPPORTED_PROTOCOL = ContractApiMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = ContractApiMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -516,7 +516,7 @@ class ContractApiHandler(Handler):
 class SigningHandler(Handler):
     """Implement the transaction handler."""
 
-    SUPPORTED_PROTOCOL = SigningMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = SigningMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -618,7 +618,7 @@ class SigningHandler(Handler):
 class OefSearchHandler(Handler):
     """This class implements an OEF search handler."""
 
-    SUPPORTED_PROTOCOL = OefSearchMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = OefSearchMessage.protocol_id
 
     def setup(self) -> None:
         """Call to setup the handler."""

@@ -93,7 +93,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_location_description method of the GenericStrategy class."""
         description = self.strategy.get_location_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_LOCATION_MODEL
         assert description.values.get("location", "") == Location(
             latitude=self.location["latitude"], longitude=self.location["longitude"]
@@ -103,7 +103,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_register_service_description method of the GenericStrategy class."""
         description = self.strategy.get_register_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_SET_SERVICE_MODEL
         assert description.values.get("key", "") == "seller_service"
         assert description.values.get("value", "") == "some_service"
@@ -112,7 +112,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_register_personality_description method of the GenericStrategy class."""
         description = self.strategy.get_register_personality_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_PERSONALITY_MODEL
         assert description.values.get("piece", "") == "genus"
         assert description.values.get("value", "") == "data"
@@ -121,7 +121,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_register_classification_description method of the GenericStrategy class."""
         description = self.strategy.get_register_classification_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_PERSONALITY_MODEL
         assert description.values.get("piece", "") == "classification"
         assert description.values.get("value", "") == "seller"
@@ -130,7 +130,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_service_description method of the GenericStrategy class."""
         description = self.strategy.get_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is SIMPLE_SERVICE_MODEL
         assert description.values.get("seller_service", "") == "some_service"
 
@@ -138,7 +138,7 @@ class TestGenericStrategy(BaseSkillTestCase):
         """Test the get_unregister_service_description method of the GenericStrategy class."""
         description = self.strategy.get_unregister_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_REMOVE_SERVICE_MODEL
         assert description.values.get("key", "") == "seller_service"
 

@@ -366,7 +366,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 await task
             except KeyboardInterrupt:  # pragma: nocover
                 raise
-            except BaseException:  # pragma: nocover # pylint: disable=broad-except
+            except BaseException:  # pragma: nocover # pylint: disable=broad-except # noqa: B036
                 pass  # nosec
 
     async def disconnect(self) -> None:

@@ -102,14 +102,14 @@ class LocalNode:
         :param logger: the logger.
         """
         self._lock = threading.Lock()
-        self.services = defaultdict(lambda: [])  # type: Dict[str, List[Description]]
+        self.services: Dict[str, List[Description]] = defaultdict(lambda: [])
         self._loop = loop if loop is not None else asyncio.new_event_loop()
         self._thread = Thread(target=self._run_loop, daemon=True)
 
-        self._in_queue = None  # type: Optional[asyncio.Queue]
-        self._out_queues = {}  # type: Dict[str, asyncio.Queue]
+        self._in_queue: Optional[asyncio.Queue] = None
+        self._out_queues: Dict[str, asyncio.Queue] = {}
 
-        self._receiving_loop_task = None  # type: Optional[Future]
+        self._receiving_loop_task: Optional[Future] = None
         self.address: Optional[Address] = None
         self._dialogues: Optional[OefSearchDialogues] = None
         self.logger = logger

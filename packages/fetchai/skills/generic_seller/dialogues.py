@@ -118,8 +118,8 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self.data_for_sale = None  # type: Optional[Dict[str, str]]
-        self._terms = None  # type: Optional[Terms]
+        self.data_for_sale: Optional[Dict[str, str]] = None
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:

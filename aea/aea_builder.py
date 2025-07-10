@@ -118,12 +118,10 @@ class _DependenciesManager:
         """Initialize the dependency graph."""
         # adjacency list of the dependency DAG
         # an arc means "depends on"
-        self._dependencies = {}  # type: Dict[ComponentId, ComponentConfiguration]
-        self._all_dependencies_by_type = (
-            {}
-        )  # type: Dict[ComponentType, Dict[ComponentId, ComponentConfiguration]]
-        self._prefix_to_components = {}  # type: Dict[PackageIdPrefix, Set[ComponentId]]
-        self._inverse_dependency_graph = {}  # type: Dict[ComponentId, Set[ComponentId]]
+        self._dependencies: Dict[ComponentId, ComponentConfiguration] = {}
+        self._all_dependencies_by_type: Dict[ComponentType, Dict[ComponentId, ComponentConfiguration]] = {}
+        self._prefix_to_components: Dict[PackageIdPrefix, Set[ComponentId]] = {}
+        self._inverse_dependency_graph: Dict[ComponentId, Set[ComponentId]] = {}
 
         self.agent_pypi_dependencies: Dependencies = {}
 

@@ -289,7 +289,7 @@ class AgentRunProcessTask(BaseAgentRunTask):
             aea.runtime.start()
             loop.run_until_complete(aea.runtime.wait_completed())
 
-        except BaseException as e:  # pylint: disable=broad-except
+        except BaseException as e:  # pylint: disable=broad-except  # noqa: B036
             print(
                 f"Exception in agent subprocess task at {datetime.datetime.now()}:\n{format_exc()}"
             )

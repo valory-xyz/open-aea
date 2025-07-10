@@ -163,7 +163,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         """
         if (
             type(actual_message)  # pylint: disable=unidiomatic-typecheck
-            != message_type
+            is not message_type
         ):
             return (
                 False,

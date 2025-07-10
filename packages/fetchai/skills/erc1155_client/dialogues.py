@@ -98,8 +98,8 @@ class ContractApiDialogue(BaseContractApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._terms = None  # type: Optional[Terms]
-        self._associated_fipa_dialogue = None  # type: Optional[BaseFipaDialogue]
+        self._terms: Optional[Terms] = None
+        self._associated_fipa_dialogue: Optional[BaseFipaDialogue] = None
 
     @property
     def terms(self) -> Terms:
@@ -318,9 +318,7 @@ class SigningDialogue(BaseSigningDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_contract_api_dialogue = (
-            None
-        )  # type: Optional[ContractApiDialogue]
+        self._associated_contract_api_dialogue: Optional[ContractApiDialogue] = None
 
     @property
     def associated_contract_api_dialogue(self) -> ContractApiDialogue:

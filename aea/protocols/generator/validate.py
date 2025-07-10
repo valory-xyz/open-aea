@@ -815,7 +815,7 @@ def _validate_keep_terminal(keep_terminal_state_dialogues: bool) -> Tuple[bool, 
     # check the type of keep_terminal_state_dialogues's value
     if (
         type(keep_terminal_state_dialogues)  # pylint: disable=unidiomatic-typecheck
-        != bool
+        is bool
     ):
         return (
             False,

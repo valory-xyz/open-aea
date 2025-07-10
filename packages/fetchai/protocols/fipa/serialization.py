@@ -125,7 +125,7 @@ class FipaSerializer(Serializer):
         fipa_pb.ParseFromString(message_pb.dialogue_message.content)
         performative = fipa_pb.WhichOneof("performative")
         performative_id = FipaMessage.Performative(str(performative))
-        performative_content = dict()  # type: Dict[str, Any]
+        performative_content: Dict[str, Any] = dict()
         if performative_id == FipaMessage.Performative.CFP:
             pb2_query = fipa_pb.cfp.query
             query = Query.decode(pb2_query)

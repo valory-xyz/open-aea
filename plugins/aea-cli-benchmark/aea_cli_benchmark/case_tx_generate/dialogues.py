@@ -79,8 +79,6 @@ class SigningDialogues(BaseSigningDialogues):
             dialogue_class=SigningDialogue,
         )
 
-        return None
-
 
 class FipaDialogue(BaseFipaDialogue):
     """The dialogue class maintains state of a dialogue and manages it."""
@@ -112,7 +110,7 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self._terms = None  # type: Optional[Terms]
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:
@@ -185,7 +183,7 @@ class LedgerApiDialogue(BaseLedgerApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_fipa_dialogue = None  # type: Optional[FipaDialogue]
+        self._associated_fipa_dialogue: Optional[FipaDialogue] = None
 
     @property
     def associated_fipa_dialogue(self) -> FipaDialogue:

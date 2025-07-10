@@ -39,7 +39,7 @@ TEST_DUMMY_AEA_DIR = TEST_DATA / "dummy_aea"
 FETCHAI_PACKAGES = ROOT_PATH / "packages" / "fetchai"
 OPEN_AEA_PACKAGES = ROOT_PATH / "packages" / "open_aea"
 
-SYMLINKS = [
+SYMLINKS: List[Tuple[Path, Path]] = [
     (TEST_DUMMY_AEA_DIR / "skills" / "dummy", TEST_DATA / "dummy_skill"),
     (
         TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "protocols" / "default",
@@ -73,7 +73,7 @@ SYMLINKS = [
         TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "skills" / "error",
         FETCHAI_PACKAGES / "skills" / "error",
     ),
-]  # type: List[Tuple[Path, Path]]
+]
 """A list of pairs: (link_path, target_path)"""
 
 

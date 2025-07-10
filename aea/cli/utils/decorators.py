@@ -68,7 +68,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
     if check_aea_version:
         _check_aea_version(ctx.agent_config)
 
-    packages_public_ids_to_types = dict(
+    packages_public_ids_to_types: Dict[PublicId, PackageType] = dict(
         [
             *map(lambda x: (x, PackageType.PROTOCOL), ctx.agent_config.protocols),
             *map(
@@ -78,7 +78,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
             *map(lambda x: (x, PackageType.SKILL), ctx.agent_config.skills),
             *map(lambda x: (x, PackageType.CONTRACT), ctx.agent_config.contracts),
         ]
-    )  # type: Dict[PublicId, PackageType]
+    )
 
     for public_id, item_type in packages_public_ids_to_types.items():
         # find the configuration file.

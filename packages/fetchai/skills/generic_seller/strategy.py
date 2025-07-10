@@ -49,9 +49,9 @@ DEFAULT_PERSONALITY_DATA = {"piece": "genus", "value": "data"}
 DEFAULT_CLASSIFICATION = {"piece": "classification", "value": "seller"}
 
 DEFAULT_HAS_DATA_SOURCE = False
-DEFAULT_DATA_FOR_SALE = {
+DEFAULT_DATA_FOR_SALE: Optional[Dict[str, Any]] = {
     "some_generic_data_key": "some_generic_data_value"
-}  # type: Optional[Dict[str, Any]]
+}
 
 
 class GenericStrategy(Model):

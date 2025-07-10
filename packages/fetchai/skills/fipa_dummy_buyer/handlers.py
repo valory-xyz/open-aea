@@ -30,7 +30,7 @@ from packages.fetchai.skills.fipa_dummy_buyer.dialogues import FipaDialogues
 class FipaBuyerHandler(Handler):
     """This class implements a FIPA handler."""
 
-    SUPPORTED_PROTOCOL = FipaMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = FipaMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup."""

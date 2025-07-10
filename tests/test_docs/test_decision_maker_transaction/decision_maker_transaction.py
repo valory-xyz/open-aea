@@ -189,7 +189,7 @@ class SigningDialogues(Model, BaseSigningDialogues):
 class SigningHandler(Handler):
     """Implement the signing handler."""
 
-    SUPPORTED_PROTOCOL = SigningMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = SigningMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""

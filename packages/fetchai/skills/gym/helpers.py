@@ -61,7 +61,7 @@ class ProxyEnv(gym.Env):
         self._queue = Queue()  # type: Queue
         self._is_rl_agent_trained = False
         self._step_count = 0
-        self._active_dialogue = None  # type: Optional[GymDialogue]
+        self._active_dialogue: Optional[GymDialogue] = None
         self.gym_address = str(GYM_CONNECTION_PUBLIC_ID)
 
     @property

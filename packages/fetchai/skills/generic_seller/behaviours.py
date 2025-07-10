@@ -47,15 +47,15 @@ class GenericServiceRegistrationBehaviour(TickerBehaviour):
 
     def __init__(self, **kwargs: Any):
         """Initialise the behaviour."""
-        services_interval = kwargs.pop(
+        services_interval: int = kwargs.pop(
             "services_interval", DEFAULT_SERVICES_INTERVAL
-        )  # type: int
-        self._max_soef_registration_retries = kwargs.pop(
+        )
+        self._max_soef_registration_retries: int = kwargs.pop(
             "max_soef_registration_retries", DEFAULT_MAX_SOEF_REGISTRATION_RETRIES
-        )  # type: int
+        )
         super().__init__(tick_interval=services_interval, **kwargs)
 
-        self.failed_registration_msg = None  # type: Optional[OefSearchMessage]
+        self.failed_registration_msg: Optional[OefSearchMessage] = None
         self._nb_retries = 0
 
     def setup(self) -> None:

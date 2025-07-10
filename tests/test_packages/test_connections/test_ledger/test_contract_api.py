@@ -112,14 +112,14 @@ async def test_erc1155_get_deploy_transaction(erc1155_contract, ledger_apis_conn
     response = await ledger_apis_connection.receive()
 
     assert response is not None
-    assert type(response.message) == ContractApiMessage
+    assert type(response.message) is ContractApiMessage
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_TRANSACTION
     ), "Error: {}".format(response_message.message)
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
-    assert type(response_message.raw_transaction) == RawTransaction
+    assert type(response_message.raw_transaction) is RawTransaction
     assert response_message.raw_transaction.ledger_id == EthereumCrypto.identifier
     assert len(response.message.raw_transaction.body) == 7
     assert len(response.message.raw_transaction.body["data"]) > 0
@@ -162,7 +162,7 @@ async def test_erc1155_get_raw_transaction(
     response = await ledger_apis_connection.receive()
 
     assert response is not None
-    assert type(response.message) == ContractApiMessage
+    assert type(response.message) is ContractApiMessage
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_TRANSACTION
@@ -170,7 +170,7 @@ async def test_erc1155_get_raw_transaction(
 
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
-    assert type(response_message.raw_transaction) == RawTransaction
+    assert type(response_message.raw_transaction) is RawTransaction
     assert response_message.raw_transaction.ledger_id == EthereumCrypto.identifier
     assert len(response.message.raw_transaction.body) == 7
     assert len(response.message.raw_transaction.body["data"]) > 0
@@ -213,16 +213,16 @@ async def test_erc1155_get_raw_message(erc1155_contract, ledger_apis_connection)
     response = await ledger_apis_connection.receive()
 
     assert response is not None
-    assert type(response.message) == ContractApiMessage
+    assert type(response.message) is ContractApiMessage
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.RAW_MESSAGE
     ), "Error: {}".format(response_message.message)
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
-    assert type(response_message.raw_message) == RawMessage
+    assert type(response_message.raw_message) is RawMessage
     assert response_message.raw_message.ledger_id == EthereumCrypto.identifier
-    assert type(response.message.raw_message.body) == bytes
+    assert type(response.message.raw_message.body) is bytes
 
 
 @pytest.mark.integration
@@ -255,14 +255,14 @@ async def test_erc1155_get_state(erc1155_contract, ledger_apis_connection):
     response = await ledger_apis_connection.receive()
 
     assert response is not None
-    assert type(response.message) == ContractApiMessage
+    assert type(response.message) is ContractApiMessage
     response_message = cast(ContractApiMessage, response.message)
     assert (
         response_message.performative == ContractApiMessage.Performative.STATE
     ), "Error: {}".format(response_message.message)
     response_dialogue = contract_api_dialogues.update(response_message)
     assert response_dialogue == contract_api_dialogue
-    assert type(response_message.state) == State
+    assert type(response_message.state) is State
     assert response_message.state.ledger_id == EthereumCrypto.identifier
     result = response_message.state.body.get("balance", None)
     expected_result = {token_id: 0}

@@ -368,7 +368,7 @@ class TProtocolSerializer(Serializer):
         t_protocol_pb.ParseFromString(message_pb.dialogue_message.content)
         performative = t_protocol_pb.WhichOneof("performative")
         performative_id = TProtocolMessage.Performative(str(performative))
-        performative_content = dict()  # type: Dict[str, Any]
+        performative_content: Dict[str, Any] = dict()
         if performative_id == TProtocolMessage.Performative.PERFORMATIVE_CT:
             pb2_content_ct = t_protocol_pb.performative_ct.content_ct
             content_ct = DataModel.decode(pb2_content_ct)

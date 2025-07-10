@@ -81,8 +81,6 @@ class SigningDialogues(BaseSigningDialogues):
             dialogue_class=SigningDialogue,
         )
 
-        return None
-
 
 def make_desc_maker_wallet(
     ledger_id: str, key_path: str

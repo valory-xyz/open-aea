@@ -427,7 +427,7 @@ class Runnable(ABC):
             raise ValueError("Call _set_task() first!")  # pragma: nocover
         try:
             self._loop.run_until_complete(self._task)
-        except BaseException:  # pylint: disable=broad-except)
+        except BaseException:  # pylint: disable=broad-except)  # noqa: B036
             logging.exception(f"Exception raised in {self}")
         self._loop.stop()
         self._loop.close()

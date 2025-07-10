@@ -130,7 +130,7 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self._terms = None  # type: Optional[Terms]
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:
@@ -203,7 +203,7 @@ class LedgerApiDialogue(BaseLedgerApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_fipa_dialogue = None  # type: Optional[FipaDialogue]
+        self._associated_fipa_dialogue: Optional[FipaDialogue] = None
 
     @property
     def associated_fipa_dialogue(self) -> FipaDialogue:
@@ -308,7 +308,7 @@ class SigningDialogue(BaseSigningDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_ledger_api_dialogue = None  # type: Optional[LedgerApiDialogue]
+        self._associated_ledger_api_dialogue: Optional[LedgerApiDialogue] = None
 
     @property
     def associated_ledger_api_dialogue(self) -> LedgerApiDialogue:

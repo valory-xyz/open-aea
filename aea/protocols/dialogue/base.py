@@ -389,14 +389,14 @@ class Dialogue(
     def __eq__(self, other: Any) -> bool:
         """Compare two dialogues."""
         return (
-            type(self) == type(other)  # pylint: disable=unidiomatic-typecheck
-            and self.dialogue_label == other.dialogue_label
-            and self.message_class == other.message_class
-            and self._incoming_messages == other._incoming_messages
-            and self._outgoing_messages == other._outgoing_messages
-            and self._ordered_message_ids == other._ordered_message_ids
-            and self.role == other.role
-            and self.self_address == other.self_address
+            type(self) is type(other)  # pylint: disable=unidiomatic-typecheck
+            and self.dialogue_label is other.dialogue_label
+            and self.message_class is other.message_class
+            and self._incoming_messages is other._incoming_messages
+            and self._outgoing_messages is other._outgoing_messages
+            and self._ordered_message_ids is other._ordered_message_ids
+            and self.role is other.role
+            and self.self_address is other.self_address
         )
 
     def json(self) -> dict:

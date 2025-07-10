@@ -36,7 +36,7 @@ class GenericDataModel(DataModel):  # pylint: disable=too-few-public-methods
         self, data_model_name: str, data_model_attributes: Dict[str, Any]
     ) -> None:
         """Initialise the dataModel."""
-        attributes = []  # type: List[Attribute]
+        attributes: List[Attribute] = []
         for values in data_model_attributes.values():
             enforce(
                 values["type"] in SUPPORTED_TYPES.keys(),

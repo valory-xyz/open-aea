@@ -62,12 +62,12 @@ class Resources:
         self._behaviour_registry = ComponentRegistry[Behaviour](agent_name=agent_name)
         self._model_registry = ComponentRegistry[Model](agent_name=agent_name)
 
-        self._registries = [
+        self._registries: List[Registry] = [
             self._component_registry,
             self._handler_registry,
             self._behaviour_registry,
             self._model_registry,
-        ]  # type: List[Registry]
+        ]
 
     @property
     def agent_name(self) -> str:

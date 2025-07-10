@@ -421,7 +421,7 @@ class RemoveItem:
         item_folder = self._get_item_folder()
         try:
             shutil.rmtree(item_folder)
-        except BaseException:
+        except BaseException:  # noqa: B036
             raise click.ClickException(
                 f"An error occurred during {item_folder} removing."
             )

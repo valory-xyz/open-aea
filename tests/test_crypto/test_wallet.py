@@ -138,7 +138,7 @@ class WalletTestCase(TestCase):
         signature = wallet.sign_message(
             EthereumCrypto.identifier, message=b"some message"
         )
-        assert type(signature) == str and int(
+        assert type(signature) is str and int(
             signature, 16
         ), "No signature present or not hexadecimal"
 
@@ -163,7 +163,7 @@ class WalletTestCase(TestCase):
             EthereumCrypto.identifier,
             transaction={"gasPrice": 50, "nonce": 10, "gas": 10},
         )
-        assert type(signed_transaction) == dict, "No signed transaction returned"
+        assert type(signed_transaction) is dict, "No signed transaction returned"
 
     def test_wallet_sign_transaction_negative(self):
         """Test Wallet.sign_transaction negative result."""

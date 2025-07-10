@@ -102,7 +102,7 @@ class DefaultSerializer(Serializer):
         default_pb.ParseFromString(message_pb.dialogue_message.content)
         performative = default_pb.WhichOneof("performative")
         performative_id = DefaultMessage.Performative(str(performative))
-        performative_content = dict()  # type: Dict[str, Any]
+        performative_content: Dict[str, Any] = dict()
         if performative_id == DefaultMessage.Performative.BYTES:
             content = default_pb.bytes.content
             performative_content["content"] = content

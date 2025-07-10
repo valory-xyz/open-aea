@@ -56,7 +56,7 @@ LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 class GenericFipaHandler(Handler):
     """This class implements a FIPA handler."""
 
-    SUPPORTED_PROTOCOL = FipaMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = FipaMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -285,7 +285,7 @@ class GenericFipaHandler(Handler):
 class GenericLedgerApiHandler(Handler):
     """Implement the ledger handler."""
 
-    SUPPORTED_PROTOCOL = LedgerApiMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = LedgerApiMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup for the handler."""
@@ -435,7 +435,7 @@ class GenericLedgerApiHandler(Handler):
 class GenericOefSearchHandler(Handler):
     """This class implements an OEF search handler."""
 
-    SUPPORTED_PROTOCOL = OefSearchMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = OefSearchMessage.protocol_id
 
     def setup(self) -> None:
         """Call to setup the handler."""

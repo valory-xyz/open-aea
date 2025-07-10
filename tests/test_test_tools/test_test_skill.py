@@ -391,7 +391,7 @@ class TestSkillTestCase(BaseSkillTestCase):
             query=query,
         )
 
-        assert type(incoming_message) == message_type
+        assert type(incoming_message) is message_type
         incoming_message = cast(FipaMessage, incoming_message)
         assert incoming_message.dialogue_reference == dialogue_reference
         assert incoming_message.message_id == 1
@@ -420,7 +420,7 @@ class TestSkillTestCase(BaseSkillTestCase):
             proposal=proposal,
         )
 
-        assert type(incoming_message) == FipaMessage
+        assert type(incoming_message) is FipaMessage
         incoming_message = cast(FipaMessage, incoming_message)
         assert (
             incoming_message.dialogue_reference
@@ -576,7 +576,7 @@ class TestSkillTestCase(BaseSkillTestCase):
             "counterparty",
         )
 
-        assert type(dialogue) == FipaDialogue
+        assert type(dialogue) is FipaDialogue
         assert dialogue.is_self_initiated
         assert len(dialogue._outgoing_messages) == 4
         assert len(dialogue._incoming_messages) == 4
@@ -622,7 +622,7 @@ class TestSkillTestCase(BaseSkillTestCase):
             "counterparty",
         )
 
-        assert type(dialogue) == FipaDialogue
+        assert type(dialogue) is FipaDialogue
         assert not dialogue.is_self_initiated
         assert len(dialogue._outgoing_messages) == 4
         assert len(dialogue._incoming_messages) == 4

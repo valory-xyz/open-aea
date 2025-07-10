@@ -117,9 +117,9 @@ class RLAgent:
 
         :param nb_goods: number of goods
         """
-        self.good_price_models = dict(
+        self.good_price_models: Dict[int, GoodPriceModel] = dict(
             (good_id, GoodPriceModel()) for good_id in range(nb_goods)
-        )  # type: Dict[int, GoodPriceModel]
+        )
 
     def _pick_an_action(self) -> Action:
         """

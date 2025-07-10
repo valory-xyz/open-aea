@@ -450,7 +450,7 @@ def test_get_storage_transaction_cosmwasm():
         sequence=0,
     )
 
-    assert type(deploy_transaction) == dict and len(deploy_transaction) == 2
+    assert type(deploy_transaction) is dict and len(deploy_transaction) == 2
     # Check sign_data
     assert "account_number" in deploy_transaction["sign_data"][cc2.address]
     assert "chain_id" in deploy_transaction["sign_data"][cc2.address]
@@ -493,7 +493,7 @@ def test_get_init_transaction_cosmwasm():
         tx_fee_denom="def",
     )
 
-    assert type(init_transaction) == dict and len(init_transaction) == 2
+    assert type(init_transaction) is dict and len(init_transaction) == 2
 
     # Check sign_data
     assert "account_number" in init_transaction["sign_data"][cc2.address]
@@ -542,7 +542,7 @@ def test_get_handle_transaction_cosmwasm():
         tx_fee_denom="def",
     )
 
-    assert type(handle_transaction) == dict and len(handle_transaction) == 2
+    assert type(handle_transaction) is dict and len(handle_transaction) == 2
 
     # Check sign_data
     assert "account_number" in handle_transaction["sign_data"][cc2.address]

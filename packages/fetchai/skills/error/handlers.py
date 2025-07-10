@@ -34,7 +34,7 @@ from packages.fetchai.protocols.default.message import DefaultMessage
 class ErrorHandler(Handler):
     """This class implements the error handler."""
 
-    SUPPORTED_PROTOCOL = DefaultMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = DefaultMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup."""

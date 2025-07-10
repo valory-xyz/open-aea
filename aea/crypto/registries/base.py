@@ -81,7 +81,7 @@ class EntryPoint(Generic[ItemType], RegexConstrainedString):
 
         if match is None:
             # actual match done in base class
-            raise ValueError("No match found!")  #  pragma: nocover
+            raise ValueError("No match found!")  # pragma: nocover
 
         self._import_path = match.group(1)
         self._class_name = match.group(2)

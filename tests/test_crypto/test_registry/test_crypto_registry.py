@@ -49,7 +49,7 @@ def test_make_fetchai():
 
     # calling 'make' again will give a different object.
     aea_ledger_fetchai_1 = aea.crypto.registries.make_crypto(FetchAICrypto.identifier)
-    assert type(aea_ledger_fetchai) == type(aea_ledger_fetchai_1)
+    assert type(aea_ledger_fetchai) is type(aea_ledger_fetchai_1)
     assert aea_ledger_fetchai.address != aea_ledger_fetchai_1
 
 
@@ -59,7 +59,7 @@ def test_make_ethereum():
 
     # calling 'make' again will give a different object.
     aea_ledger_ethereum_1 = aea.crypto.registries.make_crypto(EthereumCrypto.identifier)
-    assert type(aea_ledger_ethereum) == type(aea_ledger_ethereum_1)
+    assert type(aea_ledger_ethereum) is type(aea_ledger_ethereum_1)
     assert aea_ledger_ethereum.address != aea_ledger_ethereum_1.address
 
 
@@ -69,7 +69,7 @@ def test_make_cosmos():
 
     # calling 'make' again will give a different object.
     aea_ledger_cosmos_1 = aea.crypto.registries.make_crypto(CosmosCrypto.identifier)
-    assert type(aea_ledger_cosmos) == type(aea_ledger_cosmos_1)
+    assert type(aea_ledger_cosmos) is type(aea_ledger_cosmos_1)
     assert aea_ledger_cosmos.address != aea_ledger_cosmos_1.address
 
 
@@ -93,11 +93,11 @@ def test_register_custom_crypto():
     assert actual_spec.entry_point.class_name == expected_entry_point.class_name
 
     my_crypto = aea.crypto.registries.make_crypto("my_custom_crypto")
-    assert type(my_crypto) == CustomCrypto
+    assert type(my_crypto) is CustomCrypto
 
     # calling 'make' again will give a different object.
     my_crypto_1 = aea.crypto.registries.make_crypto("my_custom_crypto")
-    assert type(my_crypto) == type(my_crypto_1)
+    assert type(my_crypto) is type(my_crypto_1)
     assert my_crypto != my_crypto_1
 
     aea.crypto.registries.crypto_registry.specs.pop("my_custom_crypto")

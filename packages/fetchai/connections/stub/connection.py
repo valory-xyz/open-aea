@@ -223,7 +223,7 @@ class StubConnection(Connection):
             await self._read_envelopes_task
         except CancelledError:
             pass  # task was cancelled, that was expected
-        except BaseException:  # pragma: nocover  # pylint: disable=broad-except
+        except BaseException:  # pragma: nocover  # pylint: disable=broad-except  # noqa: B036
             self.logger.exception(
                 "during envelop read"
             )  # do not raise exception cause it's on task stop

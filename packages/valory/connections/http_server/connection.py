@@ -491,7 +491,7 @@ class HTTPChannel(BaseAsyncChannel):
             return Response(  # pragma: nocover
                 status=SERVER_ERROR, reason="Server terminated unexpectedly."
             )
-        except BaseException:  # pragma: nocover # pylint: disable=broad-except
+        except BaseException:  # pragma: nocover # pylint: disable=broad-except # noqa: B036
             self.logger.exception("Error during handling incoming request")
             return Response(
                 status=SERVER_ERROR, reason="Server Error", text=format_exc()

@@ -152,7 +152,7 @@ def test_get_instance_no_address_ethereum(dummy_contract):
         address=ETHEREUM_DEFAULT_ADDRESS,
     )
     instance = dummy_contract.get_instance(ledger_api)
-    assert type(instance) == web3._utils.datatypes.PropertyCheckingFactory
+    assert type(instance) is web3._utils.datatypes.PropertyCheckingFactory
 
 
 @pytest.mark.integration

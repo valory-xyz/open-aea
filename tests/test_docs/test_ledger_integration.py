@@ -59,7 +59,7 @@ class TestLedgerIntegration(BasePythonMarkdownDocs):
         assert locals_key in locals_
         obj = locals_[locals_key]
 
-        if type(cls_or_str) == type:
+        if type(cls_or_str) is type:
             assert isinstance(obj, cls_or_str)
         else:
             assert obj.__class__.__name__ == cls_or_str

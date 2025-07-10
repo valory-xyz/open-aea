@@ -101,7 +101,7 @@ class ContractApiDialogue(BaseContractApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._terms = None  # type: Optional[Terms]
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:
@@ -206,7 +206,7 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self._proposal = None  # type: Optional[Description]
+        self._proposal: Optional[Description] = None
 
     @property
     def proposal(self) -> Description:
@@ -279,7 +279,7 @@ class LedgerApiDialogue(BaseLedgerApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_signing_dialogue = None  # type: Optional[SigningDialogue]
+        self._associated_signing_dialogue: Optional[SigningDialogue] = None
 
     @property
     def associated_signing_dialogue(self) -> "SigningDialogue":
@@ -389,9 +389,7 @@ class SigningDialogue(BaseSigningDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_contract_api_dialogue = (
-            None
-        )  # type: Optional[ContractApiDialogue]
+        self._associated_contract_api_dialogue: Optional[ContractApiDialogue] = None
 
     @property
     def associated_contract_api_dialogue(self) -> ContractApiDialogue:
