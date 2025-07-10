@@ -132,7 +132,7 @@ def dependencies_to_json(dependencies: Dependencies) -> Dict[str, Dict[str, str]
 
 
 def _get_default_configuration_file_name_from_type(
-    item_type: Union[str, PackageType]
+    item_type: Union[str, PackageType],
 ) -> str:
     """Get the default configuration file name from item type."""
     item_type = PackageType(item_type)

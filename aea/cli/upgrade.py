@@ -519,7 +519,7 @@ class InteractiveEjectHelper:
 
     @staticmethod
     def _reverse_adjacency_list(
-        adjacency_list: Dict[PackageId, Set[PackageId]]
+        adjacency_list: Dict[PackageId, Set[PackageId]],
     ) -> Dict[PackageId, Set[PackageId]]:
         """Compute the inverse of an adjacency list."""
         inverse_adjacency_list: Dict[PackageId, Set[PackageId]] = {}

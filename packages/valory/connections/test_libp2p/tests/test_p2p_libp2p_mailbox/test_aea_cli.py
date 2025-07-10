@@ -38,9 +38,9 @@ DEFAULT_HOST = LOCALHOST.hostname
 class TestP2PLibp2pMailboxConnectionAEARunning(Base):
     """Test AEA with p2p_libp2p_client connection is correctly run"""
 
-    conn_path = (
-        p2p_libp2p_mailbox_path
-    ) = f"vendor.{p2p_libp2p_mailbox.__name__.split('.', 1)[-1]}"
+    conn_path = p2p_libp2p_mailbox_path = (
+        f"vendor.{p2p_libp2p_mailbox.__name__.split('.', 1)[-1]}"
+    )
     public_id = str(PUBLIC_ID)
     port = next(ports)
     uri = f"{DEFAULT_HOST}:{port}"

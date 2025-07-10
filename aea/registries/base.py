@@ -330,9 +330,9 @@ class ComponentRegistry(
         :param kwargs: kwargs
         """
         super().__init__(**kwargs)
-        self._items: PublicIdRegistry[
-            Dict[str, SkillComponentType]
-        ] = PublicIdRegistry()
+        self._items: PublicIdRegistry[Dict[str, SkillComponentType]] = (
+            PublicIdRegistry()
+        )
         self._dynamically_added: Dict[PublicId, Set[str]] = {}
 
     def register(

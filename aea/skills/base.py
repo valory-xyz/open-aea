@@ -884,9 +884,9 @@ class _SkillComponentLoader:
         declared_component_classes: Dict[
             _SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]
         ] = self._get_declared_skill_component_configurations()
-        component_classes_by_path: Dict[
-            Path, Set[Tuple[str, Type[SkillComponent]]]
-        ] = self._load_component_classes(python_modules)
+        component_classes_by_path: Dict[Path, Set[Tuple[str, Type[SkillComponent]]]] = (
+            self._load_component_classes(python_modules)
+        )
         component_loading_items = self._match_class_and_configurations(
             component_classes_by_path, declared_component_classes
         )
@@ -978,9 +978,9 @@ class _SkillComponentLoader:
             classes: List[Tuple[str, Type]] = inspect.getmembers(
                 component_module, inspect.isclass
             )
-            filtered_classes: List[
-                Tuple[str, Type[SkillComponent]]
-            ] = self._filter_classes(classes)
+            filtered_classes: List[Tuple[str, Type[SkillComponent]]] = (
+                self._filter_classes(classes)
+            )
             module_to_classes[module_path] = set(filtered_classes)
         return module_to_classes
 
@@ -996,9 +996,9 @@ class _SkillComponentLoader:
         behaviours_by_id = dict(self.configuration.behaviours.read_all())
         models_by_id = dict(self.configuration.models.read_all())
 
-        result: Dict[
-            _SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]
-        ] = {}
+        result: Dict[_SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]] = (
+            {}
+        )
         for component_type, components_by_id in [
             (Handler, handlers_by_id),
             (Behaviour, behaviours_by_id),
@@ -1130,9 +1130,9 @@ class _SkillComponentLoader:
                     )
                 else:
                     # process the configuration at the end of the loop
-                    not_resolved_configurations[
-                        (component_type, component_id)
-                    ] = component_config
+                    not_resolved_configurations[(component_type, component_id)] = (
+                        component_config
+                    )
 
         for (component_type, component_id), component_config in copy(
             not_resolved_configurations

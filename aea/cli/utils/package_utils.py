@@ -871,7 +871,7 @@ def update_aea_version_range(package_configuration: PackageConfiguration) -> Non
 
 
 def list_available_packages(
-    project_path: Union[Path, str]
+    project_path: Union[Path, str],
 ) -> List[Tuple[PackageId, Path]]:
     """Returns a list of paths for all available packages in an AEA project."""
 

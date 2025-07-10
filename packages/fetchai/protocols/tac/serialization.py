@@ -204,17 +204,17 @@ class TacSerializer(Serializer):
                 tac_pb.game_data.exchange_params_by_currency_id
             )
             exchange_params_by_currency_id_dict = dict(exchange_params_by_currency_id)
-            performative_content[
-                "exchange_params_by_currency_id"
-            ] = exchange_params_by_currency_id_dict
+            performative_content["exchange_params_by_currency_id"] = (
+                exchange_params_by_currency_id_dict
+            )
             quantities_by_good_id = tac_pb.game_data.quantities_by_good_id
             quantities_by_good_id_dict = dict(quantities_by_good_id)
             performative_content["quantities_by_good_id"] = quantities_by_good_id_dict
             utility_params_by_good_id = tac_pb.game_data.utility_params_by_good_id
             utility_params_by_good_id_dict = dict(utility_params_by_good_id)
-            performative_content[
-                "utility_params_by_good_id"
-            ] = utility_params_by_good_id_dict
+            performative_content["utility_params_by_good_id"] = (
+                utility_params_by_good_id_dict
+            )
             fee_by_currency_id = tac_pb.game_data.fee_by_currency_id
             fee_by_currency_id_dict = dict(fee_by_currency_id)
             performative_content["fee_by_currency_id"] = fee_by_currency_id_dict

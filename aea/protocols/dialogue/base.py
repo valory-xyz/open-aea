@@ -1158,9 +1158,9 @@ class BasicDialoguesStorage:
             complete_dialogue_label,
         ) = dialogue.dialogue_label.get_both_versions()
 
-        self._incomplete_to_complete_dialogue_labels[
-            incomplete_dialogue_label
-        ] = complete_dialogue_label
+        self._incomplete_to_complete_dialogue_labels[incomplete_dialogue_label] = (
+            complete_dialogue_label
+        )
 
     def _add_terminal_state_dialogue(self, dialogue: Dialogue) -> None:
         """
@@ -1246,9 +1246,9 @@ class BasicDialoguesStorage:
         complete_dialogue_label: DialogueLabel,
     ) -> None:
         """Set incomplete dialogue label."""
-        self._incomplete_to_complete_dialogue_labels[
-            incomplete_dialogue_label
-        ] = complete_dialogue_label
+        self._incomplete_to_complete_dialogue_labels[incomplete_dialogue_label] = (
+            complete_dialogue_label
+        )
 
     def is_dialogue_present(self, dialogue_label: DialogueLabel) -> bool:
         """Check dialogue with label specified presents in storage."""

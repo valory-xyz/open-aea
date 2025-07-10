@@ -1193,12 +1193,14 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         """
 
         def _prepend_if_not_none(
-            obj: Dict[str, Optional[str]]
+            obj: Dict[str, Optional[str]],
         ) -> Dict[str, Optional[str]]:
             return {
-                key: os.path.join(data_directory, value)
-                if value is not None and not os.path.isabs(value)
-                else value
+                key: (
+                    os.path.join(data_directory, value)
+                    if value is not None and not os.path.isabs(value)
+                    else value
+                )
                 for key, value in obj.items()
             }
 
@@ -1847,9 +1849,9 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         :return: list of component ids ordered for import
         """
         # the adjacency list for the inverse dependency graph
-        dependency_to_supported_dependencies: Dict[
-            ComponentId, Set[ComponentId]
-        ] = defaultdict(set)
+        dependency_to_supported_dependencies: Dict[ComponentId, Set[ComponentId]] = (
+            defaultdict(set)
+        )
         for component_id in component_ids:
             component_id = component_id.without_hash()
             component_path = find_component_directory_from_component_id(

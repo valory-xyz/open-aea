@@ -60,9 +60,9 @@ class TestSyncCommand(BaseAEATestCase):
                 json.loads(packages_file.read_text())["dev"].items(),
             )
         )
-        packages[
-            PackageId.from_uri_path("skill/author/some_skill/0.1.0")
-        ] = "bafybeidv77u2xl52mnxakwvh7fuh46aiwfpteyof4eaptfd4agoi6cdblb"
+        packages[PackageId.from_uri_path("skill/author/some_skill/0.1.0")] = (
+            "bafybeidv77u2xl52mnxakwvh7fuh46aiwfpteyof4eaptfd4agoi6cdblb"
+        )
 
         with mock.patch.object(
             PackageManagerV1, "dev_packages", new=packages

@@ -290,11 +290,11 @@ def remove_unused_component_configurations(ctx: Context) -> Generator:
         try_to_load_agent_config(ctx)
         for component_id in ctx.agent_config.package_dependencies:
             if component_id.component_prefix in saved_configuration_by_component_prefix:
-                ctx.agent_config.component_configurations[
-                    component_id
-                ] = saved_configuration_by_component_prefix[
-                    component_id.component_prefix
-                ]
+                ctx.agent_config.component_configurations[component_id] = (
+                    saved_configuration_by_component_prefix[
+                        component_id.component_prefix
+                    ]
+                )
 
     with open_file(os.path.join(ctx.cwd, DEFAULT_AEA_CONFIG_FILE), "w") as f:
         ctx.agent_loader.dump(ctx.agent_config, f)

@@ -69,8 +69,8 @@ class TestHandler(Handler):
         )
         self.rtt_count: int = 0  # pylint: disable=attribute-defined-outside-init
 
-        self.latency_total_time: float = (  # pylint: disable=attribute-defined-outside-init
-            0.0
+        self.latency_total_time: float = (
+            0.0  # pylint: disable=attribute-defined-outside-init
         )
         self.latency_count: int = 0  # pylint: disable=attribute-defined-outside-init
 

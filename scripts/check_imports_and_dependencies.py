@@ -196,7 +196,7 @@ class CheckTool:
 
     @staticmethod
     def sections_dependencies_add_files(
-        sections_dependencies: Dict[str, List[str]]
+        sections_dependencies: Dict[str, List[str]],
     ) -> Dict[str, Dict[str, List[Path]]]:
         """Add packages file lists to dependencies in sections."""
         result: Dict[str, Dict[str, List[Path]]] = defaultdict(

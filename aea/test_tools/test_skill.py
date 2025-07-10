@@ -355,10 +355,12 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         """
         dialogue_reference = (
             dialogue.dialogue_label.dialogue_reference[0],
-            Dialogues._generate_dialogue_nonce()  # pylint: disable=protected-access
-            if dialogue.dialogue_label.dialogue_reference[1]
-            == Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
-            else dialogue.dialogue_label.dialogue_reference[1],
+            (
+                Dialogues._generate_dialogue_nonce()  # pylint: disable=protected-access
+                if dialogue.dialogue_label.dialogue_reference[1]
+                == Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
+                else dialogue.dialogue_label.dialogue_reference[1]
+            ),
         )
         return dialogue_reference
 

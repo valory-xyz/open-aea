@@ -471,7 +471,9 @@ class Envelope:
             to=self.to,
             sender=self.sender,
             protocol_specification_id=self.protocol_specification_id,
-            message="{!r}".format(self.message)
-            if isinstance(self.message, bytes)
-            else self.message,
+            message=(
+                "{!r}".format(self.message)
+                if isinstance(self.message, bytes)
+                else self.message
+            ),
         )

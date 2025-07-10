@@ -193,9 +193,11 @@ def _make_libp2p_client_connection(
         tcp_key_file=None,
         nodes=[
             {
-                "uri": str(uri)
-                if uri is not None
-                else "{}:{}".format(node_host, node_port),
+                "uri": (
+                    str(uri)
+                    if uri is not None
+                    else "{}:{}".format(node_host, node_port)
+                ),
                 "public_key": peer_public_key,
             },
         ],
@@ -235,9 +237,11 @@ def _make_libp2p_mailbox_connection(
         tcp_key_file=None,
         nodes=[
             {
-                "uri": str(uri)
-                if uri is not None
-                else "{}:{}".format(node_host, node_port),
+                "uri": (
+                    str(uri)
+                    if uri is not None
+                    else "{}:{}".format(node_host, node_port)
+                ),
                 "public_key": peer_public_key,
             },
         ],

@@ -439,9 +439,9 @@ class TProtocolSerializer(Serializer):
                 t_protocol_pb.performative_pmt.content_dict_bool_bytes
             )
             content_dict_bool_bytes_dict = dict(content_dict_bool_bytes)
-            performative_content[
-                "content_dict_bool_bytes"
-            ] = content_dict_bool_bytes_dict
+            performative_content["content_dict_bool_bytes"] = (
+                content_dict_bool_bytes_dict
+            )
             content_dict_bool_int = t_protocol_pb.performative_pmt.content_dict_bool_int
             content_dict_bool_int_dict = dict(content_dict_bool_int)
             performative_content["content_dict_bool_int"] = content_dict_bool_int_dict
@@ -449,9 +449,9 @@ class TProtocolSerializer(Serializer):
                 t_protocol_pb.performative_pmt.content_dict_bool_float
             )
             content_dict_bool_float_dict = dict(content_dict_bool_float)
-            performative_content[
-                "content_dict_bool_float"
-            ] = content_dict_bool_float_dict
+            performative_content["content_dict_bool_float"] = (
+                content_dict_bool_float_dict
+            )
             content_dict_bool_bool = (
                 t_protocol_pb.performative_pmt.content_dict_bool_bool
             )
@@ -617,17 +617,17 @@ class TProtocolSerializer(Serializer):
             if t_protocol_pb.performative_o.content_o_list_bytes_is_set:
                 content_o_list_bytes = t_protocol_pb.performative_o.content_o_list_bytes
                 content_o_list_bytes_tuple = tuple(content_o_list_bytes)
-                performative_content[
-                    "content_o_list_bytes"
-                ] = content_o_list_bytes_tuple
+                performative_content["content_o_list_bytes"] = (
+                    content_o_list_bytes_tuple
+                )
             if t_protocol_pb.performative_o.content_o_dict_str_int_is_set:
                 content_o_dict_str_int = (
                     t_protocol_pb.performative_o.content_o_dict_str_int
                 )
                 content_o_dict_str_int_dict = dict(content_o_dict_str_int)
-                performative_content[
-                    "content_o_dict_str_int"
-                ] = content_o_dict_str_int_dict
+                performative_content["content_o_dict_str_int"] = (
+                    content_o_dict_str_int_dict
+                )
         elif (
             performative_id == TProtocolMessage.Performative.PERFORMATIVE_EMPTY_CONTENTS
         ):

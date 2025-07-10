@@ -42,7 +42,9 @@ class BaseProtocolMessagesTestCase(ABC):
     def perform_message_test(self, msg: Message) -> None:  # nosec
         """Test message encode/decode."""
         msg.to = "receiver"
-        assert msg._is_consistent()  # pylint: disable=protected-access  # nosec - only for testing
+        assert (
+            msg._is_consistent()
+        )  # pylint: disable=protected-access  # nosec - only for testing
         envelope = Envelope(to=msg.to, sender="sender", message=msg)
         envelope_bytes = envelope.encode()
 
@@ -50,12 +52,16 @@ class BaseProtocolMessagesTestCase(ABC):
         expected_envelope = envelope
 
         assert expected_envelope.to == actual_envelope.to  # nosec - only for testing
-        assert expected_envelope.sender == actual_envelope.sender  # nosec - only for testing
+        assert (
+            expected_envelope.sender == actual_envelope.sender
+        )  # nosec - only for testing
         assert (  # nosec - only for testing
             expected_envelope.protocol_specification_id
             == actual_envelope.protocol_specification_id
         )
-        assert expected_envelope.message != actual_envelope.message  # nosec - only for testing
+        assert (
+            expected_envelope.message != actual_envelope.message
+        )  # nosec - only for testing
 
         actual_msg = self.MESSAGE_CLASS.serializer.decode(actual_envelope.message_bytes)
         actual_msg.to = actual_envelope.to

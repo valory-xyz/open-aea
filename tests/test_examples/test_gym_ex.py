@@ -57,9 +57,9 @@ class TestGymExt:
         """Run the gym ex sequence."""
         try:
             env = os.environ.copy()
-            env[
-                "PYTHONPATH"
-            ] = f"{self.t}{env_path_separator()}{env.get('PYTHONPATH', '')}"
+            env["PYTHONPATH"] = (
+                f"{self.t}{env_path_separator()}{env.get('PYTHONPATH', '')}"
+            )
             process = PexpectWrapper(  # nosec
                 [
                     sys.executable,

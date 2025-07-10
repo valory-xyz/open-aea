@@ -576,7 +576,7 @@ def test_gas_price_strategy_eip1559() -> None:
     ],
 )
 def test_gas_price_strategy_eip1559_fallback_get_block(
-    get_block_mock: Dict[str, Optional[int]]
+    get_block_mock: Dict[str, Optional[int]],
 ) -> None:
     """Test eip1559 based gas price strategy."""
 

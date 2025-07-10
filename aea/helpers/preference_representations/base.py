@@ -45,9 +45,11 @@ def logarithmic_utility(
     )
 
     goodwise_utility = [
-        utility_params_by_good_id[good_id] * math.log(quantity + quantity_shift)
-        if quantity + quantity_shift > 0
-        else -10000
+        (
+            utility_params_by_good_id[good_id] * math.log(quantity + quantity_shift)
+            if quantity + quantity_shift > 0
+            else -10000
+        )
         for good_id, quantity in quantities_by_good_id.items()
     ]
     return sum(goodwise_utility)

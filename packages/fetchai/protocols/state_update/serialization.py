@@ -115,16 +115,16 @@ class StateUpdateSerializer(Serializer):
                 state_update_pb.initialize.exchange_params_by_currency_id
             )
             exchange_params_by_currency_id_dict = dict(exchange_params_by_currency_id)
-            performative_content[
-                "exchange_params_by_currency_id"
-            ] = exchange_params_by_currency_id_dict
+            performative_content["exchange_params_by_currency_id"] = (
+                exchange_params_by_currency_id_dict
+            )
             utility_params_by_good_id = (
                 state_update_pb.initialize.utility_params_by_good_id
             )
             utility_params_by_good_id_dict = dict(utility_params_by_good_id)
-            performative_content[
-                "utility_params_by_good_id"
-            ] = utility_params_by_good_id_dict
+            performative_content["utility_params_by_good_id"] = (
+                utility_params_by_good_id_dict
+            )
             amount_by_currency_id = state_update_pb.initialize.amount_by_currency_id
             amount_by_currency_id_dict = dict(amount_by_currency_id)
             performative_content["amount_by_currency_id"] = amount_by_currency_id_dict

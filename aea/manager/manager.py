@@ -1030,9 +1030,7 @@ class MultiAgentManager:
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
-    def _load_state(
-        self, local: bool, remote: bool
-    ) -> Tuple[
+    def _load_state(self, local: bool, remote: bool) -> Tuple[
         bool,
         Dict[PublicId, List[Dict]],
         List[Tuple[PublicId, List[Dict], Exception]],

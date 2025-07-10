@@ -155,9 +155,9 @@ def _registry_init_ipfs(ipfs_node: Optional[str]) -> None:
     """Initialize ipfs registry"""
 
     registry_config = _set_registries(REGISTRY_REMOTE, REMOTE_IPFS)
-    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS][
-        "ipfs_node"
-    ] = _clean_ipfs_node_url(ipfs_node=ipfs_node)
+    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS]["ipfs_node"] = (
+        _clean_ipfs_node_url(ipfs_node=ipfs_node)
+    )
     update_cli_config({REGISTRY_CONFIG_KEY: registry_config})
 
 

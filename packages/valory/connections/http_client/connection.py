@@ -201,9 +201,11 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 status_code=resp.status,
                 headers=resp.headers,
                 status_text=resp.reason,
-                body=resp._body  # pylint: disable=protected-access
-                if resp._body is not None  # pylint: disable=protected-access
-                else b"",
+                body=(
+                    resp._body  # pylint: disable=protected-access
+                    if resp._body is not None  # pylint: disable=protected-access
+                    else b""
+                ),
                 dialogue=dialogue,
             )
         except Exception:  # pylint: disable=broad-except

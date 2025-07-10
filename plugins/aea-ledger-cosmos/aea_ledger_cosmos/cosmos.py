@@ -555,9 +555,9 @@ class CosmosCrypto(Crypto[SigningKey]):
                 from_pub_key_pb = ProtoPubKey(key=bytes.fromhex(self.public_key))
                 from_pub_key_packed.Pack(from_pub_key_pb, type_url_prefix="/")  # type: ignore
 
-                tx.auth_info.signer_infos[
-                    0
-                ].public_key.value = from_pub_key_packed.value
+                tx.auth_info.signer_infos[0].public_key.value = (
+                    from_pub_key_packed.value
+                )
             else:
                 # Fails if public key is not present in transaction with multiple signers
                 raise RuntimeError(
