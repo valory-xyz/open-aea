@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ VALORY_FORK_DATE = datetime.strptime(
 )
 GIT_PATH = shutil.which("git")
 START_YEARS_FETCHAI = (2018, 2019, 2020, 2021)
-START_YEARS_VALORY = (2021, 2022, 2023, 2024)
+START_YEARS_VALORY = (2021, 2022, 2023, 2024, 2025)
 FETCHAI = "FetchAI"
 VALORY = "Valory"
 MIXED = "Mixed"

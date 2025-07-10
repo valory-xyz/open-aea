@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -223,7 +223,9 @@ class StubConnection(Connection):
             await self._read_envelopes_task
         except CancelledError:
             pass  # task was cancelled, that was expected
-        except BaseException:  # pragma: nocover  # pylint: disable=broad-except  # noqa: B036
+        except (  # pylint: disable=broad-except  # noqa: B036
+            BaseException
+        ):  # pragma: nocover
             self.logger.exception(
                 "during envelop read"
             )  # do not raise exception cause it's on task stop

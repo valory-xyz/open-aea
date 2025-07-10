@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ class BaseProtocolDialoguesTestCase(ABC):
 
         def new_init(self_: Dialogues, self_address: Address) -> None:
             """New init function."""
-            self.DIALOGUES_CLASS(  # type: ignore # pylint: disable=no-value-for-parameter
+            self.DIALOGUES_CLASS.__init__(  # type: ignore[call-arg]  # pylint: disable=no-value-for-parameter,unnecessary-dunder-call
                 self_,
                 self_address=self_address,
                 role_from_first_message=self.role_from_first_message,

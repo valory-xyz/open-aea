@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -152,9 +152,7 @@ def _get_faucet_apis() -> List[Plugin]:
 
 def _iter_plugins() -> Iterator[Plugin]:
     """Iterate over all the plugins."""
-    yield from itertools.chain(
-        _get_cryptos(), _get_ledger_apis(), _get_faucet_apis()
-    )
+    yield from itertools.chain(_get_cryptos(), _get_ledger_apis(), _get_faucet_apis())
 
 
 def _register_plugin(plugin: Plugin, is_raising_exception: bool = True) -> None:

@@ -168,7 +168,9 @@ class PerformanceReport:
         :return: (mean_value, standart_deviation)
         """
         if not aggr_function:
-            aggr_function = lambda x: x  # noqa: E731  # pylint: disable=unnecessary-lambda-assignment
+            aggr_function = (
+                lambda x: x  # pylint: disable=unnecessary-lambda-assignment
+            )  # noqa: E731
 
         values = [aggr_function(getattr(i, attr_name)) for i in self.exec_reports]
         mean_value = mean(values)

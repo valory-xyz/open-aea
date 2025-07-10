@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -165,19 +165,19 @@ class TestDependency:
     def test_parse_from_string(self) -> None:
         """Test from_string method."""
 
-        string = "tomte==0.2.13"
+        string = "tomte==0.4.0"
         dep = Dependency.from_string(string=string)
         assert dep.name == "tomte"
-        assert str(dep.version) == "==0.2.13"
+        assert str(dep.version) == "==0.4.0"
         assert dep.to_pip_string() == string
 
     def test_parse_from_string_wth_extras(self) -> None:
         """Test from_string method."""
 
-        string = "tomte[tox,tests]==0.2.13"
+        string = "tomte[tox,tests]==0.4.0"
         dep = Dependency.from_string(string=string)
         assert dep.name == "tomte"
-        assert str(dep.version) == "==0.2.13"
+        assert str(dep.version) == "==0.4.0"
         assert dep.extras == ["tox", "tests"]
         assert dep.to_pip_string() == string
 
@@ -194,19 +194,19 @@ class TestDependency:
     def test_parse_from_pipfile_specifier(self) -> None:
         """Test from_pipfile_specifier method"""
 
-        string = 'tomte = "==0.2.13"'
+        string = 'tomte = "==0.4.0"'
         dep = Dependency.from_pipfile_string(string)
         assert dep.name == "tomte"
-        assert str(dep.version) == "==0.2.13"
+        assert str(dep.version) == "==0.4.0"
         assert dep.to_pipfile_string() == string
 
     def test_parse_from_pipfile_specifier_with_extras(self) -> None:
         """Test from_pipfile_specifier method"""
 
-        string = 'tomte = {version = "==0.2.13", extras = ["tox", "tests"]}'
+        string = 'tomte = {version = "==0.4.0", extras = ["tox", "tests"]}'
         dep = Dependency.from_pipfile_string(string)
         assert dep.name == "tomte"
-        assert str(dep.version) == "==0.2.13"
+        assert str(dep.version) == "==0.4.0"
         assert dep.extras == ["tox", "tests"]
         assert dep.to_pipfile_string() == string
 

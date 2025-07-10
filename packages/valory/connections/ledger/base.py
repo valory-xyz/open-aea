@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,7 +168,9 @@ class RequestDispatcher(ABC):
         handler = self.get_handler(performative)
         return self.loop.create_task(self.run_async(handler, api, message, dialogue))
 
-    def get_handler(self, performative: Any) -> Callable[[LedgerApi, Message, Dialogue], Task[Any]]:
+    def get_handler(
+        self, performative: Any
+    ) -> Callable[[LedgerApi, Message, Dialogue], Task[Any]]:
         """
         Get the handler method, given the message performative.
 

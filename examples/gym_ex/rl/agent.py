@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 """This contains the rl agent class."""
 
 import random
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import gym
 import numpy as np
@@ -31,7 +31,7 @@ BanditId = int
 Price = int
 
 Action = Tuple[BanditId, Price]
-Observation = None
+Observation = Any
 Reward = float
 Done = bool
 Info = dict

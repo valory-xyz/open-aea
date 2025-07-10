@@ -69,9 +69,11 @@ class TestHandler(Handler):
         )
         self.rtt_count: int = 0  # pylint: disable=attribute-defined-outside-init
 
+        # fmt: off
         self.latency_total_time: float = (  # pylint: disable=attribute-defined-outside-init
             0.0
         )
+        # fmt: on
         self.latency_count: int = 0  # pylint: disable=attribute-defined-outside-init
 
     def teardown(self) -> None:
@@ -192,8 +194,7 @@ def run(
         rtt_count = -1
 
     latency_total_time = sum(
-        cast(TestHandler, skill.handlers["test"]).latency_total_time
-        for skill in skills
+        cast(TestHandler, skill.handlers["test"]).latency_total_time for skill in skills
     )
     latency_count = sum(
         cast(TestHandler, skill.handlers["test"]).latency_count for skill in skills

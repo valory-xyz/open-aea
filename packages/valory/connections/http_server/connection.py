@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -491,7 +491,7 @@ class HTTPChannel(BaseAsyncChannel):
             return Response(  # pragma: nocover
                 status=SERVER_ERROR, reason="Server terminated unexpectedly."
             )
-        except BaseException:  # pragma: nocover # pylint: disable=broad-except # noqa: B036
+        except BaseException:  # pylint: disable=broad-except # noqa: B036
             self.logger.exception("Error during handling incoming request")
             return Response(
                 status=SERVER_ERROR, reason="Server Error", text=format_exc()

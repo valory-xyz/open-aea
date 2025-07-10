@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -464,7 +464,7 @@ class PackageConfiguration(Configuration, ABC):
         if instance is None:
             instance = cls(**params)
         else:
-            instance(**params)  # type: ignore
+            instance.__init__(**params)  # type: ignore  # pylint: disable=unnecessary-dunder-call
 
             if directory and not instance.directory:
                 instance.directory = directory
@@ -951,7 +951,7 @@ class SkillComponentConfiguration:
         if instance is None:
             instance = cls(**params)
         else:  # pragma: nocover
-            instance(**params)  # type: ignore
+            instance.__init__(**params)  # type: ignore  # pylint: disable=unnecessary-dunder-call
         return instance
 
 

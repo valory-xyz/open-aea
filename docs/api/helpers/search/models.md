@@ -142,7 +142,7 @@ Implements an attribute for an OEF data model.
 def __init__(name: str,
              type_: Type[ATTRIBUTE_TYPES],
              is_required: bool,
-             description: str = "") -> None
+             description: Optional[str] = None) -> None
 ```
 
 Initialize an attribute.

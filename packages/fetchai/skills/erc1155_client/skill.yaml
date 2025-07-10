@@ -10,27 +10,27 @@ fingerprint:
   README.md: bafybeid73sgd24psits3e6ktrxrwwin7zd6xb7adxsplxi5bizlrxk5bom
   __init__.py: bafybeidi6meicrc6tyeokv42f5u7xymlgfy2eua5ueuxmqv272oouhqehu
   behaviours.py: bafybeifwle5mmpklafdqeptbrntujnj3pees32ibv2hxosuklrjr7ecaeu
-  dialogues.py: bafybeiggrjhnlyd2xgdtoy22olbbpwzp5knkk2t7xg75iexdsishloocsq
-  handlers.py: bafybeif7opwvneon35cg3zojhnkj3p2mp3zcajhkzi4orxwtky73mbeyc4
+  dialogues.py: bafybeig6sjkiage4s7f3zzs72lwcmt35qv5577niz4gd4qyyswyhzvx3qy
+  handlers.py: bafybeidezpqax42c2ylg2v3mfuecpoqmv3kqyfvavl2tazfpa2mem4jvli
   strategy.py: bafybeifudijy3opr6srw5kik3x3rmv6f75dts2pcqtlhjwkkzcafpad4em
   tests/__init__.py: bafybeiagjee55nf2csbyob2o5u3au6r76elv4b6o6qoxnrupinam2brfia
   tests/intermediate_class.py: bafybeifcvd4xautun4fhi7hh7jywgd3kt4pfzle5qlcqpxza4iz2dhbrku
   tests/test_behaviours.py: bafybeic6ibptolj4ondl6gie6rhhwyyvsuv35t5vr5vvkk4k7e52qzf7hu
   tests/test_dialogues.py: bafybeiautieucrrlypj2u5iobaufah63gerlt362pba3d3l5pa5spppqtq
   tests/test_handlers.py: bafybeigiapgp3inw3yun7wrsbbhrwbr5ah4cwdq6axzdglteagqrp2dgoq
-  tests/test_strategy.py: bafybeicbxie3v6vue3gcnru6vsvggcgy3shxwrldis5gppizbuhooslcqa
+  tests/test_strategy.py: bafybeieexiz5sou3giv2fwjx7sbt554i3pplsgrouqx2bmpxlaqkmbtyz4
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeibdsjmy4w2eyilbqc7yzutopl65qpeyspxwz7mjvirr52twhjlf5y
+- valory/ledger:0.19.0:bafybeih54gqeu6owv7rprlxcjuhtwzad7syk2n6szci53uoaiy2mwpokwu
 contracts:
-- fetchai/erc1155:0.22.0:bafybeiff7a6xncyad53o2r7lekpnhexcspze6ocy55xtpzqeuacnlpunm4
+- fetchai/erc1155:0.22.0:bafybeihjpo5fwcmj4zonzqizx3ocx7pqjoa4ulrqq3rsevrpuf5p5242ty
 protocols:
-- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
-- fetchai/fipa:1.0.0:bafybeiajs4ys4lqewfg7dnwg346mgs2wpcrsyqhmfzh53bsle3mzmv5k5a
-- fetchai/oef_search:1.0.0:bafybeido2dn66pdglzdwfoslxc6irppkeqxgrtclzm2fg77gkrtqps7rg4
-- open_aea/signing:1.0.0:bafybeig2d36zxy65vd7fwhs7scotuktydcarm74aprmrb5nioiymr3yixm
-- valory/contract_api:1.0.0:bafybeid247uig2ekykdumh7ewhp2cdq7rchaeqjj6e7urx35zfpdl5zrn4
-- valory/ledger_api:1.0.0:bafybeihmqzcbj6t7vxz2aehd5726ofnzsfjs5cwlf42ro4tn6i34cbfrc4
+- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
+- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
+- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
+- valory/contract_api:1.0.0:bafybeiaj4tn55rfbqgxyl7n6piu2vbu6xiajm76rthwldvtovheulwsl5q
+- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
 skills: []
 behaviours:
   search:

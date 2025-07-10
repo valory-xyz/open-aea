@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -366,7 +366,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 await task
             except KeyboardInterrupt:  # pragma: nocover
                 raise
-            except BaseException:  # pragma: nocover # pylint: disable=broad-except # noqa: B036
+            except BaseException:  # pylint: disable=broad-except # noqa: B036
                 pass  # nosec
 
     async def disconnect(self) -> None:

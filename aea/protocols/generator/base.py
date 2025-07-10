@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -1830,9 +1830,7 @@ class ProtocolGenerator:
                 self.protocol_specification_in_camel_case
             )
         )
-        cls_str += (
-            self.indent + "performative_content = dict()  # type: Dict[str, Any]\n"
-        )
+        cls_str += self.indent + "performative_content: Dict[str, Any] = dict()\n"
         counter = 1
         for performative, contents in self.spec.speech_acts.items():
             if counter == 1:

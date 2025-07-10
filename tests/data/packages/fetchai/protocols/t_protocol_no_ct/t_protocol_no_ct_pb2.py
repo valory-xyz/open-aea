@@ -143,22 +143,22 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     )
     _globals["_TPROTOCOLNOCTMESSAGE"]._serialized_start = 70
     _globals["_TPROTOCOLNOCTMESSAGE"]._serialized_end = 7381
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PT_PERFORMATIVE"
-    ]._serialized_start = 848
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PT_PERFORMATIVE"]._serialized_start = (
+        848
+    )
     _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PT_PERFORMATIVE"]._serialized_end = 988
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PCT_PERFORMATIVE"
     ]._serialized_start = 991
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PCT_PERFORMATIVE"
-    ]._serialized_end = 1287
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PCT_PERFORMATIVE"]._serialized_end = (
+        1287
+    )
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PMT_PERFORMATIVE"
     ]._serialized_start = 1290
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PMT_PERFORMATIVE"
-    ]._serialized_end = 4486
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PMT_PERFORMATIVE"]._serialized_end = (
+        4486
+    )
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PMT_PERFORMATIVE_CONTENTDICTINTBYTESENTRY"
     ]._serialized_start = 3598
@@ -249,12 +249,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_PMT_PERFORMATIVE_CONTENTDICTSTRSTRENTRY"
     ]._serialized_end = 4486
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE"
-    ]._serialized_start = 4489
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE"
-    ]._serialized_end = 6858
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE"]._serialized_start = (
+        4489
+    )
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE"]._serialized_end = (
+        6858
+    )
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE_CONTENTUNION1TYPEDICTOFSTRINTENTRY"
     ]._serialized_start = 6575
@@ -279,9 +279,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_MT_PERFORMATIVE_CONTENTUNION2TYPEDICTOFBOOLBYTESENTRY"
     ]._serialized_end = 6858
-    _globals[
-        "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_O_PERFORMATIVE"
-    ]._serialized_start = 6861
+    _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_O_PERFORMATIVE"]._serialized_start = (
+        6861
+    )
     _globals["_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_O_PERFORMATIVE"]._serialized_end = 7321
     _globals[
         "_TPROTOCOLNOCTMESSAGE_PERFORMATIVE_O_PERFORMATIVE_CONTENTODICTSTRINTENTRY"

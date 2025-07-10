@@ -848,10 +848,15 @@ class CertRequest:
             raise ValueError(  # pragma: nocover
                 "Exactly one of key_identifier or public_key can be specified."
             )
+        result = None
         if self.public_key is not None:
             result = self.public_key
-        else:
+        elif self.key_identifier is not None:
             result = self.key_identifier
+
+        if result is None:
+            raise ValueError("Either key_identifier or public_key must be specified.")
+
         return result
 
     def get_message(self, public_key: str) -> bytes:

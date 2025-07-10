@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ from asyncio import CancelledError
 from asyncio.events import AbstractEventLoop
 from asyncio.streams import StreamWriter
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 from asn1crypto import x509  # type: ignore
 from ecdsa.curves import SECP256k1  # type: ignore
@@ -320,7 +320,9 @@ class P2PLibp2pClientConnection(Connection):
         try:
             nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
         except KeyError:
-            raise AEAEnforceError("Delegate 'public_key' should be provided for each node")
+            raise AEAEnforceError(
+                "Delegate 'public_key' should be provided for each node"
+            )
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,
             "Delegate 'public_key' should be provided for each node",

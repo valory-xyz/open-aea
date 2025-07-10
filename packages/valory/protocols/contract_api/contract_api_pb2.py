@@ -40,20 +40,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_CONTRACTAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"
     ]._serialized_start = 1205
-    _globals[
-        "_CONTRACTAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"
-    ]._serialized_end = 1398
-    _globals[
-        "_CONTRACTAPIMESSAGE_GET_RAW_MESSAGE_PERFORMATIVE"
-    ]._serialized_start = 1401
+    _globals["_CONTRACTAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"]._serialized_end = (
+        1398
+    )
+    _globals["_CONTRACTAPIMESSAGE_GET_RAW_MESSAGE_PERFORMATIVE"]._serialized_start = (
+        1401
+    )
     _globals["_CONTRACTAPIMESSAGE_GET_RAW_MESSAGE_PERFORMATIVE"]._serialized_end = 1590
     _globals["_CONTRACTAPIMESSAGE_GET_STATE_PERFORMATIVE"]._serialized_start = 1593
     _globals["_CONTRACTAPIMESSAGE_GET_STATE_PERFORMATIVE"]._serialized_end = 1776
     _globals["_CONTRACTAPIMESSAGE_STATE_PERFORMATIVE"]._serialized_start = 1778
     _globals["_CONTRACTAPIMESSAGE_STATE_PERFORMATIVE"]._serialized_end = 1871
-    _globals[
-        "_CONTRACTAPIMESSAGE_RAW_TRANSACTION_PERFORMATIVE"
-    ]._serialized_start = 1873
+    _globals["_CONTRACTAPIMESSAGE_RAW_TRANSACTION_PERFORMATIVE"]._serialized_start = (
+        1873
+    )
     _globals["_CONTRACTAPIMESSAGE_RAW_TRANSACTION_PERFORMATIVE"]._serialized_end = 1995
     _globals["_CONTRACTAPIMESSAGE_RAW_MESSAGE_PERFORMATIVE"]._serialized_start = 1997
     _globals["_CONTRACTAPIMESSAGE_RAW_MESSAGE_PERFORMATIVE"]._serialized_end = 2107

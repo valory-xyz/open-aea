@@ -44,9 +44,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_FIPAMESSAGE_ACCEPT_W_INFORM_PERFORMATIVE_INFOENTRY"
     ]._serialized_start = 1158
-    _globals[
-        "_FIPAMESSAGE_ACCEPT_W_INFORM_PERFORMATIVE_INFOENTRY"
-    ]._serialized_end = 1201
+    _globals["_FIPAMESSAGE_ACCEPT_W_INFORM_PERFORMATIVE_INFOENTRY"]._serialized_end = (
+        1201
+    )
     _globals["_FIPAMESSAGE_MATCH_ACCEPT_W_INFORM_PERFORMATIVE"]._serialized_start = 1204
     _globals["_FIPAMESSAGE_MATCH_ACCEPT_W_INFORM_PERFORMATIVE"]._serialized_end = 1382
     _globals[

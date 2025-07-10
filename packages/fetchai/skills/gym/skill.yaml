@@ -10,8 +10,8 @@ fingerprint:
   __init__.py: bafybeihcv27rv6jafmrgjgeqn3fsmep54k2epi7tkiv6zfxwtczwah4klm
   dialogues.py: bafybeicnd6qc3hrzk5unxfcvcrvv4qflqwfcuq6trsih4i57btxxrxc56a
   handlers.py: bafybeihung2kbhewqdjceudcgmlbv5jbgh66knjsboigpo2qsoei6xrute
-  helpers.py: bafybeiepac2mjvl4xnhzsthwen5nstzjoopzuv6fvoisw36frww2km4fpa
-  rl_agent.py: bafybeignbkbhfiswcohlk7ode6uc76bekownpcnsmqjtasv5bm4bzsisfm
+  helpers.py: bafybeig5gzrh2pwjjwvsq5z3lbowr3wr2x7lri57atjr2qujlkhpzgucru
+  rl_agent.py: bafybeig4bsihdwlco4tfroei3jr6wg6iea23n6pudeiitb55rsqc4bapnu
   tasks.py: bafybeifvuancp2y57rjgwuzxgrzxiqkc4gzzbskgwch3uze5vlbvptlswm
   tests/__init__.py: bafybeihojk75sixkhbsmwxbrzdaqwouq6dh2oo6u7zk2clqcgxqrhklhny
   tests/helpers.py: bafybeifbvlf5ahttwz7uddixxp5ggw3uu3sby65ya4xr2gy3gfb5xouj5i
@@ -19,15 +19,15 @@ fingerprint:
   tests/test_dialogues.py: bafybeihigzfcuycwtpj5no6owcfxlo7kwsvh7bh2ohdx7u7tphea23xuwy
   tests/test_handlers.py: bafybeih6ktdgopxcpcn4n7a7wgem42wzzanjw6inwdqp67pb6lzgvxhrpy
   tests/test_helpers.py: bafybeigoayt5pabnwi72kcxpoyan7r44igjizeycw7lqjnxy52alwnez44
-  tests/test_rl_agent.py: bafybeia2s7ft7za4tyzsofmguny6vit7iwfp4gx6nemk4bekx7ytbrc4ze
+  tests/test_rl_agent.py: bafybeictotyfblrdlpcx7fbrhh6lwfcaeaat7a6fp6xwnenmn3kgzezxf4
   tests/test_task.py: bafybeic4y7wulvlx2eparks3wyftfsx5ya2xsufoaohxfqhxrabm7zt7pi
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeicpzcp2otfv4p3bvz44n2wurpsqddlwyc6mnuwbhimidjqvttw27y
+- fetchai/gym:0.19.0:bafybeif7phd6sesbbefavspnzpcvqzbwjzcbmjqec5x2x7xtdgq4ie5whu
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
-- fetchai/gym:1.0.0:bafybeigja2j7wefnunb44w3g6m5kscayeoym2etx5gddkzjjsjfefioffi
+- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/gym:1.0.0:bafybeibaqkqybb475wtb57isycy4t7ahmdmrr2yaiu7j7nhsijvzs7tqee
 skills: []
 behaviours: {}
 handlers:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -231,7 +231,9 @@ class P2PLibp2pMailboxConnection(Connection):
         try:
             nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
         except KeyError:
-            raise AEAEnforceError("Delegate 'public_key' should be provided for each node")
+            raise AEAEnforceError(
+                "Delegate 'public_key' should be provided for each node"
+            )
 
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,

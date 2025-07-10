@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -225,7 +225,9 @@ def extract(source: str, target: str) -> None:
 
         # Filter out dangerous members
         safe_members = [member for member in tar.getmembers() if is_safe_member(member)]
-        tar.extractall(path=target, members=safe_members)
+        tar.extractall(
+            path=target, members=safe_members
+        )  # nosec B202 - members are validated by is_safe_member function
         tar.close()
     else:
         raise ValueError("Unknown file type: {}".format(source))

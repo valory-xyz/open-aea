@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -1690,7 +1690,9 @@ class CosmosFaucetApi(FaucetApi):
             try:
                 uid = response.json()["uuid"]
             except KeyError:  # pragma: nocover
-                raise ValueError(f"key `uid` not found in response_json={response.json()}")
+                raise ValueError(
+                    f"key `uid` not found in response_json={response.json()}"
+                )
             _default_logger.info("Wealth claim generated, uid: {}".format(uid))
         else:  # pragma: no cover
             _default_logger.warning(

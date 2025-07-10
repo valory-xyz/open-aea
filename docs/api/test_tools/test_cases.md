@@ -876,6 +876,26 @@ def setup_class(cls) -> None
 
 Set up the test class.
 
+<a id="aea.test_tools.test_cases.AEATestCaseEmptyFlaky.setup_method"></a>
+
+#### setup`_`method
+
+```python
+def setup_method() -> None
+```
+
+Set up the test method.
+
+<a id="aea.test_tools.test_cases.AEATestCaseEmptyFlaky.teardown_method"></a>
+
+#### teardown`_`method
+
+```python
+def teardown_method() -> None
+```
+
+Teardown the test method.
+
 <a id="aea.test_tools.test_cases.AEATestCaseEmptyFlaky.teardown_class"></a>
 
 #### teardown`_`class
@@ -941,6 +961,26 @@ def setup_class(cls) -> None
 ```
 
 Set up the test class.
+
+<a id="aea.test_tools.test_cases.AEATestCaseManyFlaky.setup_method"></a>
+
+#### setup`_`method
+
+```python
+def setup_method() -> None
+```
+
+Set up the test method.
+
+<a id="aea.test_tools.test_cases.AEATestCaseManyFlaky.teardown_method"></a>
+
+#### teardown`_`method
+
+```python
+def teardown_method() -> None
+```
+
+Teardown the test method.
 
 <a id="aea.test_tools.test_cases.AEATestCaseManyFlaky.teardown_class"></a>
 

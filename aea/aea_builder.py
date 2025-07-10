@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,9 @@ class _DependenciesManager:
         # adjacency list of the dependency DAG
         # an arc means "depends on"
         self._dependencies: Dict[ComponentId, ComponentConfiguration] = {}
-        self._all_dependencies_by_type: Dict[ComponentType, Dict[ComponentId, ComponentConfiguration]] = {}
+        self._all_dependencies_by_type: Dict[
+            ComponentType, Dict[ComponentId, ComponentConfiguration]
+        ] = {}
         self._prefix_to_components: Dict[PackageIdPrefix, Set[ComponentId]] = {}
         self._inverse_dependency_graph: Dict[ComponentId, Set[ComponentId]] = {}
 
