@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any, Callable, Generator, List, Optional, Sequence, Type, Union, cast
 
 import click
-from click import argument, option
+from click import Context, argument, option
 
 from aea.cli.registry.settings import (
     REGISTRY_LOCAL,
@@ -119,7 +119,7 @@ class PublicIdOrPathParameter(click.ParamType):
         """
         super().__init__(*args, **kwargs)  # type: ignore
 
-    def get_metavar(self, param: Any) -> str:
+    def get_metavar(self, param: Any, ctx: Context) -> str:
         """Return the metavar default for this param if it provides one."""
         return "PUBLIC_ID_OR_PATH"
 
@@ -159,7 +159,7 @@ class PublicIdOrPathParameter(click.ParamType):
 class PublicIdParameter(click.ParamType):
     """Define a public id parameter for Click applications."""
 
-    def get_metavar(self, param: Any) -> str:
+    def get_metavar(self, param: Any, ctx: Context) -> str:
         """Return the metavar default for this param if it provides one."""
         return "PUBLIC_ID_OR_HASH"
 
@@ -202,7 +202,7 @@ class AgentDirectory(click.Path):
             exists=True, file_okay=False, dir_okay=True, readable=True, writable=False
         )
 
-    def get_metavar(self, param: Any) -> str:
+    def get_metavar(self, param: Any, ctx: Context) -> str:
         """Return the metavar default for this param if it provides one."""
         return "AGENT_DIRECTORY"  # pragma: no cover
 
@@ -232,7 +232,7 @@ class PackagesSource(click.ParamType):
     def __init__(self) -> None:
         """Initialize the package source parameter."""
 
-    def get_metavar(self, param: Any) -> str:
+    def get_metavar(self, param: Any, ctx: Context) -> str:
         """Return the metavar default for this param if it provides one."""
         return "SOURCE"  # pragma: no cover
 
@@ -248,7 +248,7 @@ class PackagesSource(click.ParamType):
 class PyPiDependency(click.ParamType):
     """Click parameter for PyPy dependency string"""
 
-    def get_metavar(self, param: Any) -> str:
+    def get_metavar(self, param: Any, ctx: Context) -> str:
         """Return the metavar default for this param if it provides one."""
         return "DEPENDENCY"  # pragma: no cover
 
@@ -265,7 +265,7 @@ class LedgerChoice(click.ParamType):
 
     ALL = "all"
 
-    def get_metavar(self, param: click.Parameter) -> str:
+    def get_metavar(self, param: click.Parameter, ctx: Context) -> str:
         """Get metavar name."""
         return "LEDGER_ID"
 

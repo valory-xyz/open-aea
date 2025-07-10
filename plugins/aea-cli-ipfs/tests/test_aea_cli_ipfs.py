@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,11 +30,10 @@ import click
 import ipfshttpclient  # type: ignore
 import pytest
 from aea_cli_ipfs.ipfs_utils import addr_to_url, resolve_addr
-from click.testing import CliRunner
 from urllib3.exceptions import NewConnectionError as ConnectionError
 
 from aea.cli.core import cli
-from aea.test_tools.click_testing import CliTest
+from aea.test_tools.click_testing import CliRunner, CliTest
 
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -97,8 +96,9 @@ def test_ipfs():
     """Test aea ipfs command itself."""
     runner = CliRunner()
     with patch("ipfshttpclient.Client.id"):
-        r = runner.invoke(cli, ["ipfs"], catch_exceptions=False, standalone_mode=False)
-    assert r.exit_code == 0
+        r = runner.invoke(cli, ["ipfs"], standalone_mode=False)
+    assert r.exit_code == 1
+    assert "Usage: aea ipfs [OPTIONS] COMMAND [ARGS]..." in r.exception.message
 
 
 def test_ipfs_add():

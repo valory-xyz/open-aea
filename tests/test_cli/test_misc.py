@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,10 +27,11 @@ from tests.conftest import CliRunner
 
 
 def test_no_argument():
-    """Test that if we run the cli tool without arguments, it exits gracefully."""
+    """Test that if we run the cli tool without arguments, it shows help."""
     runner = CliRunner()
     result = runner.invoke(cli, [])
-    assert result.exit_code == 0
+    assert result.exit_code == 2
+    assert "Usage: aea [OPTIONS] COMMAND [ARGS]..." in result.stderr
 
 
 def test_flag_version():

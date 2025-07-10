@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,9 @@ class AgentLoggerAdapter(LoggerAdapter):
         self, msg: Any, kwargs: MutableMapping[str, Any]
     ) -> Tuple[Any, MutableMapping[str, Any]]:
         """Prepend the agent name to every log message."""
+        if self.extra is None:
+            return msg, kwargs
+
         return f"[{self.extra['agent_name']}] {msg}", kwargs
 
 

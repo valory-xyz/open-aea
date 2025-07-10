@@ -39,7 +39,7 @@ setup(
             "py.typed",
         ]
     },
-    python_requires=">=3.9,<4.0",
+    python_requires=">=3.10,<4.0",
     install_requires=[
         "open-aea-ledger-ethereum~=1.65.0",
         "open-aea-flashbots==1.4.0",
@@ -63,8 +63,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: Microsoft",
         "Operating System :: Unix",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Topic :: Communications",

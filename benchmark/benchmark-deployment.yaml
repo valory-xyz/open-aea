@@ -23,7 +23,7 @@ spec:
         kubernetes.io/os: linux
       initContainers:
       - name: python
-        image: python:3.8-buster
+        image: python:3.10-buster
         command: ['sh', '-c', 'bash /app/run_from_branch.sh | tee /data/index.html']
         volumeMounts:
         - name: benchmark-data

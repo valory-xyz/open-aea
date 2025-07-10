@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,7 +95,10 @@ class TestPushLocally(AEATestCaseEmpty):
         """Test ok for vendor's item."""
 
         with mock.patch("click.core._"):
-            with mock.patch("os.path.exists", side_effect=[False, True, False]):
+            with mock.patch(
+                "os.path.exists",
+                side_effect=[False, True, False, False, False, True, False],
+            ):
                 self.invoke("push", "--local", "skill", "fetchai/echo")
 
         copy_tree_mock.assert_called_once()

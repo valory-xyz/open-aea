@@ -2,7 +2,7 @@
 python3 --version
 ```
 ``` bash
-sudo apt-get install python3.8-dev
+sudo apt-get install python3.10-dev
 ```
 ``` bash
 curl https://raw.githubusercontent.com/valory-xyz/open-aea/main/scripts/install.sh --output install.sh

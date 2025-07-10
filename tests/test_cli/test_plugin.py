@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -129,7 +129,7 @@ def test_registered():
 def test_register_and_run(runner):
     """Test that registration and run of the command work correctly."""
 
-    result = runner.invoke(good_cli)
+    result = runner.invoke(good_cli, ["--help"])
     assert result.exit_code == 0
 
     for ep in iter_entry_points("_test_click_plugins.test_plugins"):
@@ -140,12 +140,12 @@ def test_register_and_run(runner):
 
 def test_broken_register_and_run(runner):
     """Test that the broken plugin doesn't get registered as expected."""
-    result = runner.invoke(broken_cli)
+    result = runner.invoke(broken_cli, ["--help"])
     assert result.exit_code == 0
 
     for ep in iter_entry_points("_test_click_plugins.broken_plugins"):
         cmd_result = runner.invoke(broken_cli, [ep.name])
-        assert cmd_result.exit_code != 0
+        assert cmd_result.exit_code == 1
         assert "Traceback" in cmd_result.output
 
 
@@ -159,7 +159,7 @@ def test_group_chain(runner):
         """Sub CLI."""
         pass
 
-    result = runner.invoke(good_cli)
+    result = runner.invoke(good_cli, ["--help"])
     assert result.exit_code == 0
     assert sub_cli.name in result.output
     for ep in iter_entry_points("_test_click_plugins.test_plugins"):
@@ -172,7 +172,7 @@ def test_group_chain(runner):
         """Sub CLI with plugins."""
         pass
 
-    result = runner.invoke(good_cli, ["sub-cli-plugins"])
+    result = runner.invoke(good_cli, ["sub-cli-plugins", "--help"])
     assert result.exit_code == 0
     for ep in iter_entry_points("_test_click_plugins.test_plugins"):
         assert ep.name in result.output
@@ -199,21 +199,21 @@ def test_exception():
 
 def test_broken_register_and_run_with_help(runner):
     """Test the broken registration of the plugin when the command is run with the '--help' flag."""
-    result = runner.invoke(broken_cli)
+    result = runner.invoke(broken_cli, ["--help"])
     assert result.exit_code == 0
 
     for ep in iter_entry_points("_test_click_plugins.broken_plugins"):
         cmd_result = runner.invoke(broken_cli, [ep.name, "--help"])
-        assert cmd_result.exit_code != 0
+        assert cmd_result.exit_code == 1
         assert "Traceback" in cmd_result.output
 
 
 def test_broken_register_and_run_with_args(runner):
     """Test the broken registration of the plugin when the command is run with the '--help' flag."""
-    result = runner.invoke(broken_cli)
+    result = runner.invoke(broken_cli, ["--help"])
     assert result.exit_code == 0
 
     for ep in iter_entry_points("_test_click_plugins.broken_plugins"):
         cmd_result = runner.invoke(broken_cli, [ep.name, "-a", "b"])
-        assert cmd_result.exit_code != 0
+        assert cmd_result.exit_code == 1
         assert "Traceback" in cmd_result.output

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -110,7 +110,7 @@ class TestGenerateKey:
         args = [*CLI_LOG_OPTION, "generate-key", "ledger"]
         result = self.runner.invoke(cli, args)
         assert result.exit_code == 1
-        assert "Invalid identifier provided `ledger`" in result.stdout
+        assert "Invalid identifier provided `ledger`" in result.stderr
 
     def test_no_ledger_installation_found(self):
         """Test that the fetch private key is created correctly."""
@@ -120,7 +120,7 @@ class TestGenerateKey:
         try:
             result = self.runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "No ledger installation found" in result.stdout
+            assert "No ledger installation found" in result.stderr
         finally:
             crypto_registry.specs = specs
 

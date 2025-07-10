@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -261,10 +261,10 @@ async def test_node_stopped_callback() -> None:
     if not (
         platform.system() != "Windows"
         and sys.version_info.major == 3
-        and sys.version_info.minor >= 8
+        and sys.version_info.minor >= 10
     ):
         pytest.skip(
-            "Not supported on this platform. Unix and python >= 3.8 supported only"
+            "Not supported on this platform. Unix and python >= 3.10 supported only"
         )
 
     con = _make_libp2p_connection()
