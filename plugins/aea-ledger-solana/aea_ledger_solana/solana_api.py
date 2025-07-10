@@ -19,8 +19,8 @@
 """This module contains the Solana API Client implementation for the solana ledger."""
 
 import json
+import secrets
 from dataclasses import dataclass
-from random import randint
 
 import solders.system_program as sp
 from solana.rpc.api import Client as ApiClient
@@ -51,8 +51,8 @@ class SolanaApiClient(ApiClient):
         """Create a new account."""
         required_balance = SplClient.get_min_balance_rent_for_exempt_for_account(self)
 
-        seed = str(  # nosec - we should retrive this from on chian somewhere.
-            randint(0, 1000000000)
+        seed = str(  # Use secure random for cryptographic seed generation
+            secrets.randbelow(1000000000)
         )
         acc = PublicKey.create_with_seed(
             PublicKey.from_string(sender_address),

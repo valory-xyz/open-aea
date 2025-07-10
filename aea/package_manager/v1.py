@@ -157,7 +157,7 @@ class PackageManagerV1(BasePackageManager):
     def _get_latest_tag(repo: str) -> str:
         """Get latest tag for the repository."""
 
-        response = r_get(GIT_TAGS_URL.format(repo=repo))
+        response = r_get(GIT_TAGS_URL.format(repo=repo), timeout=30)
         if response.status_code != 200:
             raise PackagesSourceNotValid(
                 f"Fetching tags from `{repo}` failed with message '"
@@ -172,7 +172,7 @@ class PackageManagerV1(BasePackageManager):
     def _get_packages_json(repo: str, tag: str) -> Dict[str, Dict[str, str]]:
         """Get `packages.json`."""
 
-        response = r_get(PACKAGE_FILE_REMOTE_URL.format(repo=repo, tag=tag))
+        response = r_get(PACKAGE_FILE_REMOTE_URL.format(repo=repo, tag=tag), timeout=30)
         if response.status_code != 200:
             raise PackagesSourceNotValid(
                 f"Fetching packages from `{repo}` failed with message '"

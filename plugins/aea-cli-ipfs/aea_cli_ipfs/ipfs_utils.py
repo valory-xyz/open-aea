@@ -147,7 +147,7 @@ class IPFSDaemon:
     def is_started_externally(self) -> bool:
         """Check daemon was started externally."""
         try:
-            x = requests.post(self.api_url)
+            x = requests.post(self.api_url, timeout=30)
             return x.status_code == 200
         except requests.exceptions.ConnectionError:
             return False

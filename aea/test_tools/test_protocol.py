@@ -42,26 +42,26 @@ class BaseProtocolMessagesTestCase(ABC):
     def perform_message_test(self, msg: Message) -> None:  # nosec
         """Test message encode/decode."""
         msg.to = "receiver"
-        assert msg._is_consistent()  # pylint: disable=protected-access
+        assert msg._is_consistent()  # pylint: disable=protected-access  # nosec - only for testing
         envelope = Envelope(to=msg.to, sender="sender", message=msg)
         envelope_bytes = envelope.encode()
 
         actual_envelope = Envelope.decode(envelope_bytes)
         expected_envelope = envelope
 
-        assert expected_envelope.to == actual_envelope.to
-        assert expected_envelope.sender == actual_envelope.sender
-        assert (
+        assert expected_envelope.to == actual_envelope.to  # nosec - only for testing
+        assert expected_envelope.sender == actual_envelope.sender  # nosec - only for testing
+        assert (  # nosec - only for testing
             expected_envelope.protocol_specification_id
             == actual_envelope.protocol_specification_id
         )
-        assert expected_envelope.message != actual_envelope.message
+        assert expected_envelope.message != actual_envelope.message  # nosec - only for testing
 
         actual_msg = self.MESSAGE_CLASS.serializer.decode(actual_envelope.message_bytes)
         actual_msg.to = actual_envelope.to
         actual_msg.sender = actual_envelope.sender
         expected_msg = msg
-        assert expected_msg == actual_msg
+        assert expected_msg == actual_msg  # nosec - only for testing
 
     def test_messages_ok(self) -> None:
         """Run messages are ok for encode and decode."""
@@ -71,7 +71,7 @@ class BaseProtocolMessagesTestCase(ABC):
     def test_messages_inconsistent(self) -> None:
         """Run messages are inconsistent."""
         for msg in self.build_inconsistent():
-            assert (  # nosec
+            assert (  # nosec - only for testing
                 not msg._is_consistent()  # pylint: disable=protected-access
             ), msg
 
@@ -165,4 +165,4 @@ class BaseProtocolDialoguesTestCase(ABC):
         _, dialogue = dialogues.create(
             counterparty="some", **self.make_message_content()
         )
-        assert dialogue is not None  # nosec
+        assert dialogue is not None  # nosec - only for testing

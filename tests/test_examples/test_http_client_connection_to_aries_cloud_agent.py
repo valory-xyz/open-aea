@@ -93,7 +93,7 @@ class TestAEAToACA:
                 "--admin-insecure-mode",
                 "--inbound-transport",
                 "http",
-                "0.0.0.0",
+                "127.0.0.1",
                 "8000",
                 "--outbound-transport",
                 "http",

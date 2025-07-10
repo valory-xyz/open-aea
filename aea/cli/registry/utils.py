@@ -208,7 +208,21 @@ def extract(source: str, target: str) -> None:
     """
     if source.endswith("tar.gz"):
         tar = tarfile.open(source, "r:gz")
-        tar.extractall(path=target)
+        # Validate tar members to prevent directory traversal attacks
+        def is_safe_member(member):
+            """Check if tar member is safe to extract."""
+            # Resolve any path traversal attempts
+            member_path = os.path.normpath(member.name)
+            # Check for absolute paths or parent directory references
+            if member_path.startswith('/') or '..' in member_path:
+                return False
+            # Check if the resolved path would be within target directory
+            full_path = os.path.join(target, member_path)
+            return os.path.commonpath([os.path.abspath(target), os.path.abspath(full_path)]) == os.path.abspath(target)
+        
+        # Filter out dangerous members
+        safe_members = [member for member in tar.getmembers() if is_safe_member(member)]
+        tar.extractall(path=target, members=safe_members)
         tar.close()
     else:
         raise ValueError("Unknown file type: {}".format(source))
