@@ -82,8 +82,8 @@ def load_fetch_ipfs() -> Callable[[str, PublicId, str, bool], Optional[Path]]:
 class DepedencyMismatchErrors(Enum):
     """Dependency mismatch errors."""
 
-    HASH_NOT_FOUND: int = 1
-    HASH_DOES_NOT_MATCH: int = 2
+    HASH_NOT_FOUND = 1
+    HASH_DOES_NOT_MATCH = 2
 
 
 class Cache:

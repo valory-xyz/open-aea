@@ -696,7 +696,7 @@ class Skill(Component):
         return self.skill_context.logger
 
     @logger.setter
-    def logger(self, *args: str) -> None:
+    def logger(self, *args: Any) -> None:
         """Set the logger."""
         raise ValueError("Cannot set logger to a skill component.")
 
@@ -794,14 +794,14 @@ def _parse_module(
             raise AEAComponentLoadException(  # pragma: nocover
                 f"'{component_id}' is not a valid identifier."
             )
-        component_class = name_to_class.get(component_class_name, None)
-        if component_class is None:
+        _component_class = name_to_class.get(component_class_name, None)
+        if _component_class is None:
             skill_context.logger.warning(
                 f"{component_type_name.capitalize()} '{component_class_name}' cannot be found."
             )
         else:
             try:
-                component = component_class(
+                component = _component_class(
                     name=component_id,
                     configuration=component_config,
                     skill_context=skill_context,

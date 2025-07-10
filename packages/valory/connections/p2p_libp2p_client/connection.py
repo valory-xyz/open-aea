@@ -29,7 +29,7 @@ from asyncio import CancelledError
 from asyncio.events import AbstractEventLoop
 from asyncio.streams import StreamWriter
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from asn1crypto import x509  # type: ignore
 from ecdsa.curves import SECP256k1  # type: ignore
@@ -40,7 +40,7 @@ from aea.configurations.base import PublicId
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.connections.base import Connection, ConnectionStates
 from aea.crypto.registries import make_crypto
-from aea.exceptions import enforce
+from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.acn.agent_record import AgentRecord
 from aea.helpers.acn.uri import Uri
 from aea.helpers.pipe import IPCChannelClient, TCPSocketChannelClient, TCPSocketProtocol
@@ -317,7 +317,10 @@ class P2PLibp2pClientConnection(Connection):
             "Delegate 'uri' should be provided for each node",
         )
 
-        nodes_public_keys = [node.get("public_key", None) for node in nodes]
+        try:
+            nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
+        except KeyError:
+            raise AEAEnforceError("Delegate 'public_key' should be provided for each node")
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,
             "Delegate 'public_key' should be provided for each node",

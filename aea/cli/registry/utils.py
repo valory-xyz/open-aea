@@ -210,7 +210,7 @@ def extract(source: str, target: str) -> None:
         tar = tarfile.open(source, "r:gz")
 
         # Validate tar members to prevent directory traversal attacks
-        def is_safe_member(member):
+        def is_safe_member(member: tarfile.TarInfo) -> bool:
             """Check if tar member is safe to extract."""
             # Resolve any path traversal attempts
             member_path = os.path.normpath(member.name)

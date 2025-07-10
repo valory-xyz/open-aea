@@ -41,7 +41,7 @@ from aea.configurations.base import PublicId
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.connections.base import Connection, ConnectionStates
 from aea.crypto.registries import make_crypto
-from aea.exceptions import enforce
+from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.acn.agent_record import AgentRecord
 from aea.helpers.acn.uri import Uri
 from aea.mail.base import Envelope
@@ -79,7 +79,7 @@ class NodeClient:
         self.node_uri = node_uri
         self.agent_record = node_por
         self._session_token: Optional[str] = None
-        self.ssl_ctx = Optional[ssl.SSLContext]
+        self.ssl_ctx: Optional[ssl.SSLContext] = None
 
     async def connect(self) -> bool:
         """Connect to node with pipe."""
@@ -228,7 +228,11 @@ class P2PLibp2pMailboxConnection(Connection):
             "Delegate 'uri' should be provided for each node",
         )
 
-        nodes_public_keys = [node.get("public_key", None) for node in nodes]
+        try:
+            nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
+        except KeyError:
+            raise AEAEnforceError(f"Delegate 'public_key' should be provided for each node")
+
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,
             "Delegate 'public_key' should be provided for each node",

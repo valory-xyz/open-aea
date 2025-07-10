@@ -140,6 +140,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
@@ -195,6 +197,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
@@ -259,6 +263,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
@@ -354,6 +360,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 

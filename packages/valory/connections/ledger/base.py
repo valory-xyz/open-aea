@@ -76,7 +76,7 @@ class RequestDispatcher(ABC):
 
     async def run_async(
         self,
-        func: Callable[[Any], Task],
+        func: Callable[[LedgerApi, Message, Dialogue], Task[Any]],
         api: LedgerApi,
         message: Message,
         dialogue: Dialogue,
@@ -168,7 +168,7 @@ class RequestDispatcher(ABC):
         handler = self.get_handler(performative)
         return self.loop.create_task(self.run_async(handler, api, message, dialogue))
 
-    def get_handler(self, performative: Any) -> Callable[[Any], Task]:
+    def get_handler(self, performative: Any) -> Callable[[LedgerApi, Message, Dialogue], Task[Any]]:
         """
         Get the handler method, given the message performative.
 

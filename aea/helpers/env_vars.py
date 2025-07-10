@@ -334,7 +334,7 @@ def generate_env_vars_recursively(
             for key, value in enumerate(data):
                 res = generate_env_vars_recursively(
                     data=value,
-                    export_path=[*export_path, key],
+                    export_path=[*export_path, str(key)],
                 )
                 env_var_dict.update(res)
     else:

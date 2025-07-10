@@ -141,8 +141,8 @@ def _check_aea_project(
             package_dir = Path(ctx.registry_path).absolute()
             if not package_dir.is_dir():
                 raise FileNotFoundError("Cannnot find packages directory.")
+            (package_dir / default_author).mkdir(exist_ok=True)
             ctx.agent_config.directory = package_dir / default_author
-            ctx.agent_config.directory.mkdir(exist_ok=True)
         else:
             try_to_load_agent_config(ctx)
 

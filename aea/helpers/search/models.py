@@ -193,7 +193,7 @@ class Attribute:
         name: str,
         type_: Type[ATTRIBUTE_TYPES],
         is_required: bool,
-        description: str = "",
+        description: Optional[str] = None,
     ) -> None:
         """
         Initialize an attribute.
