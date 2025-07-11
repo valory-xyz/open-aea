@@ -21,9 +21,8 @@
 """Implementation of plug-in mechanism for cryptos."""
 import itertools
 import pprint
+from importlib.metadata import EntryPoint, entry_points
 from typing import Iterator, List, Set
-
-from pkg_resources import EntryPoint, WorkingSet
 
 from aea.configurations.constants import (
     ALLOWED_GROUPS,
@@ -78,16 +77,21 @@ class Plugin:
             f"{_error_message_prefix} '{self._entry_point.name}' is not a valid identifier for a plugin.",
             AEAPluginError,
         )
+
+        # Parse the entry point value to extract module and attribute
+        value_parts = self._entry_point.value.split(":")
+        if len(value_parts) != 2:
+            raise AEAPluginError(f"{_error_message_prefix} Invalid entry point format.")
+
+        _, attr_path = value_parts
+        attrs = attr_path.split(".")
+
         enforce(
-            len(self._entry_point.attrs) == 1,
+            len(attrs) == 1,
             f"{_error_message_prefix} Nested attributes currently not supported.",
             AEAPluginError,
         )
-        enforce(
-            len(self._entry_point.extras) == 0,
-            f"{_error_message_prefix} Extras currently not supported.",
-            AEAPluginError,
-        )
+
         enforce(
             EntryPointString.REGEX.match(self.entry_point_path) is not None,
             f"{_error_message_prefix} Entry point path '{self.entry_point_path}' is not valid.",
@@ -106,13 +110,26 @@ class Plugin:
     @property
     def attr(self) -> str:
         """Get the class name."""
-        return self._entry_point.attrs[0]
+        # Parse the entry point value to extract the attribute name
+        value_parts = self._entry_point.value.split(":")
+        if len(value_parts) != 2:
+            raise AEAPluginError(
+                f"Invalid entry point format for '{self._entry_point.name}'."
+            )
+        return value_parts[1]
 
     @property
     def entry_point_path(self) -> str:
         """Get the entry point path."""
-        class_name = self.attr
-        return f"{self._entry_point.module_name}{DOTTED_PATH_MODULE_ELEMENT_SEPARATOR}{class_name}"
+        # Parse the entry point value to get module and attribute
+        value_parts = self._entry_point.value.split(":")
+        if len(value_parts) != 2:
+            raise AEAPluginError(
+                f"Invalid entry point format for '{self._entry_point.name}'."
+            )
+
+        module_name, attr_name = value_parts
+        return f"{module_name}{DOTTED_PATH_MODULE_ELEMENT_SEPARATOR}{attr_name}"
 
 
 def _check_no_duplicates(plugins: List[EntryPoint]) -> None:
@@ -130,9 +147,9 @@ def _get_plugins(group: str) -> List[Plugin]:
     :param group: the plugin group.
     :return: a mapping from plugin name to Plugin objects.
     """
-    entry_points: List[EntryPoint] = list(WorkingSet().iter_entry_points(group=group))
-    _check_no_duplicates(entry_points)
-    return [Plugin(group, entry_point) for entry_point in entry_points]
+    entry_points_list: List[EntryPoint] = list(entry_points(group=group))
+    _check_no_duplicates(entry_points_list)
+    return [Plugin(group, entry_point) for entry_point in entry_points_list]
 
 
 def _get_cryptos() -> List[Plugin]:
