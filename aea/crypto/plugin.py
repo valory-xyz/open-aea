@@ -60,6 +60,21 @@ class Plugin:
         self._entry_point = entry_point
         self._check_consistency()
 
+    def _parse_entry_point(self) -> List[str]:
+        """
+        Parse the entry point value to extract module and attribute.
+
+        :raises AEAPluginError: if the entry point format is invalid.
+        :return: a tuple containing the module name and the attribute name.
+        """
+        value_parts = self._entry_point.value.split(":")
+        if len(value_parts) != 2:
+            raise AEAPluginError(
+                f"Invalid entry point format for '{self._entry_point.name}'."
+            )
+
+        return value_parts
+
     def _check_consistency(self) -> None:
         """
         Check consistency of input.
@@ -78,12 +93,7 @@ class Plugin:
             AEAPluginError,
         )
 
-        # Parse the entry point value to extract module and attribute
-        value_parts = self._entry_point.value.split(":")
-        if len(value_parts) != 2:
-            raise AEAPluginError(f"{_error_message_prefix} Invalid entry point format.")
-
-        _, attr_path = value_parts
+        _, attr_path = self._parse_entry_point()
         attrs = attr_path.split(".")
 
         enforce(
@@ -110,25 +120,13 @@ class Plugin:
     @property
     def attr(self) -> str:
         """Get the class name."""
-        # Parse the entry point value to extract the attribute name
-        value_parts = self._entry_point.value.split(":")
-        if len(value_parts) != 2:
-            raise AEAPluginError(
-                f"Invalid entry point format for '{self._entry_point.name}'."
-            )
+        value_parts = self._parse_entry_point()
         return value_parts[1]
 
     @property
     def entry_point_path(self) -> str:
         """Get the entry point path."""
-        # Parse the entry point value to get module and attribute
-        value_parts = self._entry_point.value.split(":")
-        if len(value_parts) != 2:
-            raise AEAPluginError(
-                f"Invalid entry point format for '{self._entry_point.name}'."
-            )
-
-        module_name, attr_name = value_parts
+        module_name, attr_name = self._parse_entry_point()
         return f"{module_name}{DOTTED_PATH_MODULE_ELEMENT_SEPARATOR}{attr_name}"
 
 

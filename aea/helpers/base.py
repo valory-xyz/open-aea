@@ -853,8 +853,7 @@ class CertRequest:
             result = self.public_key
         elif self.key_identifier is not None:
             result = self.key_identifier
-
-        if result is None:
+        else:
             raise ValueError("Either key_identifier or public_key must be specified.")
 
         return result
