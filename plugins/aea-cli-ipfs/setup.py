@@ -38,7 +38,7 @@ setup(
     package_data={"aea_cli_ipfs": ["py.typed"]},
     entry_points={"aea.cli": ["ipfs_cli_command = aea_cli_ipfs.core:ipfs"]},
     install_requires=[
-        "open-aea>=1.0.0, <2.0.0",
+        "open-aea>=2.0.0, <3.0.0",
         "ipfshttpclient>=0.8.0a2",
         "pytest>=7.0.0,<7.3.0",
     ],

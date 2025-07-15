@@ -4,7 +4,7 @@ version: 0.26.0
 type: skill
 description: The weather client skill implements the skill to purchase weather data.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeig3rwpeqh5kdr2iflvy72vkfmby3sl4ulb3sbblt5lndvogvlblme
   __init__.py: bafybeic6biuigdmylscufxz6suvtkxems27j2cns3h36e53gxlm5hihvza
@@ -19,14 +19,14 @@ fingerprint:
   tests/test_models.py: bafybeibte32m37u42tkg4nisfkuyhn5tfwp42yuxwr3fsdbm2pnc2mpfcu
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeih54gqeu6owv7rprlxcjuhtwzad7syk2n6szci53uoaiy2mwpokwu
+- valory/ledger:0.19.0:bafybeifdsep5suryfufmto4j5fyvjhmlgypyg6zvvwqsm4edlwfbfsav5y
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
-- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
-- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
-- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
+- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
+- valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
 skills: []
 behaviours:
   search:
@@ -88,5 +88,5 @@ models:
     class_name: GenericStrategy
 dependencies:
   open-aea-ledger-fetchai:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0
 is_abstract: true

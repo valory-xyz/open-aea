@@ -5,9 +5,9 @@ protocol_specification_id: some_author/some_protocol_name:1.0.0
 type: protocol
 description: A protocol for testing purposes.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeiapuowiqkverwcuzbdbqf2u3aixc3vgcfzsy6ckl27m5dxwtmaz3e
+  README.md: bafybeigbulvy6bmskwmyv2k5bx63r5jfy7w2polhktgun3bllif4sl4kia
   __init__.py: bafybeihbj3lbm5o7i4xvkig5vh5pfyxbnkehwl2vzrie6tz73sagkdipva
   dialogues.py: bafybeihtlklqgnmtwl5dgryer3cygzg2r6lpbpad2wr2cu4i5loxxa5lle
   message.py: bafybeih53jdc4q6rmiviyjo6x5py6rcl4vd4yj4m5yuwo5cl5sjfdloqlm

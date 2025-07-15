@@ -34,7 +34,7 @@ setup(
     packages=find_packages(include=["aea_ledger_solana*"]),
     package_data={"aea_ledger_solana": ["py.typed"]},
     install_requires=[
-        "open-aea>=1.0.0, <2.0.0",
+        "open-aea>=2.0.0, <3.0.0",
         "cryptography",
         "PyNaCl>=1.5.0,<2",
         "solders>=0.14.0",

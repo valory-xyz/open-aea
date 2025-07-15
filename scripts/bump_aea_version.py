@@ -81,7 +81,7 @@ of an AEA package configuration file, e.g.:
 dependencies:
     ...
     open-aea-ledger-fetchai:
-        version: >=1.0.0,<2.0.0
+        version: >=2.0.0,<3.0.0
 """
 YAML_DEPENDENCY_SPECIFIER_SET_PATTERN = (
     "(?<={package_name}:\n    version: )({specifier_set})"

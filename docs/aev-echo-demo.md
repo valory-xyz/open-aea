@@ -19,7 +19,7 @@ author: open_aea
 version: 0.1.0
 license: Apache-2.0
 description: Http echo agent configured with default variables.
-aea_version: '>=1.3.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint: {}
 fingerprint_ignore_patterns: []
 connections:

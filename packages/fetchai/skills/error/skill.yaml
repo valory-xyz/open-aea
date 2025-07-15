@@ -4,7 +4,7 @@ version: 0.17.0
 type: skill
 description: The error skill implements basic error handling required by all AEAs.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiengmjaouqmsgyersxfph5y56d3y2auopqufdcj7jqjlhuelbmjgi
   __init__.py: bafybeigbc7i65emm34lmmqou7zphytqorbbopbbswqr3cytltn7fkuyjpm
@@ -13,7 +13,7 @@ fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 skills: []
 behaviours: {}
 handlers:

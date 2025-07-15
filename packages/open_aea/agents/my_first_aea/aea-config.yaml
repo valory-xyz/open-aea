@@ -3,19 +3,19 @@ author: open_aea
 version: 0.1.0
 description: A simple agent to demo the echo skill.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiftiqiqpxn7ghrurhepquzqzk3su3x6wanlnolt2uj772fzgz574m
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/stub:0.21.0:bafybeibng5extul7wgyihxnvsdxsslnhfcb42t6kgjrwnxko2syvh37mfm
+- fetchai/stub:0.21.0:bafybeibuimb5unnszgkh3sfjihjtosyqeyx7mb6rtxvv7pbupvjr6owyum
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- fetchai/state_update:1.0.0:bafybeicta6j5uax7el2tljxag4dtac3wgc6k4svzgse6cgeeky6wuwdbtq
-- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- fetchai/state_update:1.0.0:bafybeibhzrwhghuo4a6zvf4xdkp4sxpscxuy4k3iurlg6cnkxnmd6q5ly4
+- open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
 skills:
-- fetchai/echo:0.19.0:bafybeihcjqw6zbdkehwgv6surz3lqcwtakqrp7tmfrwrr2w3ivbbbofnru
+- fetchai/echo:0.19.0:bafybeigrd4lpaljnt7mks7v3c6xgtlgx7zmpexlkojxck4zy4pbxiuoo64
 default_connection: fetchai/stub:0.21.0
 default_ledger: ethereum
 required_ledgers:
@@ -28,4 +28,4 @@ default_routing: {}
 connection_private_key_paths: {}
 dependencies:
   open-aea-ledger-ethereum:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0

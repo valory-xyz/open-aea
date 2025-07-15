@@ -4,7 +4,7 @@ version: 0.1.0
 type: skill
 description: a dummy_skill for testing purposes.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   __init__.py: bafybeichkx2ckqoynbchlmslrzrnf2fxaong63tw7gg2apsdvkxdn2tv2y
   behaviours.py: bafybeidwtvqueyxrvjaboefepoh4kqmpxmlqtp7qtqusrpbif4iilweas4

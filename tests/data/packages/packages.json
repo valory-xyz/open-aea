@@ -1,9 +1,9 @@
 {
     "dev": {
-        "protocol/fetchai/t_protocol/0.1.0": "bafybeiau6ld2vggrulrl37hbokocdhdo7dvt43zxnsdb2zeugmbg6fovwu",
-        "protocol/fetchai/t_protocol_no_ct/0.1.0": "bafybeigxqeqq3kceudlktadgeo2h4jxdma6v5ud7nqt5rwa3v7jyx5md44",
-        "contract/default_author/stub_0/0.1.0": "bafybeidicpfgwqbr54v5pca77wu6ifnf23idf5htpdrudhbwxzaavm3wyy",
-        "contract/default_author/stub_1/0.1.0": "bafybeibpmdrfhgz33ubww57rmmzn56g67e5xe462xiulk2p2ttezgujn5a"
+        "protocol/fetchai/t_protocol/0.1.0": "bafybeig2eo7bw7yn7x4ml4dp4qgcderctobtgckzjdzi6gij6hzugpv44e",
+        "protocol/fetchai/t_protocol_no_ct/0.1.0": "bafybeicbongaethlfp3qzl6p53loguj4qgokgqdxnnvjy5hn3d2b3nj7mu",
+        "contract/default_author/stub_0/0.1.0": "bafybeiejst6phgsu6yzz5buabbzaqb2ca6fh6j6nlsf4wf7mmzq4njf2iq",
+        "contract/default_author/stub_1/0.1.0": "bafybeifjjj63oyzxow5lznmsztq3in45w2uu333a4bz5qb4brwhaczqmnq"
     },
     "third_party": {}
 }

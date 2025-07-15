@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -440,7 +440,7 @@ class TestCommon(TestCase):
         assert spec.version == "0.1.0"
         assert spec.author == "fetchai"
         assert spec.license == "Apache-2.0"
-        assert spec.aea_version == ">=1.0.0, <2.0.0"
+        assert spec.aea_version == ">=2.0.0, <3.0.0"
         assert spec.description == "A protocol for testing purposes."
         assert spec.speech_acts is not None
         assert spec.protobuf_snippets is not None and spec.protobuf_snippets != ""

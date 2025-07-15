@@ -4,7 +4,7 @@ version: 0.20.0
 type: skill
 description: The gym skill wraps an RL agent.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeictcczi3z3o7gcz3764jjotnfpek4da2w25j7d3sedbjb5phsskvu
   __init__.py: bafybeihcv27rv6jafmrgjgeqn3fsmep54k2epi7tkiv6zfxwtczwah4klm
@@ -23,11 +23,11 @@ fingerprint:
   tests/test_task.py: bafybeic4y7wulvlx2eparks3wyftfsx5ya2xsufoaohxfqhxrabm7zt7pi
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeif7phd6sesbbefavspnzpcvqzbwjzcbmjqec5x2x7xtdgq4ie5whu
+- fetchai/gym:0.19.0:bafybeihqvwwagnfdftgygnlcbx6c66ayz7mywqeg56fkvgblynlgnogmna
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- fetchai/gym:1.0.0:bafybeibaqkqybb475wtb57isycy4t7ahmdmrr2yaiu7j7nhsijvzs7tqee
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- fetchai/gym:1.0.0:bafybeicljygeclc5wsc45yhls4u7alukcozvuj7kf6agbtc6cjfwghryru
 skills: []
 behaviours: {}
 handlers:

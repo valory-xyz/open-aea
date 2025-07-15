@@ -4,7 +4,7 @@ version: 0.1.0
 type: skill
 description: Skill with simple task to run.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeie2x4d7ucozkyvwb6idwtgizuyufbmbghv3x3io2gaff5t7ue5egu
   __init__.py: bafybeif36wgaf6cjgs4ejt35rgvapcipxhprtocwinuzodzf2gy4puolom

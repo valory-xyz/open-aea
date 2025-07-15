@@ -4,7 +4,7 @@ author: valory
 version: 1.0.0
 description: The protocol used for envelope delivery on the ACN.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 protocol_specification_id: aea/acn:1.0.0
 speech_acts:
   register:
