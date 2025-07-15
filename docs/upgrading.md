@@ -9,6 +9,12 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.65.0` to `v0.2.0`
+
+- No longer supports Python 3.8 and 3.9.
+- `get_metavar` now requires a new parameter, `ctx: Context`
+- `aea` and its subcommands that expect some arguments (for example `aea`, `aea ipfs`, etc.), when used without any arguments will now finish with exit code 2 instead of 0, and print their usage help in `stderr`.
+
 ## `v1.64.0` to `v1.65.0`
 
 - No backwards incompatible changes
