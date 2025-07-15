@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ class Agent(AbstractAgent, WithLogger):
     _inbox: InBox
     _outbox: OutBox
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         identity: Identity,
         connections: List[Connection],
@@ -216,7 +216,7 @@ class Agent(AbstractAgent, WithLogger):
 
         if was_started:
             self.runtime.wait_completed(sync=True)
-        else:  #  pragma: nocover
+        else:  # pragma: nocover
             raise AEAException("Failed to start runtime! Was it already started?")
 
     def handle_envelope(self, envelope: Envelope) -> None:

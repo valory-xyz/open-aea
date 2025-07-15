@@ -211,7 +211,7 @@ Creates class level Rules instance to share among instances
 #### `__`new`__`
 
 ```python
-def __new__(cls, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta"
+def __new__(mcs, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta"
 ```
 
 Construct a new type.

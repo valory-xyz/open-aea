@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ from packages.fetchai.protocols.default.message import DefaultMessage
 class ErrorHandler(Handler):
     """This class implements the error handler."""
 
-    SUPPORTED_PROTOCOL = DefaultMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = DefaultMessage.protocol_id
 
     def setup(self) -> None:
         """Implement the setup."""

@@ -927,7 +927,7 @@ the logger
 
 ```python
 @logger.setter
-def logger(*args: str) -> None
+def logger(*args: Any) -> None
 ```
 
 Set the logger.

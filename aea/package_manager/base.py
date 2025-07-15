@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -82,8 +82,8 @@ def load_fetch_ipfs() -> Callable[[str, PublicId, str, bool], Optional[Path]]:
 class DepedencyMismatchErrors(Enum):
     """Dependency mismatch errors."""
 
-    HASH_NOT_FOUND: int = 1
-    HASH_DOES_NOT_MATCH: int = 2
+    HASH_NOT_FOUND = 1
+    HASH_DOES_NOT_MATCH = 2
 
 
 class Cache:
@@ -214,8 +214,7 @@ class BasePackageManager(ABC):
     ) -> Iterator[PackageId]:
         """Iterate dependency tree."""
         for level in DependencyTree.generate(packages_dir=self.path):
-            for package_id in level:
-                yield package_id
+            yield from level
 
     def check_dependencies(
         self,

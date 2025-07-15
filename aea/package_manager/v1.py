@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ class PackageManagerV1(BasePackageManager):
         DEV = "dev"
         THIRD_PARTY = "third_party"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         path: Path,
         dev_packages: Optional[PackageIdToHashMapping] = None,
@@ -157,7 +157,7 @@ class PackageManagerV1(BasePackageManager):
     def _get_latest_tag(repo: str) -> str:
         """Get latest tag for the repository."""
 
-        response = r_get(GIT_TAGS_URL.format(repo=repo))
+        response = r_get(GIT_TAGS_URL.format(repo=repo), timeout=30)
         if response.status_code != 200:
             raise PackagesSourceNotValid(
                 f"Fetching tags from `{repo}` failed with message '"
@@ -172,7 +172,7 @@ class PackageManagerV1(BasePackageManager):
     def _get_packages_json(repo: str, tag: str) -> Dict[str, Dict[str, str]]:
         """Get `packages.json`."""
 
-        response = r_get(PACKAGE_FILE_REMOTE_URL.format(repo=repo, tag=tag))
+        response = r_get(PACKAGE_FILE_REMOTE_URL.format(repo=repo, tag=tag), timeout=30)
         if response.status_code != 200:
             raise PackagesSourceNotValid(
                 f"Fetching packages from `{repo}` failed with message '"
@@ -228,7 +228,7 @@ class PackageManagerV1(BasePackageManager):
         )
         return self
 
-    def sync(
+    def sync(  # pylint: disable=too-many-positional-arguments
         self,
         dev: bool = False,
         third_party: bool = True,

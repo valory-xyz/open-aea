@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,23 +44,22 @@ from aea.configurations.constants import (
 )
 
 
-CONFIG_FILE_NAMES = [
+CONFIG_FILE_NAMES: List[str] = [
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,
     DEFAULT_CONNECTION_CONFIG_FILE,
     DEFAULT_CONTRACT_CONFIG_FILE,
     DEFAULT_PROTOCOL_CONFIG_FILE,
-]  # type: List[str]
+]
 
 CLI_LOG_OPTION = ["-v", "OFF"]
 
-DEFAULT_CONFIG_FILE_PATHS = []  # type: List[Path]
+DEFAULT_CONFIG_FILE_PATHS: List[Path] = []
 
 
 def default_config_file_paths() -> Generator:
     """Get (generator) the default config file paths."""
-    for item in DEFAULT_CONFIG_FILE_PATHS:
-        yield item
+    yield from DEFAULT_CONFIG_FILE_PATHS
 
 
 def unified_yaml_load(configuration_file: Path) -> Dict:

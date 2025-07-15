@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,7 +163,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         """
         if (
             type(actual_message)  # pylint: disable=unidiomatic-typecheck
-            != message_type
+            is not message_type
         ):
             return (
                 False,
@@ -182,7 +182,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
 
         return True, "The message has the provided expected attributes."
 
-    def build_incoming_message(
+    def build_incoming_message(  # pylint: disable=too-many-positional-arguments
         self,
         message_type: Type[Message],
         performative: Message.Performative,
@@ -245,7 +245,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         incoming_message.to = default_to if to is None else to
         return incoming_message
 
-    def build_incoming_message_for_skill_dialogue(
+    def build_incoming_message_for_skill_dialogue(  # pylint: disable=too-many-positional-arguments
         self,
         dialogue: Dialogue,
         performative: Message.Performative,
@@ -355,10 +355,12 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         """
         dialogue_reference = (
             dialogue.dialogue_label.dialogue_reference[0],
-            Dialogues._generate_dialogue_nonce()  # pylint: disable=protected-access
-            if dialogue.dialogue_label.dialogue_reference[1]
-            == Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
-            else dialogue.dialogue_label.dialogue_reference[1],
+            (
+                Dialogues._generate_dialogue_nonce()  # pylint: disable=protected-access
+                if dialogue.dialogue_label.dialogue_reference[1]
+                == Dialogue.UNASSIGNED_DIALOGUE_REFERENCE
+                else dialogue.dialogue_label.dialogue_reference[1]
+            ),
         )
         return dialogue_reference
 

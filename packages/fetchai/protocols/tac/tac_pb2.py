@@ -158,14 +158,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals[
         "_TACMESSAGE_GAME_DATA_PERFORMATIVE_GOODIDTONAMEENTRY"
     ]._serialized_start = 3331
-    _globals[
-        "_TACMESSAGE_GAME_DATA_PERFORMATIVE_GOODIDTONAMEENTRY"
-    ]._serialized_end = 3382
+    _globals["_TACMESSAGE_GAME_DATA_PERFORMATIVE_GOODIDTONAMEENTRY"]._serialized_end = (
+        3382
+    )
     _globals["_TACMESSAGE_GAME_DATA_PERFORMATIVE_INFOENTRY"]._serialized_start = 3384
     _globals["_TACMESSAGE_GAME_DATA_PERFORMATIVE_INFOENTRY"]._serialized_end = 3427
-    _globals[
-        "_TACMESSAGE_TRANSACTION_CONFIRMATION_PERFORMATIVE"
-    ]._serialized_start = 3430
+    _globals["_TACMESSAGE_TRANSACTION_CONFIRMATION_PERFORMATIVE"]._serialized_start = (
+        3430
+    )
     _globals["_TACMESSAGE_TRANSACTION_CONFIRMATION_PERFORMATIVE"]._serialized_end = 3869
     _globals[
         "_TACMESSAGE_TRANSACTION_CONFIRMATION_PERFORMATIVE_AMOUNTBYCURRENCYIDENTRY"

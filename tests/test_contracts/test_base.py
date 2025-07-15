@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -152,7 +152,7 @@ def test_get_instance_no_address_ethereum(dummy_contract):
         address=ETHEREUM_DEFAULT_ADDRESS,
     )
     instance = dummy_contract.get_instance(ledger_api)
-    assert type(instance) == web3._utils.datatypes.PropertyCheckingFactory
+    assert type(instance) is web3._utils.datatypes.PropertyCheckingFactory
 
 
 @pytest.mark.integration

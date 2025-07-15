@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -290,11 +290,11 @@ def remove_unused_component_configurations(ctx: Context) -> Generator:
         try_to_load_agent_config(ctx)
         for component_id in ctx.agent_config.package_dependencies:
             if component_id.component_prefix in saved_configuration_by_component_prefix:
-                ctx.agent_config.component_configurations[
-                    component_id
-                ] = saved_configuration_by_component_prefix[
-                    component_id.component_prefix
-                ]
+                ctx.agent_config.component_configurations[component_id] = (
+                    saved_configuration_by_component_prefix[
+                        component_id.component_prefix
+                    ]
+                )
 
     with open_file(os.path.join(ctx.cwd, DEFAULT_AEA_CONFIG_FILE), "w") as f:
         ctx.agent_loader.dump(ctx.agent_config, f)
@@ -303,7 +303,7 @@ def remove_unused_component_configurations(ctx: Context) -> Generator:
 class RemoveItem:
     """Implementation of item remove from the project."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         ctx: Context,
         item_type: str,
@@ -421,7 +421,7 @@ class RemoveItem:
         item_folder = self._get_item_folder()
         try:
             shutil.rmtree(item_folder)
-        except BaseException:
+        except BaseException:  # noqa: B036
             raise click.ClickException(
                 f"An error occurred during {item_folder} removing."
             )

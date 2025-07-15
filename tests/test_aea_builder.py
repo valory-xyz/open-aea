@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -568,9 +568,9 @@ def test_set_from_config_default():
     agent_configuration.connection_private_key_paths_dict = {"fetchai": None}
     agent_configuration.ledger_apis_dict = {"fetchai": None}
     agent_configuration.private_key_paths_dict = {"fetchai": None}
-    agent_configuration.protocols = (
-        agent_configuration.connections
-    ) = agent_configuration.contracts = agent_configuration.skills = []
+    agent_configuration.protocols = agent_configuration.connections = (
+        agent_configuration.contracts
+    ) = agent_configuration.skills = []
 
     with patch.object(builder, "set_default_connection"):
         builder.set_from_configuration(agent_configuration, aea_project_path="/anydir")
@@ -610,9 +610,9 @@ def test_set_from_config_custom():
     agent_configuration.connection_private_key_paths_dict = {"fetchai": None}
     agent_configuration.ledger_apis_dict = {"fetchai": None}
     agent_configuration.private_key_paths_dict = {"fetchai": None}
-    agent_configuration.protocols = (
-        agent_configuration.connections
-    ) = agent_configuration.contracts = agent_configuration.skills = []
+    agent_configuration.protocols = agent_configuration.connections = (
+        agent_configuration.contracts
+    ) = agent_configuration.skills = []
 
     with patch.object(builder, "set_default_connection"):
         builder.set_from_configuration(agent_configuration, aea_project_path="/anydir")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -132,7 +132,7 @@ class IPFSDaemon:
         """Check if IPFS node is running."""
         res = shutil.which("ipfs")
         if res is None:
-            raise Exception("Please install IPFS first!")
+            raise RuntimeError("Please install IPFS first!")
         process = subprocess.Popen(  # nosec
             ["ipfs", "--version"],
             stdout=subprocess.PIPE,
@@ -140,14 +140,14 @@ class IPFSDaemon:
         )
         output, _ = process.communicate()
         if b"0.6.0" not in output:
-            raise Exception(
+            raise RuntimeError(
                 "Please ensure you have version 0.6.0 of IPFS daemon installed."
             )
 
     def is_started_externally(self) -> bool:
         """Check daemon was started externally."""
         try:
-            x = requests.post(self.api_url)
+            x = requests.post(self.api_url, timeout=30)
             return x.status_code == 200
         except requests.exceptions.ConnectionError:
             return False

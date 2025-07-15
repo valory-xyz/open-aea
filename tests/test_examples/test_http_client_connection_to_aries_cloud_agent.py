@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,7 +93,7 @@ class TestAEAToACA:
                 "--admin-insecure-mode",
                 "--inbound-transport",
                 "http",
-                "0.0.0.0",
+                "127.0.0.1",
                 "8000",
                 "--outbound-transport",
                 "http",
@@ -282,7 +282,7 @@ class TestAEAToACA:
 class AEAHandler(Handler):
     """The handler for the AEA."""
 
-    SUPPORTED_PROTOCOL = HttpMessage.protocol_id  # type: Optional[PublicId]
+    SUPPORTED_PROTOCOL: Optional[PublicId] = HttpMessage.protocol_id
 
     def __init__(self, **kwargs):
         """Initialize the handler."""

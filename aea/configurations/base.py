@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -132,7 +132,7 @@ def dependencies_to_json(dependencies: Dependencies) -> Dict[str, Dict[str, str]
 
 
 def _get_default_configuration_file_name_from_type(
-    item_type: Union[str, PackageType]
+    item_type: Union[str, PackageType],
 ) -> str:
     """Get the default configuration file name from item type."""
     item_type = PackageType(item_type)
@@ -233,6 +233,9 @@ class PackageConfiguration(Configuration, ABC):
         "_aea_version",
         "_aea_version_specifiers",
         "_directory",
+        "default_configuration_filename",
+        "package_type",
+        "schema",
     )
 
     default_configuration_filename: str
@@ -243,7 +246,7 @@ class PackageConfiguration(Configuration, ABC):
     schema: str
     CHECK_EXCLUDES: List[Tuple[str]] = []
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -461,10 +464,10 @@ class PackageConfiguration(Configuration, ABC):
         if instance is None:
             instance = cls(**params)
         else:
-            instance.__init__(**params)  # type: ignore
+            instance.__init__(**params)  # type: ignore  # pylint: disable=unnecessary-dunder-call
 
-        if directory and not instance.directory:
-            instance.directory = directory
+            if directory and not instance.directory:
+                instance.directory = directory
 
         return instance
 
@@ -476,7 +479,7 @@ class ComponentConfiguration(PackageConfiguration, ABC):
 
     __slots__ = ("pypi_dependencies", "_build_directory")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -596,7 +599,7 @@ class ConnectionConfig(ComponentConfiguration):
         "cert_requests",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr = "",
         author: SimpleIdOrStr = "",
@@ -802,7 +805,7 @@ class ProtocolConfig(ComponentConfiguration):
         "protocol_specification_id",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -948,7 +951,7 @@ class SkillComponentConfiguration:
         if instance is None:
             instance = cls(**params)
         else:  # pragma: nocover
-            instance.__init__(**params)  # type: ignore
+            instance.__init__(**params)  # type: ignore  # pylint: disable=unnecessary-dunder-call
         return instance
 
 
@@ -978,7 +981,7 @@ class SkillConfig(ComponentConfiguration):
         "is_abstract",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -1244,7 +1247,7 @@ class AgentConfig(PackageConfiguration):
         "dependencies",
     )
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-locals
+    def __init__(  # pylint: disable=too-many-arguments,too-many-locals,too-many-positional-arguments
         self,
         agent_name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -1689,7 +1692,7 @@ class ProtocolSpecification(ProtocolConfig):
 
     __slots__ = ("speech_acts", "_protobuf_snippets", "_dialogue_config")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -1801,7 +1804,7 @@ class ContractConfig(ComponentConfiguration):
         "contracts",
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,
@@ -1923,7 +1926,7 @@ class CustomComponentConfig(PackageConfiguration):
         ["config", "cert_requests", "is_abstract", "build_directory"]
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         name: SimpleIdOrStr,
         author: SimpleIdOrStr,

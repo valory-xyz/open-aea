@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,7 +89,7 @@ class ERC1155Contract(Contract):
         return token_id
 
     @classmethod
-    def get_create_batch_transaction(  # pylint: disable=unused-argument
+    def get_create_batch_transaction(  # pylint: disable=unused-argument,too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -140,11 +140,13 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
     @classmethod
-    def get_create_single_transaction(
+    def get_create_single_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -195,11 +197,13 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
     @classmethod
-    def get_mint_batch_transaction(
+    def get_mint_batch_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -259,6 +263,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
@@ -298,7 +304,7 @@ class ERC1155Contract(Contract):
         return decoded_type
 
     @classmethod
-    def get_mint_single_transaction(
+    def get_mint_single_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -354,6 +360,8 @@ class ERC1155Contract(Contract):
             tx = cosmos_api.get_handle_transaction(
                 deployer_address, contract_address, msg, amount=0, tx_fee=0, gas=gas
             )
+            if tx is None:
+                raise ValueError("Failed to create transaction")
             return tx
         raise NotImplementedError
 
@@ -396,7 +404,7 @@ class ERC1155Contract(Contract):
         raise NotImplementedError
 
     @classmethod
-    def get_atomic_swap_single_transaction(
+    def get_atomic_swap_single_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -625,7 +633,7 @@ class ERC1155Contract(Contract):
         raise NotImplementedError  # pragma: nocover
 
     @classmethod
-    def get_atomic_swap_batch_transaction(
+    def get_atomic_swap_batch_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -810,7 +818,7 @@ class ERC1155Contract(Contract):
         raise NotImplementedError  # pragma: nocover
 
     @classmethod
-    def get_hash_single(
+    def get_hash_single(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,
@@ -905,7 +913,7 @@ class ERC1155Contract(Contract):
         )
 
     @classmethod
-    def get_hash_batch(
+    def get_hash_batch(  # pylint: disable=too-many-positional-arguments
         cls,
         ledger_api: LedgerApi,
         contract_address: Address,

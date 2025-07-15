@@ -9,24 +9,24 @@ fingerprint:
   README.md: bafybeig3rwpeqh5kdr2iflvy72vkfmby3sl4ulb3sbblt5lndvogvlblme
   __init__.py: bafybeic6biuigdmylscufxz6suvtkxems27j2cns3h36e53gxlm5hihvza
   behaviours.py: bafybeicsftdc3rya773wbxgbn4punkedgnu6ls7z7f4i3fs5nkhwgdfcj4
-  dialogues.py: bafybeicuhvcjgwzjbntzpa3pae6bitq53k3j7kgf6ze5n7jxslhkxayyyq
-  handlers.py: bafybeiev5j3cebhneumt53pvqvcf4yogqvo2cdjhx7bujozaqtamurykge
+  dialogues.py: bafybeig4jzy25idmmfmlxlm2grutx3qdsur6k6ah2vubbp47lrgixa2rfq
+  handlers.py: bafybeidoyxhbggrzmifqlcvbivitwkzqpljuf2lpgph3r2vlxlqunqhna4
   strategy.py: bafybeidzwda36osegdqljxoxcj5ljds5k62iuti73qu2ghzl6nubadmaxe
   tests/__init__.py: bafybeid6od3orr5gjysmm4lbcn6xcul22n2dlc7qafppiqvkvcov2pftiu
   tests/test_behaviours.py: bafybeicjtzefueekagkw7qfrttaogpvss53n6bjqbf4rmgwdzpj3hbdrxq
   tests/test_dialogues.py: bafybeih3hp72ueixsboojh3wzjgw26qluv54i6kirgn23o7jmwmcqrgboy
   tests/test_handlers.py: bafybeibve5lkkpdiwwomd2qhn5bu5ink2ct5w36ynhd7jfbfacnurxqp3q
-  tests/test_models.py: bafybeibh72j3n72yseqvmpppucpu5wtidf6ebxbxkfnmrnlh4zv5y5apei
+  tests/test_models.py: bafybeibte32m37u42tkg4nisfkuyhn5tfwp42yuxwr3fsdbm2pnc2mpfcu
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeibdsjmy4w2eyilbqc7yzutopl65qpeyspxwz7mjvirr52twhjlf5y
+- valory/ledger:0.19.0:bafybeih54gqeu6owv7rprlxcjuhtwzad7syk2n6szci53uoaiy2mwpokwu
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
-- fetchai/fipa:1.0.0:bafybeiajs4ys4lqewfg7dnwg346mgs2wpcrsyqhmfzh53bsle3mzmv5k5a
-- fetchai/oef_search:1.0.0:bafybeido2dn66pdglzdwfoslxc6irppkeqxgrtclzm2fg77gkrtqps7rg4
-- open_aea/signing:1.0.0:bafybeig2d36zxy65vd7fwhs7scotuktydcarm74aprmrb5nioiymr3yixm
-- valory/ledger_api:1.0.0:bafybeihmqzcbj6t7vxz2aehd5726ofnzsfjs5cwlf42ro4tn6i34cbfrc4
+- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
+- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
+- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
+- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
 skills: []
 behaviours:
   search:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ VALORY_FORK_DATE = datetime.strptime(
 )
 GIT_PATH = shutil.which("git")
 START_YEARS_FETCHAI = (2018, 2019, 2020, 2021)
-START_YEARS_VALORY = (2021, 2022, 2023, 2024)
+START_YEARS_VALORY = (2021, 2022, 2023, 2024, 2025)
 FETCHAI = "FetchAI"
 VALORY = "Valory"
 MIXED = "Mixed"
@@ -231,9 +231,9 @@ def _validate_years(
     # Start year is not in allowed start years list
     if start_year not in allowed_start_years:
         check_info["check"] = False
-        check_info[
-            "message"
-        ] = f"Start year {start_year} is not in the list of allowed years; {allowed_start_years}."
+        check_info["message"] = (
+            f"Start year {start_year} is not in the list of allowed years; {allowed_start_years}."
+        )
         check_info["error_code"] = ErrorTypes.START_YEAR_NOT_ALLOWED
         return check_info
 
@@ -247,9 +247,9 @@ def _validate_years(
 
         if end_year != modification_date.year:
             check_info["check"] = False
-            check_info[
-                "message"
-            ] = f"End year does not match the last modification year. Header has: {end_year}; Last Modified: {modification_date.year}"
+            check_info["message"] = (
+                f"End year does not match the last modification year. Header has: {end_year}; Last Modified: {modification_date.year}"
+            )
             check_info["error_code"] = ErrorTypes.END_YEAR_WRONG
             return check_info
 

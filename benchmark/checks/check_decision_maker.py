@@ -60,7 +60,6 @@ class SigningDialogues(BaseSigningDialogues):
         Initialize dialogues.
 
         :param self_address: the address of the entity for whom dialogues are maintained
-        :return: None
         """
 
         def role_from_first_message(  # pylint: disable=unused-argument
@@ -80,8 +79,6 @@ class SigningDialogues(BaseSigningDialogues):
             role_from_first_message=role_from_first_message,
             dialogue_class=SigningDialogue,
         )
-
-        return None
 
 
 def make_desc_maker_wallet(

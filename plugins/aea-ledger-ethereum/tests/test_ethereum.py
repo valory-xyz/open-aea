@@ -157,10 +157,10 @@ def test_initialization():
     account = EthereumCrypto()
     assert account.entity is not None, "The property must return the account."
     assert (
-        account.address is not None and type(account.address) == str
+        account.address is not None and type(account.address) is str
     ), "After creation the display address must not be None"
     assert (
-        account.public_key is not None and type(account.public_key) == str
+        account.public_key is not None and type(account.public_key) is str
     ), "After creation the public key must no be None"
     assert account.entity is not None, "After creation the entity must no be None"
 
@@ -397,7 +397,7 @@ def test_get_deploy_transaction(ethereum_testnet_config, ganache):
         max_priority_fee_per_gas=max_priority_fee_per_gas,
         max_fee_per_gas=max_fee_per_gas,
     )
-    assert type(deploy_tx) == dict and len(deploy_tx) == 8
+    assert type(deploy_tx) is dict and len(deploy_tx) == 8
     assert all(
         key
         in [
@@ -576,7 +576,7 @@ def test_gas_price_strategy_eip1559() -> None:
     ],
 )
 def test_gas_price_strategy_eip1559_fallback_get_block(
-    get_block_mock: Dict[str, Optional[int]]
+    get_block_mock: Dict[str, Optional[int]],
 ) -> None:
     """Test eip1559 based gas price strategy."""
 

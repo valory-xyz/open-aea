@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,7 +66,7 @@ class BaseRuntime(Runnable, WithLogger):
     TASKMANAGERS = {"threaded": ThreadedTaskManager, "multiprocess": ProcessTaskManager}
     DEFAULT_TASKMANAGER = "threaded"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent: AbstractAgent,
         multiplexer_options: Dict,
@@ -228,7 +228,7 @@ class BaseRuntime(Runnable, WithLogger):
     def _set_task(self) -> None:
         """Set task."""
         if self._loop is None:
-            raise ValueError("Loop not set!")  #  pragma: nocover
+            raise ValueError("Loop not set!")  # pragma: nocover
 
         self._task = self._loop.create_task(self._run_wrapper())
 
@@ -263,7 +263,7 @@ class AsyncRuntime(BaseRuntime):
 
     AGENT_LOOP_STARTED_TIMEOUT: float = 5
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent: AbstractAgent,
         multiplexer_options: Dict,

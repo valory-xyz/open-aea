@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,7 +68,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
     if check_aea_version:
         _check_aea_version(ctx.agent_config)
 
-    packages_public_ids_to_types = dict(
+    packages_public_ids_to_types: Dict[PublicId, PackageType] = dict(
         [
             *map(lambda x: (x, PackageType.PROTOCOL), ctx.agent_config.protocols),
             *map(
@@ -78,7 +78,7 @@ def _validate_config_consistency(ctx: Context, check_aea_version: bool = True) -
             *map(lambda x: (x, PackageType.SKILL), ctx.agent_config.skills),
             *map(lambda x: (x, PackageType.CONTRACT), ctx.agent_config.contracts),
         ]
-    )  # type: Dict[PublicId, PackageType]
+    )
 
     for public_id, item_type in packages_public_ids_to_types.items():
         # find the configuration file.
@@ -141,8 +141,8 @@ def _check_aea_project(
             package_dir = Path(ctx.registry_path).absolute()
             if not package_dir.is_dir():
                 raise FileNotFoundError("Cannnot find packages directory.")
+            (package_dir / default_author).mkdir(exist_ok=True)
             ctx.agent_config.directory = package_dir / default_author
-            ctx.agent_config.directory.mkdir(exist_ok=True)
         else:
             try_to_load_agent_config(ctx)
 

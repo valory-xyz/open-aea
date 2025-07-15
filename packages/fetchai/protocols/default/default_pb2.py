@@ -33,9 +33,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals["_DEFAULTMESSAGE_BYTES_PERFORMATIVE"]._serialized_end = 568
     _globals["_DEFAULTMESSAGE_ERROR_PERFORMATIVE"]._serialized_start = 571
     _globals["_DEFAULTMESSAGE_ERROR_PERFORMATIVE"]._serialized_end = 832
-    _globals[
-        "_DEFAULTMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY"
-    ]._serialized_start = 784
+    _globals["_DEFAULTMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY"]._serialized_start = (
+        784
+    )
     _globals["_DEFAULTMESSAGE_ERROR_PERFORMATIVE_ERRORDATAENTRY"]._serialized_end = 832
     _globals["_DEFAULTMESSAGE_END_PERFORMATIVE"]._serialized_start = 834
     _globals["_DEFAULTMESSAGE_END_PERFORMATIVE"]._serialized_end = 852

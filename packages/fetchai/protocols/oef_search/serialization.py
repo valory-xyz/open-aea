@@ -126,7 +126,7 @@ class OefSearchSerializer(Serializer):
         oef_search_pb.ParseFromString(message_pb.dialogue_message.content)
         performative = oef_search_pb.WhichOneof("performative")
         performative_id = OefSearchMessage.Performative(str(performative))
-        performative_content = dict()  # type: Dict[str, Any]
+        performative_content: Dict[str, Any] = dict()
         if performative_id == OefSearchMessage.Performative.REGISTER_SERVICE:
             pb2_service_description = oef_search_pb.register_service.service_description
             service_description = Description.decode(pb2_service_description)

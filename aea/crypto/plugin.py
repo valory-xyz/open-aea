@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,8 @@
 """Implementation of plug-in mechanism for cryptos."""
 import itertools
 import pprint
+from importlib.metadata import EntryPoint, entry_points
 from typing import Iterator, List, Set
-
-from pkg_resources import EntryPoint, WorkingSet
 
 from aea.configurations.constants import (
     ALLOWED_GROUPS,
@@ -61,6 +60,21 @@ class Plugin:
         self._entry_point = entry_point
         self._check_consistency()
 
+    def _parse_entry_point(self) -> List[str]:
+        """
+        Parse the entry point value to extract module and attribute.
+
+        :raises AEAPluginError: if the entry point format is invalid.
+        :return: a tuple containing the module name and the attribute name.
+        """
+        value_parts = self._entry_point.value.split(":")
+        if len(value_parts) != 2:
+            raise AEAPluginError(
+                f"Invalid entry point format for '{self._entry_point.name}'."
+            )
+
+        return value_parts
+
     def _check_consistency(self) -> None:
         """
         Check consistency of input.
@@ -78,16 +92,16 @@ class Plugin:
             f"{_error_message_prefix} '{self._entry_point.name}' is not a valid identifier for a plugin.",
             AEAPluginError,
         )
+
+        _, attr_path = self._parse_entry_point()
+        attrs = attr_path.split(".")
+
         enforce(
-            len(self._entry_point.attrs) == 1,
+            len(attrs) == 1,
             f"{_error_message_prefix} Nested attributes currently not supported.",
             AEAPluginError,
         )
-        enforce(
-            len(self._entry_point.extras) == 0,
-            f"{_error_message_prefix} Extras currently not supported.",
-            AEAPluginError,
-        )
+
         enforce(
             EntryPointString.REGEX.match(self.entry_point_path) is not None,
             f"{_error_message_prefix} Entry point path '{self.entry_point_path}' is not valid.",
@@ -106,13 +120,14 @@ class Plugin:
     @property
     def attr(self) -> str:
         """Get the class name."""
-        return self._entry_point.attrs[0]
+        value_parts = self._parse_entry_point()
+        return value_parts[1]
 
     @property
     def entry_point_path(self) -> str:
         """Get the entry point path."""
-        class_name = self.attr
-        return f"{self._entry_point.module_name}{DOTTED_PATH_MODULE_ELEMENT_SEPARATOR}{class_name}"
+        module_name, attr_name = self._parse_entry_point()
+        return f"{module_name}{DOTTED_PATH_MODULE_ELEMENT_SEPARATOR}{attr_name}"
 
 
 def _check_no_duplicates(plugins: List[EntryPoint]) -> None:
@@ -130,9 +145,9 @@ def _get_plugins(group: str) -> List[Plugin]:
     :param group: the plugin group.
     :return: a mapping from plugin name to Plugin objects.
     """
-    entry_points: List[EntryPoint] = list(WorkingSet().iter_entry_points(group=group))
-    _check_no_duplicates(entry_points)
-    return [Plugin(group, entry_point) for entry_point in entry_points]
+    entry_points_list: List[EntryPoint] = list(entry_points(group=group))
+    _check_no_duplicates(entry_points_list)
+    return [Plugin(group, entry_point) for entry_point in entry_points_list]
 
 
 def _get_cryptos() -> List[Plugin]:
@@ -152,10 +167,7 @@ def _get_faucet_apis() -> List[Plugin]:
 
 def _iter_plugins() -> Iterator[Plugin]:
     """Iterate over all the plugins."""
-    for plugin in itertools.chain(
-        _get_cryptos(), _get_ledger_apis(), _get_faucet_apis()
-    ):
-        yield plugin
+    yield from itertools.chain(_get_cryptos(), _get_ledger_apis(), _get_faucet_apis())
 
 
 def _register_plugin(plugin: Plugin, is_raising_exception: bool = True) -> None:

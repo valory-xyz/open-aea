@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -425,7 +425,7 @@ class Behaviour(AbstractBehaviour, ABC):
         :return: None
         """
 
-    def is_done(self) -> bool:  # pylint: disable=no-self-use
+    def is_done(self) -> bool:
         """Return True if the behaviour is terminated, False otherwise."""
         return False
 
@@ -599,7 +599,7 @@ class Skill(Component):
 
     __slots__ = ("_skill_context", "_handlers", "_behaviours", "_models")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         configuration: SkillConfig,
         skill_context: Optional[SkillContext] = None,
@@ -696,7 +696,7 @@ class Skill(Component):
         return self.skill_context.logger
 
     @logger.setter
-    def logger(self, *args: str) -> None:
+    def logger(self, *args: Any) -> None:
         """Set the logger."""
         raise ValueError("Cannot set logger to a skill component.")
 
@@ -794,14 +794,14 @@ def _parse_module(
             raise AEAComponentLoadException(  # pragma: nocover
                 f"'{component_id}' is not a valid identifier."
             )
-        component_class = name_to_class.get(component_class_name, None)
-        if component_class is None:
+        _component_class = name_to_class.get(component_class_name, None)
+        if _component_class is None:
             skill_context.logger.warning(
                 f"{component_type_name.capitalize()} '{component_class_name}' cannot be found."
             )
         else:
             try:
-                component = component_class(
+                component = _component_class(
                     name=component_id,
                     configuration=component_config,
                     skill_context=skill_context,
@@ -884,9 +884,9 @@ class _SkillComponentLoader:
         declared_component_classes: Dict[
             _SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]
         ] = self._get_declared_skill_component_configurations()
-        component_classes_by_path: Dict[
-            Path, Set[Tuple[str, Type[SkillComponent]]]
-        ] = self._load_component_classes(python_modules)
+        component_classes_by_path: Dict[Path, Set[Tuple[str, Type[SkillComponent]]]] = (
+            self._load_component_classes(python_modules)
+        )
         component_loading_items = self._match_class_and_configurations(
             component_classes_by_path, declared_component_classes
         )
@@ -978,9 +978,9 @@ class _SkillComponentLoader:
             classes: List[Tuple[str, Type]] = inspect.getmembers(
                 component_module, inspect.isclass
             )
-            filtered_classes: List[
-                Tuple[str, Type[SkillComponent]]
-            ] = self._filter_classes(classes)
+            filtered_classes: List[Tuple[str, Type[SkillComponent]]] = (
+                self._filter_classes(classes)
+            )
             module_to_classes[module_path] = set(filtered_classes)
         return module_to_classes
 
@@ -996,9 +996,9 @@ class _SkillComponentLoader:
         behaviours_by_id = dict(self.configuration.behaviours.read_all())
         models_by_id = dict(self.configuration.models.read_all())
 
-        result: Dict[
-            _SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]
-        ] = {}
+        result: Dict[_SKILL_COMPONENT_TYPES, Dict[str, SkillComponentConfiguration]] = (
+            {}
+        )
         for component_type, components_by_id in [
             (Handler, handlers_by_id),
             (Behaviour, behaviours_by_id),
@@ -1130,9 +1130,9 @@ class _SkillComponentLoader:
                     )
                 else:
                     # process the configuration at the end of the loop
-                    not_resolved_configurations[
-                        (component_type, component_id)
-                    ] = component_config
+                    not_resolved_configurations[(component_type, component_id)] = (
+                        component_config
+                    )
 
         for (component_type, component_id), component_config in copy(
             not_resolved_configurations

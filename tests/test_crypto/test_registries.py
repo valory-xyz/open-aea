@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ def test_make_ledger_api_cosmos_positive():
 class Something:
     """Some class."""
 
-    class_key = None  # type: Optional[str]
+    class_key: Optional[str] = None
 
     def __init__(self, **kwargs):
         """Initialize something."""
@@ -69,7 +69,7 @@ def test_register_make_with_class_kwargs():
     assert Something.class_key is None
     item = reg.make(id_)
     assert item is not None
-    assert type(item) == Something
+    assert type(item) is Something
     assert item.kwargs == kwargs
     assert item.class_key == "class_value"
 

@@ -826,7 +826,7 @@ class SellerDialogue(FipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self.some_object = None  # type: Optional[Any]
+        self.some_object: Optional[Any] = None
 
 
 class SellerDialogues(FipaDialogues):

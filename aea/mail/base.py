@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -268,7 +268,7 @@ class Envelope:
 
     __slots__ = ("_to", "_sender", "_protocol_specification_id", "_message", "_context")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         to: Address,
         sender: Address,
@@ -471,7 +471,9 @@ class Envelope:
             to=self.to,
             sender=self.sender,
             protocol_specification_id=self.protocol_specification_id,
-            message="{!r}".format(self.message)
-            if isinstance(self.message, bytes)
-            else self.message,
+            message=(
+                "{!r}".format(self.message)
+                if isinstance(self.message, bytes)
+                else self.message
+            ),
         )

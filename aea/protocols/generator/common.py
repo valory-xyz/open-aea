@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -185,6 +185,7 @@ def _get_sub_types_of_compositional_types(compositional_type: str) -> Tuple[str,
             ].strip()
             while inside_string != "":
                 do_not_add = False
+                sub_type = None
                 if inside_string.find(",") == -1:  # No comma; this is the last sub-type
                     provisional_sub_type = inside_string.strip()
                     if (
@@ -230,7 +231,7 @@ def _get_sub_types_of_compositional_types(compositional_type: str) -> Tuple[str,
                             inside_string = the_rest_of_inside_string[
                                 the_rest_of_inside_string.index(",") + 1 :
                             ].strip()
-                if not do_not_add:
+                if not do_not_add and sub_type is not None:
                     sub_types_list.append(sub_type)
             return tuple(sub_types_list)
     raise SyntaxError(

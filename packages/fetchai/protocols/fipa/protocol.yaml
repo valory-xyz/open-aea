@@ -12,11 +12,11 @@ fingerprint:
   custom_types.py: bafybeihzdd5m6h7y6xghpyzp54ddd6b2id7mj5qeafnnrg23tim45g6b2e
   dialogues.py: bafybeig75dpfj42vqf2kwxn3qhku6qizo6o2omuz4hx7aoa43rb47hikle
   fipa.proto: bafybeibycv37qg5eesvmptehsg2uydyxh34fa2xiqgtjfqevhn2fg622ca
-  fipa_pb2.py: bafybeiduuzmhzytgq4yktpj4hvrhq626cuur56ic7tayqeu7r6itlxwmse
+  fipa_pb2.py: bafybeiejp64ulzytdkcdq327ap7wdmlxifxtauwm7tlduti7xabxqwcy2a
   message.py: bafybeid46ldjgzbz3o5bwcspcu2lefc75rnkn4osa24p73eovmueuo7h4q
-  serialization.py: bafybeie5qeeemqtay7qldshysrojnwxpwk3ccwr643h4vul3peqnvbbc4e
+  serialization.py: bafybeifoqbg2tdv7ourlkrc34dygygccyrf66u42rdp24hova4oeboq754
   tests/__init__.py: bafybeiejmbkzylap7xuv3wbduwwewybasdt6bxq3l3fkaoxazij2rgfre4
-  tests/test_fipa.py: bafybeihh37hqvueezb56enmpxbithkmboomitt3cxaent6lnlin7ijq5py
+  tests/test_fipa.py: bafybeidymzn5l6e3r56bbun36twcho5up5lzx6cvwqei3dkxbaubwk4vj4
   tests/test_fipa_dialogues.py: bafybeifw4ux7p5o7fxlbj2vhi4wbfrav3xcvtixnattdulthrmqhviiadi
   tests/test_fipa_messages.py: bafybeiccxkxuy4tpnn7ksb43qah34mgakkmy43s4orxpmifyhu3ciettmm
 fingerprint_ignore_patterns: []

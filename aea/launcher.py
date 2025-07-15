@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,7 +128,7 @@ def _run_agent(
         agent.start()
     except KeyboardInterrupt:  # pragma: nocover
         _default_logger.debug("_run_agent: keyboard interrupt")
-    except BaseException as e:  # pragma: nocover
+    except BaseException as e:  # pragma: nocover  # noqa: B036
         _default_logger.exception("exception in _run_agent")
         exc = AEAException(f"Raised {type(e)}({e})")
         exc.__traceback__ = e.__traceback__
@@ -244,7 +244,7 @@ class AEADirMultiprocessTask(AbstractMultiprocessExecutorTask):
 
     def stop(self) -> None:
         """Stop task."""
-        if not self._future:  #  pragma: nocover
+        if not self._future:  # pragma: nocover
             _default_logger.debug("Stop called, but no future set.")
             return
         if self._future.done():
@@ -267,7 +267,7 @@ class AEALauncher(AbstractMultipleRunner):
         "multiprocess": ProcessExecutor,
     }
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent_dirs: Sequence[Union[PathLike, str]],
         mode: str,

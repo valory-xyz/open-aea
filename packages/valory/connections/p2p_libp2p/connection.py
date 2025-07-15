@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -275,7 +275,7 @@ class NodeClient:
 class Libp2pNode:
     """Libp2p p2p node as a subprocess with named pipes interface."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent_record: AgentRecord,
         key: Crypto,
@@ -437,14 +437,14 @@ class Libp2pNode:
 
     async def _set_connection_to_node(self) -> bool:
         if self.pipe is None:
-            raise Exception("pipe was not set")  # pragma: nocover
+            raise RuntimeError("pipe was not set")  # pragma: nocover
 
         return await self.pipe.connect(timeout=self._connection_timeout)
 
     def get_client(self) -> NodeClient:
         """Get client instance to communicate to node."""
         if self.pipe is None:
-            raise Exception("pipe was not set")  # pragma: nocover
+            raise RuntimeError("pipe was not set")  # pragma: nocover
 
         return NodeClient(self.pipe, self.record)
 
@@ -503,7 +503,7 @@ class Libp2pNode:
             connected = await self._set_connection_to_node()
 
             if not connected:
-                raise Exception("Couldn't connect to libp2p process within timeout")
+                raise TimeoutError("Couldn't connect to libp2p process within timeout")
         except Exception as e:
             err_msg = self.get_libp2p_node_error()
             self.logger.error("Couldn't connect to libp2p process: {}".format(err_msg))

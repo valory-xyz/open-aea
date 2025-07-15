@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -330,9 +330,9 @@ class ComponentRegistry(
         :param kwargs: kwargs
         """
         super().__init__(**kwargs)
-        self._items: PublicIdRegistry[
-            Dict[str, SkillComponentType]
-        ] = PublicIdRegistry()
+        self._items: PublicIdRegistry[Dict[str, SkillComponentType]] = (
+            PublicIdRegistry()
+        )
         self._dynamically_added: Dict[PublicId, Set[str]] = {}
 
     def register(

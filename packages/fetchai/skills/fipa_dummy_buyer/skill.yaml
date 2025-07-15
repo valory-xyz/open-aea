@@ -10,12 +10,12 @@ fingerprint:
   __init__.py: bafybeibo4h6frngou3bba3e7sxxo46kky7bm7ok5rpuaee4eqngby27v5y
   behaviours.py: bafybeidoqfhcsefrhjjcwbvfrjtt7kezrmrtdd3bq6kzfcz4hxolyrwh2u
   dialogues.py: bafybeidqtzrqju57jnesnvyy7m5atjscaszprwekuzzwno47aeyutxqag4
-  handlers.py: bafybeiew56vkcg2hron3fq4putdzj6sqtqnkakgrqeunlfdlal75ugimue
+  handlers.py: bafybeifkzc6xzqwyzmrzhsf3eh3sjfdtiv5x3t3xetyczh4csqsjqlqr6y
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols:
-- fetchai/fipa:1.0.0:bafybeiajs4ys4lqewfg7dnwg346mgs2wpcrsyqhmfzh53bsle3mzmv5k5a
+- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
 skills: []
 behaviours:
   initializer:

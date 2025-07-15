@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,8 +118,8 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self.data_for_sale = None  # type: Optional[Dict[str, str]]
-        self._terms = None  # type: Optional[Terms]
+        self.data_for_sale: Optional[Dict[str, str]] = None
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:

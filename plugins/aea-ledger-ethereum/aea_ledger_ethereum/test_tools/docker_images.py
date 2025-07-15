@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 class GanacheDockerImage(DockerImage):
     """Wrapper to Ganache Docker image."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         client: DockerClient,
         addr: str,
@@ -97,7 +97,9 @@ class GanacheDockerImage(DockerImage):
         request = dict(jsonrpc=2.0, method="web3_clientVersion", params=[], id=1)
         for i in range(max_attempts):
             try:
-                response = requests.post(f"{self._addr}:{self._port}", json=request)
+                response = requests.post(
+                    f"{self._addr}:{self._port}", json=request, timeout=30
+                )
                 enforce(response.status_code == 200, "")
                 return True
             except Exception:  # pylint: disable=broad-except

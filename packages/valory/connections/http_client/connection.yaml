@@ -9,13 +9,13 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeigqhgnqpgi22gfxqvsgbmrjdkrklpgu2m4px6zwb7bhvy3gkkyetu
   __init__.py: bafybeieh7rjtg22qukaznxzhadreuxhyfeamj3lcluxtcbfiexktue2nim
-  connection.py: bafybeiephqitgfzzautuegh2fpp5yezglkri4gj646glu3erokbfgsupzu
+  connection.py: bafybeih5wxvm67odsltrlvah2vnuggeabogvsrglvruzk5p3cqd7ffyfdi
   tests/__init__.py: bafybeiak7fbussk7n5zl2o4trefz7whvc3ae3k2vrryhb6cettb2qskjau
   tests/test_http_client.py: bafybeic4k7g6k4y5axh3pgpz25j7drghqxl5gblczux2sxtms54ududepe
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeih4azmfwtamdbkhztkm4xitep3gx6tfdnoz6tvllmaqnhu3klejfa
+- valory/http:1.0.0:bafybeiaui7puypbkw63ahcv4hrabi36yx3dk4blfxokjkrnf5elqd2weqy
 class_name: HTTPClientConnection
 config:
   host: 127.0.0.1

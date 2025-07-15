@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -224,7 +224,7 @@ def build_node(build_dir: str) -> None:
         copy_tree(LIBP2P_NODE_MODULE, dirname)
         err_str = _golang_module_build(dirname)
         if err_str:  # pragma: nocover
-            raise Exception(f"Node build failed: {err_str}")
+            raise RuntimeError(f"Node build failed: {err_str}")
         ensure_dir(build_dir)
         shutil.copy(
             os.path.join(dirname, LIBP2P_NODE_MODULE_NAME),

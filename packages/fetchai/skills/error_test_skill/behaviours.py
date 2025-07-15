@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +33,7 @@ class RaiseErrorBehaviour(TickerBehaviour):
     def act(self) -> None:
         """Act according to the behaviour."""
         self.context.logger.info("Raise Error Behaviour: act method called.")
-        raise Exception("Expected exception!")
+        raise RuntimeError("Expected exception!")
 
     def teardown(self) -> None:
         """Teardown the behaviour."""

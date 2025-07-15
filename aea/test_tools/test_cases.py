@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -875,7 +875,7 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
         return read_envelope_from_file(str(cls.t / agent / DEFAULT_OUTPUT_FILE_NAME))
 
     @classmethod
-    def missing_from_output(
+    def missing_from_output(  # pylint: disable=too-many-positional-arguments
         cls,
         process: subprocess.Popen,
         strings: Sequence[str],
@@ -1075,7 +1075,15 @@ class AEATestCaseEmptyFlaky(AEATestCaseEmpty):
         super(AEATestCaseEmptyFlaky, cls).setup_class()
         if len(cls.method_list) > 1:  # pragma: nocover
             raise ValueError(f"{cls.__name__} can only contain one test method!")
-        cls.run_count += 1
+
+    def setup_method(self) -> None:
+        """Set up the test method."""
+        self.run_count += 1
+
+    def teardown_method(self) -> None:
+        """Teardown the test method."""
+        os.chdir(self.old_cwd)
+        shutil.rmtree(self.t, ignore_errors=True)
 
     @classmethod
     def teardown_class(cls) -> None:
@@ -1112,7 +1120,15 @@ class AEATestCaseManyFlaky(AEATestCaseMany):
         super(AEATestCaseManyFlaky, cls).setup_class()
         if len(cls.method_list) > 1:  # pragma: nocover
             raise ValueError(f"{cls.__name__} can only contain one test method!")
-        cls.run_count += 1
+
+    def setup_method(self) -> None:
+        """Set up the test method."""
+        self.run_count += 1
+
+    def teardown_method(self) -> None:
+        """Teardown the test method."""
+        os.chdir(self.old_cwd)
+        shutil.rmtree(self.t, ignore_errors=True)
 
     @classmethod
     def teardown_class(cls) -> None:

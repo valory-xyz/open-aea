@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ class FetchLedgerDockerImage(DockerImage):
 
     PORTS = {1317: 1317, 26657: 26657}
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         client: DockerClient,
         addr: str,

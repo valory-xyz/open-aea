@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -190,7 +190,7 @@ class PeriodicCaller:
     Used for periodic function run using asyncio.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         callback: Callable,
         period: float,
@@ -427,7 +427,7 @@ class Runnable(ABC):
             raise ValueError("Call _set_task() first!")  # pragma: nocover
         try:
             self._loop.run_until_complete(self._task)
-        except BaseException:  # pylint: disable=broad-except)
+        except BaseException:  # pylint: disable=broad-except)  # noqa: B036
             logging.exception(f"Exception raised in {self}")
         self._loop.stop()
         self._loop.close()

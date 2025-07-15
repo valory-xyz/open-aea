@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,7 @@ def get_auth_token() -> Optional[str]:
     )
 
 
-def request_api(
+def request_api(  # pylint: disable=too-many-positional-arguments
     method: str,
     path: str,
     params: Optional[Dict] = None,
@@ -109,7 +109,7 @@ def request_api(
         logger.debug("Successfully created!")
     elif resp.status_code == 403:
         raise click.ClickException(
-            "You are not authenticated. " 'Please sign in with "aea login" command.'
+            'You are not authenticated. Please sign in with "aea login" command.'
         )
     elif resp.status_code == 500:
         raise click.ClickException(
@@ -142,7 +142,7 @@ def request_api(
     return resp_json
 
 
-def _perform_registry_request(
+def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
     method: str,
     path: str,
     params: Optional[Dict] = None,
@@ -208,7 +208,26 @@ def extract(source: str, target: str) -> None:
     """
     if source.endswith("tar.gz"):
         tar = tarfile.open(source, "r:gz")
-        tar.extractall(path=target)
+
+        # Validate tar members to prevent directory traversal attacks
+        def is_safe_member(member: tarfile.TarInfo) -> bool:
+            """Check if tar member is safe to extract."""
+            # Resolve any path traversal attempts
+            member_path = os.path.normpath(member.name)
+            # Check for absolute paths or parent directory references
+            if member_path.startswith("/") or ".." in member_path:
+                return False
+            # Check if the resolved path would be within target directory
+            full_path = os.path.join(target, member_path)
+            return os.path.commonpath(
+                [os.path.abspath(target), os.path.abspath(full_path)]
+            ) == os.path.abspath(target)
+
+        # Filter out dangerous members
+        safe_members = [member for member in tar.getmembers() if is_safe_member(member)]
+        tar.extractall(
+            path=target, members=safe_members
+        )  # nosec B202 - members are validated by is_safe_member function
         tar.close()
     else:
         raise ValueError("Unknown file type: {}".format(source))
@@ -233,9 +252,9 @@ def clean_tarfiles(func: Callable) -> Callable:
         except Exception as e:
             _rm_tarfiles()
             raise e
-        else:
-            _rm_tarfiles()
-            return result
+
+        _rm_tarfiles()
+        return result
 
     return wrapper
 
@@ -361,7 +380,7 @@ def get_latest_version_available_in_registry(
 
 
 def list_missing_packages(
-    packages: List[Tuple[str, PublicId]]
+    packages: List[Tuple[str, PublicId]],
 ) -> List[Tuple[str, PublicId]]:
     """Get list of packages not currently present in registry."""
     result: List[Tuple[str, PublicId]] = []

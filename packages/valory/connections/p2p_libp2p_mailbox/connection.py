@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ from aea.configurations.base import PublicId
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.connections.base import Connection, ConnectionStates
 from aea.crypto.registries import make_crypto
-from aea.exceptions import enforce
+from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.acn.agent_record import AgentRecord
 from aea.helpers.acn.uri import Uri
 from aea.mail.base import Envelope
@@ -79,7 +79,7 @@ class NodeClient:
         self.node_uri = node_uri
         self.agent_record = node_por
         self._session_token: Optional[str] = None
-        self.ssl_ctx = Optional[ssl.SSLContext]
+        self.ssl_ctx: Optional[ssl.SSLContext] = None
 
     async def connect(self) -> bool:
         """Connect to node with pipe."""
@@ -228,7 +228,13 @@ class P2PLibp2pMailboxConnection(Connection):
             "Delegate 'uri' should be provided for each node",
         )
 
-        nodes_public_keys = [node.get("public_key", None) for node in nodes]
+        try:
+            nodes_public_keys: List[str] = [node["public_key"] for node in nodes]
+        except KeyError:
+            raise AEAEnforceError(
+                "Delegate 'public_key' should be provided for each node"
+            )
+
         enforce(
             len(nodes_public_keys) == len(nodes) and None not in nodes_public_keys,
             "Delegate 'public_key' should be provided for each node",
@@ -242,7 +248,7 @@ class P2PLibp2pMailboxConnection(Connection):
         for cert_request in cert_requests:
             save_path = cert_request.get_absolute_save_path(Path(self.data_dir))
             if not save_path.is_file():
-                raise Exception(  # pragma: nocover
+                raise ValueError(  # pragma: nocover
                     "cert_request 'save_path' field is not a file. "
                     "Please ensure that 'issue-certificates' command is called beforehand"
                 )

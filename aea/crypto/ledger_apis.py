@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,7 @@ class LedgerApis:
         return balance
 
     @classmethod
-    def get_transfer_transaction(
+    def get_transfer_transaction(  # pylint: disable=too-many-positional-arguments
         cls,
         identifier: str,
         sender_address: str,
@@ -270,7 +270,7 @@ class LedgerApis:
         return is_settled
 
     @staticmethod
-    def is_transaction_valid(
+    def is_transaction_valid(  # pylint: disable=too-many-positional-arguments
         identifier: str,
         tx: Any,
         seller: Address,

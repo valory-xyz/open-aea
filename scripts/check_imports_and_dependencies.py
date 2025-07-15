@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,7 +75,7 @@ class DependenciesTool:
         """Get package files list."""
         packages_info = list(search_packages_info([package_name]))
         if len(packages_info) == 0:
-            raise Exception(f"package {package_name} not found")
+            raise ValueError(f"package {package_name} not found")
         if isinstance(packages_info[0], dict):
             files = packages_info[0]["files"]
             location = packages_info[0]["location"]
@@ -196,7 +196,7 @@ class CheckTool:
 
     @staticmethod
     def sections_dependencies_add_files(
-        sections_dependencies: Dict[str, List[str]]
+        sections_dependencies: Dict[str, List[str]],
     ) -> Dict[str, Dict[str, List[Path]]]:
         """Add packages file lists to dependencies in sections."""
         result: Dict[str, Dict[str, List[Path]]] = defaultdict(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -90,7 +90,7 @@ class Project(_Base):
         self.builder.call_all_build_entrypoints()
 
     @classmethod
-    def load(
+    def load(  # pylint: disable=too-many-positional-arguments
         cls,
         working_dir: str,
         public_id: PublicId,

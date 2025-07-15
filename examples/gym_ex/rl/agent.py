@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 """This contains the rl agent class."""
 
 import random
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import gym
 import numpy as np
@@ -31,7 +31,7 @@ BanditId = int
 Price = int
 
 Action = Tuple[BanditId, Price]
-Observation = None
+Observation = Any
 Reward = float
 Done = bool
 Info = dict
@@ -117,9 +117,9 @@ class RLAgent:
 
         :param nb_goods: number of goods
         """
-        self.good_price_models = dict(
+        self.good_price_models: Dict[int, GoodPriceModel] = dict(
             (good_id, GoodPriceModel()) for good_id in range(nb_goods)
-        )  # type: Dict[int, GoodPriceModel]
+        )
 
     def _pick_an_action(self) -> Action:
         """
@@ -138,12 +138,12 @@ class RLAgent:
 
         return action
 
-    def _update_model(  # pylint: disable=unused-argument
+    def _update_model(  # pylint: disable=too-many-positional-arguments
         self,
-        observation: Observation,  # type: ignore
+        observation: Observation,  # pylint: disable=unused-argument
         reward: Reward,
-        done: Done,
-        info: Info,
+        done: Done,  # pylint: disable=unused-argument
+        info: Info,  # pylint: disable=unused-argument
         action: Action,
     ) -> None:
         """

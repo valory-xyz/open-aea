@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,6 @@ class SigningDialogues(BaseSigningDialogues):
         Initialize dialogues.
 
         :param self_address: the address of the entity for whom dialogues are maintained
-        :return: None
         """
 
         def role_from_first_message(  # pylint: disable=unused-argument
@@ -72,8 +71,6 @@ class SigningDialogues(BaseSigningDialogues):
             role_from_first_message=role_from_first_message,
             dialogue_class=SigningDialogue,
         )
-
-        return None
 
 
 def make_desc_maker_wallet(

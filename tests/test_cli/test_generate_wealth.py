@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,22 +79,40 @@ class GenerateWealthCommandTestCase(TestCase):
         self.assertEqual(result.exit_code, 0)
 
 
-class TestWealthCommandsPositive(AEATestCaseManyFlaky):
+class TestWealthCommandsPositiveNoPass(AEATestCaseManyFlaky):
     """Test case for CLI wealth commands."""
 
     @pytest.mark.integration
     @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS_INTEGRATION)
-    def test_wealth_commands(self, password_or_none):
+    def test_wealth_commands(self):
         """Test wealth commands."""
         agent_name = "test_aea"
         self.create_agents(agent_name)
 
         self.set_agent_context(agent_name)
 
-        self.generate_private_key(password=password_or_none)
-        self.add_private_key(password=password_or_none)
+        self.generate_private_key(password=None)
+        self.add_private_key(password=None)
 
-        self.generate_wealth(password=password_or_none)
+        self.generate_wealth(password=None)
+
+
+class TestWealthCommandsPositiveFakePass(AEATestCaseManyFlaky):
+    """Test case for CLI wealth commands."""
+
+    @pytest.mark.integration
+    @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS_INTEGRATION)
+    def test_wealth_commands(self):
+        """Test wealth commands."""
+        agent_name = "test_aea"
+        self.create_agents(agent_name)
+
+        self.set_agent_context(agent_name)
+
+        self.generate_private_key(password="fake_password")  # nosec
+        self.add_private_key(password="fake_password")  # nosec
+
+        self.generate_wealth(password="fake_password")  # nosec
 
 
 class TestWealthCommandsNegative(AEATestCaseMany):

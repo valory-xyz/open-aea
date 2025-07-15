@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,7 +98,7 @@ def list_agent_items(ctx: Context, item_type: str) -> List[Dict]:
     """Return a list of item details, given the item type."""
     result = []
     item_type_plural = item_type + "s"
-    public_ids = getattr(ctx.agent_config, item_type_plural)  # type: Set[PublicId]
+    public_ids: Set[PublicId] = getattr(ctx.agent_config, item_type_plural)
     default_file_name = _get_default_configuration_file_name_from_type(item_type)
     for public_id in public_ids:
         # first, try to retrieve the item from the vendor directory.

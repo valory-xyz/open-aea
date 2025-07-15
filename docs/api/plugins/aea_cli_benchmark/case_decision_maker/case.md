@@ -28,10 +28,6 @@ Initialize dialogues.
 
 - `self_address`: the address of the entity for whom dialogues are maintained
 
-**Returns**:
-
-None
-
 <a id="plugins.aea-cli-benchmark.aea_cli_benchmark.case_decision_maker.case.make_desc_maker_wallet"></a>
 
 #### make`_`desc`_`maker`_`wallet

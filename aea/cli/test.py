@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -488,7 +488,7 @@ def load_package(
             )
 
 
-def test_package_by_path(
+def test_package_by_path(  # pylint: disable=too-many-positional-arguments
     package_dir: Path,
     pytest_arguments: Sequence[str],
     aea_project_path: Optional[Path] = None,
@@ -537,7 +537,7 @@ def test_package_by_path(
     sys.exit(exit_code)
 
 
-def test_package_collection(
+def test_package_collection(  # pylint: disable=too-many-positional-arguments
     available_packages: List[Tuple[str, Path]],
     packages_dir: Path,
     pytest_args: List[str],

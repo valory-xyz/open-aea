@@ -8,16 +8,16 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeigayltuo3dejkvuqvm6cysyzw6xueha4ehgo23qv75xdavd7bik24
   __init__.py: bafybeibojyrqpiw5xkemsnrdie572mixa5ud4sxdtmpgfutl253kj4zjga
-  connection.py: bafybeictfwockpuemdsgkn35o5bmfjmtptffb4xqd2optgyortxpkxa6yi
+  connection.py: bafybeifx65labevmuwtizwvm3a7ka66oqoue2ophqpcfds6osxkjezmqme
   tests/__init__.py: bafybeiecschrd664thii7emksuuziz3xrporjptci4wodsgdavlzpfzhqi
   tests/test_misc.py: bafybeielp624jc7vqaikjyshgrpnlbhvdxrlvjezhd2kmthtuhf7atfzx4
   tests/test_search_services.py: bafybeibcgnt5db5ms2zbshlxthzralqvmudyzy3llxurqkjg5cm7xhx56m
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
-- fetchai/fipa:1.0.0:bafybeiajs4ys4lqewfg7dnwg346mgs2wpcrsyqhmfzh53bsle3mzmv5k5a
-- fetchai/oef_search:1.0.0:bafybeido2dn66pdglzdwfoslxc6irppkeqxgrtclzm2fg77gkrtqps7rg4
+- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
+- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
 class_name: OEFLocalConnection
 config: {}
 excluded_protocols: []

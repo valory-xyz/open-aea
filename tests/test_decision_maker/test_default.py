@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -210,7 +210,7 @@ class BaseTestDecisionMaker:
             signing_msg_response.performative
             == SigningMessage.Performative.SIGNED_TRANSACTION
         )
-        assert type(signing_msg_response.signed_transaction.body) == dict
+        assert type(signing_msg_response.signed_transaction.body) is dict
 
     def test_handle_tx_signing_ethereum(self):
         """Test tx signing for ethereum."""
@@ -244,7 +244,7 @@ class BaseTestDecisionMaker:
             signing_msg_response.performative
             == SigningMessage.Performative.SIGNED_TRANSACTION
         )
-        assert type(signing_msg_response.signed_transaction.body) == dict
+        assert type(signing_msg_response.signed_transaction.body) is dict
 
     def test_handle_tx_signing_unknown(self):
         """Test tx signing for unknown."""
@@ -312,7 +312,7 @@ class BaseTestDecisionMaker:
             signing_msg_response.performative
             == SigningMessage.Performative.SIGNED_MESSAGE
         )
-        assert type(signing_msg_response.signed_message) == SignedMessage
+        assert type(signing_msg_response.signed_message) is SignedMessage
 
     def test_handle_message_signing_ethereum(self):
         """Test message signing for ethereum."""
@@ -346,7 +346,7 @@ class BaseTestDecisionMaker:
             signing_msg_response.performative
             == SigningMessage.Performative.SIGNED_MESSAGE
         )
-        assert type(signing_msg_response.signed_message) == SignedMessage
+        assert type(signing_msg_response.signed_message) is SignedMessage
 
     def test_handle_message_signing_ethereum_deprecated(self):
         """Test message signing for ethereum deprecated."""
@@ -382,7 +382,7 @@ class BaseTestDecisionMaker:
             signing_msg_response.performative
             == SigningMessage.Performative.SIGNED_MESSAGE
         )
-        assert type(signing_msg_response.signed_message) == SignedMessage
+        assert type(signing_msg_response.signed_message) is SignedMessage
         assert signing_msg_response.signed_message.is_deprecated_mode
 
     def test_handle_message_signing_unknown_and_two_dialogues(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -114,7 +114,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
         600  # custom code to indicate there was exception during request
     )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         agent_address: Address,
         address: str,
@@ -201,9 +201,11 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 status_code=resp.status,
                 headers=resp.headers,
                 status_text=resp.reason,
-                body=resp._body  # pylint: disable=protected-access
-                if resp._body is not None  # pylint: disable=protected-access
-                else b"",
+                body=(
+                    resp._body  # pylint: disable=protected-access
+                    if resp._body is not None  # pylint: disable=protected-access
+                    else b""
+                ),
                 dialogue=dialogue,
             )
         except Exception:  # pylint: disable=broad-except
@@ -316,7 +318,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
             return None
 
     @staticmethod
-    def to_envelope(
+    def to_envelope(  # pylint: disable=too-many-positional-arguments
         http_request_message: HttpMessage,
         status_code: int,
         headers: CIMultiDictProxy,
@@ -364,7 +366,7 @@ class HTTPClientAsyncChannel:  # pylint: disable=too-many-instance-attributes
                 await task
             except KeyboardInterrupt:  # pragma: nocover
                 raise
-            except BaseException:  # pragma: nocover # pylint: disable=broad-except
+            except BaseException:  # pylint: disable=broad-except # noqa: B036
                 pass  # nosec
 
     async def disconnect(self) -> None:

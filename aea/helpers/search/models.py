@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -193,7 +193,7 @@ class Attribute:
         name: str,
         type_: Type[ATTRIBUTE_TYPES],
         is_required: bool,
-        description: str = "",
+        description: Optional[str] = None,
     ) -> None:
         """
         Initialize an attribute.
@@ -471,15 +471,15 @@ class Description:
 
         kv = models_pb2.Query.KeyValue()  # type: ignore
         kv.key = key
-        if type(value) == bool:  # pylint: disable=unidiomatic-typecheck
+        if type(value) is bool:  # pylint: disable=unidiomatic-typecheck
             kv.value.boolean = value
-        elif type(value) == int:  # pylint: disable=unidiomatic-typecheck
+        elif type(value) is int:  # pylint: disable=unidiomatic-typecheck
             kv.value.integer = value
-        elif type(value) == float:  # pylint: disable=unidiomatic-typecheck
+        elif type(value) is float:  # pylint: disable=unidiomatic-typecheck
             kv.value.double = value
-        elif type(value) == str:  # pylint: disable=unidiomatic-typecheck
+        elif type(value) is str:  # pylint: disable=unidiomatic-typecheck
             kv.value.string = value
-        elif type(value) == Location:  # pylint: disable=unidiomatic-typecheck
+        elif type(value) is Location:  # pylint: disable=unidiomatic-typecheck
             kv.value.location.CopyFrom(value.encode())  # type: ignore
 
         return kv
@@ -874,17 +874,17 @@ class ConstraintType:
         elif self.type == ConstraintTypes.WITHIN:
             range_ = models_pb2.Query.Range()  # type: ignore
 
-            if type(self.value[0]) == str:  # pylint: disable=unidiomatic-typecheck
+            if type(self.value[0]) is str:  # pylint: disable=unidiomatic-typecheck
                 values = models_pb2.Query.StringPair()  # type: ignore
                 values.first = self.value[0]
                 values.second = self.value[1]
                 range_.string_pair.CopyFrom(values)
-            elif type(self.value[0]) == int:  # pylint: disable=unidiomatic-typecheck
+            elif type(self.value[0]) is int:  # pylint: disable=unidiomatic-typecheck
                 values = models_pb2.Query.IntPair()  # type: ignore
                 values.first = self.value[0]
                 values.second = self.value[1]
                 range_.integer_pair.CopyFrom(values)
-            elif type(self.value[0]) == float:  # pylint: disable=unidiomatic-typecheck
+            elif type(self.value[0]) is float:  # pylint: disable=unidiomatic-typecheck
                 values = models_pb2.Query.DoublePair()  # type: ignore
                 values.first = self.value[0]
                 values.second = self.value[1]
@@ -1070,7 +1070,7 @@ class ConstraintExpr(ABC):
         :return: ``True`` if the constraint expression is valid wrt the data model, ``False`` otherwise.
         """
 
-    def check_validity(self) -> None:  # pylint: disable=no-self-use  # pragma: nocover
+    def check_validity(self) -> None:  # pragma: nocover
         """
         Check whether a Constraint Expression satisfies some basic requirements.
 

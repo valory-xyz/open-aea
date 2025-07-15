@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -282,7 +282,7 @@ class TestDHTRobustness(BaseP2PLibp2pTest, ACNWithBootstrappedEntryNodes):
 
         n_messages = 10**exponent
         for _ in range(n_messages):
-            mux_pair = random.sample(self.multiplexers, 2)
+            mux_pair = random.sample(self.multiplexers, 2)  # nosec - only for testing
             sender, to = (c.address for m in mux_pair for c in m.connections)
             envelope = self.enveloped_default_message(to=to, sender=sender)
             mux_pair[0].put(envelope)
@@ -296,7 +296,7 @@ class TestDHTRobustness(BaseP2PLibp2pTest, ACNWithBootstrappedEntryNodes):
         shipped, delivered = [], []
         n_messages = 10**exponent
         for _ in range(n_messages):
-            mux_pair = random.sample(self.multiplexers, 2)
+            mux_pair = random.sample(self.multiplexers, 2)  # nosec - only for testing
             sender, to = (c.address for m in mux_pair for c in m.connections)
             envelope = self.enveloped_default_message(to=to, sender=sender)
             mux_pair[0].put(envelope)
@@ -320,7 +320,7 @@ class TestDHTRobustness(BaseP2PLibp2pTest, ACNWithBootstrappedEntryNodes):
     def send_message_via_random_multiplexer_pair(self, message) -> bool:
         """Send message via random multiplexers"""
 
-        mux_pair = random.sample(self.multiplexers, 2)
+        mux_pair = random.sample(self.multiplexers, 2)  # nosec - only for testing
         sender, to = (c.address for m in mux_pair for c in m.connections)
         envelope = Envelope(
             to=to,

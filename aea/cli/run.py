@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -106,7 +106,7 @@ from aea.skills.base import Behaviour, Handler, Model, Skill
 )
 @click.pass_context
 @check_aea_project
-def run(
+def run(  # pylint: disable=too-many-positional-arguments
     click_context: click.Context,
     connection_ids: List[PublicId],
     exclude_connection_ids: List[PublicId],
@@ -292,7 +292,7 @@ def _print_addresses(aea: AEA) -> None:
     print_table(addresses)
 
 
-def run_aea(
+def run_aea(  # pylint: disable=too-many-positional-arguments
     ctx: Context,
     connection_ids: List[PublicId],
     env_file: str,

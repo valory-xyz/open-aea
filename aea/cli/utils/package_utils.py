@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -530,7 +530,7 @@ def is_item_present_unified(
     )
 
 
-def is_item_present(
+def is_item_present(  # pylint: disable=too-many-positional-arguments
     path: str,
     agent_config: AgentConfig,
     item_type: str,
@@ -871,7 +871,7 @@ def update_aea_version_range(package_configuration: PackageConfiguration) -> Non
 
 
 def list_available_packages(
-    project_path: Union[Path, str]
+    project_path: Union[Path, str],
 ) -> List[Tuple[PackageId, Path]]:
     """Returns a list of paths for all available packages in an AEA project."""
 

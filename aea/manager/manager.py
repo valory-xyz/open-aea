@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -289,7 +289,7 @@ class AgentRunProcessTask(BaseAgentRunTask):
             aea.runtime.start()
             loop.run_until_complete(aea.runtime.wait_completed())
 
-        except BaseException as e:  # pylint: disable=broad-except
+        except BaseException as e:  # pylint: disable=broad-except  # noqa: B036
             print(
                 f"Exception in agent subprocess task at {datetime.datetime.now()}:\n{format_exc()}"
             )
@@ -342,7 +342,7 @@ class MultiAgentManager:
     VENV_BUILD_TIMEOUT = 240
     SAVE_FILENAME = "save.json"
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         working_dir: str,
         mode: str = "async",
@@ -682,7 +682,7 @@ class MultiAgentManager:
         """
         return list(self._projects.keys())
 
-    def add_agent(
+    def add_agent(  # pylint: disable=too-many-positional-arguments
         self,
         public_id: PublicId,
         agent_name: Optional[str] = None,
@@ -1030,9 +1030,7 @@ class MultiAgentManager:
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
-    def _load_state(
-        self, local: bool, remote: bool
-    ) -> Tuple[
+    def _load_state(self, local: bool, remote: bool) -> Tuple[
         bool,
         Dict[PublicId, List[Dict]],
         List[Tuple[PublicId, List[Dict], Exception]],

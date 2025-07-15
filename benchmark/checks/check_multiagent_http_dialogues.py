@@ -91,7 +91,7 @@ class HttpPingPongHandler(Handler):
         message = cast(HttpMessage, message)
         dialogue = self.dialogues.update(message)
         if not dialogue:
-            raise Exception("something goes wrong")
+            raise RuntimeError("something goes wrong")
         rtt_ts, latency_ts = struct.unpack("dd", message.body)  # type: ignore
         if message.performative == HttpMessage.Performative.REQUEST:
             self.latency_total_time += time.time() - latency_ts
@@ -202,40 +202,30 @@ def run(
     local_node.stop()
     runner.stop(timeout=5)
     total_messages = sum(
-        [
-            cast(HttpPingPongHandler, skill.handlers[handler_name]).count
-            for skill in skills.values()
-        ]
+        cast(HttpPingPongHandler, skill.handlers[handler_name]).count
+        for skill in skills.values()
     )
     rate = total_messages / duration
 
     rtt_total_time = sum(
-        [
-            cast(HttpPingPongHandler, skill.handlers[handler_name]).rtt_total_time
-            for skill in skills.values()
-        ]
+        cast(HttpPingPongHandler, skill.handlers[handler_name]).rtt_total_time
+        for skill in skills.values()
     )
     rtt_count = sum(
-        [
-            cast(HttpPingPongHandler, skill.handlers[handler_name]).rtt_count
-            for skill in skills.values()
-        ]
+        cast(HttpPingPongHandler, skill.handlers[handler_name]).rtt_count
+        for skill in skills.values()
     )
 
     if rtt_count == 0:
         rtt_count = -1
 
     latency_total_time = sum(
-        [
-            cast(HttpPingPongHandler, skill.handlers[handler_name]).latency_total_time
-            for skill in skills.values()
-        ]
+        cast(HttpPingPongHandler, skill.handlers[handler_name]).latency_total_time
+        for skill in skills.values()
     )
     latency_count = sum(
-        [
-            cast(HttpPingPongHandler, skill.handlers[handler_name]).latency_count
-            for skill in skills.values()
-        ]
+        cast(HttpPingPongHandler, skill.handlers[handler_name]).latency_count
+        for skill in skills.values()
     )
 
     if latency_count == 0:
@@ -262,7 +252,7 @@ def run(
 @click.option("--num_of_agents", default=2, help="Amount of agents to run.")
 @number_of_runs_deco
 @output_format_deco
-def main(
+def main(  # pylint: disable=too-many-positional-arguments
     duration: int,
     runtime_mode: str,
     runner_mode: str,

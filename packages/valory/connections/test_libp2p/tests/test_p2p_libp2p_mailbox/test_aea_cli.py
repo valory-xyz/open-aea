@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,9 +38,9 @@ DEFAULT_HOST = LOCALHOST.hostname
 class TestP2PLibp2pMailboxConnectionAEARunning(Base):
     """Test AEA with p2p_libp2p_client connection is correctly run"""
 
-    conn_path = (
-        p2p_libp2p_mailbox_path
-    ) = f"vendor.{p2p_libp2p_mailbox.__name__.split('.', 1)[-1]}"
+    conn_path = p2p_libp2p_mailbox_path = (
+        f"vendor.{p2p_libp2p_mailbox.__name__.split('.', 1)[-1]}"
+    )
     public_id = str(PUBLIC_ID)
     port = next(ports)
     uri = f"{DEFAULT_HOST}:{port}"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -137,7 +137,7 @@ class MyRLAgent(RLAgent):
 
         return action
 
-    def _update_model(  # pylint: disable=unused-argument
+    def _update_model(  # pylint: disable=unused-argument,too-many-positional-arguments
         self,
         observation: Any,
         reward: float,

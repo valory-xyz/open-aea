@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -266,13 +266,8 @@ class ExtractTestCase(TestCase):
     @mock.patch("aea.cli.registry.utils.tarfile.open")
     def test_extract_positive(self, tarfile_open_mock, os_remove_mock):
         """Test for extract method positive result."""
-        source = "file.tar.gz"
+        source = "tests/data/t_protocol.tar.gz"
         target = "target-folder"
-
-        tar_mock = mock.Mock()
-        tar_mock.extractall = lambda path: None
-        tar_mock.close = lambda: None
-        tarfile_open_mock.return_value = tar_mock
 
         extract(source, target)
         tarfile_open_mock.assert_called_once_with(source, "r:gz")

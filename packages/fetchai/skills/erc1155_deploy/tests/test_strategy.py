@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,7 +103,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_location_description method of the Strategy class."""
         description = self.strategy.get_location_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_LOCATION_MODEL
         assert description.values.get("location", "") == Location(
             latitude=self.location["latitude"], longitude=self.location["longitude"]
@@ -113,7 +113,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_register_service_description method of the Strategy class."""
         description = self.strategy.get_register_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_SET_SERVICE_MODEL
         assert description.values.get("key", "") == self.service_data["key"]
         assert description.values.get("value", "") == self.service_data["value"]
@@ -122,7 +122,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_register_personality_description method of the Strategy class."""
         description = self.strategy.get_register_personality_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_PERSONALITY_MODEL
         assert description.values.get("piece", "") == self.personality_data["piece"]
         assert description.values.get("value", "") == self.personality_data["value"]
@@ -131,7 +131,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_register_classification_description method of the Strategy class."""
         description = self.strategy.get_register_classification_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_PERSONALITY_MODEL
         assert description.values.get("piece", "") == self.classification["piece"]
         assert description.values.get("value", "") == self.classification["value"]
@@ -140,7 +140,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_service_description method of the Strategy class."""
         description = self.strategy.get_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is SIMPLE_SERVICE_MODEL
         assert (
             description.values.get("seller_service", "") == self.service_data["value"]
@@ -150,7 +150,7 @@ class TestStrategy(ERC1155DeployTestCase):
         """Test the get_unregister_service_description method of the Strategy class."""
         description = self.strategy.get_unregister_service_description()
 
-        assert type(description) == Description
+        assert type(description) is Description
         assert description.data_model is AGENT_REMOVE_SERVICE_MODEL
         assert description.values.get("key", "") == self.service_data["key"]
 

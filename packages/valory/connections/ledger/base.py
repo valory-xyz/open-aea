@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ from aea.protocols.dialogue.base import Dialogue, Dialogues
 class RequestDispatcher(ABC):
     """Base class for a request dispatcher."""
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         logger: Logger,
         connection_state: AsyncState,
@@ -76,7 +76,7 @@ class RequestDispatcher(ABC):
 
     async def run_async(
         self,
-        func: Callable[[Any], Task],
+        func: Callable[[LedgerApi, Message, Dialogue], Task[Any]],
         api: LedgerApi,
         message: Message,
         dialogue: Dialogue,
@@ -132,7 +132,7 @@ class RequestDispatcher(ABC):
         func_result = await asyncio.wait_for(running_func, timeout=timeout)
         return func_result
 
-    def set_extra_kwargs(  # pylint: disable=no-self-use, unused-argument
+    def set_extra_kwargs(  # pylint: disable=unused-argument
         self, message: Message
     ) -> None:
         """
@@ -168,7 +168,9 @@ class RequestDispatcher(ABC):
         handler = self.get_handler(performative)
         return self.loop.create_task(self.run_async(handler, api, message, dialogue))
 
-    def get_handler(self, performative: Any) -> Callable[[Any], Task]:
+    def get_handler(
+        self, performative: Any
+    ) -> Callable[[LedgerApi, Message, Dialogue], Task[Any]]:
         """
         Get the handler method, given the message performative.
 
@@ -177,7 +179,7 @@ class RequestDispatcher(ABC):
         """
         handler = getattr(self, performative.value, None)
         if handler is None:
-            raise Exception("Performative not recognized.")  # pragma: nocover
+            raise ValueError("Performative not recognized.")  # pragma: nocover
         return handler
 
     @abstractmethod

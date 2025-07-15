@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,7 +59,7 @@ class TestLedgerIntegration(BasePythonMarkdownDocs):
         assert locals_key in locals_
         obj = locals_[locals_key]
 
-        if type(cls_or_str) == type:
+        if type(cls_or_str) is type:
             assert isinstance(obj, cls_or_str)
         else:
             assert obj.__class__.__name__ == cls_or_str

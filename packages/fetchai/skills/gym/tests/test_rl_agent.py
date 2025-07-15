@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ class TestPriceBandit(GymTestCase):
     def test_sample(self):
         """Test the sample method of PriceBandit class."""
         sample = self.price_bandit.sample()
-        assert type(sample) == int
+        assert type(sample) is int
 
     def test_update(self):
         """Test the update method of the PriceBandit class."""
@@ -115,7 +115,7 @@ class TestGoodPriceModel(GymTestCase):
     def test_get_price_expectation(self):
         """Test the get_price_expectation method of GoodPriceModel class."""
         expectation = self.good_price_model.get_price_expectation()
-        assert type(expectation) == int
+        assert type(expectation) is int
 
 
 class TestMyRLAgent(GymTestCase):

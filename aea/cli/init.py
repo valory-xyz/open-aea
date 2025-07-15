@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,8 +57,8 @@ from aea.cli.utils.package_utils import validate_author_name
     "--ipfs-node", type=str, default=DEFAULT_IPFS_URL, help="Multiaddr for IPFS node."
 )
 @pass_ctx
-def init(  # pylint: disable=unused-argument
-    ctx: Context,
+def init(  # pylint: disable=too-many-positional-arguments
+    ctx: Context,  # pylint: disable=unused-argument
     author: str,
     reset: bool,
     no_subscribe: bool,
@@ -77,7 +77,7 @@ def init(  # pylint: disable=unused-argument
     )
 
 
-def do_init(
+def do_init(  # pylint: disable=too-many-positional-arguments
     author: str,
     reset: bool,
     no_subscribe: bool,
@@ -155,9 +155,9 @@ def _registry_init_ipfs(ipfs_node: Optional[str]) -> None:
     """Initialize ipfs registry"""
 
     registry_config = _set_registries(REGISTRY_REMOTE, REMOTE_IPFS)
-    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS][
-        "ipfs_node"
-    ] = _clean_ipfs_node_url(ipfs_node=ipfs_node)
+    registry_config["settings"][REGISTRY_REMOTE][REMOTE_IPFS]["ipfs_node"] = (
+        _clean_ipfs_node_url(ipfs_node=ipfs_node)
+    )
     update_cli_config({REGISTRY_CONFIG_KEY: registry_config})
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2024 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
             return key.entity.pubkey()
         try:
             return Pubkey.from_string(key)
-        except BaseException:
+        except BaseException:  # noqa: B036
             return Keypair.from_base58_string(key).pubkey()
 
     @staticmethod
@@ -314,7 +314,7 @@ class SolanaApi(LedgerApi, SolanaHelper):
         :return: the ledger API response.
         """
         return self._get_account_state(
-            address=callable_name, *args, raise_on_try=raise_on_try, **kwargs
+            callable_name, *args, raise_on_try=raise_on_try, **kwargs
         )
 
     @try_decorator("Unable to get state: {}", logger_method="warning")

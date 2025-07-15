@@ -28,10 +28,6 @@ Initialize dialogues.
 
 - `self_address`: the address of the entity for whom dialogues are maintained
 
-**Returns**:
-
-None
-
 <a id="plugins.aea-cli-benchmark.aea_cli_benchmark.case_tx_generate.dialogues.FipaDialogue"></a>
 
 ## FipaDialogue Objects

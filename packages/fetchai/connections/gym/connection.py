@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -189,6 +189,14 @@ class GymChannel:
         elif gym_message.performative == GymMessage.Performative.CLOSE:
             await self._run_in_executor(self.gym_env.close)
             return
+        else:
+            self.logger.warning(
+                "Received message with unsupported performative: {}".format(
+                    gym_message.performative
+                )
+            )
+            return
+
         envelope = Envelope(
             to=msg.to,
             sender=msg.sender,

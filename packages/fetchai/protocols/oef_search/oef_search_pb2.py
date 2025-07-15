@@ -35,9 +35,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals["_OEFSEARCHMESSAGE_QUERY"]._serialized_end = 1005
     _globals["_OEFSEARCHMESSAGE_REGISTER_SERVICE_PERFORMATIVE"]._serialized_start = 1007
     _globals["_OEFSEARCHMESSAGE_REGISTER_SERVICE_PERFORMATIVE"]._serialized_end = 1128
-    _globals[
-        "_OEFSEARCHMESSAGE_UNREGISTER_SERVICE_PERFORMATIVE"
-    ]._serialized_start = 1130
+    _globals["_OEFSEARCHMESSAGE_UNREGISTER_SERVICE_PERFORMATIVE"]._serialized_start = (
+        1130
+    )
     _globals["_OEFSEARCHMESSAGE_UNREGISTER_SERVICE_PERFORMATIVE"]._serialized_end = 1253
     _globals["_OEFSEARCHMESSAGE_SEARCH_SERVICES_PERFORMATIVE"]._serialized_start = 1255
     _globals["_OEFSEARCHMESSAGE_SEARCH_SERVICES_PERFORMATIVE"]._serialized_end = 1355

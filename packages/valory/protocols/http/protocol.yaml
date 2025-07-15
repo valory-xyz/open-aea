@@ -13,7 +13,7 @@ fingerprint:
   http.proto: bafybeigq6ykgxdqi4m65x3rcj4ehdm3usaisejzl2oisn6kzkjits3fzkq
   http_pb2.py: bafybeibvqp664j4iaozk2hyotmd7gzsyknk4dt3mcddniuzdvdxhtkjcoq
   message.py: bafybeialkadryevi2xfny4ijfe6ecg37lt72gqa666sn3sk727fxpkcmsi
-  serialization.py: bafybeie2g2yb3asbvkpfa5zgpm4is2hejx6ypj3yqzciav6xowb6njtaou
+  serialization.py: bafybeieajnh6abcfio7wwz6y7spkz322ktgrzk3i6nryowmdfbnuosrotm
   tests/__init__.py: bafybeifitr3wqclw3kammd2fw5zww6gvzbvu6s72di2p7544qfisuslhpq
   tests/test_http.py: bafybeibbz5zcqmqsvtwp2rucj2ubbbazmqt3shpjnkt5bdhnlclqy4fseq
   tests/test_http_dialogues.py: bafybeic22z3aatytdx3cxrtzt3hqwwhxlnaal6sn7grm3cn5k7ycq5v46y

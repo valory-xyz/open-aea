@@ -23,7 +23,7 @@ from enum import Enum
 from typing import Any, Dict
 
 
-CODE_TO_MSG = {
+CODE_TO_MSG: Dict[int, str] = {
     0: "Unexpected error.",
     1: "Request not recognized",
     2: "Agent addr already registered.",
@@ -34,7 +34,7 @@ CODE_TO_MSG = {
     7: "Agent name not in whitelist.",
     8: "The competition is not running yet.",
     9: "The message is inconsistent with the dialogue.",
-}  # type: Dict[int, str]
+}
 
 
 class ErrorCode(Enum):

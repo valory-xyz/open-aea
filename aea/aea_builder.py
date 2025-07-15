@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,12 +118,12 @@ class _DependenciesManager:
         """Initialize the dependency graph."""
         # adjacency list of the dependency DAG
         # an arc means "depends on"
-        self._dependencies = {}  # type: Dict[ComponentId, ComponentConfiguration]
-        self._all_dependencies_by_type = (
-            {}
-        )  # type: Dict[ComponentType, Dict[ComponentId, ComponentConfiguration]]
-        self._prefix_to_components = {}  # type: Dict[PackageIdPrefix, Set[ComponentId]]
-        self._inverse_dependency_graph = {}  # type: Dict[ComponentId, Set[ComponentId]]
+        self._dependencies: Dict[ComponentId, ComponentConfiguration] = {}
+        self._all_dependencies_by_type: Dict[
+            ComponentType, Dict[ComponentId, ComponentConfiguration]
+        ] = {}
+        self._prefix_to_components: Dict[PackageIdPrefix, Set[ComponentId]] = {}
+        self._inverse_dependency_graph: Dict[ComponentId, Set[ComponentId]] = {}
 
         self.agent_pypi_dependencies: Dependencies = {}
 
@@ -1193,12 +1193,14 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         """
 
         def _prepend_if_not_none(
-            obj: Dict[str, Optional[str]]
+            obj: Dict[str, Optional[str]],
         ) -> Dict[str, Optional[str]]:
             return {
-                key: os.path.join(data_directory, value)
-                if value is not None and not os.path.isabs(value)
-                else value
+                key: (
+                    os.path.join(data_directory, value)
+                    if value is not None and not os.path.isabs(value)
+                    else value
+                )
                 for key, value in obj.items()
             }
 
@@ -1847,9 +1849,9 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         :return: list of component ids ordered for import
         """
         # the adjacency list for the inverse dependency graph
-        dependency_to_supported_dependencies: Dict[
-            ComponentId, Set[ComponentId]
-        ] = defaultdict(set)
+        dependency_to_supported_dependencies: Dict[ComponentId, Set[ComponentId]] = (
+            defaultdict(set)
+        )
         for component_id in component_ids:
             component_id = component_id.without_hash()
             component_path = find_component_directory_from_component_id(

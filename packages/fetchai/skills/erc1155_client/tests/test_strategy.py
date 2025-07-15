@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ class TestStrategy(ERC1155ClientTestCase):
         """Test the get_location_and_service_query method of the Strategy class."""
         query = self.strategy.get_location_and_service_query()
 
-        assert type(query) == Query
+        assert type(query) is Query
         assert len(query.constraints) == 2
         assert query.model is None
 
@@ -68,7 +68,7 @@ class TestStrategy(ERC1155ClientTestCase):
         """Test the get_service_query method of the Strategy class."""
         query = self.strategy.get_service_query()
 
-        assert type(query) == Query
+        assert type(query) is Query
         assert len(query.constraints) == 1
 
         assert query.model == SIMPLE_SERVICE_MODEL

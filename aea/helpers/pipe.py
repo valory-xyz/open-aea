@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -127,9 +127,9 @@ class PosixNamedPipeProtocol:
         self._in = -1
         self._out = -1
 
-        self._stream_reader = None  # type: Optional[asyncio.StreamReader]
-        self._reader_protocol = None  # type: Optional[asyncio.StreamReaderProtocol]
-        self._fileobj = None  # type: Optional[IO[str]]
+        self._stream_reader: Optional[asyncio.StreamReader] = None
+        self._reader_protocol: Optional[asyncio.StreamReaderProtocol] = None
+        self._fileobj: Optional[IO[str]] = None
 
         self._connection_attempts = PIPE_CONN_ATTEMPTS
         self._connection_timeout = PIPE_CONN_TIMEOUT

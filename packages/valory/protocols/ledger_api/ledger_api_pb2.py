@@ -43,12 +43,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals["_LEDGERAPIMESSAGE_TRANSACTIONRECEIPT"]._serialized_end = 1831
     _globals["_LEDGERAPIMESSAGE_GET_BALANCE_PERFORMATIVE"]._serialized_start = 1833
     _globals["_LEDGERAPIMESSAGE_GET_BALANCE_PERFORMATIVE"]._serialized_end = 1895
-    _globals[
-        "_LEDGERAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"
-    ]._serialized_start = 1897
-    _globals[
-        "_LEDGERAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"
-    ]._serialized_end = 2000
+    _globals["_LEDGERAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"]._serialized_start = (
+        1897
+    )
+    _globals["_LEDGERAPIMESSAGE_GET_RAW_TRANSACTION_PERFORMATIVE"]._serialized_end = (
+        2000
+    )
     _globals[
         "_LEDGERAPIMESSAGE_SEND_SIGNED_TRANSACTION_PERFORMATIVE"
     ]._serialized_start = 2003
@@ -71,22 +71,22 @@ if _descriptor._USE_C_DESCRIPTORS == False:
     _globals["_LEDGERAPIMESSAGE_BALANCE_PERFORMATIVE"]._serialized_end = 2718
     _globals["_LEDGERAPIMESSAGE_RAW_TRANSACTION_PERFORMATIVE"]._serialized_start = 2720
     _globals["_LEDGERAPIMESSAGE_RAW_TRANSACTION_PERFORMATIVE"]._serialized_end = 2838
-    _globals[
-        "_LEDGERAPIMESSAGE_TRANSACTION_DIGEST_PERFORMATIVE"
-    ]._serialized_start = 2840
+    _globals["_LEDGERAPIMESSAGE_TRANSACTION_DIGEST_PERFORMATIVE"]._serialized_start = (
+        2840
+    )
     _globals["_LEDGERAPIMESSAGE_TRANSACTION_DIGEST_PERFORMATIVE"]._serialized_end = 2967
-    _globals[
-        "_LEDGERAPIMESSAGE_TRANSACTION_DIGESTS_PERFORMATIVE"
-    ]._serialized_start = 2970
-    _globals[
-        "_LEDGERAPIMESSAGE_TRANSACTION_DIGESTS_PERFORMATIVE"
-    ]._serialized_end = 3100
-    _globals[
-        "_LEDGERAPIMESSAGE_TRANSACTION_RECEIPT_PERFORMATIVE"
-    ]._serialized_start = 3103
-    _globals[
-        "_LEDGERAPIMESSAGE_TRANSACTION_RECEIPT_PERFORMATIVE"
-    ]._serialized_end = 3233
+    _globals["_LEDGERAPIMESSAGE_TRANSACTION_DIGESTS_PERFORMATIVE"]._serialized_start = (
+        2970
+    )
+    _globals["_LEDGERAPIMESSAGE_TRANSACTION_DIGESTS_PERFORMATIVE"]._serialized_end = (
+        3100
+    )
+    _globals["_LEDGERAPIMESSAGE_TRANSACTION_RECEIPT_PERFORMATIVE"]._serialized_start = (
+        3103
+    )
+    _globals["_LEDGERAPIMESSAGE_TRANSACTION_RECEIPT_PERFORMATIVE"]._serialized_end = (
+        3233
+    )
     _globals["_LEDGERAPIMESSAGE_GET_STATE_PERFORMATIVE"]._serialized_start = 3236
     _globals["_LEDGERAPIMESSAGE_GET_STATE_PERFORMATIVE"]._serialized_end = 3382
     _globals["_LEDGERAPIMESSAGE_STATE_PERFORMATIVE"]._serialized_start = 3384

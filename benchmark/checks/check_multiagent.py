@@ -69,9 +69,11 @@ class TestHandler(Handler):
         )
         self.rtt_count: int = 0  # pylint: disable=attribute-defined-outside-init
 
+        # fmt: off
         self.latency_total_time: float = (  # pylint: disable=attribute-defined-outside-init
             0.0
         )
+        # fmt: on
         self.latency_count: int = 0  # pylint: disable=attribute-defined-outside-init
 
     def teardown(self) -> None:
@@ -177,28 +179,25 @@ def run(
     runner.stop(timeout=5)
 
     total_messages = sum(
-        [cast(TestHandler, skill.handlers["test"]).count for skill in skills]
+        cast(TestHandler, skill.handlers["test"]).count for skill in skills
     )
     rate = total_messages / duration
 
     rtt_total_time = sum(
-        [cast(TestHandler, skill.handlers["test"]).rtt_total_time for skill in skills]
+        cast(TestHandler, skill.handlers["test"]).rtt_total_time for skill in skills
     )
     rtt_count = sum(
-        [cast(TestHandler, skill.handlers["test"]).rtt_count for skill in skills]
+        cast(TestHandler, skill.handlers["test"]).rtt_count for skill in skills
     )
 
     if rtt_count == 0:
         rtt_count = -1
 
     latency_total_time = sum(
-        [
-            cast(TestHandler, skill.handlers["test"]).latency_total_time
-            for skill in skills
-        ]
+        cast(TestHandler, skill.handlers["test"]).latency_total_time for skill in skills
     )
     latency_count = sum(
-        [cast(TestHandler, skill.handlers["test"]).latency_count for skill in skills]
+        cast(TestHandler, skill.handlers["test"]).latency_count for skill in skills
     )
 
     if latency_count == 0:
@@ -225,7 +224,7 @@ def run(
 @click.option("--num_of_agents", default=2, help="Amount of agents to run.")
 @number_of_runs_deco
 @output_format_deco
-def main(
+def main(  # pylint: disable=too-many-positional-arguments
     duration: int,
     runtime_mode: str,
     runner_mode: str,

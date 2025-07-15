@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,6 @@ class SigningDialogues(BaseSigningDialogues):
         Initialize dialogues.
 
         :param self_address: the address of the entity for whom dialogues are maintained
-        :return: None
         """
 
         def role_from_first_message(  # pylint: disable=unused-argument
@@ -78,8 +77,6 @@ class SigningDialogues(BaseSigningDialogues):
             role_from_first_message=role_from_first_message,
             dialogue_class=SigningDialogue,
         )
-
-        return None
 
 
 class FipaDialogue(BaseFipaDialogue):
@@ -112,7 +109,7 @@ class FipaDialogue(BaseFipaDialogue):
             role=role,
             message_class=message_class,
         )
-        self._terms = None  # type: Optional[Terms]
+        self._terms: Optional[Terms] = None
 
     @property
     def terms(self) -> Terms:
@@ -185,7 +182,7 @@ class LedgerApiDialogue(BaseLedgerApiDialogue):
             role=role,
             message_class=message_class,
         )
-        self._associated_fipa_dialogue = None  # type: Optional[FipaDialogue]
+        self._associated_fipa_dialogue: Optional[FipaDialogue] = None
 
     @property
     def associated_fipa_dialogue(self) -> FipaDialogue:

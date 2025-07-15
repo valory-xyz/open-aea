@@ -68,7 +68,7 @@ ResourceStats = namedtuple("ResourceStats", "time,cpu,mem")
 class ExecReport:
     """Process execution report."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         args: tuple,
         time_passed: float,

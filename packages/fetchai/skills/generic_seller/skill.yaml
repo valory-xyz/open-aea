@@ -9,24 +9,24 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeiazl5fv537mvhkqu2jsxhztcbe5cpa5mrdcm3xnnbinz3on3whipa
   __init__.py: bafybeiafdr7ynn72cev3ldmh7jpm2hkavrli7fwmq5h2is6632kiaqi3qa
-  behaviours.py: bafybeic3gw4cup4c2fufetwkgv7qtyewa6xtcwntkzbd2t3y53ehrfunju
-  dialogues.py: bafybeiakiuh742hgsopjl25unyu6osnnfylhp3w2kt5a2juej3a25jbnwi
-  handlers.py: bafybeiezirvynokkyhkasjcdi6miqw7ss37gx4fohc4jiqryt3moywjnhy
-  strategy.py: bafybeia5mjxph7ui2iav5uxutwnr6q2uf4otxdge5vuk7g5ycaso3jldkm
+  behaviours.py: bafybeicihes2crssf76ttzxreoompamehbuh3xwn4rixb3kg3ltzzndrju
+  dialogues.py: bafybeibmyzirsh4djy3qcpp3emqm6n3dr2y3sby4rayvt3dbkd6cadfolu
+  handlers.py: bafybeihz5cs53thabtakotg3vowmg5hl3w7g3joytxgkgxawxdmb3lasbe
+  strategy.py: bafybeihp5d2wg75zrq6ehaea3t7rqdfphxttpabenwpaa55h3kly6v5pfi
   tests/__init__.py: bafybeihqxdniovyormfdxlfyxosmbstbriacfo4si7gofld5fx66jwmp5a
   tests/test_behaviours.py: bafybeihihmi2ex7praigjeqomwwli7z3nyymcvdaregrcrnwk755zn24om
   tests/test_dialogues.py: bafybeibvhilg6cy2bupe7xvdekdflykmoqe6oo45hmm6g7mjfoemamuzs4
   tests/test_handlers.py: bafybeiay7w3drl5tq4bnkwrnyakookgtysf4jrlbb7ukajphzj3k3eil2y
-  tests/test_models.py: bafybeihabrc22zqssit3fmqhxptosy6qz6mx65ukhf5iayvirfv42xrhoq
+  tests/test_models.py: bafybeiegf2wo3lxg76yud2zmwa75h6wjfzhuv25tuq7xc7mssfjhpmnkce
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeibdsjmy4w2eyilbqc7yzutopl65qpeyspxwz7mjvirr52twhjlf5y
+- valory/ledger:0.19.0:bafybeih54gqeu6owv7rprlxcjuhtwzad7syk2n6szci53uoaiy2mwpokwu
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeiaf3qhrdttthrisrl2tlpt3mpo5btkozw2dnxlj4cbqq56ilcl6oa
-- fetchai/fipa:1.0.0:bafybeiajs4ys4lqewfg7dnwg346mgs2wpcrsyqhmfzh53bsle3mzmv5k5a
-- fetchai/oef_search:1.0.0:bafybeido2dn66pdglzdwfoslxc6irppkeqxgrtclzm2fg77gkrtqps7rg4
-- valory/ledger_api:1.0.0:bafybeihmqzcbj6t7vxz2aehd5726ofnzsfjs5cwlf42ro4tn6i34cbfrc4
+- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
+- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
+- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
 skills: []
 behaviours:
   service_registration:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,12 +111,12 @@ class BaseAgentLoop(Runnable, WithLogger, ABC):
         """Set event loop and all event loop related objects."""
         self._loop: AbstractEventLoop = loop
 
-    def _setup(self) -> None:  # pylint: disable=no-self-use
+    def _setup(self) -> None:
         """Set up agent loop before started."""
         # start and stop methods are classmethods cause one instance shared across multiple threads
         ExecTimeoutThreadGuard.start()
 
-    def _teardown(self) -> None:  # pylint: disable=no-self-use
+    def _teardown(self) -> None:
         """Tear down loop on stop."""
         # start and stop methods are classmethods cause one instance shared across multiple threads
         ExecTimeoutThreadGuard.stop()

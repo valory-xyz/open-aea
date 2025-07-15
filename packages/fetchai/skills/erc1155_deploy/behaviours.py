@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,16 +50,16 @@ class ServiceRegistrationBehaviour(TickerBehaviour):
 
     def __init__(self, **kwargs: Any) -> None:
         """Initialise the behaviour."""
-        services_interval = kwargs.pop(
+        services_interval: int = kwargs.pop(
             "services_interval", DEFAULT_SERVICES_INTERVAL
-        )  # type: int
-        self._max_soef_registration_retries = kwargs.pop(
+        )
+        self._max_soef_registration_retries: int = kwargs.pop(
             "max_soef_registration_retries", DEFAULT_MAX_SOEF_REGISTRATION_RETRIES
-        )  # type: int
+        )
         super().__init__(tick_interval=services_interval, **kwargs)
         self.is_registered = False
         self.registration_in_progress = False
-        self.failed_registration_msg = None  # type: Optional[OefSearchMessage]
+        self.failed_registration_msg: Optional[OefSearchMessage] = None
         self._nb_retries = 0
 
     def setup(self) -> None:

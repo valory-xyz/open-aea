@@ -227,10 +227,10 @@ class _DialogueMeta(type):
     Creates class level Rules instance to share among instances
     """
 
-    def __new__(cls, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta":
+    def __new__(mcs, name: str, bases: Tuple[Type], dct: Dict) -> "_DialogueMeta":
         """Construct a new type."""
         # set class level `_rules`
-        dialogue_cls: Type[Dialogue] = super().__new__(cls, name, bases, dct)  # type: ignore
+        dialogue_cls: Type[Dialogue] = super().__new__(mcs, name, bases, dct)  # type: ignore
         dialogue_cls._rules = dialogue_cls.Rules(
             dialogue_cls.INITIAL_PERFORMATIVES,
             dialogue_cls.TERMINAL_PERFORMATIVES,
@@ -389,7 +389,7 @@ class Dialogue(
     def __eq__(self, other: Any) -> bool:
         """Compare two dialogues."""
         return (
-            type(self) == type(other)  # pylint: disable=unidiomatic-typecheck
+            type(self) is type(other)  # pylint: disable=unidiomatic-typecheck
             and self.dialogue_label == other.dialogue_label
             and self.message_class == other.message_class
             and self._incoming_messages == other._incoming_messages
@@ -982,7 +982,7 @@ class Dialogue(
         )
         self._dialogue_label = final_dialogue_label
 
-    def _custom_validation(  # pylint: disable=no-self-use,unused-argument
+    def _custom_validation(  # pylint: disable=unused-argument
         self, message: Message
     ) -> Tuple[bool, str]:
         """
@@ -1158,9 +1158,9 @@ class BasicDialoguesStorage:
             complete_dialogue_label,
         ) = dialogue.dialogue_label.get_both_versions()
 
-        self._incomplete_to_complete_dialogue_labels[
-            incomplete_dialogue_label
-        ] = complete_dialogue_label
+        self._incomplete_to_complete_dialogue_labels[incomplete_dialogue_label] = (
+            complete_dialogue_label
+        )
 
     def _add_terminal_state_dialogue(self, dialogue: Dialogue) -> None:
         """
@@ -1246,9 +1246,9 @@ class BasicDialoguesStorage:
         complete_dialogue_label: DialogueLabel,
     ) -> None:
         """Set incomplete dialogue label."""
-        self._incomplete_to_complete_dialogue_labels[
-            incomplete_dialogue_label
-        ] = complete_dialogue_label
+        self._incomplete_to_complete_dialogue_labels[incomplete_dialogue_label] = (
+            complete_dialogue_label
+        )
 
     def is_dialogue_present(self, dialogue_label: DialogueLabel) -> bool:
         """Check dialogue with label specified presents in storage."""
@@ -1557,7 +1557,7 @@ class Dialogues:
 
     _keep_terminal_state_dialogues = False
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         self_address: Address,
         end_states: FrozenSet[Dialogue.EndState],

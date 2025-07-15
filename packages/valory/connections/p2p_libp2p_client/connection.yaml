@@ -10,11 +10,11 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeiaf5kdnfdc2jifojgniib76zl2c4utnx7ofewc3szqkrxsby62ulu
   __init__.py: bafybeid2azroxglu6fl7bxdfcsv3j77vyzgpikjnfwpxg73zeb5orez6ju
-  connection.py: bafybeihcwyo5nhxmsjxw7qrrvkvp7qu6izbgzgipmmnrpdvc6jtwmw7vgy
+  connection.py: bafybeidj2o57ffkd63cvlkdrastz4nuzbyykfojdfogn2cbabjfiyxdw7q
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/acn:1.1.0:bafybeic6h55ov5lrzbah6fate54c4u6spopcexxspw3abotbmffabfddeu
+- valory/acn:1.1.0:bafybeihbmzyadrvuh2bzxojs4edl7zymtj3v3cquib2svbno2d5kveo53y
 class_name: P2PLibp2pClientConnection
 config:
   connect_retries: 3

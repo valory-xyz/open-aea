@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -180,7 +180,7 @@ class PythonPackageVersionBumper:
 
     IGNORE_DIRS = (Path(".git"),)
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         root_dir: Path,
         python_pkg_dir: Path,

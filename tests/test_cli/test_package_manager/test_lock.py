@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -58,9 +58,9 @@ class TestLockCommand(BaseAEATestCase):
                 json.loads(packages_file.read_text())["dev"].items(),
             )
         )
-        dev_packages[
-            PackageId.from_uri_path("protocol/open_aea/signing/1.0.0")
-        ] = "bafybeiambqptflge33eemdhis2whik67hjplfnqwieoa6wblzlaf7vu"
+        dev_packages[PackageId.from_uri_path("protocol/open_aea/signing/1.0.0")] = (
+            "bafybeiambqptflge33eemdhis2whik67hjplfnqwieoa6wblzlaf7vu"
+        )
 
         with mock.patch.object(
             PackageManagerV1, "dev_packages", new=dev_packages

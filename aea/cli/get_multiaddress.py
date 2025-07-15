@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,7 +80,7 @@ URI_REGEX = re.compile(r"(?:https?://)?(?P<host>[^:/ ]+):(?P<port>[0-9]*)")
 )
 @click.pass_context
 @check_aea_project
-def get_multiaddress(
+def get_multiaddress(  # pylint: disable=too-many-positional-arguments
     click_context: click.Context,
     ledger_id: str,
     password: Optional[str],
@@ -104,7 +104,7 @@ def get_multiaddress(
     click.echo(address)
 
 
-def _try_get_multiaddress(
+def _try_get_multiaddress(  # pylint: disable=too-many-positional-arguments
     click_context: click.Context,
     ledger_id: str,
     password: Optional[str] = None,
@@ -226,7 +226,7 @@ def _read_host_and_port_from_config(
         )
 
 
-def _try_get_connection_multiaddress(
+def _try_get_connection_multiaddress(  # pylint: disable=too-many-positional-arguments
     click_context: click.Context,
     crypto: Crypto,
     connection_id: PublicId,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,7 +81,7 @@ class EntryPoint(Generic[ItemType], RegexConstrainedString):
 
         if match is None:
             # actual match done in base class
-            raise ValueError("No match found!")  #  pragma: nocover
+            raise ValueError("No match found!")  # pragma: nocover
 
         self._import_path = match.group(1)
         self._class_name = match.group(2)

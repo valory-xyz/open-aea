@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,12 +62,12 @@ class Resources:
         self._behaviour_registry = ComponentRegistry[Behaviour](agent_name=agent_name)
         self._model_registry = ComponentRegistry[Model](agent_name=agent_name)
 
-        self._registries = [
+        self._registries: List[Registry] = [
             self._component_registry,
             self._handler_registry,
             self._behaviour_registry,
             self._model_registry,
-        ]  # type: List[Registry]
+        ]
 
     @property
     def agent_name(self) -> str:
@@ -118,9 +118,9 @@ class Resources:
         :param protocol: a protocol
         """
         self._component_registry.register(protocol.component_id, protocol)
-        self._specification_to_protocol_id[
-            protocol.protocol_specification_id
-        ] = protocol.public_id
+        self._specification_to_protocol_id[protocol.protocol_specification_id] = (
+            protocol.public_id
+        )
 
     def get_protocol(self, protocol_id: PublicId) -> Optional[Protocol]:
         """
