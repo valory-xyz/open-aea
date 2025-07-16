@@ -11,7 +11,7 @@ version: 0.1.0
 type: connection
 description: Connection A.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   __init__.py: bafybeidmifvya6yjc6h7xppntnwqji2crm5o74xrwhmkutycdo4cqdryhy
   connection.py: bafybeigqfexwzamkgssmesfglbtnd3fstlwbsaveerzfezoipmkkk7ceke
@@ -40,7 +40,7 @@ version: 0.1.0
 type: skill
 description: Some skill
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   __init__.py: bafybeiaxeinf2klacqlcz5gjki7lg5pefrwtcpzymq7uutcjyltrjzywm4
   behaviours.py: bafybeigvoskmq3cx6vyry7u6wnvrllnxco4ilwbrvflhua6xrbusqfrwi4

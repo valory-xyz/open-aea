@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -102,7 +102,7 @@ def test_config_loader_load_service_config(*_mocks):
             "author": "valory",
             "version": "0.1.0",
             "description": "Description",
-            "aea_version": ">=1.0.0, <2.0.0",
+            "aea_version": ">=2.0.0, <3.0.0",
             "license": "Apache-2.0",
             "agent": "agent",
             "network": "hardhat",
@@ -215,7 +215,7 @@ def test_load_package_configuration_with_incompatible_aea_version(*_mocks):
     config_loader = ConfigLoader.from_configuration_type(
         PackageType.PROTOCOL, skip_aea_validation=False
     )
-    specifier_set = "<2.0.0,>=1.0.0"
+    specifier_set = "<3.0.0,>=2.0.0"
     file = StringIO(f"name: some_protocol\naea_version: '{specifier_set}'")
     with pytest.raises(
         AEAEnforceError,

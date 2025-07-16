@@ -4,7 +4,7 @@ version: 0.19.0
 type: skill
 description: The echo skill implements simple echo functionality.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiecz4czxtvzwfsfal5rtcjo4gma3ojxu3yxd7phgcfi6vfhnm622y
   __init__.py: bafybeigqsnja54qqvj6bmxkpj27v4ejqydklqhapdui44v4qj4e3nqyw24
@@ -19,7 +19,7 @@ fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 skills: []
 behaviours:
   echo:

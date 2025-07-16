@@ -4,7 +4,7 @@ version: 0.19.0
 type: connection
 description: A connection to interact with any ledger API and contract API.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
@@ -20,8 +20,8 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/contract_api:1.0.0:bafybeiaj4tn55rfbqgxyl7n6piu2vbu6xiajm76rthwldvtovheulwsl5q
-- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
+- valory/contract_api:1.0.0:bafybeicmo2ufeoqyyczkom6xp3nwmhosd75kpe4xfwn7gaz6vegj732b4m
+- valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
 class_name: LedgerConnection
 config:
   ledger_apis:

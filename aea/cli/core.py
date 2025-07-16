@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """Core definitions for the AEA command-line tool."""
+from importlib.metadata import entry_points
 from typing import Optional
 
 import click
-from pkg_resources import iter_entry_points
 
 import aea
 from aea.cli.add import add
@@ -74,7 +74,7 @@ from aea.cli.utils.loggers import logger, simple_verbosity_option
 from aea.helpers.win32 import enable_ctrl_c_support
 
 
-@with_plugins(iter_entry_points("aea.cli"))
+@with_plugins(entry_points(group="aea.cli"))
 @click.group(name="aea")  # type: ignore
 @click.version_option(aea.__version__, prog_name="aea")
 @simple_verbosity_option(logger, default="INFO")

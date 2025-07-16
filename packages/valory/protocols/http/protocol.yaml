@@ -5,9 +5,9 @@ protocol_specification_id: valory/http:1.0.0
 type: protocol
 description: A protocol for HTTP requests and responses.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeihkatpicz56ofrvu5fgks7ecrsfzw5toz23o23yvoymhk6l6hl7dy
+  README.md: bafybeidjbpusbdmr4f6tfbjllfs7v6srgjec32ipprsd2c6ytyoqfpn6gy
   __init__.py: bafybeiaunocsisejjcb7uae7fh5xgiuyvr7rtixpew7qlp2tz442zhxhcu
   dialogues.py: bafybeigo4wsehjjuppdo75fyb33r6ykuwxjsdfjrlhz6kfmh3py2yqoguq
   http.proto: bafybeigq6ykgxdqi4m65x3rcj4ehdm3usaisejzl2oisn6kzkjits3fzkq

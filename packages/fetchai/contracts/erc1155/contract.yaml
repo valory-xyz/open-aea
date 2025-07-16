@@ -4,7 +4,7 @@ version: 0.22.0
 type: contract
 description: The erc1155 contract implements an ERC1155 contract package.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeigbif52kdfcgx4h2f57xtcwuxkt6hlbyrsceyqoxnoh4pd24pxuxi
   __init__.py: bafybeidlszdrxy5blev2tyvajau443hsh4v2y65rsey2gsfet3c7syggqa
@@ -26,10 +26,10 @@ contract_interface_paths:
   fetchai: build/erc1155.wasm
 dependencies:
   open-aea-ledger-cosmos:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0
   open-aea-ledger-ethereum:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0
   open-aea-ledger-fetchai:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0
   protobuf: {}
 contracts: []

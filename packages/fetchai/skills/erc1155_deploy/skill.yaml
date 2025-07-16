@@ -5,7 +5,7 @@ type: skill
 description: The ERC1155 deploy skill has the ability to deploy and interact with
   the smart contract.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiae7b2hjkzsd7z2yjft37hrqt5rfct6ocrox4pna7u4ypunz7rmw4
   __init__.py: bafybeiehln6kky4ih7d2737tb4h4ofoffixbefhmjzlpzhzpkhlpg7dww4
@@ -21,16 +21,16 @@ fingerprint:
   tests/test_strategy.py: bafybeiair3p3nbmod5ynhwvykdfd6rakwamn2445puxseu6jor56xobs4e
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeih54gqeu6owv7rprlxcjuhtwzad7syk2n6szci53uoaiy2mwpokwu
+- valory/ledger:0.19.0:bafybeifdsep5suryfufmto4j5fyvjhmlgypyg6zvvwqsm4edlwfbfsav5y
 contracts:
-- fetchai/erc1155:0.22.0:bafybeihjpo5fwcmj4zonzqizx3ocx7pqjoa4ulrqq3rsevrpuf5p5242ty
+- fetchai/erc1155:0.22.0:bafybeiar52w5jgx223ms7kwk3wnvk6p6snsnhtmeea4gh5n4o5k7c3nwm4
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- fetchai/fipa:1.0.0:bafybeiggu3txj7uzi2dccw5cxmoakgqjgxe7iqqhwd765divl55a6rg3r4
-- fetchai/oef_search:1.0.0:bafybeib2ytkjdczrddpg3by7dom5wsg4jbc6ttqvcbz764xe7ypdcseqq4
-- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
-- valory/contract_api:1.0.0:bafybeiaj4tn55rfbqgxyl7n6piu2vbu6xiajm76rthwldvtovheulwsl5q
-- valory/ledger_api:1.0.0:bafybeihs2dpqfeij2tqg72yloxteqg2hh4gxeeb2zmasmvssupvnjrktaa
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
+- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
+- valory/contract_api:1.0.0:bafybeicmo2ufeoqyyczkom6xp3nwmhosd75kpe4xfwn7gaz6vegj732b4m
+- valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
 skills: []
 behaviours:
   service_registration:
@@ -106,5 +106,5 @@ models:
     class_name: Strategy
 dependencies:
   open-aea-ledger-ethereum:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0
 is_abstract: false

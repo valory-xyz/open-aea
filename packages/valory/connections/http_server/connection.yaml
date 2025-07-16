@@ -5,7 +5,7 @@ type: connection
 description: The HTTP server connection that wraps http server implementing a RESTful
   API specification.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeifepluovb4so2eem34ulpcp4svegb2dqfpmtojtofhfkb3j2xanui
   __init__.py: bafybeifykou5sazojmc7hdqnsdp4mncd4zh3xys3mdgdzwks23mvhzu2ga
@@ -19,7 +19,7 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeiaui7puypbkw63ahcv4hrabi36yx3dk4blfxokjkrnf5elqd2weqy
+- valory/http:1.0.0:bafybeibxab2yfpchusrzw4rgrasjomtpphazanpivhhtznmuao5ny2lsmi
 class_name: HTTPServerConnection
 config:
   api_spec_path: null

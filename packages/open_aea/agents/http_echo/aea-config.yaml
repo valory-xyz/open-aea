@@ -3,19 +3,19 @@ author: open_aea
 version: 0.1.0
 license: Apache-2.0
 description: Http echo agent configured with default variables.
-aea_version: '>=1.3.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeibkr6ecv5efx3hwxvxposvpmr76ugrj6kydeasb7bppo3ibynnjcu
 fingerprint_ignore_patterns: []
 connections:
-- valory/http_server:0.22.0:bafybeiaeie5xdgqmlvofg2qyx6vtibqkzzjkpb5wrntqyy2miehxn64jt4
+- valory/http_server:0.22.0:bafybeiegcpryvvquu24xlm3kqsaxvwgxij44lky6tp6mv6tpadhgg6guqa
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
-- valory/http:1.0.0:bafybeiaui7puypbkw63ahcv4hrabi36yx3dk4blfxokjkrnf5elqd2weqy
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
+- valory/http:1.0.0:bafybeibxab2yfpchusrzw4rgrasjomtpphazanpivhhtznmuao5ny2lsmi
 skills:
-- fetchai/http_echo:0.20.0:bafybeieglhm7u7xzads5ly3ejbwi2ldn7tffmfcxdp4p2vi726rpnyyccy
+- fetchai/http_echo:0.20.0:bafybeideuqz3xe4zccvpw4klsky4yqfscj7vtii7dyg4m4ryne67bist4i
 default_ledger: ethereum
 required_ledgers:
 - ethereum

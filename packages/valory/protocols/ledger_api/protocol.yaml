@@ -5,9 +5,9 @@ protocol_specification_id: valory/ledger_api:1.0.0
 type: protocol
 description: A protocol for ledger APIs requests and responses.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeieviyxw7rq2fxq74c2fq2vv4qsyvxvioyke6wlz3m7ubfgxvebica
+  README.md: bafybeiangprj3bjszgn3ll7u7kk47yf7k53wkd5bdmldpzmsgxb7d3tzzq
   __init__.py: bafybeibfvmxy5raxuvodfvgzwavcdcr6zvmvvivi5gxjaph2tcvsyqhb6e
   custom_types.py: bafybeiefoqbszkmctw6fep4pot6rdlm4irfy2dydoihlcb7g6i3v47gu4m
   dialogues.py: bafybeigpoxtmrbctfktm2focxqui3grn7ovfhu73neblux5wxhc3bzsluu

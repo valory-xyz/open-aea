@@ -6,7 +6,7 @@ description: The p2p libp2p connection implements an interface to standalone gol
   go-libp2p node that can exchange aea envelopes with other agents connected to the
   same DHT.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiabkdibf7iv3y33xkaemvuwiuhrjedrlvuklgjgty3gzggkgr5d5q
   __init__.py: bafybeibtknmpggpj77fflwndllcqvvbolpds7doymdp4fjd277metq6oxy
@@ -51,7 +51,7 @@ fingerprint:
   libp2p_node/mocks/mock_peerstore.go: bafybeihmzqrlhxxht5zmgym2kbqd3g7fo6k2cl3ziv3oc5zcvvxd2qmjoq
   libp2p_node/protocols/acn/v1_0_0/acn.pb.go: bafybeibhoxaaq6mnc654gaguljypkj2qwhd3epi6d3zc4t5x24bdvfnvdy
   libp2p_node/protocols/acn/v1_0_0/acn.proto: bafybeigvgpfuxg67fymghnd5pfi7lvjf7ntkagkl2tlr3dzbwhxb5ekkjm
-  libp2p_node/protocols/acn/v1_0_0/acn.yaml: bafybeidcmqt4wad37njvr5rzqlx2rlqjiviq6dpepkvbvhf2xwqcnl4jda
+  libp2p_node/protocols/acn/v1_0_0/acn.yaml: bafybeiaciincxvcb4imlzpdiju62tzafm6hodxvthhz67xeqjfaamg3upa
   libp2p_node/utils/utils.go: bafybeihbd2br74nm3pupy4qkijm2tnuyl7pbq3uwasidmql5znhbr575k4
   libp2p_node/utils/utils_test.go: bafybeig2kkgqy7miml66w2byomeqjp4czzv45gb4jas76cxildo3lxi4xq
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e
@@ -64,8 +64,8 @@ fingerprint_ignore_patterns: []
 build_entrypoint: check_dependencies.py
 connections: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- valory/acn:1.1.0:bafybeihbmzyadrvuh2bzxojs4edl7zymtj3v3cquib2svbno2d5kveo53y
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- valory/acn:1.1.0:bafybeicztpzulro64brsms6qmlav3dz635eykpb7ihtchu2eke2hr52efa
 class_name: P2PLibp2pConnection
 config:
   delegate_uri: 127.0.0.1:11000

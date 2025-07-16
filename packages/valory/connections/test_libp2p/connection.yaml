@@ -5,7 +5,7 @@ type: connection
 description: The scaffold connection provides a scaffold for a connection to be implemented
   by the developer.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   __init__.py: bafybeigddvtlrl7xrcpyo253phiomibsrfnihvx45d64r77rmyl6dnwrdi
   connection.py: bafybeih7la26pgvxryhkwnhdvy7laguras5vka64fz22ur2w7tfxhr4dtq
@@ -34,12 +34,12 @@ fingerprint:
   tests/test_p2p_libp2p_mailbox/test_mailbox_service.py: bafybeibp3bkwkrw57qahvuysjdlumywtlk3te5gsvusgrvhsc75k7rrk4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/p2p_libp2p:0.1.0:bafybeiao7g745w36evfa55d447vtovnlpqnkosw7wfcjmavg2tmy2vfwue
-- valory/p2p_libp2p_client:0.1.0:bafybeifc4hg5aj725slci5bsl4nqsfllmjze6avmxnfzkw3zmvooyth4xy
-- valory/p2p_libp2p_mailbox:0.1.0:bafybeifxzzndkojxxuktyef2vq2pbzwis6doat27ou5hlqwmn7i7k4myau
+- valory/p2p_libp2p:0.1.0:bafybeifzslvb5sdayob4reuor35bmd2tr5oen4l77dx34eigcxtfcfv3ke
+- valory/p2p_libp2p_client:0.1.0:bafybeiexvaynue2f25vhnhir4vxf4nm6xcpilz56vx2wokbwa3qo3osqq4
+- valory/p2p_libp2p_mailbox:0.1.0:bafybeih4j2ccgscpm5enpwigveagbyzgqbn7wj64reiyr44limdzshn3cm
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- valory/acn:1.1.0:bafybeihbmzyadrvuh2bzxojs4edl7zymtj3v3cquib2svbno2d5kveo53y
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- valory/acn:1.1.0:bafybeicztpzulro64brsms6qmlav3dz635eykpb7ihtchu2eke2hr52efa
 class_name: MyScaffoldAsyncConnection
 config:
   foo: bar

@@ -5,9 +5,9 @@ protocol_specification_id: aea/acn:1.0.0
 type: protocol
 description: The protocol used for envelope delivery on the ACN.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeie7paijucvzemlfhwfmmhorypwuhzbeimgoitlkokdio5c3ne4pjq
+  README.md: bafybeigqnacvyixfdiko3u5f6ydwymlqi4p4xymitcj2jynwndk5xln62m
   __init__.py: bafybeifb7xujieda2zxji2foegdiz4o2px7egjqi6vil23vto6f6s44epm
   acn.proto: bafybeidkun7o75sxpyk2sixt7dsykgty62f6dnixnes2irbunyamilqsh4
   acn_pb2.py: bafybeialafz3yomunwa3g5xgrdqwodzl7zg5dncvzuetv7xoew4zhw76ni

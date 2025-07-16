@@ -1,5 +1,13 @@
 # Release History - open AEA
 
+## 2.0.0 (2025-07-16)
+
+AEA, Plugins, Packages:
+- Ends support for Python 3.8 and 3.9. #801
+- Docker images now use Python 3.10 as the base Python version #801
+- `get_metavar` now requires a new parameter, `ctx: Context` #801
+- `aea` and its subcommands that expect some arguments (for example `aea`, `aea ipfs`, etc.), when used without any arguments will now finish with exit code 2 instead of 0, and print their usage help in `stderr`. #801
+
 ## 1.65.0 (2025-03-13)
 
 Packages:

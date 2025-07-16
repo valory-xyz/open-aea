@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,17 +22,17 @@
 import os
 import sys
 import traceback
+from importlib.metadata import EntryPoint
 from typing import Callable, Iterable, List
 
 import click
-import pkg_resources
 
 
-def with_plugins(plugins: Iterable[pkg_resources.EntryPoint]) -> Callable:
+def with_plugins(plugins: Iterable[EntryPoint]) -> Callable:
     """
     A decorator to register external CLI commands to an instance of `click.Group()`.
 
-    :param plugins: An iterable producing one `pkg_resources.EntryPoint()` per iteration.
+    :param plugins: An iterable producing one `EntryPoint()` per iteration.
     :return: a click.Group instance.
     """
 

@@ -25,7 +25,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="open-aea-ledger-ethereum-hwi",
-    version="1.65.0",
+    version="2.0.0",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and support for hardware wallet interactions.",
@@ -38,11 +38,11 @@ setup(
         ]
     },
     install_requires=[
-        "open-aea>=1.0.0, <2.0.0",
+        "open-aea>=2.0.0, <3.0.0",
         "web3>=6.0.0,<7",
         "ipfshttpclient==0.8.0a2",
         "eth-account>=0.8.0,<0.9.0",
-        "open-aea-ledger-ethereum~=1.65.0",
+        "open-aea-ledger-ethereum~=2.0.0",
         "ledgerwallet==0.1.3",
         "protobuf<4.25.0,>=4.21.6",
         "construct<=2.10.61",

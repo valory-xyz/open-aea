@@ -5,9 +5,9 @@ protocol_specification_id: open_aea/signing:1.0.0
 type: protocol
 description: A protocol for communication between skills and decision maker.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeictzqfrs3zlpmirbelejsenkupesqh7nkjncbopkmamk7dkersmrm
+  README.md: bafybeifzupdjrjidbrvuezdbuf3ncw2hpi6pj5qygh33vxijispvnzhwsm
   __init__.py: bafybeicf7hlkwenhd4l4ezz4emrhzn22oi54fo6oyoc23ivrkznlz6m3za
   custom_types.py: bafybeicbmroddjj6xvtoi6k6d2mt7iqr3uwxvhwt3ecpy5ze52ffc6i7bq
   dialogues.py: bafybeihp66yugpu3gohrj7vwkghmy2di3wy2nzfveczenhebp7egfksa5m

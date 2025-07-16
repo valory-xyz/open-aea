@@ -5,9 +5,9 @@ protocol_specification_id: valory/contract_api:1.0.0
 type: protocol
 description: A protocol for contract APIs requests and responses.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeigaihpzixjv56vbuch6yqk5shzevt3rlpvchgqudmztid5mgchlqy
+  README.md: bafybeifk6ojnhanfe6lxhax6foofzjqfsma4tkm3c6cuk4sver4p5n5uhm
   __init__.py: bafybeibgimc4jrl3q5smgq62fq6vpiinihhsrhlp67cjjrqldtjfxp4owm
   contract_api.proto: bafybeiafpnyivdogs7omw2bxxxkmnbqcl3n32oqbzug65p7jimbeubgljy
   contract_api_pb2.py: bafybeigodvpxzcfwcrxtcur2f6a6holqstjz5rn6xyphcqofyfxvkgjjqi

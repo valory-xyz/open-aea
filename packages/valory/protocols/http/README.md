@@ -13,7 +13,7 @@ author: valory
 version: 1.0.0
 description: A protocol for HTTP requests and responses.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 protocol_specification_id: valory/http:1.0.0
 speech_acts:
   request:

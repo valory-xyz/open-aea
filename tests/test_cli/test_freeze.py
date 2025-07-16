@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,7 +71,7 @@ class TestFreeze:
         """Test that the command has printed the correct output."""
         assert (
             self.result.output
-            == """open-aea-ledger-cosmos<2.0.0,>=1.0.0\nopen-aea-ledger-ethereum<2.0.0,>=1.0.0\nopen-aea-ledger-fetchai<2.0.0,>=1.0.0\nprotobuf\n"""
+            == """open-aea-ledger-cosmos<3.0.0,>=2.0.0\nopen-aea-ledger-ethereum<3.0.0,>=2.0.0\nopen-aea-ledger-fetchai<3.0.0,>=2.0.0\nprotobuf\n"""
         )
 
     def teardown(self):

@@ -3,16 +3,16 @@ author: fetchai
 version: 0.1.0
 description: A simple agent to test error raised in skill.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeig75bdp2xp2k44ohxt277etnzeqhwdkwsjfciz7upwgymawmfo2vm
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/stub:0.21.0:bafybeibng5extul7wgyihxnvsdxsslnhfcb42t6kgjrwnxko2syvh37mfm
+- fetchai/stub:0.21.0:bafybeibuimb5unnszgkh3sfjihjtosyqeyx7mb6rtxvv7pbupvjr6owyum
 contracts: []
 protocols: []
 skills:
-- fetchai/error_test_skill:0.1.0:bafybeiaadxt7rqmq35fpe5hig2t5liuhzjvgradvzdidl47xbxzbzt25va
+- fetchai/error_test_skill:0.1.0:bafybeihin2q4e7vd7k3rh52zvqgoj5c5h343pmgyz7o6wgiwhxuqexoxae
 default_connection: fetchai/stub:0.21.0
 default_ledger: fetchai
 required_ledgers:
@@ -25,4 +25,4 @@ default_routing: {}
 connection_private_key_paths: {}
 dependencies:
   open-aea-ledger-fetchai:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0

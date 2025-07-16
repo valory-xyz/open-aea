@@ -4,20 +4,20 @@ version: 0.25.0
 description: The gym aea demos the interaction between a skill containing a RL agent
   and a gym connection.
 license: Apache-2.0
-aea_version: '>=1.0.0, <2.0.0'
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiadln5ca6tu6rzbsgjpeluf6nz5efxl3u223c3vxwgf2iynkj5n6q
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeif7phd6sesbbefavspnzpcvqzbwjzcbmjqec5x2x7xtdgq4ie5whu
+- fetchai/gym:0.19.0:bafybeihqvwwagnfdftgygnlcbx6c66ayz7mywqeg56fkvgblynlgnogmna
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeieshkmbc3ojynrtkw2ocvreqkqsm54jq3hpdbdqm4lpavdgnkcp2e
-- fetchai/gym:1.0.0:bafybeibaqkqybb475wtb57isycy4t7ahmdmrr2yaiu7j7nhsijvzs7tqee
-- fetchai/state_update:1.0.0:bafybeicta6j5uax7el2tljxag4dtac3wgc6k4svzgse6cgeeky6wuwdbtq
-- open_aea/signing:1.0.0:bafybeigtjxedmhndewhvxgcgv6w3vxscg6rnqfnszbhpier5j7zvfyjkpu
+- fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
+- fetchai/gym:1.0.0:bafybeicljygeclc5wsc45yhls4u7alukcozvuj7kf6agbtc6cjfwghryru
+- fetchai/state_update:1.0.0:bafybeibhzrwhghuo4a6zvf4xdkp4sxpscxuy4k3iurlg6cnkxnmd6q5ly4
+- open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
 skills:
-- fetchai/gym:0.20.0:bafybeih4ark3b5rbuge6js2zdf5sexogeqvbz2vqpg6itvwx7emynxsnme
+- fetchai/gym:0.20.0:bafybeiclutzxcpoxvbs4ejqtwpnkymjtp5wbny7qhtvlzxi5bthnjrav2a
 default_connection: fetchai/gym:0.19.0
 default_ledger: fetchai
 required_ledgers:
@@ -30,4 +30,4 @@ default_routing: {}
 connection_private_key_paths: {}
 dependencies:
   open-aea-ledger-fetchai:
-    version: <2.0.0,>=1.0.0
+    version: <3.0.0,>=2.0.0

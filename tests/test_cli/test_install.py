@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,7 @@ class TestInstall(AEATestCase):
 
         assert result.exit_code == 0
         assert (
-            "`['open-aea-ledger-cosmos<2.0.0,>=1.0.0']` will be overridden by ['open-aea-ledger-cosmos==1.0.0']"
+            "`['open-aea-ledger-cosmos<3.0.0,>=2.0.0']` will be overridden by ['open-aea-ledger-cosmos==1.0.0']"
             in caplog.text
         )
 
