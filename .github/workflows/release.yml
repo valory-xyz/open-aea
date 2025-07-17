@@ -8,7 +8,7 @@ on:
 jobs:
   publish-pip-packages:
     name: Create Framework & Plugin Releases
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ubuntu-latest]
