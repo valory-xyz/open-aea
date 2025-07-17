@@ -24,7 +24,12 @@ jobs:
           sudo apt-get autoremove
           sudo apt-get autoclean
           python -m pip install --upgrade pip
-          pip install setuptools pipenv twine
+          pip install pipenv twine
+
+      - name: Setup pipenv and install build dependencies
+        run: |
+          pipenv install --dev --skip-lock
+          pipenv run pip install setuptools wheel
 
       - name: Build wheels and source tarball
         run: |
