@@ -40,8 +40,8 @@ setup(
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "ipfshttpclient>=0.8.0a2",
-        "pytest>=7.0.0,<7.3.0",
     ],
+    tests_require=["pytest"],
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",
