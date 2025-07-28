@@ -1,5 +1,13 @@
 # Release History - open AEA
 
+## 2.0.1 (2025-07-25)
+
+AEA:
+- Loosens the pytest version range to `>=7.0.0,<8.0.0` # 808
+
+Plugins:
+- Removes pytest from the base dependencies of `aea-cli-ipfs` plugin and keeps it only for tests # 808
+
 ## 2.0.0 (2025-07-16)
 
 AEA, Plugins, Packages:
