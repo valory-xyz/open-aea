@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ def test_send_bundle_with_successful_transaction(ethereum_flashbot_api) -> None:
         send_bundle, target_blocks[0], opts={"replacementUuid": ANY}
     )
     assert response_mock.wait.called
-    assert tx_hashes == [tx["hash"].hex() for tx in response_mock.bundle]
+    assert tx_hashes == [tx["hash"].to_0x_hex() for tx in response_mock.bundle]
 
 
 def test_bundle_transactions_with_empty_list(ethereum_flashbot_api) -> None:
@@ -197,7 +197,7 @@ def test_bundle_and_send_with_successful_transaction(ethereum_flashbot_api) -> N
     ethereum_flashbot_api.flashbots.simulate.assert_called_once()
     ethereum_flashbot_api.flashbots.send_bundle.assert_called_once()
     assert response_mock.wait.called
-    assert tx_hashes == [tx["hash"].hex() for tx in response_mock.bundle]
+    assert tx_hashes == [tx["hash"].to_0x_hex() for tx in response_mock.bundle]
 
 
 def test_bundle_and_send_with_failed_simulation(ethereum_flashbot_api) -> None:

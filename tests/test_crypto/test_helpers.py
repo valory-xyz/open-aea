@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -171,11 +171,14 @@ def test_private_key_verify():
 def test_make_certificate():
     """Test make_certificate."""
     with TemporaryDirectory() as tmp_dir:
-        make_certificate(
-            "fetchai",
-            os.path.join(CUR_PATH, "data", "fetchai_private_key.txt"),
-            b"message",
-            os.path.join(tmp_dir, "test.txt"),
+        assert (
+            make_certificate(
+                "fetchai",
+                os.path.join(CUR_PATH, "data", "fetchai_private_key.txt"),
+                b"message",
+                os.path.join(tmp_dir, "test.txt"),
+            )
+            == "0x7464556270356d34642b74546a4e62776b6373337346664b7334344c7755385177664f6278304f56696b34656859476d3158416449486739485541364932666965437942305365356e4d656665486c64536b646d44773d3d"
         )
 
 

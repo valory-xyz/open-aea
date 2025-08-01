@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ from eth_account._utils.legacy_transactions import (
     encode_transaction,
     serializable_unsigned_transaction_from_dict,
 )
-from eth_account._utils.typed_transactions import TypedTransaction
 from eth_account.datastructures import HexBytes, SignedMessage, SignedTransaction
 from eth_account.messages import SignableMessage
+from eth_account.typed_transactions import TypedTransaction
 from eth_keys.main import PublicKey
 from eth_rlp import HashableRLP
 from eth_typing.evm import ChecksumAddress
@@ -442,7 +442,7 @@ class HWIAccount:
         transaction_hash = keccak(encoded_transaction)
 
         return SignedTransaction(
-            rawTransaction=HexBytes(encoded_transaction),
+            raw_transaction=HexBytes(encoded_transaction),
             hash=HexBytes(transaction_hash),
             r=response.r,
             s=response.s,

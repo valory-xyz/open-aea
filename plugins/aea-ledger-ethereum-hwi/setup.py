@@ -41,7 +41,7 @@ setup(
         "open-aea>=2.0.0, <3.0.0",
         "web3>=6.0.0,<7",
         "ipfshttpclient==0.8.0a2",
-        "eth-account>=0.8.0,<0.9.0",
+        "eth-account>=0.13.0,<0.14.0",
         "open-aea-ledger-ethereum~=2.0.1",
         "ledgerwallet==0.1.3",
         "protobuf<4.25.0,>=4.21.6",

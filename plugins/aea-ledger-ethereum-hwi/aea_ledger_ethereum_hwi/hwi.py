@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -152,14 +152,14 @@ class EthereumHWICrypto(Crypto[HWIAccount]):
         if is_deprecated_mode and len(message) == 32:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                signature_dict = cast(HWIAccount, self.entity).signHash(message)
-            signed_msg = signature_dict["signature"].hex()
+                signature_dict = cast(HWIAccount, self.entity).unsafe_sign_hash(message)
+            signed_msg = signature_dict["signature"].to_0x_hex()
         else:
             signable_message = encode_defunct(primitive=message)
             signature = cast(HWIAccount, self.entity).sign_message(
                 signable_message=signable_message
             )
-            signed_msg = signature["signature"].hex()
+            signed_msg = signature["signature"].to_0x_hex()
         return signed_msg
 
     def sign_transaction(self, transaction: JSONLike, **kwargs: Any) -> JSONLike:
