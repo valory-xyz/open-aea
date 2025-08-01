@@ -1136,13 +1136,3 @@ def items() -> Dict[str, Any]
 
 Return session items.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.set_wrapper_for_web3py_session_cache"></a>
-
-#### set`_`wrapper`_`for`_`web3py`_`session`_`cache
-
-```python
-def set_wrapper_for_web3py_session_cache() -> None
-```
-
-Wrap web3py session cache with threading.Lock.
-
