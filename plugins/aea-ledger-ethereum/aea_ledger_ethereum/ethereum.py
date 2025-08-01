@@ -602,7 +602,7 @@ class EthereumCrypto(Crypto[LocalAccount]):
             extra_entropy=extra_entropy,
         )
 
-        bytes_representation = Web3.to_bytes(hexstr=self.entity.key.hex())
+        bytes_representation = Web3.to_bytes(hexstr=self.entity.key.to_0x_hex())
         self._public_key = str(keys.PrivateKey(bytes_representation).public_key)
         self._address = self.entity.address
 
@@ -615,7 +615,7 @@ class EthereumCrypto(Crypto[LocalAccount]):
 
         :return: a private key string in hex format
         """
-        return self.entity.key.hex()
+        return self.entity.key.to_0x_hex()
 
     @property
     def public_key(self) -> str:

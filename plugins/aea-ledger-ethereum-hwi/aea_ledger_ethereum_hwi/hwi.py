@@ -29,10 +29,7 @@ from aea_ledger_ethereum.ethereum import EthereumApi, EthereumFaucetApi, Ethereu
 from aea_ledger_ethereum.ethereum import (
     SignedTransactionTranslator as BaseSignedTransactionTranslator,
 )
-from aea_ledger_ethereum.ethereum import (
-    TESTNET_NAME,
-    set_wrapper_for_web3py_session_cache,
-)
+from aea_ledger_ethereum.ethereum import TESTNET_NAME
 from aea_ledger_ethereum_hwi.account import HWIAccount
 from eth_account.messages import encode_defunct
 from eth_account.signers.local import LocalAccount
@@ -230,6 +227,3 @@ class EthereumHWIFaucetApi(EthereumFaucetApi):
 
     identifier = _ETHEREUM_HWI
     testnet_name = TESTNET_NAME
-
-
-set_wrapper_for_web3py_session_cache()
