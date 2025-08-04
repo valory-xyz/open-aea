@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ def test_sign_transaction_legacy() -> None:
     ), enumerate_devices_patch:
         signed_tx = account.sign_transaction(transaction_dict=tx)
 
-    assert signed_tx.rawTransaction == HexBytes(
+    assert signed_tx.raw_transaction == HexBytes(
         "0x01f8658001843b9aca0082520894e81de7001292e482d4d1851ff7ed50c56093f8bb0180c080a00e14610af513df91f0ba4580bb39876b3ad201bc878a2d34f9654454222401daa00bf694eb1a2d3e5acaa05c659ee9ef82b9f82bacf5c60b0650b2d9f033e72713"
     )
     assert signed_tx.hash == HexBytes(
@@ -117,7 +117,7 @@ def test_sign_transaction_eip1559() -> None:
     ), enumerate_devices_patch:
         signed_tx = account.sign_transaction(transaction_dict=tx)
 
-    assert signed_tx.rawTransaction == HexBytes(
+    assert signed_tx.raw_transaction == HexBytes(
         "0x02f86b050784b2d05e00852794ca240082520894f33bb476529e93bb862262f6c6d8cc324741d7aa0180c080a00e14610af513df91f0ba4580bb39876b3ad201bc878a2d34f9654454222401daa00bf694eb1a2d3e5acaa05c659ee9ef82b9f82bacf5c60b0650b2d9f033e72713"
     )
     assert signed_tx.hash == HexBytes(

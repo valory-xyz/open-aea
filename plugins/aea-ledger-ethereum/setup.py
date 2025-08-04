@@ -41,9 +41,9 @@ setup(
     },
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
-        "web3>=6.0.0,<7",
+        "web3>=7.0.0,<8",
         "ipfshttpclient==0.8.0a2",
-        "eth-account>=0.8.0,<0.9.0",
+        "eth-account>=0.13.0,<0.14.0",
     ],
     tests_require=["pytest"],
     entry_points={

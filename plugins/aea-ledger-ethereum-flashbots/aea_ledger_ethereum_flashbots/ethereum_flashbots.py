@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2025 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -247,7 +247,9 @@ class EthereumFlashbotApi(EthereumApi):
             default_builder_response.wait()
             try:
                 receipts = default_builder_response.receipts()
-                tx_hashes = [tx["hash"].hex() for tx in default_builder_response.bundle]
+                tx_hashes = [
+                    tx["hash"].to_0x_hex() for tx in default_builder_response.bundle
+                ]
                 _default_logger.debug(
                     f"Bundle with replacement uuid {replacement_uuid} was mined in block {receipts[0]['blockNumber']}"
                     f"Tx hashes: {tx_hashes}"

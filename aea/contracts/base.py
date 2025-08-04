@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -333,7 +333,7 @@ class Contract(Component):
 
             args = [kwargs[i] for i in input_names]
             # Encode and return the contract call
-            data = instance.encodeABI(fn_name=method_name, args=args)
+            data = instance.encode_abi(abi_element_identifier=method_name, args=args)
         except KeyError as e:  # pragma: nocover
             _default_logger.warning(f"No such information in method ABI:\n{e}")
             return None
