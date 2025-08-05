@@ -9,7 +9,15 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
-## `v1.65.0` to `v0.2.0`
+## `v2.0.1` to `v2.0.2`
+
+- No backwards incompatible changes
+
+## `v2.0.0` to `v2.0.1`
+
+- No backwards incompatible changes
+
+## `v1.65.0` to `v2.0.0`
 
 - No longer supports Python 3.8 and 3.9.
 - `get_metavar` now requires a new parameter, `ctx: Context`
