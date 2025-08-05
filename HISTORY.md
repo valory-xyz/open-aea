@@ -5,6 +5,7 @@
 AEA, Plugins, Packages:
 - Bumps the version of `web3py` to `>=7.0.0,<8.0.0`  # 810
 - Bumps the version of `eth-account` to `>=0.13.0,<0.14.0`  # 810
+- Bumps the version of `hexbytes` to `==1.3.1`  # 810
 
 ## 2.0.1 (2025-07-25)
 
