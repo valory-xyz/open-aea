@@ -394,6 +394,7 @@ def test_get_deploy_transaction(ethereum_testnet_config, ganache):
         value=0,
         max_priority_fee_per_gas=max_priority_fee_per_gas,
         max_fee_per_gas=max_fee_per_gas,
+        raise_on_try=True,
     )
     assert type(deploy_tx) is dict and len(deploy_tx) == 8
     assert all(
@@ -1112,13 +1113,17 @@ def test_gas_estimation(
         "data": "",
     }
     with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
-        with patch.object(ethereum_api._api.eth, "estimate_gas") as estimate_gas_mock:
-            if mock_exception:
+        if mock_exception:
+            with patch.object(
+                ethereum_api._api.eth, "estimate_gas"
+            ) as estimate_gas_mock:
                 # raise exception on first call only
                 estimate_gas_mock.side_effect = [
                     ValueError("triggered exception"),
                     None,
                 ]
+                ethereum_api.update_with_gas_estimate(tx)
+        else:
             ethereum_api.update_with_gas_estimate(tx)
         if mock_exception:
             assert (

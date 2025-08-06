@@ -1034,7 +1034,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         :param tx_fee: the transaction fee (gas) to be used (in Wei).
         :param tx_nonce: verifies the authenticity of the tx.
         :param chain_id: the Chain ID of the Ethereum transaction.
-        :param max_fee_per_gas: maximum amount you’re willing to pay, inclusive of `baseFeePerGas` and `maxPriorityFeePerGas`. The difference between `maxFeePerGas` and `baseFeePerGas + maxPriorityFeePerGas` is refunded  (in Wei).
+        :param max_fee_per_gas: maximum amount you're willing to pay, inclusive of `baseFeePerGas` and `maxPriorityFeePerGas`. The difference between `maxFeePerGas` and `baseFeePerGas + maxPriorityFeePerGas` is refunded  (in Wei).
         :param max_priority_fee_per_gas: the part of the fee that goes to the miner (in Wei).
         :param gas_price: the gas price (in Wei)
         :param gas_price_strategy: the gas price strategy to be used.
@@ -1230,9 +1230,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         del transaction["gas"]
         try:
             gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
-                transaction=cast(
-                    TxParams, AttributeDictTranslator.from_dict(transaction)
-                )
+                transaction=cast(TxParams, transaction)
             )
         except (ContractLogicError, ValueError) as e:
             _default_logger.warning(
@@ -1244,9 +1242,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             # we can set the block identifier to "latest" block
             # this might fail if the node doesn't support the `block_identifier` param
             gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
-                transaction=cast(
-                    TxParams, AttributeDictTranslator.from_dict(transaction)
-                ),
+                transaction=cast(TxParams, transaction),
                 block_identifier="latest",
             )
 
@@ -1549,7 +1545,9 @@ class EthereumApi(LedgerApi, EthereumHelper):
         if gas is not None:
             transaction.update({"gas": gas})
         if self._is_gas_estimation_enabled:
-            transaction = self.update_with_gas_estimate(transaction)
+            transaction = self.update_with_gas_estimate(
+                transaction, raise_on_try=raise_on_try
+            )
         return transaction
 
     @try_decorator("Unable to retrieve max_priority_fee: {}", logger_method="warning")

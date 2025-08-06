@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 2.0.3 (2025-08-07)
+
+Plugins:
+- Fixes no attribute error in `aea-ledger-ethereum` plugin when calling `update_with_gas_estimate` along with `from` address in the transaction. #812
+
 ## 2.0.2 (2025-08-05)
 
 AEA, Plugins, Packages:
