@@ -1124,7 +1124,7 @@ def test_gas_estimation(
                 ]
                 ethereum_api.update_with_gas_estimate(tx)
         else:
-            ethereum_api.update_with_gas_estimate(tx)
+            ethereum_api.update_with_gas_estimate(tx, raise_on_try=True)
         if mock_exception:
             assert (
                 "ValueError: triggered exception" in caplog.text
