@@ -20,7 +20,7 @@ config:
   connect_retries: 3
   ledger_id: cosmos
   nodes:
-  - uri: acn.staging.autonolas.tech:9005
+  - uri: acn.autonolas.tech:9005
     public_key: 02d3a830c9d6ea1ae91936951430dee11f4662f33118b02190693be835359a9d77
   tls_connection_signature_timeout: 5.0
 cert_requests:

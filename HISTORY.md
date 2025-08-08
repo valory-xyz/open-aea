@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 2.0.4 (2025-08-11)
+
+Packages:
+- Updates the `acn.staging.autonolas.tech` DNS entries to `acn.autonolas.tech`
+
 ## 2.0.3 (2025-08-07)
 
 Plugins:

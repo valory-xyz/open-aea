@@ -17,11 +17,11 @@
 | connection/valory/ledger/0.19.0                               | `bafybeifdsep5suryfufmto4j5fyvjhmlgypyg6zvvwqsm4edlwfbfsav5y` |
 | connection/valory/http_server/0.22.0                          | `bafybeiegcpryvvquu24xlm3kqsaxvwgxij44lky6tp6mv6tpadhgg6guqa` |
 | connection/valory/p2p_libp2p/0.1.0                            | `bafybeifzslvb5sdayob4reuor35bmd2tr5oen4l77dx34eigcxtfcfv3ke` |
-| connection/valory/p2p_libp2p_client/0.1.0                     | `bafybeiexvaynue2f25vhnhir4vxf4nm6xcpilz56vx2wokbwa3qo3osqq4` |
-| connection/valory/p2p_libp2p_mailbox/0.1.0                    | `bafybeih4j2ccgscpm5enpwigveagbyzgqbn7wj64reiyr44limdzshn3cm` |
+| connection/valory/p2p_libp2p_client/0.1.0                     | `bafybeihezztwiiismlbblbv67i4zibp7w6xzpqadt67mcdjaoauibjqii4` |
+| connection/valory/p2p_libp2p_mailbox/0.1.0                    | `bafybeiggrmnx77hovphgmrtvmsaeinzhfagylajeinofr7xplockdqgvma` |
 | connection/fetchai/local/0.20.0                               | `bafybeibr2nsgdm5sipm7sk7e4jpaa5ofn4bzljb3at4ivqhcy3a7tuacme` |
 | connection/valory/http_client/0.23.0                          | `bafybeib34a2ukancj5524tz64smczju2q2njscgufmtml6dcjb3bjyaocy` |
-| connection/valory/test_libp2p/0.1.0                           | `bafybeihbjrjecpvzhwgf3udenmqzhvtokeqa56mc56icz2qkioovd56i24` |
+| connection/valory/test_libp2p/0.1.0                           | `bafybeiazfe57h25m4homkrarsd2x3wbdwgcfzigr2l4mfm5pzhzkzvlvpa` |
 | skill/fetchai/echo/0.19.0                                     | `bafybeigrd4lpaljnt7mks7v3c6xgtlgx7zmpexlkojxck4zy4pbxiuoo64` |
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeihin2q4e7vd7k3rh52zvqgoj5c5h343pmgyz7o6wgiwhxuqexoxae` |
 | skill/fetchai/gym/0.20.0                                      | `bafybeiclutzxcpoxvbs4ejqtwpnkymjtp5wbny7qhtvlzxi5bthnjrav2a` |

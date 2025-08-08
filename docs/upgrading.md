@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.0.3` to `v2.0.4`
+
+- No backwards incompatible changes
+
 ## `v2.0.2` to `v2.0.3`
 
 - No backwards incompatible changes

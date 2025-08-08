@@ -3,7 +3,7 @@
 dns:
   enabled: true
   dnsname: acn-node-443
-  publicdnsname: acn.staging.autonolas.tech
+  publicdnsname: acn.autonolas.tech
 
 acnnodes:
   enabled: true
