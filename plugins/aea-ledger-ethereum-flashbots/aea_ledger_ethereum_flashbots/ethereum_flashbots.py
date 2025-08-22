@@ -28,7 +28,7 @@ from uuid import uuid4
 from aea_ledger_ethereum import DEFAULT_ADDRESS, EthereumApi, EthereumCrypto
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
-from flashbots import FlashbotProvider, Flashbots, construct_flashbots_middleware
+from flashbots import FlashbotProvider, Flashbots, FlashbotsMiddlewareBuilder
 from flashbots.flashbots import FlashbotsBundleResponse
 from flashbots.types import FlashbotsBundleRawTx, FlashbotsBundleTx
 from hexbytes import HexBytes
@@ -63,7 +63,7 @@ def multiple_flashbots_builders(
     for builder_name, endpoint_uri in builders:
         flashbots_provider = FlashbotProvider(signature_account, endpoint_uri)
         w3 = Web3(HTTPProvider(endpoint_uri=rpc_endpoint))
-        flash_middleware = construct_flashbots_middleware(flashbots_provider)
+        flash_middleware = FlashbotsMiddlewareBuilder.build(flashbots_provider)
         w3.middleware_onion.add(flash_middleware)
         # attach modules to add the new namespace commands
         attach_modules(w3, {"flashbots": (Flashbots,)})
@@ -247,9 +247,7 @@ class EthereumFlashbotApi(EthereumApi):
             default_builder_response.wait()
             try:
                 receipts = default_builder_response.receipts()
-                tx_hashes = [
-                    tx["hash"].to_0x_hex() for tx in default_builder_response.bundle
-                ]
+                tx_hashes = [tx["hash"].hex() for tx in default_builder_response.bundle]
                 _default_logger.debug(
                     f"Bundle with replacement uuid {replacement_uuid} was mined in block {receipts[0]['blockNumber']}"
                     f"Tx hashes: {tx_hashes}"

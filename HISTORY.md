@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 2.0.5 (2025-08-15)
+
+Plugins:
+- Bumps `open-aea-flashbots==2.0.0` in `open-aea-ledger-ethereum-flashbots`
+
 ## 2.0.4 (2025-08-11)
 
 Packages:
