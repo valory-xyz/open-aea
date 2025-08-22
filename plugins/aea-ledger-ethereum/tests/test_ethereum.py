@@ -82,16 +82,16 @@ class EIP1559Networks(Enum):
     """The supported networks upgraded with EIP-1559."""
 
     ETHEREUM = "https://eth.drpc.org"
-    ARBITRUM = "https://arbitrum.drpc.org"
+    ARBITRUM = "https://arb1.arbitrum.io/rpc"
     ZKSYNC = "https://mainnet.era.zksync.io"
-    BINANCE = "https://binance.llamarpc.com"
-    GNOSIS = "https://gnosis.drpc.org"
-    CELO = "https://rpc.ankr.com/celo"
-    OPTIMISM = "https://optimism.drpc.org"
-    BASE = "https://base.drpc.org"
-    MODE = "https://mode.drpc.org"
-    POLYGON = "https://polygon.drpc.org"
-    FRAXTAL = "https://fraxtal.drpc.org"
+    BINANCE = "https://bsc-dataseed1.binance.org"
+    GNOSIS = "https://rpc.gnosischain.com"
+    CELO = "https://forno.celo.org"
+    OPTIMISM = "https://mainnet.optimism.io"
+    BASE = "https://mainnet.base.org"
+    MODE = "https://mainnet.mode.network"
+    POLYGON = "https://polygon-rpc.com"
+    FRAXTAL = "https://rpc.frax.com"
 
 
 def __get_rpc(network: EIP1559Networks) -> str:
@@ -982,6 +982,7 @@ def test_try_get_gas_pricing(
     assert gas_reprice == expected_reprice, "The repricing was performed incorrectly!"
 
 
+@pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 @pytest.mark.parametrize(
     "chain_config, strategy_config_overrides, poa_chain",
     (
