@@ -1,6 +1,6 @@
 FROM python:3.10-alpine
 
-ENV PYTHONPATH "$PYTHONPATH:/usr/lib/python3.10/site-packages"
+ENV PYTHONPATH="$PYTHONPATH:/usr/lib/python3.10/site-packages"
 RUN apk add --no-cache make git bash wget
 RUN apk add --no-cache gcc musl-dev python3-dev libffi-dev openssl-dev
 RUN apk add --update --no-cache py3-numpy py3-scipy py3-pillow
