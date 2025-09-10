@@ -571,7 +571,7 @@ class HTTPServerConnection(Connection):
         host = cast(Optional[str], self.configuration.config.get("host"))
         port = cast(Optional[int], self.configuration.config.get("port"))
         timeout = cast(
-            Optional[float],
+            float,
             self.configuration.config.get("timeout", DEFAULT_RESPONSE_TIMEOUT),
         )
         target_skill_id_ = cast(
