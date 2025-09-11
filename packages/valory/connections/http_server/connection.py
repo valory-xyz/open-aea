@@ -64,6 +64,8 @@ NOT_FOUND = 404
 REQUEST_TIMEOUT = 408
 SERVER_ERROR = 500
 
+DEFAULT_RESPONSE_TIMEOUT = 5.0  # seconds
+
 _default_logger = logging.getLogger("aea.packages.valory.connections.http_server")
 
 RequestId = DialogueLabel
@@ -371,8 +373,6 @@ class BaseAsyncChannel(ABC):
 class HTTPChannel(BaseAsyncChannel):
     """A wrapper for an RESTful API with an internal HTTPServer."""
 
-    RESPONSE_TIMEOUT = 5.0
-
     def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         address: Address,
@@ -381,7 +381,7 @@ class HTTPChannel(BaseAsyncChannel):
         target_skill_id: PublicId,
         api_spec_path: Optional[str],
         connection_id: PublicId,
-        timeout_window: float = RESPONSE_TIMEOUT,
+        timeout_window: float,
         logger: logging.Logger = _default_logger,
         ssl_cert_path: Optional[str] = None,
         ssl_key_path: Optional[str] = None,
@@ -570,6 +570,10 @@ class HTTPServerConnection(Connection):
         super().__init__(**kwargs)
         host = cast(Optional[str], self.configuration.config.get("host"))
         port = cast(Optional[int], self.configuration.config.get("port"))
+        timeout = cast(
+            float,
+            self.configuration.config.get("timeout", DEFAULT_RESPONSE_TIMEOUT),
+        )
         target_skill_id_ = cast(
             Optional[str], self.configuration.config.get("target_skill_id")
         )
@@ -594,6 +598,7 @@ class HTTPServerConnection(Connection):
             target_skill_id,
             api_spec_path,
             connection_id=self.connection_id,
+            timeout_window=timeout,
             logger=self.logger,
             ssl_cert_path=ssl_cert_path,
             ssl_key_path=ssl_key_path,
