@@ -2,6 +2,8 @@
 
 ## 2.0.6 (2025-09-30)
 
+AEA:
+- Pins `click` to `>=8.1.0,<8.3.0` # 819
 Packages:
 - Makes timeout in `http_server` configurable by any skill that's using this connection #818
 
