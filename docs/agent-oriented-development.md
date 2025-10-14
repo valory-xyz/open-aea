@@ -18,27 +18,27 @@ and middlemen have no place in a multi-agent system; rather it is the notion of
 a '_commanding reliance on middlemen_' that is rejected.
 
 Lack of a centralized authority is not their only distinctive characteristic. 
-The agents and their components - those enabling them to enact, react and engage
+The agent blueprints and their components - those enabling them to enact, react and engage
 in decision-making - generally belong to different stakeholders - e.g. 
 individuals, companies or governments - and need to share no more commonality 
 than a network connection and an interaction protocol to be able to interact. 
 The consequence hereof is that they can be exceptionally diverse in terms of
 their design, the standards they adhere to, the software used to implement them 
-and the hardware they operate on. Moreover, each of the agents has their own 
+and the hardware they operate on. Moreover, each of the agent instances has their own 
 objectives, which may well be unaligned, inconsistent or even conflicting with 
 those of others.
 
-**Division of responsibilities:** In a decentralised system every agent is 
-equally privileged and (in principle) able to interact with any other agent. 
-Without a central authority that provides the services needed to mediate agent 
-interactions, hosting them becomes part of the agents' responsibility. An 
+**Division of responsibilities:** In a decentralised system every agent instance is 
+equally privileged and (in principle) able to interact with any other instances. 
+Without a central authority that provides the services needed to mediate agent instance 
+interactions, hosting them becomes part of the AI agents' responsibility. An 
 example hereof is the access to a registry of contact addresses that is 
 otherwise maintained by a service provider. Without any form of government, 
 however, a central database that can be updated at the sole discretion of any 
-individual agent is easily corrupted. Yet, a system in which every agent is only
+individual agent instance is easily corrupted. Yet, a system in which every instance is only
 responsible for maintaining their own set of records is also problematic, since 
 errors and the asynchronous execution of events inevitably leads to a situation 
-in which agents possess different versions of the record. Instead, agents must 
+in which instances possess different versions of the record. Instead, agent instance must 
 share responsibility over the state of records and do so by maintaining a local 
 copy of it and periodically synchronizing this state by requiring consensus to 
 be achieved over it and any updates to it. 
@@ -82,44 +82,44 @@ higher their chances of finding the product they are looking for.
 Since decentralisation implies shared ownership and control of governance, with 
 each of the entities in these networks acting in pursuit of their own objectives,
 conflicts of interest are expected to arise. Practical implications hereof on 
-the design of agents that need to be considered by a developer are that 
+the design of agent blueprints that need to be considered by a developer are that 
 information available to it is:
 
 * Incomplete: what is unrevealed may have been deemed private for strategic reasons. 
 * Uncertain: it may be the result of an inaccurate prediction. 
 * Incorrect: it could be an outright lie, due to the adversarial nature of the environment.
 
-This uncertainty poses a challenge to the agents, who, since they cannot blindly trust other agents, need to validate the information that they provide.
+This uncertainty poses a challenge to the agent instances, who, since they cannot blindly trust other instances, need to validate the information that they provide.
 
 
 ## Asynchronous task execution
 
 
-A system of self-interested agents favours a design that allowed for asynchronous execution, such that agents can express behaviour independently each other.
+A system of self-interested agent instances favours a design that allowed for asynchronous execution, such that instances can express behaviour independently each other.
 
-**Asynchronous programming:** Generally speaking, asynchronous programming allows the decoupling of the tasks that the agents carry out via concurrent processing. This leads to uncertainty regarding the behaviour of the system, since the order of code execution will vary. For example, suppose an agent `i` sends a message requesting some resources from an agent `j`. Since agents are distributed, there is uncertainties associated with the communication over a network: `j` may never receive `i`'s request, or may receive it after a long delay. Furthermore, `j` could receive the request in time and respond immediately, but as mentioned in the last section, its answer might be incomplete (gives only some of the requested resources), uncertain (promises to give the resources, but cannot be fully trusted), or incorrect (sends a wrong resource). In addition, since agents are self-interested, `j` may _decide_ to reply much later, to the point that the resource is no longer useful to agent `i`, or `j` may simply decide not to respond at all. There is a myriad of reasons why it may choose to do that. The take away is that agents' autonomy strongly influences what can be expected of them, and of an environment inhabited by them. This makes developing applications for systems whose constituents are autonomous fundamentally different from conventional object-oriented systems design.
+**Asynchronous programming:** Generally speaking, asynchronous programming allows the decoupling of the tasks that the agent instances carry out via concurrent processing. This leads to uncertainty regarding the behaviour of the system, since the order of code execution will vary. For example, suppose an agent instance `i` sends a message requesting some resources from an instance `j`. Since the instances are distributed, there is uncertainties associated with the communication over a network: `j` may never receive `i`'s request, or may receive it after a long delay. Furthermore, `j` could receive the request in time and respond immediately, but as mentioned in the last section, its answer might be incomplete (gives only some of the requested resources), uncertain (promises to give the resources, but cannot be fully trusted), or incorrect (sends a wrong resource). In addition, since agent instances are self-interested, `j` may _decide_ to reply much later, to the point that the resource is no longer useful to the instance `i`, or `j` may simply decide not to respond at all. There is a myriad of reasons why it may choose to do that. The take away is that agent instances' autonomy strongly influences what can be expected of them, and of an environment inhabited by them. This makes developing applications for systems whose constituents are autonomous fundamentally different from conventional object-oriented systems design.
 
 **Objects vs agents:** In object-oriented systems, objects are entities that encapsulate state and perform actions, i.e. call methods, on this state. In object-oriented languages, like C++ and Java, it is common practice to declare methods as public, so they can be invoked by other objects in the system whenever they wish. This implies that an object has no control over access to its attributes or the execution of its methods by other objects in the system.  
 
-We cannot take for granted that an agent `i` will execute an action (the equivalent of a method in object-oriented systems) just because another agent `j` wants it to. We therefore do not think of agents as invoking methods on one another, rather as _requesting_ actions. If `i` requests `j` to perform an action, then `j` may or may not perform the action. The control structure of these systems in different and can be summarised with the following slogan (from <a href="https://www.wiley.com/en-gb/An+Introduction+to+MultiAgent+Systems%2C+2nd+Edition-p-978EUDTE00553" target="_blank">An Introduction to MultiAgent Systems</a> by <a href="https://www.cs.ox.ac.uk/people/michael.wooldridge/" target="_blank">Michael Wooldridge</a>):
+We cannot take for granted that an agent instance `i` will execute an action (the equivalent of a method in object-oriented systems) just because another instance `j` wants it to. We therefore do not think of agent instances as invoking methods on one another, rather as _requesting_ actions. If `i` requests `j` to perform an action, then `j` may or may not perform the action. The control structure of these systems in different and can be summarised with the following slogan (from <a href="https://www.wiley.com/en-gb/An+Introduction+to+MultiAgent+Systems%2C+2nd+Edition-p-978EUDTE00553" target="_blank">An Introduction to MultiAgent Systems</a> by <a href="https://www.cs.ox.ac.uk/people/michael.wooldridge/" target="_blank">Michael Wooldridge</a>):
 >objects do it for free; agents do it because they want to.
 
 
 ## Time
 
-Closely related with the discussion of asynchronicity, is the idea that in multi-agent systems, time is not a universally agreed notion. Agents may not necessarily share the same clock and this fact must be taken into account when designing agent-based systems. For example, you cannot necessarily expect agents to synchronise their behaviour according to time (e.g. perform a certain task at a time `X`). 
+Closely related with the discussion of asynchronicity, is the idea that in multi-agent systems, time is not a universally agreed notion. Agent instances may not necessarily share the same clock and this fact must be taken into account when designing agent-based systems. For example, you cannot necessarily expect the agent instances to synchronise their behaviour according to time (e.g. perform a certain task at a time `X`). 
 
-Another related issue, is that unlike some agent-based simulation (ABS) systems where there is a global tick rate for all agents, in AEA-based systems tick rates may be different for different agents. This is due to the fundamental difference that ABS systems control some aspects of all of their agents' executions while in AEA-based systems, agents are truly decoupled from one another  - most likely distributed and running on different machines and networks - and there is absolutely no central unit that moderates any aspect of their behaviour.    
+Another related issue, is that unlike some agent-based simulation (ABS) systems where there is a global tick rate for all agent instances, in AEA-based systems tick rates may be different for different instances. This is due to the fundamental difference that ABS systems control some aspects of all of their instances' executions while in AEA-based systems, instances are truly decoupled from one another  - most likely distributed and running on different machines and networks - and there is absolutely no central unit that moderates any aspect of their behaviour.    
 
 ## Complex, Incomplete, Inconsistent and Uncertain
 
-The fourth characteristic(s) relate to the environment in which agents are expected to operate in, and these have been mentioned a number of times in the previous sections.
+The fourth characteristic(s) relate to the environment in which agent instances are expected to operate in, and these have been mentioned a number of times in the previous sections.
 
-The environment agents are suited for typically tend to be complex, to the point that it is usually impossible for any single agent to perceive the whole of the environment on its own. This means that at any point in time, any agent has a limited knowledge about the state of the environment. In other words, the agents;' information tend to be incomplete due to the complexity and sophistication of the world in which they reside. 
+The environment agent instances are suited for typically tend to be complex, to the point that it is usually impossible for any single agent instance to perceive the whole of the environment on its own. This means that at any point in time, any agent instance has a limited knowledge about the state of the environment. In other words, the agent instances' information tend to be incomplete due to the complexity and sophistication of the world in which they reside. 
 
-Consider an agent which represents a driverless vehicle. The complexity of the problem of driving on the road makes it impossible for a single vehicle to have an accurate and up-to-date knowledge of the overall state of the world . This means that an agent's model of the world is at best uncertain. For instance, the vehicle, through its sensor may detect green light at a junction, and by being aware of what it means, it may infer that it is safe to cross a junction. However, that simply may not be true as another car in the opposite direction may still cross the junction violating their red light. Therefore, there is uncertainty associated with the knowledge "it is safe to cross the road because the light is green", and the agent must recognise that. 
+Consider an agent instance which represents a driverless vehicle. The complexity of the problem of driving on the road makes it impossible for a single vehicle to have an accurate and up-to-date knowledge of the overall state of the world . This means that an agent instance's model of the world is at best uncertain. For instance, the vehicle, through its sensor may detect green light at a junction, and by being aware of what it means, it may infer that it is safe to cross a junction. However, that simply may not be true as another car in the opposite direction may still cross the junction violating their red light. Therefore, there is uncertainty associated with the knowledge "it is safe to cross the road because the light is green", and the agent instance must recognise that. 
 
-Furthermore, the often conflicting nature of the environment means information obtained from multiple sources (agents) may be inconsistent. Again, this must be taken into consideration when designing an agent which is expected to operate successfully in a potentially conflicting environment. 
+Furthermore, the often conflicting nature of the environment means information obtained from multiple sources (agent instances) may be inconsistent. Again, this must be taken into consideration when designing an agent blueprint which is expected to operate successfully in a potentially conflicting environment. 
 
 ## Further Reading
 

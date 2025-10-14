@@ -155,9 +155,9 @@ Next, we are creating the signing message and we send it to the decision-maker.
 
 ```
 
-## Run the agent
+## Run the agent instance
 
-Finally, we are running the agent and we expect the signed transaction to be printed in the terminal.
+Finally, we are running the agent instance and we expect the signed transaction to be printed in the terminal.
 ``` python
     # Set the AEA running in a different thread
     try:

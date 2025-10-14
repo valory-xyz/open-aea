@@ -3,7 +3,7 @@
 ## Description
 
 This is a protocol for interacting with an OEF search service.
-It allows for registering of agents and services, and searching of agents and services using a query language.
+It allows for registering of agent instances and AI agents, and searching of agent instances and AI agents using a query language.
 
 ## Specification
 

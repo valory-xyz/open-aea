@@ -1,5 +1,5 @@
 ``` bash
-aea fetch open_aea/gym_aea:0.1.0:bafybeiazmkxqavujumrqb5v3ydc54x4f2yyvnpebhjcitwt6bkiamkggfe --remote
+aea fetch open_aea/gym_aea:0.1.0:bafybeiay5ek63umygmchj7ouvnjir6u3gmr3smhybv2mg27hrbqhcmddsu --remote
 cd gym_aea
 aea install
 ```

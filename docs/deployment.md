@@ -21,7 +21,7 @@ For an example of how to use <a href="https://kubernetes.io" target="_blank">Kub
 
 ## Deployment using a binary
 
-For making an executable binary of your `aea` agent:
+For making an executable binary of your `aea` agent blueprint:
 
 1. Create a python file which imports the necessary `aea` modules, and executes the CLI `aea` entrypoint. For example `aea_entrypoint.py`:
 ```python

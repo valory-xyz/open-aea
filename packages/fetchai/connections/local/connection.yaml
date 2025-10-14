@@ -17,7 +17,7 @@ connections: []
 protocols:
 - fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 - fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
-- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- fetchai/oef_search:1.0.0:bafybeifn2yec37apznybpxa7qpbomquomb2d37qmdwkyrokjj37v4valr4
 class_name: OEFLocalConnection
 config: {}
 excluded_protocols: []

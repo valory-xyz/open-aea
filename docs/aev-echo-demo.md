@@ -1,12 +1,12 @@
 # Configuring with Environment Variables
 
-The purpose of this demonstration is to show the `open-aea` framework can dynamically configure agents from environment variables.
+The purpose of this demonstration is to show the `open-aea` framework can dynamically configure agent instances from environment variables.
 
 A full break down of the development flow is covered within the <a href="../quickstart/">Development Quickstart</a>.
 
 It is highly recommended that developers begin by following the quick start!
 
-After you have followed the quick start, create a <a href="../http-echo-demo/">HTTP Echo Agent</a>. 
+After you have followed the quick start, create a <a href="../http-echo-demo/">HTTP Echo Agent blueprint</a>. 
 
 It is assumed that developers are within a pipenv virtual environment.
 
@@ -18,7 +18,7 @@ agent_name: http_echo
 author: open_aea
 version: 0.1.0
 license: Apache-2.0
-description: Http echo agent configured with default variables.
+description: Http echo agent blueprint configured with default variables.
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint: {}
 fingerprint_ignore_patterns: []
@@ -69,7 +69,7 @@ ${ENVIRONMENT_VALUE:PYTHON_TYPE:DEFAULT_VALUE}
 
 We can use environment variables to override these default values.
 
-First run the agent with the default port (assuming you are within the agent directory created within <a href="../http-echo-demo/">HTTP Echo Agent</a>) as so:
+First run the agent instance with the default port (assuming you are within the agent directory created within <a href="../http-echo-demo/">HTTP Echo agent blueprint</a>) as so:
 
 ``` bash
 aea run --aev

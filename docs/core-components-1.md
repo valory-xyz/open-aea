@@ -36,13 +36,13 @@ The framework provides one default `Protocol`, called `signing` (current version
 
 Additional `Protocols`, for new types of interactions, can be added as packages. For more details on `Protocols` you can read the <a href="../protocol">protocol guide</a>. To learn how you can easily automate protocol definition, head to the guide for the <a href="../protocol-generator">protocol generator</a>.
 
-Protocol specific `Messages`, wrapped in `Envelopes`, are sent and received to other agents, agent components and services via `Connections`.
+Protocol specific `Messages`, wrapped in `Envelopes`, are sent and received to other agent instances, agent components and AI agents via `Connections`.
 
 ### Connection
 
 A <a href="../api/connections/base#connection-objects">`Connection`</a> wraps an SDK or API and provides an interface to networks, ledgers or other services. Where necessary, a `Connection` is responsible for translating between the framework-specific `Envelope` with its `Message` and the external service or third-party protocol (e.g. `HTTP`).
 
-The framework provides one default `Connection`, called `stub` (current version `fetchai/stub:0.21.0`). It implements an I/O reader and writer to send `Messages` to the agent from a local file.
+The framework provides one default `Connection`, called `stub` (current version `fetchai/stub:0.21.0`). It implements an I/O reader and writer to send `Messages` to the agent instance from a local file.
 
 Additional `Connections` can be added as packages. For more details on `Connections` read the <a href="../connection"> `Connection` guide </a>.
 
@@ -99,7 +99,7 @@ We recommend you continue with the next step in the 'Getting Started' series:
 
 Most AEA development focuses on developing the `Skills` and `Protocols` necessary for an AEA to deliver against its economic objectives.
 
-Understanding `Protocols` is core to developing your own agent. You can learn more about the `Protocols` agents use to communicate with each other and how they are created in the following section:
+Understanding `Protocols` is core to developing your own agent blueprints. You can learn more about the `Protocols` agent blueprints use to communicate with each other and how they are created in the following section:
 
 - <a href="../protocol">Protocols</a>
 

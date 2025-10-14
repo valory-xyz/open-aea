@@ -36,7 +36,7 @@ We recommend you continue with the : <a href="../development-setup/">Development
 
 Most AEA development focuses on developing the `Skills` and `Protocols` necessary for an AEA to deliver against its economic objectives and implement interaction protocols.
 
-Understanding `Protocols` is core to developing your own agent. You can learn more about the `Protocols` agents use to communicate with each other and how they are created in the following section:
+Understanding `Protocols` is core to developing your own agent blueprint. You can learn more about the `Protocols` agents use to communicate with each other and how they are created in the following section:
 
 - <a href="../protocol">Protocols</a>
 

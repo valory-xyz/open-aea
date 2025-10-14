@@ -1,4 +1,4 @@
-An agent that is generated using the AEA framework is a modular system with different connections, contracts, protocols and skills.
+An agent blueprint that is generated using the AEA framework is a modular system with different connections, contracts, protocols and skills.
 
 ## File structure
 
@@ -6,7 +6,7 @@ The file structure of an AEA is fixed.
 
 The top level directory has the AEA's name. Below is a `aea-config.yaml` configuration file, then directories containing the connections, contracts, protocols, and skills developed by the developer as part of the given project. The connections, contracts, protocols and skills used from the registry (local or remote - added via `aea fetch` or `aea add`) are located in `vendor` and sorted by author. Build artefacts are placed in the `.build/` directory and certificates are placed in the `.certs/` directory. Finally, there are files containing the private keys of the AEA.
 
-When we create a new agent with the command `aea create my_aea` we create the file structure that looks like the following:
+When we create a new agent blueprint with the command `aea create my_aea` we create the file structure that looks like the following:
 
 ``` bash
 aea_name/
@@ -62,9 +62,9 @@ In the above configuration example, the package is authored by Fetch.ai and is l
 
 ## Importing modules from packages
 
-The way we import modules from packages inside the agent is in the form of `packages.{author}.{package_type}.{package_name}.{module_name}`. So for the above example, the import path is `packages.fetchai.connections.stub.{module_name}`.
+The way we import modules from packages inside the agent blueprint is in the form of `packages.{author}.{package_type}.{package_name}.{module_name}`. So for the above example, the import path is `packages.fetchai.connections.stub.{module_name}`.
 
-The framework loads the modules from the local agent project and adds them to Python's `sys.modules` under the respective path.
+The framework loads the modules from the local agent blueprint project and adds them to Python's `sys.modules` under the respective path.
 
 We use a custom package management approach for the AEAs rather than the default Python one as it provides us with more flexibility, especially when it comes to extension beyond the Python ecosystem.
 
@@ -75,7 +75,7 @@ Python dependencies of packages are specified in their respective configuration 
 ## Create a package
 
 If you want to create a package, you can use the <a href="../scaffolding/">CLI command</a> `aea scaffold connection [name]` (also available for contracts, protocols, skills...) and this will create the package and put it inside the respective folder based on the command for example if we `scaffold` skill with the name `my_skill`
-it will be located inside the folder skills in the root directory of the agent (`my_aea/skills/my_skill`).
+it will be located inside the folder skills in the root directory of the agent blueprint (`my_aea/skills/my_skill`).
 
 ## Use published packages from the registry
 

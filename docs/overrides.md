@@ -77,7 +77,7 @@ config:
 
 When loading the skill, the loader will apply these overrides to the in-memory connection configuration, which means the original connection configuration won't be affected by the overrides.
 
-> Although it's possible to perform overrides at the component level, avoid performing overrides at the component level. Use agent configuration to perform overrides. This will help you keep the configurations clean.
+> Although it's possible to perform overrides at the component level, avoid performing overrides at the component level. Use agent blueprint configuration to perform overrides. This will help you keep the configurations clean.
 
 ### Environment overrides
 
@@ -131,8 +131,8 @@ Here we haven't define a environment variable name for the placeholder, this mea
 ### Best practices when using overrides and suggestions 
 
 - You can utilise environment overrides to avoid exposing private API keys in the public code.
-- When defining network parameters like API endpoints and URLs, if you have a local server setup for the said API or URL use the local setting in the base component config and use overrides at the skill or agent level to utilise the production servers.
-- Avoid defining environment placeholders in multiple configuration files, either define them at the base component configuration or at the top level configurations like a skill or an agent package.
+- When defining network parameters like API endpoints and URLs, if you have a local server setup for the said API or URL use the local setting in the base component config and use overrides at the skill or agent blueprint level to utilise the production servers.
+- Avoid defining environment placeholders in multiple configuration files, either define them at the base component configuration or at the top level configurations like a skill or an agent blueprint package.
 
 ### Default package overridables
 

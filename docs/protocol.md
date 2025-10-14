@@ -30,7 +30,7 @@ It optionally also contains
 * `dialogues.py`, which defines the structure of dialogues formed from the exchange of a series of messages
 * `custom_types.py`, which defines custom types
 
-All protocols are for point to point interactions between two agents or agent-like services.
+All protocols are for point to point interactions between two agent blueprints or AI Agents.
 
 <!-- ## Interaction Protocols
 

@@ -60,7 +60,7 @@ This is a fork of <a href="https://github.com/fetchai/agents-aea">the original A
 
        pip install "open-aea[all]"
 
-3. Then, build your agent as described in the [docs](https://open-aea.docs.autonolas.tech/).
+3. Then, build your agent as described in the [docs](https://stack.olas.network/open-aea/).
 
 ## Alternatively (1): Use `pipx` (CLI usage only)
 
@@ -108,7 +108,7 @@ You can have more control on the installed dependencies by leveraging the setupt
 
       pip install ".[all]"
 
-- Then, build your agent as described in the [docs](https://open-aea.docs.autonolas.tech/).
+- Then, build your agent as described in the [docs](https://stack.olas.network/open-aea/).
 
 - Install Skaffold to manage containers & tagging:
 
@@ -118,7 +118,7 @@ sudo install skaffold /usr/local/bin/
 ```
 ## Documentation
 
-- All documentation is hosted [here](https://open-aea.docs.autonolas.tech/).
+- All documentation is hosted [here](https://stack.olas.network/open-aea/).
 
 - To start a live-reloading docs server on localhost: `mkdocs serve`. To amend the docs, create a new documentation file in `docs/` and add a reference to it in `mkdocs.yml`.
 

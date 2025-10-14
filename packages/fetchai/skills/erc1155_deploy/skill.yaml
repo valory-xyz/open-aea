@@ -7,7 +7,7 @@ description: The ERC1155 deploy skill has the ability to deploy and interact wit
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeiae7b2hjkzsd7z2yjft37hrqt5rfct6ocrox4pna7u4ypunz7rmw4
+  README.md: bafybeieclg7pw6xlvgfxhidcyr6zuja5n3rnowtalymo6ms77juwjaxaxy
   __init__.py: bafybeiehln6kky4ih7d2737tb4h4ofoffixbefhmjzlpzhzpkhlpg7dww4
   behaviours.py: bafybeibiqlpciwp2vbwjp2c7rb72ndxctzmojmfqpmpljqi6axgxb2ufim
   dialogues.py: bafybeiavo7ipbmyiyhlh7qd2q6deqczeqdyjccnrv4amolta4bex5g37ou
@@ -27,7 +27,7 @@ contracts:
 protocols:
 - fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 - fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
-- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- fetchai/oef_search:1.0.0:bafybeifn2yec37apznybpxa7qpbomquomb2d37qmdwkyrokjj37v4valr4
 - open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
 - valory/contract_api:1.0.0:bafybeicmo2ufeoqyyczkom6xp3nwmhosd75kpe4xfwn7gaz6vegj732b4m
 - valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa

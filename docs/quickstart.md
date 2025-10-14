@@ -167,7 +167,7 @@ This is a simple demo that introduces you to the main components of an AEA.
 The fastest way to have your first AEA is to fetch one that already exists!
 
 ``` bash
-aea fetch open_aea/my_first_aea:0.1.0:bafybeifptjiktbm4cl7hgu74regnj5ltbkbfmfrsstwpexqcru2zadko2u --remote
+aea fetch open_aea/my_first_aea:0.1.0:bafybeigrqnsuzotjj3gnz4zqutbp52plbr473lvqau5a2uh7mtfeyiujsq --remote
 cd my_first_aea
 ```
 ### Install AEA dependencies
@@ -280,9 +280,9 @@ This copies the <code>fetchai/echo:0.19.0</code> skill code containing the "beha
 
 ### Echo skill
 
-Just like humans, AEAs can have _skills_ to achieve their tasks. As an agent developer, you can create skills to add to your own AEAs. You can also choose to publish your skills so others add them to their AEAs. More details on skills can be found on <a href="../skill/"> this page </a>.
+Just like humans, AEAs can have _skills_ to achieve their tasks. As an agent blueprint developer, you can create skills to add to your own AEAs. You can also choose to publish your skills so others add them to their AEAs. More details on skills can be found on <a href="../skill/"> this page </a>.
 
-The above agent has an echo skill, fetched from the registry, which simply echoes any messages it receives back to its sender.
+The above agent blueprint has an echo skill, fetched from the registry, which simply echoes any messages it receives back to its sender.
 
 ### Communication via envelopes and messages
 

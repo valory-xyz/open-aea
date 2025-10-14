@@ -44,15 +44,15 @@ Or
 
 `aea add protocol open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm --remote`
 
-## Publishing agents
+## Publishing agent blueprints
 
-Navigate to the agent directory and publish the agent using
+Navigate to the agent directory and publish the agent blueprint using
 
 `aea publish`
 
-## Fetching agents
+## Fetching agent blueprints
 
-Agents can be fetched from the IPFS registry in the same way as fetching packages by using extended public ids or plain IPFS hashes.
+Agent blueprints can be fetched from the IPFS registry in the same way as fetching packages by using extended public ids or plain IPFS hashes.
 
 `aea fetch PUBLIC_ID_OR_HASH`
 

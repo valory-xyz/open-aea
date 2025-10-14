@@ -136,13 +136,13 @@ Currently, configuration and metadata of a package are conflated making it not s
 
 This feature could be problematic with respect to component to component messaging which currently relies on component ids, which are bound to the package and not its instance.
 
-#### Containerized Agents
+#### Containerized Agent blueprints
 
-Agent management, especially when many of them live on the same host, can be cumbersome. The framework should provide more utilities for these large-scale use cases. But a proper isolation of the agent environment is something that helps also simple use cases.
+Agent blueprint management, especially when many of them live on the same host, can be cumbersome. The framework should provide more utilities for these large-scale use cases. But a proper isolation of the agent environment is something that helps also simple use cases.
 
-A new software architecture, somehow inspired to the Docker system. The CLI only involves the initialization of the building of the agent (think of it as the specification of the `Dockerfile`: the `Agentfile`), but the actual build and run are done by the AEA engine, a daemon process analogous of the Docker Engine, which exposes APIs for these operations.
+A new software architecture, somehow inspired to the Docker system. The CLI only involves the initialization of the building of the agent blueprint (think of it as the specification of the `Dockerfile`: the `Agentfile`), but the actual build and run are done by the AEA engine, a daemon process analogous of the Docker Engine, which exposes APIs for these operations.
 
-Users and developers would potentially like to run many AEAs of different versions and with differences in the versions of their dependencies. It is not possible to import different versions of the same Python (PyPI) package in the same process in a clean way. However, in different processes this is trivial with virtual environments. It would be desirable to consider this in the context of a container solution for agents.
+Users and developers would potentially like to run many AEAs of different versions and with differences in the versions of their dependencies. It is not possible to import different versions of the same Python (PyPI) package in the same process in a clean way. However, in different processes this is trivial with virtual environments. It would be desirable to consider this in the context of a container solution for agent blueprints.
 
 #### Dependency light version of the AEA framework
 
@@ -219,7 +219,7 @@ This is a further small but meaningful step toward an actor-based model for agen
 
 Currently, the framework does not manage any aspect of submitting multiple transactions to the ledgers. This responsibility is left to skills. Additionally, the ledger APIs/contract APIs take the ledger as a reference to determine the nonce for a transaction. If a new transaction is sent before a previous transaction has been processed then the nonce will not be incremented correctly for the second transaction. This can lead to submissions of multiple transactions with the same nonce, and therefore failure of subsequent transactions.
 
-A naive approach would involve manually incrementing the nonce and then submitting transactions into the pool with the correct nonce for eventual inclusion. The problem with this approach is that any failure of a transaction will cause non of the subsequent transactions to be processed for some ledgers (https://ethereum.stackexchange.com/questions/2808/what-happens-when-a-transaction-nonce-is-too-high). To recover from a transaction failure not only the failed transaction would need to be handled, but potentially also all subsequent transactions. It is easy to see that logic required to recover from a transaction failure early in a sequence can be arbitrarily complex (involving potentially new negotiations between agents, new signatures having to be generated etc.).
+A naive approach would involve manually incrementing the nonce and then submitting transactions into the pool with the correct nonce for eventual inclusion. The problem with this approach is that any failure of a transaction will cause non of the subsequent transactions to be processed for some ledgers (https://ethereum.stackexchange.com/questions/2808/what-happens-when-a-transaction-nonce-is-too-high). To recover from a transaction failure not only the failed transaction would need to be handled, but potentially also all subsequent transactions. It is easy to see that logic required to recover from a transaction failure early in a sequence can be arbitrarily complex (involving potentially new negotiations between agent instances, new signatures having to be generated etc.).
 
 A further problem with the naive approach is that it (imperfectly) replicates the ledger state (with respect to (subset of state of) a specific account).
 

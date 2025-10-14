@@ -7,7 +7,7 @@ description: The weather station skill implements the functionality to sell weat
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeiazl5fv537mvhkqu2jsxhztcbe5cpa5mrdcm3xnnbinz3on3whipa
+  README.md: bafybeidr74pnez2mp232yer3oxonjh2rr7resenrcfbwymgwesptnyccja
   __init__.py: bafybeiafdr7ynn72cev3ldmh7jpm2hkavrli7fwmq5h2is6632kiaqi3qa
   behaviours.py: bafybeicihes2crssf76ttzxreoompamehbuh3xwn4rixb3kg3ltzzndrju
   dialogues.py: bafybeibmyzirsh4djy3qcpp3emqm6n3dr2y3sby4rayvt3dbkd6cadfolu
@@ -25,7 +25,7 @@ contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 - fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
-- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- fetchai/oef_search:1.0.0:bafybeifn2yec37apznybpxa7qpbomquomb2d37qmdwkyrokjj37v4valr4
 - valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
 skills: []
 behaviours:

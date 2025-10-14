@@ -6,7 +6,7 @@ description: The weather client skill implements the skill to purchase weather d
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeig3rwpeqh5kdr2iflvy72vkfmby3sl4ulb3sbblt5lndvogvlblme
+  README.md: bafybeib5cmxb5ursck65gbgbhjqbzyg33vifym6quvhie2ltnyyu4mqpse
   __init__.py: bafybeic6biuigdmylscufxz6suvtkxems27j2cns3h36e53gxlm5hihvza
   behaviours.py: bafybeicsftdc3rya773wbxgbn4punkedgnu6ls7z7f4i3fs5nkhwgdfcj4
   dialogues.py: bafybeig4jzy25idmmfmlxlm2grutx3qdsur6k6ah2vubbp47lrgixa2rfq
@@ -24,7 +24,7 @@ contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeifs26twgfmrcxxxrexsa42aol3rbktdqa3u5vvjlywzm5rh2nfmee
 - fetchai/fipa:1.0.0:bafybeifjoud3662m67zssxgtnhm5jqqhjcw5qmqvwbrtc6iuxatxmaoq3m
-- fetchai/oef_search:1.0.0:bafybeif6hudy4bvhnvolyjfbgbqhc3vrm5wy62z5d53qfb3zehehmcn4pq
+- fetchai/oef_search:1.0.0:bafybeifn2yec37apznybpxa7qpbomquomb2d37qmdwkyrokjj37v4valr4
 - open_aea/signing:1.0.0:bafybeib7p5as3obcdzseiwg5umj2piiqaodkxkto7qh7b552l5emwsmdzm
 - valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
 skills: []

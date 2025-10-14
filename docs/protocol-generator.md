@@ -5,7 +5,7 @@
 
 ## How to run
 
-First make sure you are inside your AEA's folder (see <a href="../quickstart">here</a> on how to create a new agent).
+First make sure you are inside your AEA's folder (see <a href="../quickstart">here</a> on how to create a new agent blueprint).
 
 Then run
 

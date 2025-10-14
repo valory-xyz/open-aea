@@ -65,7 +65,7 @@ _multiplexer = AsyncMultiplexer()
 _multiplexer._out_queue = (asyncio.Queue())
 
 agent_context = AgentContext(
-    identity=Identity("test_agent_name", "test_agent_address", "test_agent_public_key"),
+    identity=Identity("test_agent_instance_name", "test_agent_instance_address", "test_agent_public_key"),
     connection_status=_multiplexer.connection_status,
     outbox=OutBox(cast(Multiplexer, cls._multiplexer)),
     decision_maker_message_queue=Queue(),
@@ -75,7 +75,7 @@ agent_context = AgentContext(
     currency_denominations={},
     default_connection=None,
     default_routing={},
-    search_service_address="dummy_search_service_address",
+    search_service_address="dummy_search_ai_agent_address",
     decision_maker_address="dummy_decision_maker_address",
     data_dir="."
 )
@@ -85,8 +85,8 @@ agent_context = AgentContext(
 
 Some of the useful objects you can access in your test class for the loaded skill are below:
 
-* `self.skill.skill_context.agent_address`: this is the agent identity the skill uses and is set to `"test_agent_address"`.
-* `self.skill.skill_context.search_service_address`: this is the address of the search service and is set to `"dummy_search_service_address"`.
+* `self.skill.skill_context.agent_address`: this is the agent instance the skill uses and is set to `"test_agent_instance_address"`.
+* `self.skill.skill_context.search_service_address`: this is the address of the search AI agent and is set to `"dummy_search_ai_agent_address"`.
 * `self.skill.skill_context.skill_id`: this is the id of the skill.
 * `self.skill.skill_context.decision_maker_address`: this is the address of the decision maker and is set to `"dummy_decision_maker_address"`.
 

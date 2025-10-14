@@ -9,7 +9,7 @@ This skill finds an agent on the sOEF which sells data, requests specific data, 
 
 ## Behaviours
 
-* `search`: searches for data selling service on the sOEF
+* `search`: searches for data selling AI agent on the sOEF
 * `transaction`: sequentially processes transactions' settlements on a blockchain
 
 ## Handlers

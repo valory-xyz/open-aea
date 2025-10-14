@@ -82,7 +82,7 @@ Messages.
 component-to-component interactions within AEAs. As such, they include:
 Messages; Serialization; Dialogues (rules over Message sequences). 
 Protocol-specific messages, wrapped in Envelopes, are sent and received to other
-agents, agent components and services via connections.
+agent instances, agent components and AI agents via connections.
 [<a href="../protocol/">more</a>]
 
 * **Connection**: A Connection wraps an SDK or API and provides an interface to 
