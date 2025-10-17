@@ -5,7 +5,7 @@ description: A simple agent to demo the echo skill.
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeiftiqiqpxn7ghrurhepquzqzk3su3x6wanlnolt2uj772fzgz574m
+  README.md: bafybeib3kmhqz4qswa223lj3xkoejy26z6nm6uwv4ms6wkcsvu2jyxmfjy
 fingerprint_ignore_patterns: []
 connections:
 - fetchai/stub:0.21.0:bafybeibuimb5unnszgkh3sfjihjtosyqeyx7mb6rtxvv7pbupvjr6owyum

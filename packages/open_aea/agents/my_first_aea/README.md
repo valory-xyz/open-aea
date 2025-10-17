@@ -1,10 +1,10 @@
-# My First Agent
+# My First Agent Blueprint
 
-This is the "Hello World" agent!
+This is the "Hello World" agent blueprint!
 
 ## Description
 
-This agent uses its primary skill, the `fetchai/echo` skill, to sends back the contents of any message it receives.
+This agent blueprint uses its primary skill, the `fetchai/echo` skill, to sends back the contents of any message it receives.
 
 ## Links
 

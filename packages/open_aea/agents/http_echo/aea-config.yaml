@@ -2,10 +2,10 @@ agent_name: http_echo
 author: open_aea
 version: 0.1.0
 license: Apache-2.0
-description: Http echo agent configured with default variables.
+description: Http echo agent blueprint configured with default variables.
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeibkr6ecv5efx3hwxvxposvpmr76ugrj6kydeasb7bppo3ibynnjcu
+  README.md: bafybeide6e3netkj62dtt26l5os7opkbbaotgrzmxmxp4gvrhzx453hguu
 fingerprint_ignore_patterns: []
 connections:
 - valory/http_server:0.22.0:bafybeicmy3phyy3ckvlfumioiadwlmlt5dijkp3mhezkxgx7kigigwe3rm

@@ -1,8 +1,8 @@
-The AEA gym skill demonstrates how a custom Reinforcement Learning agent, that uses OpenAI's <a href="https://github.com/openai/gym" target="_blank">gym</a> library, may be embedded into an AEA skill and connection.
+The AEA gym skill demonstrates how a custom Reinforcement Learning agent blueprint, that uses OpenAI's <a href="https://github.com/openai/gym" target="_blank">gym</a> library, may be embedded into an AEA skill and connection.
 
 ### Discussion
 
-The gym skills demonstrate how to wrap a Reinforcement Learning agent in a skill.
+The gym skills demonstrate how to wrap a Reinforcement Learning agent blueprint in a skill.
 The example decouples the RL agent from the `gym.Env` allowing them to run in separate execution environments, potentially owned by different entities.
 
 
@@ -19,7 +19,7 @@ Follow the <a href="../quickstart/#preliminaries">Preliminaries</a> and <a href=
 
 First, fetch the gym AEA:
 ``` bash
-aea fetch open_aea/gym_aea:0.1.0:bafybeiazmkxqavujumrqb5v3ydc54x4f2yyvnpebhjcitwt6bkiamkggfe --remote
+aea fetch open_aea/gym_aea:0.1.0:bafybeiay5ek63umygmchj7ouvnjir6u3gmr3smhybv2mg27hrbqhcmddsu --remote
 cd gym_aea
 aea install
 ```

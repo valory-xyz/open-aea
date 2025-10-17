@@ -1,4 +1,4 @@
-A <a href="../api/connections/base#connection-objects">`Connection`</a> provides an interface for the agent to connect with entities in the outside world. Connections wrap SDKs or APIs and provide interfaces to networks, ledgers and other services. As such, a connection is concerned with I/O bound and continuously connected operations. Where necessary, a connection is responsible for translating between the framework specific <a href="../protocol">protocol</a> (an <a href="../api/mail/base#envelope-objects">`Envelope`</a> with its contained <a href="../api/protocols/base#message-objects">`Message`</a>) and the external service or third-party protocol (e.g. `HTTP`). Hence, there are two roles for connections: wrapper and transport connection. The transport connection is responsible to delivering AEA envelopes.
+A <a href="../api/connections/base#connection-objects">`Connection`</a> provides an interface for the AI agent to connect with entities in the outside world. Connections wrap SDKs or APIs and provide interfaces to networks, ledgers and other services. As such, a connection is concerned with I/O bound and continuously connected operations. Where necessary, a connection is responsible for translating between the framework specific <a href="../protocol">protocol</a> (an <a href="../api/mail/base#envelope-objects">`Envelope`</a> with its contained <a href="../api/protocols/base#message-objects">`Message`</a>) and the external service or third-party protocol (e.g. `HTTP`). Hence, there are two roles for connections: wrapper and transport connection. The transport connection is responsible to delivering AEA envelopes.
 
 The messages constructed or received by a connection are eventually processed by one or several <a href="../skill">skills</a> which deal with handling and generating messages related to a specific business objective.
 
@@ -28,15 +28,15 @@ As a developer you have the choice between implementing a sync or asynchronous i
 
 The developer needs to implement four public coroutines:
 
-- The `connect` coroutine implements the setup logic required to be performed for the connection when it is initially launched. The `connect` coroutine is called by the AEA framework once when the agent is being started.
+- The `connect` coroutine implements the setup logic required to be performed for the connection when it is initially launched. The `connect` coroutine is called by the AEA framework once when the agent instance is being started.
 
-- The `disconnect` coroutine implements the teardown logic required to be performed for the connection when it is eventually stopped. The `disconnect` coroutine is called by the AEA framework once when the agent is being stopped.
+- The `disconnect` coroutine implements the teardown logic required to be performed for the connection when it is eventually stopped. The `disconnect` coroutine is called by the AEA framework once when the agent instance is being stopped.
 
-- The `send` coroutine is called by the AEA framework each time the `Multiplexer` handles an outgoing envelope specified to be handled by this connection. The `send` coroutine must implement the processing of the envelope leaving the agent.
+- The `send` coroutine is called by the AEA framework each time the `Multiplexer` handles an outgoing envelope specified to be handled by this connection. The `send` coroutine must implement the processing of the envelope leaving the agent instance.
 
-- The `receive` coroutine is continuously called by the AEA framework. It either returns `None` or an envelope. The `receive` coroutine must implement the logic of data being received by the agent, and if necessary, its translation into a relevant protocol.
+- The `receive` coroutine is continuously called by the AEA framework. It either returns `None` or an envelope. The `receive` coroutine must implement the logic of data being received by the agent instance, and if necessary, its translation into a relevant protocol.
 
-The framework provides a demo `stub` connection which implements an I/O reader and writer to send and receive messages between the agent and a local file. To gain inspiration and become familiar with the structure of connection packages, you may find it useful to check out `fetchai/stub:0.21.0`, `valory/http_server:0.22.0` or `valory/http_client:0.23.0` connections. The latter two connections are for external clients to connect with an agent, and for the agent to connect with external servers, respectively.
+The framework provides a demo `stub` connection which implements an I/O reader and writer to send and receive messages between the agent instance and a local file. To gain inspiration and become familiar with the structure of connection packages, you may find it useful to check out `fetchai/stub:0.21.0`, `valory/http_server:0.22.0` or `valory/http_client:0.23.0` connections. The latter two connections are for external clients to connect with an agent instance, and for the instance to connect with external servers, respectively.
 
 ### Primary methods to develop - sync connection interface
 

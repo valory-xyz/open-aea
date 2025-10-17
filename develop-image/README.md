@@ -84,7 +84,7 @@ SSH into a new image:
 kubectl run --generator=run-pod/v1 -it debian --image=debian -- bash
 ```
 
-# Dedicated node pool for benchmarking agents
+# Dedicated node pool for benchmarking agent instances
 
 
 ## Setup and tear down

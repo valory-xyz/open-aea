@@ -8,7 +8,7 @@ Before starting this guide, ensure that you have done one of the following thing
 
 - You have cloned our <a href="https://github.com/valory-xyz/dev-template" target="_blank">developer template</a>. Once setup, it will generate a virtual environment with Open AEA installed, an empty local registry, some useful tools for checking packages and dummy tests.
 
-- You have gone through the <a href="https://open-aea.docs.autonolas.tech/quickstart/" target="_blank">quickstart</a> to verify that your machine satisfies the framework requirements and that you have followed the setup instructions so you have the Open AEA framework and the Ethereum plugin installed.
+- You have gone through the <a href="https://stack.olas.network/open-aea/quickstart/" target="_blank">quickstart</a> to verify that your machine satisfies the framework requirements and that you have followed the setup instructions so you have the Open AEA framework and the Ethereum plugin installed.
 
 Now, let's create our contract package:
 
@@ -26,7 +26,7 @@ aea scaffold --to-local-registry contract ERC20Contract /path/to/IERC20.json
 You'll find the contract in the local registry at `packages/john_doe/contracts/ERC20Contract`.
 
 
-4. Now it is time to call the new method from an agent. Let's say that we would like to get the WETH balance for the WETH account itself. In any skill's `behaviour.py` file, first import the contract package and set the target address:
+4. Now it is time to call the new method from an agent blueprint. Let's say that we would like to get the WETH balance for the WETH account itself. In any skill's `behaviour.py` file, first import the contract package and set the target address:
 ```python
 from packages.john_doe.contracts.erc20.contract import (
     ContractApiMessage,

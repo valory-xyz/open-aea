@@ -50,7 +50,7 @@ This data structure is used as a payload in other ACN messages (see below).
 
 The `AgentRecord` data structure contains the following fields:
 
-- `service_id`: a string describing the service identifier.
+- `service_id`: a string describing the AI agent identifier.
 - `ledger_id`: a string. It is the identifier of the ledger
     this agent record is associated to.
     Currently, the allowed values are:

@@ -4,7 +4,7 @@
 
 This is a skill for selling data via a smart contract.
 
-This skill registers some data selling service on the sOEF. It can be requested (for example by an agent with the `generic_buyer` skill) to provide specific data. It then negotiates the price and delivers the data after it receives payment.
+This skill registers some data selling AI agent on the sOEF. It can be requested (for example by an agent with the `generic_buyer` skill) to provide specific data. It then negotiates the price and delivers the data after it receives payment.
 
 ## Behaviours
 

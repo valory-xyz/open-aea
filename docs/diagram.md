@@ -6,8 +6,8 @@ The framework has two distinctive parts.
 Currently, the framework supports four types of packages which can be added to the core as modules:
 
 - <a href="../skill">Skills</a> encapsulate logic that deliver economic value to the AEA. Skills are the main focus of the framework's extensibility.
-- <a href="../protocol">Protocols</a> define the structure of agent-to-agent and component-to-component interactions (messages and dialogues) for agents.
-- <a href="../connection">Connections</a> provide interfaces for the agent to connect with the outside world. They wrap SDKs or APIs and provide interfaces to networks, ledgers and other services.
+- <a href="../protocol">Protocols</a> define the structure of agent-to-agent and component-to-component interactions (messages and dialogues) for agent blueprints.
+- <a href="../connection">Connections</a> provide interfaces for the agent instance to connect with the outside world. They wrap SDKs or APIs and provide interfaces to networks, ledgers and other services.
 - <a href="../contract">Contracts</a> wrap smart contracts for Ethereum and third-party decentralized ledgers.
 
 The following figure illustrates the framework's architecture:

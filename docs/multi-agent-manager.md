@@ -118,7 +118,7 @@ FET_CONNECTION_PRIVATE_KEY_PATH_CLIENT = Path(manager.data_dir, weather_client_n
 FET_CONNECTION_PRIVATE_KEY_PATH_CLIENT.write_bytes(FET_CONNECTION_PRIVATE_KEY_CLIENT)
 ```
 
-## Running the agents:
+## Running the agent instances:
 
 ``` python
 import time
@@ -133,7 +133,7 @@ manager.start_agent(weather_client_id.name)
 time.sleep(5.0)
 ```
 
-## Stopping the agents:
+## Stopping the agent instances:
 
 ``` python
 manager.stop_all_agents()
@@ -147,4 +147,4 @@ manager.stop_manager()
 
 # Limitations
 
-The `MultiAgentManager` can only be used with compatible package versions, in particular the same package (with respect to author and name) cannot be used in different versions. If you want to run multiple agents with differing versions of the same package then use the `aea launch` command in the multi-processing mode, or simply launch each agent individually with `aea run`.
+The `MultiAgentManager` can only be used with compatible package versions, in particular the same package (with respect to author and name) cannot be used in different versions. If you want to run multiple agent instances with differing versions of the same package then use the `aea launch` command in the multi-processing mode, or simply launch each agent instance individually with `aea run`.

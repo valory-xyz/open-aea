@@ -1,4 +1,4 @@
-# RL agent & gym
+# RL agent blueprint & gym
 
 ## Dependencies
 

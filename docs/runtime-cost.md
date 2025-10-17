@@ -6,8 +6,8 @@ It is important to emphasise the fact that the AEA is a framework, so ultimately
 These observations can provide guidance on what to report as part of the cost of running an AEA.
 
 Here is a list of suggestion on how to measure the cost of running an AEA:
-- the cost of running the framework itself: by running a minimal agent with an idle loop (the default one) with no connections, skills or protocols and measuring memory usage and CPU consumption as a baseline.
-- the cost of interconnecting components: by running an a agent with a basic skill (e.g. `fetchai/echo`) and measuring memory usage and CPU consumption relative to number of messages exchanged as well as bandwidth.
+- the cost of running the framework itself: by running a minimal agent instance with an idle loop (the default one) with no connections, skills or protocols and measuring memory usage and CPU consumption as a baseline.
+- the cost of interconnecting components: by running an a agent instance with a basic skill (e.g. `fetchai/echo`) and measuring memory usage and CPU consumption relative to number of messages exchanged as well as bandwidth.
 - the cost of basic components: dialogues memory relative to number of messages, SOEF connection baseline memory usage, P2P connection baseline memory usage, smart contract baseline memory usage
 
 The `aea run --profiling SECONDS` command can be used to report measures in all of the above scenarios.
@@ -20,7 +20,7 @@ In order to run a locally modified version of the framework, you will need to bu
 docker build . -t valory/open-aea-user:<tag> --file ./develop-image/Dockerfile_local
 ```
 
-It's time to build the image for the agent or service, that will build on top of the open-aea one. First, enable profiling by adding the corresponding flag in your start script. The run line should look like this:
+It's time to build the image for the agent blueprint or AI agent, that will build on top of the open-aea one. First, enable profiling by adding the corresponding flag in your start script. The run line should look like this:
 
 ```bash
 aea run --aev --profiling 15  # This runs profiling every 15 seconds

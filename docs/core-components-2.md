@@ -16,7 +16,7 @@ You can learn more about the decision maker <a href="../decision-maker">here</a>
 
 The <a href="../api/crypto/wallet#wallet-objects">`Wallet`</a> contains the private-public key pairs used by the AEA. Skills do not have access to the wallet, only the decision maker does.
 
-The agent has two sets of private keys, as configured in the `aea-config.yaml`:
+The agent blueprint has two sets of private keys, as configured in the `aea-config.yaml`:
 
 - `private_key_paths`: This is a dictionary mapping identifiers to the file paths of private keys used in the AEA. For each identifier, e.g. `fetchai`, the AEA can have one private key. The private keys listed here are available in the `Decision Maker` and the associated public keys and addresses are available in all skills. The AEA uses these keys to sign transactions and messages. These keys usually hold the AEAs funds.
 - `connection_private_key_paths`: This is a dictionary mapping identifiers to the file paths of private keys used in connections. For each identifier, e.g. `fetchai`, the `Multiplexer` can have one private key. The private keys listed here are available in the connections. The connections use these keys to secure message transport, for instance.
@@ -64,7 +64,7 @@ Understanding the decision maker is vital to developing a goal oriented and cryp
 - <a href="../decision-maker">Decision Maker</a>
 
 
-Understanding `Contracts` is important when developing AEAs that make commitments or use smart contracts for other purposes. You can learn more about the `Contracts` agents use in the following section:
+Understanding `Contracts` is important when developing AEAs that make commitments or use smart contracts for other purposes. You can learn more about the `Contracts` agent blueprints use in the following section:
 
 - <a href="../contract">Contracts</a>
 

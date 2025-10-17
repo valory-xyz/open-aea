@@ -1,4 +1,4 @@
-The `valory/p2p_libp2p:0.26.0` connection allows AEAs to create a peer-to-peer communication network. In particular, the connection creates an overlay network which maps agents' public keys to IP addresses.
+The `valory/p2p_libp2p:0.26.0` connection allows AEAs to create a peer-to-peer communication network. In particular, the connection creates an overlay network which maps agent instances' public keys to IP addresses.
 
 ## Local demo
 
@@ -125,7 +125,7 @@ config:
   local_uri: 127.0.0.1:9001
 ```
 
-Note, this configuration change must be made for all agents attempting to communicate with each other via the Agent Communication Network. For example, in demos involving two agents, both agents will need the above modifications to their respective `aea-config.yaml` file. However, remember to use different ports in `local_uri.` This will allow both agents to default to this communication network without the added overhead of opening ports and specifying hosts on the individual host machines running each agent.
+Note, this configuration change must be made for all agent instances attempting to communicate with each other via the Agent Communication Network. For example, in demos involving two agent instances, both agent instances will need the above modifications to their respective `aea-config.yaml` file. However, remember to use different ports in `local_uri.` This will allow both instances to default to this communication network without the added overhead of opening ports and specifying hosts on the individual host machines running each agent.
 
 
 ## Configuring the `connection.yaml` entries:

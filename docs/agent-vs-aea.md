@@ -46,7 +46,7 @@ However, we need to implement 4 abstract methods:
 - `teardown()`
 
 
-When we run an agent, `start()` calls `setup()` and then the main agent loop. The main agent loop calls `act()`, `react()` and `update()` on each tick. When the agent is stopped via `stop()` then `teardown()` is called.
+When we run an agent instance, `start()` calls `setup()` and then the main agent loop. The main agent loop calls `act()`, `react()` and `update()` on each tick. When the agent instance is stopped via `stop()` then `teardown()` is called.
 
 Such a lightweight agent can be used to implement simple logic.
 
@@ -132,7 +132,7 @@ class MyAgent(Agent):
 ```
 
 ## Start the agent
-We run the agent from a different thread so that we can still use the main thread to pass it messages.
+We run the agent instance from a different thread so that we can still use the main thread to pass it messages.
 ``` python
     # Set the agent running in a different thread
     try:
@@ -161,7 +161,7 @@ We use the input and output text files to send an envelope to our agent and rece
 ```
 
 ## Shutdown
-Finally stop our agent and wait for it to finish
+Finally stop our agent instance and wait for it to finish
 ``` python
     finally:
         # Shut down the agent
@@ -171,7 +171,7 @@ Finally stop our agent and wait for it to finish
 
 ## Your turn
 
-Now it is your turn to develop a simple agent with the `Agent` class.
+Now it is your turn to develop a simple agent blueprint with the `Agent` class.
 
 ## Entire code listing
 If you just want to copy and paste the entire script in you can find it here:
