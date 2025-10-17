@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 2.0.7 (2025-10-17)
+
+Docs:
+- Updates the docs to use the new naming convention for Agent blueprints and AI agents #821
+
 ## 2.0.6 (2025-09-30)
 
 AEA:
