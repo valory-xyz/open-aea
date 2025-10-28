@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,6 +64,8 @@ NOT_FOUND = 404
 REQUEST_TIMEOUT = 408
 SERVER_ERROR = 500
 
+DEFAULT_RESPONSE_TIMEOUT = 5.0  # seconds
+
 _default_logger = logging.getLogger("aea.packages.valory.connections.http_server")
 
 RequestId = DialogueLabel
@@ -118,7 +120,7 @@ def headers_to_string(headers: Dict) -> str:
 class Request:
     """Generic request object."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         host_url: str,
         path: str,
@@ -371,9 +373,7 @@ class BaseAsyncChannel(ABC):
 class HTTPChannel(BaseAsyncChannel):
     """A wrapper for an RESTful API with an internal HTTPServer."""
 
-    RESPONSE_TIMEOUT = 5.0
-
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         address: Address,
         host: str,
@@ -381,7 +381,7 @@ class HTTPChannel(BaseAsyncChannel):
         target_skill_id: PublicId,
         api_spec_path: Optional[str],
         connection_id: PublicId,
-        timeout_window: float = RESPONSE_TIMEOUT,
+        timeout_window: float,
         logger: logging.Logger = _default_logger,
         ssl_cert_path: Optional[str] = None,
         ssl_key_path: Optional[str] = None,
@@ -491,7 +491,7 @@ class HTTPChannel(BaseAsyncChannel):
             return Response(  # pragma: nocover
                 status=SERVER_ERROR, reason="Server terminated unexpectedly."
             )
-        except BaseException:  # pragma: nocover # pylint: disable=broad-except
+        except BaseException:  # pylint: disable=broad-except # noqa: B036
             self.logger.exception("Error during handling incoming request")
             return Response(
                 status=SERVER_ERROR, reason="Server Error", text=format_exc()
@@ -570,6 +570,10 @@ class HTTPServerConnection(Connection):
         super().__init__(**kwargs)
         host = cast(Optional[str], self.configuration.config.get("host"))
         port = cast(Optional[int], self.configuration.config.get("port"))
+        timeout = cast(
+            float,
+            self.configuration.config.get("timeout", DEFAULT_RESPONSE_TIMEOUT),
+        )
         target_skill_id_ = cast(
             Optional[str], self.configuration.config.get("target_skill_id")
         )
@@ -594,6 +598,7 @@ class HTTPServerConnection(Connection):
             target_skill_id,
             api_spec_path,
             connection_id=self.connection_id,
+            timeout_window=timeout,
             logger=self.logger,
             ssl_cert_path=ssl_cert_path,
             ssl_key_path=ssl_key_path,
