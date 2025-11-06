@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 def get_all_extras() -> Dict:
     cli_deps = [
-        "click>=8.1.0,<9",
+        "click>=8.1.0,<8.1.8",
         "pyyaml>=6.0.1,<9",
         "packaging>=23.1,<24.0",
         "pytest>=7.0.0,<7.3.0",

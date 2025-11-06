@@ -105,7 +105,7 @@ def test_click_version():
     When this tests fails you need to ensure that the current versions implementation
     of the click.testing.CliRunner remains compatible with our monkey-patched version
     """
-    assert click.__version__ == "8.1.8", message
+    assert click.__version__ == "8.1.7", message
 
 
 @pytest.mark.parametrize("mix_stderr", [True, False])
