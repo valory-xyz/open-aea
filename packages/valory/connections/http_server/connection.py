@@ -120,7 +120,7 @@ def headers_to_string(headers: Dict) -> str:
 class Request:
     """Generic request object."""
 
-    def __init__(  # pylint: disable=too-many-positional-arguments
+    def __init__(
         self,
         host_url: str,
         path: str,
@@ -373,7 +373,7 @@ class BaseAsyncChannel(ABC):
 class HTTPChannel(BaseAsyncChannel):
     """A wrapper for an RESTful API with an internal HTTPServer."""
 
-    def __init__(  # pylint: disable=too-many-positional-arguments
+    def __init__(
         self,
         address: Address,
         host: str,

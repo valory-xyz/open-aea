@@ -16,7 +16,7 @@ The easiest way to get started with the http server is to use our pre-built exam
 
 ``` bash
 pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeic2zpk3epl4mnkrufl22u5wtiohitgab5otcjruhpqiicsijp3jem --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeifh7oowgljar6mnki7xd6rgd3monncccjf4gx3oh22w2xr7phemna --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install

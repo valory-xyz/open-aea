@@ -1,5 +1,10 @@
 # Release History - open AEA
 
+## 1.65.1 (2025-10-29)
+
+Packages:
+- Made HTTP server timeout configurable #823
+
 ## 1.65.0 (2025-03-13)
 
 Packages:

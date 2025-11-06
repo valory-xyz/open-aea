@@ -9,6 +9,10 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v1.65.0` to `v1.65.1`
+
+- No backwards incompatible changes
+
 ## `v1.64.0` to `v1.65.0`
 
 - No backwards incompatible changes
