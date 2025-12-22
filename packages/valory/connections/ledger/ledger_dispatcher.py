@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@ import asyncio
 import logging
 from typing import Any, cast
 
-from aea.common import JSONLike
 from aea.connections.base import ConnectionStates
 from aea.crypto.base import LedgerApi
 from aea.helpers.transaction.base import RawTransaction, State, TransactionDigest
@@ -451,12 +450,19 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
         """
         if not isinstance(message, LedgerApiMessage):  # pragma: nocover
             raise ValueError("argument is not a LedgerApiMessage instance.")
-        message = cast(LedgerApiMessage, message)
+
         kwargs = {}
         if message.is_set("kwargs"):
             # check if kwargs is set
-            kwargs = cast(JSONLike, message.kwargs.body)
+            kwargs = message.kwargs.body
+
         # if the chain id is specified in the message, use it.
         # otherwise, use the ledger id.
-        chain_id = cast(str, kwargs.pop("chain_id", self.get_ledger_id(message)))
+        chain_id = str(kwargs.pop("chain_id", ""))
+        if not chain_id:
+            self.logger.warning(
+                "Chain id not specified in the message, using ledger id instead."
+            )
+            chain_id = self.get_ledger_id(message)
+
         return chain_id

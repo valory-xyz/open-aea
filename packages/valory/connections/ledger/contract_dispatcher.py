@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2025 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -427,11 +427,17 @@ class ContractApiRequestDispatcher(RequestDispatcher):
         """
         if not isinstance(message, ContractApiMessage):  # pragma: nocover
             raise ValueError("argument is not a ContractApiMessage instance.")
-        message = cast(ContractApiMessage, message)
-        kwargs = cast(JSONLike, message.kwargs.body)
+        kwargs = message.kwargs.body
+
         # if the chain id is specified in the message, use it.
         # otherwise, use the ledger id.
-        chain_id = cast(str, kwargs.pop("chain_id", self.get_ledger_id(message)))
+        chain_id = str(kwargs.pop("chain_id", ""))
+        if not chain_id:
+            self.logger.warning(
+                "Chain id not specified in the message, using ledger id instead."
+            )
+            chain_id = self.get_ledger_id(message)
+
         return chain_id
 
     def set_extra_kwargs(self, message: Message) -> None:
