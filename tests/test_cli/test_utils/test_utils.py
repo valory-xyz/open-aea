@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """This test module contains the tests for aea.cli.utils module."""
 
+import os
 from builtins import FileNotFoundError
 from copy import deepcopy
 from tempfile import TemporaryDirectory
@@ -589,8 +590,8 @@ def test_password_option():
             CliRunner().invoke(
                 cmd, ["-p"], catch_exceptions=False, standalone_mode=False
             )
-    # -p and --password togehter, -p in priority
-    with pytest.raises(ValueError, match=password):
+    # -p and --password together, -p in priority
+    with pytest.raises(ValueError, match="prompted_password"):
         with patch("click.prompt", return_value="prompted_password"):
             CliRunner().invoke(
                 cmd,
@@ -598,6 +599,34 @@ def test_password_option():
                 catch_exceptions=False,
                 standalone_mode=False,
             )
+
+    # Test with AEA_PASSWORD env var
+    env_password = "env_password_" + uuid4().hex
+    os.environ["AEA_PASSWORD"] = env_password
+    try:
+        with pytest.raises(ValueError, match=env_password):
+            CliRunner().invoke(cmd, [], catch_exceptions=False, standalone_mode=False)
+
+        # Test --password overrides env var
+        cli_password = "cli_password_" + uuid4().hex
+        with pytest.raises(ValueError, match=cli_password):
+            CliRunner().invoke(
+                cmd,
+                ["--password", cli_password],
+                catch_exceptions=False,
+                standalone_mode=False,
+            )
+
+        # Test -p overrides env var (interactive mode)
+        interactive_password = "interactive_" + uuid4().hex
+        with pytest.raises(ValueError, match=interactive_password):
+            with patch("click.prompt", return_value=interactive_password):
+                CliRunner().invoke(
+                    cmd, ["-p"], catch_exceptions=False, standalone_mode=False
+                )
+    finally:
+        # Clean up env var
+        del os.environ["AEA_PASSWORD"]
 
 
 def test_context_registry_path_does_not_exist():

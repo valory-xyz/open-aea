@@ -397,7 +397,8 @@ def password_option(confirmation_prompt: bool = False, **kwargs) -> Callable:  #
 
     def callback(ctx, _, value: bool) -> bool:  # type: ignore
         if value is True:
-            ctx.params["password"] = ctx.params.get("password") or click.prompt(
+            # Always prompt for password when -p flag is used, overriding any existing value
+            ctx.params["password"] = click.prompt(
                 "Enter password",
                 hide_input=True,
                 confirmation_prompt=confirmation_prompt,
@@ -419,6 +420,7 @@ def password_option(confirmation_prompt: bool = False, **kwargs) -> Callable:  #
                 is_eager=True,
                 metavar="PASSWORD",
                 help="Set password for key encryption/decryption",
+                envvar="AEA_PASSWORD",
                 **kwargs,
             )(fn)
         )  # type: ignore
