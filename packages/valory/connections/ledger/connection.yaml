@@ -8,7 +8,7 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
-  base.py: bafybeicibxlywffu5f6lg2betosq2tamnrdubblvgqgvzhfjhpimngmqle
+  base.py: bafybeibazgerlqklsfzga7ycxv3rbi7dkoo2fjs674bidnyjlfyg5g4d2a
   connection.py: bafybeicydkymhz2feqmihtkiwdfg7pp4pww2elqv4tijuhjcplyvawdk74
   contract_dispatcher.py: bafybeiegp25e4fhgnyhx33s5lz3xxeftuszomtkewdr5frsyllmoef7w3u
   ledger_dispatcher.py: bafybeidx6taabp6av6osal65uc7dwt7qgdv7xw6k277wlgtnsvyoksv6v4
@@ -20,8 +20,8 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/contract_api:1.0.0:bafybeicmo2ufeoqyyczkom6xp3nwmhosd75kpe4xfwn7gaz6vegj732b4m
-- valory/ledger_api:1.0.0:bafybeiga6gdd3ccdt5jgrov474koz524f3pfbhprwxfjj7wextkl7wozsa
+- valory/contract_api:1.0.0:bafybeigl7mxuyxngk4gztgygeccbgdfrllx73kwbvvkjvtkfw6ionyd56q
+- valory/ledger_api:1.0.0:bafybeig7yk77pmebqcb33jbavodcslmltitz2uolq6s5arklvsvu5bvp7y
 class_name: LedgerConnection
 config:
   ledger_apis:

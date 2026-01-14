@@ -8,13 +8,13 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeif7mbtd4fdgzzxthgn2cexdnpzhpwdphntpttn3y524weycpxjyai
-  __init__.py: bafybeihxjbwdczfaygeq2elhvfwqjctshzi3qu6bdlijhcx2hd27lfzcby
+  __init__.py: bafybeifssxsz6kiupf4xq7nlq2oeiwyi65nmh6ozq6mdtigoqh6emnzuyu
   custom_types.py: bafybeihxd2m5g4fi5yr3t2zyvjem7qzu6tyuelecr6siinaur2cqxn4xky
-  dialogues.py: bafybeifo4qmgkwerfeff2j5q3yagcu44jqkiqcqpm6gciyajqibscajjdm
-  message.py: bafybeigb3ueji6cxualkbafdefc27o2yspvl6q6ptgx6moqoccdcaooula
+  dialogues.py: bafybeifipetkswyqlnriwmvbjxprfyksmmorzixil5d7s2ymi6iyv2nslm
+  message.py: bafybeifhbxrnrkbsuiwo35vbgagvmwnf5arl2d3diw6lukk4u2taf7rdkq
   oef_search.proto: bafybeifvmxnxg4cuxkj64iqeifyv7jl4ihxgsope7p4j74yotedboai7jm
   oef_search_pb2.py: bafybeigbhv45ehfnzrcc3t7lpt5nch27mh3bsghae7qeuybzp2wckfp5om
-  serialization.py: bafybeid63sqfqi6xyc3ms5phw52w3quk7o3lqyxptaokhh6iudtu7afsrq
+  serialization.py: bafybeiahlagbt3lkducxnculmesgswkd57babnkvx3izyttmvcg4gyvp34
   tests/__init__.py: bafybeiebv7wlew4kejoreeddxek6tq3qzejxkxc5kbch5pm4ojvykgd2om
   tests/test_oef_search.py: bafybeiahbytplglft6nyko3pzufhu4fvjtu2uat5ok5ogzrmdfic6ipaaa
   tests/test_oef_search_dialogues.py: bafybeidtatsgbixbhvln4jfhbkdvyo6kdq2lec7hagp5vmnqwlpckbgqpe

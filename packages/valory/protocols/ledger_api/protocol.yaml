@@ -8,13 +8,13 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiangprj3bjszgn3ll7u7kk47yf7k53wkd5bdmldpzmsgxb7d3tzzq
-  __init__.py: bafybeibfvmxy5raxuvodfvgzwavcdcr6zvmvvivi5gxjaph2tcvsyqhb6e
+  __init__.py: bafybeif7p7g7mjnz2ppik2nffyoplsczhc3cv4jbmamjc56wtqyq64elgm
   custom_types.py: bafybeiefoqbszkmctw6fep4pot6rdlm4irfy2dydoihlcb7g6i3v47gu4m
-  dialogues.py: bafybeigpoxtmrbctfktm2focxqui3grn7ovfhu73neblux5wxhc3bzsluu
+  dialogues.py: bafybeibxw45e4dsfnn5z4cptyskh232pwztsklzffxnj6a6aync6r2b4jm
   ledger_api.proto: bafybeidsmls6jcbeqv4kokizh3kvwzrlae2penr7ntungtosk6m4lxzd4u
   ledger_api_pb2.py: bafybeidr67zlm6gt5gc3ar2gel37d2jd2nirg6ucppkjv7mu6mar5dulgm
-  message.py: bafybeibotc3vvrddwuovuhnbh6oam5dd5nuilbp6cqaybg2dxitncendym
-  serialization.py: bafybeih7bgtkyj3xm56rdv2ecdancf56inmbq4lxzxn7imvm3hkqiisz6i
+  message.py: bafybeihrv4d4mdnzj46hkkjc3zhz777tbakmemw2drj5l4b7eb7t76kz6u
+  serialization.py: bafybeihw3v5ygjhfrhuyzvrnw2l5nfotj6zyfyjoslqowlxbcaxiu7dnxe
   tests/__init__.py: bafybeih2pvd62uql4qcvrrzqx6evsuu3apqok6wu63qq4r5qm3rikbfsmy
   tests/test_ledger_api.py: bafybeiayvznmhqqy66rfqffyurysjc5jfp3bywhcv4zfvwr7kdwj25qjpa
   tests/test_ledger_api_dialogues.py: bafybeiaq4ia6kvbwblyyuq7l64vwlluf57lpdkfddohbkbf2osiolrjeku

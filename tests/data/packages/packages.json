@@ -1,7 +1,7 @@
 {
     "dev": {
-        "protocol/fetchai/t_protocol/0.1.0": "bafybeig2eo7bw7yn7x4ml4dp4qgcderctobtgckzjdzi6gij6hzugpv44e",
-        "protocol/fetchai/t_protocol_no_ct/0.1.0": "bafybeicbongaethlfp3qzl6p53loguj4qgokgqdxnnvjy5hn3d2b3nj7mu",
+        "protocol/fetchai/t_protocol/0.1.0": "bafybeiax4o7qput5y5absjdfixexi6ezcu7qyzppbo7vop4a6mhjphhioy",
+        "protocol/fetchai/t_protocol_no_ct/0.1.0": "bafybeib3qbwcxjggzpczkpofuatxellg6lxur72wdg2nm6pgkyzpwwewca",
         "contract/default_author/stub_0/0.1.0": "bafybeiejst6phgsu6yzz5buabbzaqb2ca6fh6j6nlsf4wf7mmzq4njf2iq",
         "contract/default_author/stub_1/0.1.0": "bafybeifjjj63oyzxow5lznmsztq3in45w2uu333a4bz5qb4brwhaczqmnq"
     },

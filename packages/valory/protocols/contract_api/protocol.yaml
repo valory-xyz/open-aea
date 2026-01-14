@@ -8,13 +8,13 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeifk6ojnhanfe6lxhax6foofzjqfsma4tkm3c6cuk4sver4p5n5uhm
-  __init__.py: bafybeibgimc4jrl3q5smgq62fq6vpiinihhsrhlp67cjjrqldtjfxp4owm
+  __init__.py: bafybeifea65jobxpcwtc7lldu3lmtzvc56szvu7pqim2bkc74m5sx6egpy
   contract_api.proto: bafybeiafpnyivdogs7omw2bxxxkmnbqcl3n32oqbzug65p7jimbeubgljy
   contract_api_pb2.py: bafybeigodvpxzcfwcrxtcur2f6a6holqstjz5rn6xyphcqofyfxvkgjjqi
   custom_types.py: bafybeiawof5bblaefwui5wgsou2ohvrxi2zrkdthehiet57qguplzsgrhu
-  dialogues.py: bafybeicoda7fvthowpv5wq642u7l6fawxeg4vz4ss4upszfynbzphxu3mq
-  message.py: bafybeifjgcyrhosn4ki6oo3425yetjiolkqkoilir3vngpfjhhboff5nvy
-  serialization.py: bafybeibobapn4qq74updl77vogasryvaspiu3yyn5rtiu7d27gisssfwju
+  dialogues.py: bafybeih64olxjl6gfganqww26kpfuhym23vgm4bdqpr3tsmya644gtjmyq
+  message.py: bafybeigw2gfsunp34hxpz2nesvbvcuvxyzgixhhfnozwohcdxikomntooq
+  serialization.py: bafybeidpck33szy4mxiu3rypwbvnsonz7vs5bzw4cp4n4ol3frad5mhoby
   tests/__init__.py: bafybeicc5zmsziu4r5dwjnhckfbgnwbgydn7ekeyqsestutq2tusajqzmu
   tests/test_contract_api.py: bafybeigszksq7bxi3skvw3zvpatkltgbnvnfatofjn63xnd5xds33iyni4
   tests/test_contract_api_dialogues.py: bafybeifalicqk4g44sl5dpeuvls5dqtyfdgc6nwyuf5cl4fofis7fr3mnq

@@ -8,10 +8,10 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeidmw7yrpxticypwpzzql3npt3x2nuky3od4yznrjgzw7ghg34ctyi
-  __init__.py: bafybeieg4ggjg3r2whylvvktwusukcvlxlqubccpwdzyuk2al46jz45llm
-  dialogues.py: bafybeif5ltsix2yu6v4xl4leubq77d2wur2r3jx6zu3um54qmxjj7zpoiy
-  message.py: bafybeih4uurpjzth2sxrqbbgayuvy5d7ilzgprkphdjyhwtzwiokqtlriy
-  serialization.py: bafybeianx65wh6olebzxavyoyrshfgvugdc2dkniznbaydxzf6twwmykum
+  __init__.py: bafybeih3wu5ed2wl4v7bbfuutjhzfgt3e43bdkuhgv5sdhq5rmiyfjbzqu
+  dialogues.py: bafybeicx2oqo7kostdobxtz7b7rvjugf6hhmkzl7ft3seb7gcdknh2dcai
+  message.py: bafybeifdpw2ezf5slmhxmlws7krjtbp4nb4lbxmu3t2fcwhuknucrecl4a
+  serialization.py: bafybeicmaqfr7ehsnmc6gh4bcjjyoocaqlvg4vd3pfunpnrvlcxcfajgvm
   state_update.proto: bafybeifb4w4hhbfulbsj3uoazthtcywhqkxabhtztwycsx3dtsmq6x43re
   state_update_pb2.py: bafybeigxg6dl2sgh2ivlu6my5osijmkkd6rl4ntrdzwd5tv7dwf5zdl73m
   tests/__init__.py: bafybeicf4p3m6qv3qkvd3ahxemeslvkrzjegetayjwrvjoch4ajoqezgpq
