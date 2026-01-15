@@ -1598,11 +1598,11 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
             transaction.update(gas_pricing)
 
+        transaction.update({"from": _deployer_address})
         transaction = instance.constructor(**kwargs).build_transaction(transaction)
         if transaction is None:
             return None  # pragma: nocover
         transaction.pop("to", None)  # only 'from' address, don't insert 'to' address!
-        transaction.update({"from": _deployer_address})
         if gas is not None:
             transaction.update({"gas": gas})
         if self._is_gas_estimation_enabled:
