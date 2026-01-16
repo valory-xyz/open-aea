@@ -603,6 +603,48 @@ Load contract interface.
 
 the interface
 
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.rpc_response"></a>
+
+#### rpc`_`response
+
+```python
+def rpc_response(result: Any, request_id: RPCId = 1) -> RPCResponse
+```
+
+Construct an RPC response.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.CachedChainIdMiddleware"></a>
+
+## CachedChainIdMiddleware Objects
+
+```python
+class CachedChainIdMiddleware(Web3MiddlewareBuilder)
+```
+
+A custom web3 middleware to cache the chain id, avoiding unnecessary RPC costs by repeated eth_chainId calls.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.CachedChainIdMiddleware.build"></a>
+
+#### build
+
+```python
+@staticmethod
+@curry
+def build(w3: Union[AsyncWeb3, Web3], **kwargs: Any) -> Web3Middleware
+```
+
+Build the middleware.
+
+<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.CachedChainIdMiddleware.wrap_make_request"></a>
+
+#### wrap`_`make`_`request
+
+```python
+def wrap_make_request(make_request: MakeRequestFn) -> MakeRequestFn
+```
+
+Wrap the make_request.
+
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi"></a>
 
 ## EthereumApi Objects
