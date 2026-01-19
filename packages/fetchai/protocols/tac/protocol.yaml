@@ -9,11 +9,11 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihdwjiobsmo6qbyysjhzez7hmkrryl5d4oy2l366fac64xcm3zqii
-  __init__.py: bafybeih3fvms3ym26v3tf5yydqex3xaxn2qwhmblh34oipqeyhjvcqvuzy
+  __init__.py: bafybeihc5gpjv6pqi2cgyawlfulg7v7z56nuvfkzaowxysnq3o5czsq75m
   custom_types.py: bafybeiez6ydu4fcor763omf6j7zjy2uwcjie6mc6c2wsrqf7zf6tbvqp6q
-  dialogues.py: bafybeichvrgqgjztlr6lmvzk2ximvpcrekhk2n6ctj6pchzdgc5lebdzxu
-  message.py: bafybeiesvw5dqg7vb6vpsawxq2jsw7oh4gzefvotm3gm2irrf2rz7rinfe
-  serialization.py: bafybeiewsspmfpbavnisxhny55ynia4bpxqf4rlsdqv2d4sagemmfokhiu
+  dialogues.py: bafybeida7emus7imdmrhzfm4bnvueowuxfdowypyawqybvmwumgirhnita
+  message.py: bafybeiho5x7fzsy6l33dsyvgppv3lsqpycazq66i66zahq7po2ovq74ozq
+  serialization.py: bafybeifiq6tj2flakahm5svl5rsjkqws4uzd2cjpsjzqq43ppuexp4ocbe
   tac.proto: bafybeig5yaqdqk5vzxibwbfkmd2oqsty4nsyhjihphjtq6q3ht7lyc334u
   tac_pb2.py: bafybeiabsnnzts4i23455dxdrsdyips2ggkaoo6mlik7u5ek7ya26ikq2a
   tests/__init__.py: bafybeigio4dcbzdb4zxbycaredo4l4a72z4rk6wt5bbvubhu6fdj73t6oe

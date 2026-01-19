@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,16 +48,27 @@ from eth_typing import BlockNumber, HexStr
 from eth_utils.currency import from_wei, to_wei  # pylint: disable=import-error
 from requests import HTTPError
 from requests.exceptions import ReadTimeout as RequestsReadTimeoutError
+from toolz import curry  # type: ignore  # pylint: disable=import-error
 from urllib3.exceptions import ReadTimeoutError as Urllib3ReadTimeoutError
-from web3 import HTTPProvider, Web3
+from web3 import AsyncWeb3, HTTPProvider, Web3
 from web3._utils.events import EventFilterBuilder
 from web3._utils.http import DEFAULT_HTTP_TIMEOUT
 from web3.contract.contract import ContractEvent
 from web3.datastructures import AttributeDict
-from web3.exceptions import ContractLogicError, TransactionNotFound
+from web3.exceptions import ContractLogicError, TransactionNotFound, Web3ValueError
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
-from web3.middleware import ExtraDataToPOAMiddleware
-from web3.types import TxData, TxParams, TxReceipt, Wei
+from web3.middleware import ExtraDataToPOAMiddleware, Web3Middleware
+from web3.middleware.base import Web3MiddlewareBuilder
+from web3.types import (
+    MakeRequestFn,
+    RPCEndpoint,
+    RPCId,
+    RPCResponse,
+    TxData,
+    TxParams,
+    TxReceipt,
+    Wei,
+)
 from web3.utils.caching import SimpleCache
 
 from aea.common import Address, JSONLike
@@ -157,6 +168,9 @@ MATCH_SINGLE = "match_single"
 MATCH_ANY = "match_any"
 
 REQUESTS_TIMEOUT_KEY = "timeout"
+
+ETH_CHAIN_ID = "eth_chainId"
+JSON_RPC_VERSION = "2.0"
 
 
 def to_eth_unit(
@@ -905,6 +919,45 @@ class EthereumHelper(Helper):
         return contract_interface
 
 
+def rpc_response(result: Any, request_id: RPCId = 1) -> RPCResponse:
+    """Construct an RPC response."""
+    return {
+        "jsonrpc": JSON_RPC_VERSION,
+        "id": request_id,
+        "result": result,
+    }
+
+
+class CachedChainIdMiddleware(Web3MiddlewareBuilder):
+    """A custom web3 middleware to cache the chain id, avoiding unnecessary RPC costs by repeated eth_chainId calls."""
+
+    chain_id: int
+
+    @staticmethod
+    @curry
+    def build(w3: Union[AsyncWeb3, Web3], **kwargs: Any) -> Web3Middleware:
+        """Build the middleware."""
+        chain_id = kwargs.get("chain_id")
+        if not isinstance(chain_id, int) or chain_id < 1:
+            raise Web3ValueError(
+                f"You must set a valid chain id for the {CachedChainIdMiddleware.__name__} middleware."
+            )
+        middleware = CachedChainIdMiddleware(w3)
+        middleware.chain_id = chain_id
+        return middleware
+
+    def wrap_make_request(self, make_request: MakeRequestFn) -> MakeRequestFn:
+        """Wrap the make_request."""
+
+        def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
+            """Middleware function to override the request with."""
+            if method == ETH_CHAIN_ID:
+                return rpc_response(self.chain_id)
+            return make_request(method, params)
+
+        return middleware
+
+
 class EthereumApi(LedgerApi, EthereumHelper):
     """Class to interact with the Ethereum Web3 APIs."""
 
@@ -933,6 +986,14 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
         )
         self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
+        # cache the chain id and use it for all the `eth_chainId` calls to avoid excess RPC usage
+        cached_chain_id = (
+            CachedChainIdMiddleware.build(  # pylint: disable=no-value-for-parameter
+                chain_id=self._chain_id
+            )
+        )
+        self._api.middleware_onion.add(cached_chain_id)
+
         self._is_gas_estimation_enabled = kwargs.pop("is_gas_estimation_enabled", False)
 
         self._default_gas_price_strategy: str = kwargs.pop(
@@ -1537,11 +1598,11 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
             transaction.update(gas_pricing)
 
+        transaction.update({"from": _deployer_address})
         transaction = instance.constructor(**kwargs).build_transaction(transaction)
         if transaction is None:
             return None  # pragma: nocover
         transaction.pop("to", None)  # only 'from' address, don't insert 'to' address!
-        transaction.update({"from": _deployer_address})
         if gas is not None:
             transaction.update({"gas": gas})
         if self._is_gas_estimation_enabled:
