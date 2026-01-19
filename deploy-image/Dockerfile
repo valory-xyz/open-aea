@@ -16,7 +16,7 @@ RUN apk add --no-cache go
 
 # aea installation
 RUN pip install --upgrade pip
-RUN pip install --upgrade --force-reinstall open-aea[all]==2.0.7 "open-aea-cli-ipfs<3.0.0,>=2.0.7"
+RUN pip install --upgrade --force-reinstall open-aea[all]==2.0.8 "open-aea-cli-ipfs<3.0.0,>=2.0.8"
 
 # directories and aea cli config
 WORKDIR /home/agents
