@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 __title__ = "open-aea"
 __description__ = "Open Autonomous Economic Agent framework (without vendor lock-in)"
 __url__ = "https://github.com/valory-xyz/open-aea.git"
-__version__ = "2.0.7"
+__version__ = "2.0.8"
 __author__ = "Valory AG"
 __license__ = "Apache-2.0"
 __copyright__ = "2021 Valory AG, 2019 Fetch.AI Limited"

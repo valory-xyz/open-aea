@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 2.0.8 (2026-01-20)
+
+Packages:
+- Warns when the chain id is not specified in a message #824
+- Caches the chain id to avoid excessive RPC usage #826
+
 ## 2.0.7 (2025-10-17)
 
 Docs:
