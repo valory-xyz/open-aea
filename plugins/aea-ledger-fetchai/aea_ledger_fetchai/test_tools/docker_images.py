@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,7 +120,6 @@ class FetchLedgerDockerImage(DockerImage):
             network="host",
             volumes=volumes,
             entrypoint=str(entrypoint),
-            ports=self.PORTS,
         )
         return container
 
