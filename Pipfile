@@ -20,7 +20,9 @@ asn1crypto = "<1.5.0,>=1.4.0"
 bech32 = "==1.2.0"
 defusedxml = "==0.6.0"
 # ^ still used?
-docker = ">4.2.0"
+# this done for maximum compataility, some tests are failing on system docker too fresh
+# 400 Client Error: Bad Request ("client version 1.35 is too old. Minimum supported API version is 1.44, please upgrade your client to a newer version")
+docker = "<=7.1.0,>=4.2.0"
 ecdsa = ">=0.15"
 eth-account = ">=0.13.0,<0.14.0"
 gym = "==0.15.6"
