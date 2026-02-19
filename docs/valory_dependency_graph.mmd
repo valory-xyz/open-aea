@@ -1,0 +1,185 @@
+---
+title: Valory-xyz Repository Dependency Graph
+---
+flowchart TD
+
+    %% ── Style Classes ──────────────────────────────────────────────────────────
+    classDef foundation  fill:#4CAF50,color:#fff,stroke:#388E3C,stroke-width:2px
+    classDef framework   fill:#2196F3,color:#fff,stroke:#1565C0,stroke-width:2px
+    classDef onchain     fill:#FF9800,color:#fff,stroke:#E65100,stroke-width:2px
+    classDef operations  fill:#9C27B0,color:#fff,stroke:#6A1B9A,stroke-width:2px
+    classDef mecheco     fill:#F44336,color:#fff,stroke:#B71C1C,stroke-width:2px
+    classDef agent       fill:#00BCD4,color:#fff,stroke:#006064,stroke-width:2px
+    classDef enduser     fill:#E91E63,color:#fff,stroke:#880E4F,stroke-width:2px
+    classDef frontend    fill:#607D8B,color:#fff,stroke:#263238,stroke-width:2px
+    classDef devtools    fill:#FFC107,color:#000,stroke:#F57F17,stroke-width:2px
+    classDef docs        fill:#ECEFF1,color:#000,stroke:#B0BEC5,stroke-width:2px
+
+    %% ── Subgraph: Foundation ───────────────────────────────────────────────────
+    subgraph FOUNDATION["🏗️ Foundation"]
+        open_aea["open-aea\n(AEA Framework)"]:::foundation
+        open_acn["open-acn\n(Agent Communication Network)"]:::foundation
+        tomte["tomte\n(Dev Tooling Library)"]:::devtools
+    end
+
+    %% ── Subgraph: On-chain Protocol (Solidity) ─────────────────────────────────
+    subgraph ONCHAIN["⛓️ On-chain Protocol"]
+        gov["autonolas-governance\n(OLAS Token & Governance)"]:::onchain
+        reg["autonolas-registries\n(Component / Agent / Service Registry)"]:::onchain
+        tok["autonolas-tokenomics\n(Tokenomics)"]:::onchain
+        stk["autonolas-staking-programmes\n(Staking)"]:::onchain
+        mkt["autonolas-marketplace\n(AI Agent Marketplace)"]:::onchain
+        near_reg["registries-near\n(Near Registries)"]:::onchain
+        sol_tok["autonolas-tokenomics-solana\n(Solana Tokenomics)"]:::onchain
+    end
+
+    %% ── Subgraph: Core Agent Services Framework ────────────────────────────────
+    subgraph CORE["🤖 Core Agent Services Framework"]
+        open_autonomy["open-autonomy\n(Autonomous Agent Services Framework)"]:::framework
+    end
+
+    %% ── Subgraph: Operations & Middleware ──────────────────────────────────────
+    subgraph OPS["⚙️ Operations & Middleware"]
+        middleware["olas-operate-middleware\n(Operate Middleware — Run / Stake / Earn)"]:::operations
+    end
+
+    %% ── Subgraph: Mech Ecosystem ───────────────────────────────────────────────
+    subgraph MECH["🔧 Mech Ecosystem"]
+        mech["mech\n(Base Mech Agent)"]:::mecheco
+        mech_predict["mech-predict\n(Prediction Mech)"]:::mecheco
+        mech_agents_fun["mech-agents-fun\n(Agents.fun Mech)"]:::mecheco
+        mech_client["mech-client\n(Mech Client SDK)"]:::mecheco
+        mech_tools_dev["mech-tools-dev\n(Mech Dev Toolkit)"]:::mecheco
+        mock_mech["mock-mech\n(Mock Mech for Testing)"]:::mecheco
+        mech_marketplace_legacy["mech-marketplace-legacy\n(v0 Mech Marketplace)"]:::mecheco
+    end
+
+    %% ── Subgraph: AI Agent Services & Applications ─────────────────────────────
+    subgraph AGENTS["🧠 AI Agent Services & Applications"]
+        trader["trader\n(Prediction Market Trader)"]:::agent
+        market_creator["market-creator\n(Prediction Market Creator)"]:::agent
+        optimus["optimus\n(BabyDegen DeFi Agent)"]:::agent
+        memeooorr["meme-ooorr\n(Meme Coin Deployer)"]:::agent
+        governatooorr["governatooorr\n(AI Governance Delegate)"]:::agent
+        contribution["contribution-service\n(Dynamic NFT Contribution Service)"]:::agent
+        iekit["IEKit\n(Impact Evaluator Service)"]:::agent
+        auto_fund["autonomous-fund\n(Autonomous Fund Manager)"]:::agent
+        apy_oracle["apy-oracle\n(APY Oracle Service)"]:::agent
+        price_oracle["price-oracle\n(Price Oracle Service)"]:::agent
+        hello_world["hello-world\n(Hello World Example)"]:::agent
+        langchain_trader["langchain-trader\n(LangChain Trader)"]:::agent
+        pettai["pettai-agent\n(PettAI Agent)"]:::agent
+        prediction_markets["prediction-markets\n(Prediction Markets Demo Monorepo)"]:::agent
+        agents_fun_eliza["agents-fun-eliza\n(Eliza Framework Agent)"]:::agent
+        zkml["ZK-ML-Verifier\n(ZK-ML Verification Service)"]:::agent
+        celo_trader["celo-trader\n(Celo Trader)"]:::agent
+    end
+
+    %% ── Subgraph: End-User Applications & Quickstarts ──────────────────────────
+    subgraph ENDUSER["🖥️ End-User Applications & Quickstarts"]
+        pearl["olas-operate-app (Pearl)\n(Run Agents — Stake & Earn)"]:::enduser
+        quickstart["quickstart\n(Olas Agent Quickstart)"]:::enduser
+        trader_qs["trader-quickstart\n(Trader Quickstart)"]:::enduser
+        modius_qs["modius-quickstart\n(Modius/DeFi Agent Quickstart)"]:::enduser
+        optimus_qs["optimus-quickstart\n(Optimus Quickstart)"]:::enduser
+        mech_qs["mech-quickstart\n(Mech Quickstart)"]:::enduser
+        olas_sdk_starter["olas-sdk-starter\n(Olas SDK Starter)"]:::enduser
+        open_autonomy_client["open-autonomy-client\n(Autonomous Service Client SDK)"]:::enduser
+    end
+
+    %% ── Subgraph: Frontends ────────────────────────────────────────────────────
+    subgraph FRONTEND["🌐 Frontends"]
+        registry_fe["autonolas-registry-frontend\n(Registry dApp)"]:::frontend
+        tokenomics_fe["autonolas-tokenomics-frontend\n(Tokenomics dApp)"]:::frontend
+        frontend_mono["autonolas-frontend-mono\n(Olas Network Apps Monorepo)"]:::frontend
+        contribution_fe["autonolas-contribution-service-frontend\n(Contribution dApp)"]:::frontend
+        ai_mech_fe["ai-registry-mech-frontend\n(AI Mech Registry dApp)"]:::frontend
+        olas_predict_fe["olas-predict\n(Olas Predict UI)"]:::frontend
+        operate_fe["autonolas-operate-frontend\n(Operate dApp)"]:::frontend
+        agent_ui["agent-ui-monorepo\n(Agent UI Monorepo)"]:::frontend
+    end
+
+    %% ── Subgraph: Documentation ────────────────────────────────────────────────
+    subgraph DOCS["📚 Documentation"]
+        docs["docs\n(Olas Ecosystem Docs Aggregator)"]:::docs
+    end
+
+    %% ═══════════════════════════════════════════════════════════════════════════
+    %% Dependencies
+    %% ═══════════════════════════════════════════════════════════════════════════
+
+    %% Core framework builds on open-aea
+    open_autonomy --> open_aea
+
+    %% open-aea uses open-acn for agent communication
+    open_aea --> open_acn
+
+    %% On-chain contract hierarchy
+    reg --> gov
+    tok --> gov
+    tok --> reg
+    stk --> reg
+    stk --> tok
+    mkt --> reg
+
+    %% Operations middleware builds on open-autonomy
+    middleware --> open_autonomy
+
+    %% Mech ecosystem
+    mech --> open_autonomy
+    mech_predict --> open_autonomy
+    mech_agents_fun --> open_autonomy
+    mock_mech --> open_autonomy
+    mech_marketplace_legacy --> open_autonomy
+    mech_client --> middleware
+    mech_tools_dev --> open_autonomy
+    mech_tools_dev --> mech_client
+    mech_tools_dev --> middleware
+
+    %% AI Agent Services build on open-autonomy
+    trader --> open_autonomy
+    market_creator --> open_autonomy
+    optimus --> open_autonomy
+    memeooorr --> open_autonomy
+    governatooorr --> open_autonomy
+    contribution --> open_autonomy
+    iekit --> open_autonomy
+    auto_fund --> open_autonomy
+    apy_oracle --> open_autonomy
+    price_oracle --> open_autonomy
+    hello_world --> open_autonomy
+    langchain_trader --> open_autonomy
+    pettai --> open_autonomy
+    agents_fun_eliza --> open_autonomy
+    zkml --> open_autonomy
+    celo_trader --> open_autonomy
+
+    %% Prediction markets demo combines trader + market-creator
+    prediction_markets --> trader
+    prediction_markets --> market_creator
+
+    %% End-user apps
+    pearl --> middleware
+    quickstart --> middleware
+    trader_qs --> trader
+    modius_qs --> optimus
+    optimus_qs --> optimus
+    mech_qs --> mech
+    olas_sdk_starter --> open_autonomy
+    open_autonomy_client --> open_autonomy
+
+    %% Frontends connect to on-chain contracts / services
+    registry_fe --> reg
+    tokenomics_fe --> tok
+    frontend_mono --> registry_fe
+    frontend_mono --> tokenomics_fe
+    contribution_fe --> contribution
+    ai_mech_fe --> mech
+    olas_predict_fe --> trader
+    operate_fe --> middleware
+    agent_ui --> open_autonomy
+
+    %% Documentation aggregates from major repos
+    docs --> open_aea
+    docs --> open_autonomy
+    docs --> middleware
