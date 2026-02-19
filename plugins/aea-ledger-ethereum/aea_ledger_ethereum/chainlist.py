@@ -25,6 +25,11 @@ returns the best candidates sorted by latency.  Used as fallback RPCs
 for the RPC rotation system.
 """
 
+# All bare except-Exception clauses in this module are intentional:
+# they guard optional I/O (HTTP probes, cache reads) where any failure
+# is logged and silently swallowed so the caller can degrade gracefully.
+# pylint: disable=broad-exception-caught
+
 import json
 import logging
 import tempfile
@@ -91,7 +96,7 @@ def probe_rpc(
         if not block_hex or not isinstance(block_hex, str) or block_hex == "0x0":
             return None
         return (url, latency_ms, int(block_hex, 16))
-    except Exception:  # pylint: disable=broad-exception-caught  # noqa: BLE001
+    except Exception:  # noqa: BLE001
         return None
 
 
@@ -143,7 +148,7 @@ def _probe_candidates(candidates: List[str]) -> List[Tuple[str, float, int]]:
                 result = future.result()
                 if result is not None:
                     results.append(result)
-            except Exception:  # pylint: disable=broad-exception-caught  # nosec B110  # noqa: BLE001  E501
+            except Exception:  # nosec B110  # noqa: BLE001
                 pass
     return results
 
@@ -197,7 +202,7 @@ class ChainlistRPC:
                         self._data = json.load(fh)
                     if self._data:
                         return
-            except Exception:  # pylint: disable=broad-exception-caught  # nosec B110  # noqa: BLE001  E501
+            except Exception:  # nosec B110  # noqa: BLE001
                 pass
 
         try:
@@ -208,13 +213,13 @@ class ChainlistRPC:
                 _CACHE_DIR.mkdir(parents=True, exist_ok=True)
                 with _CACHE_PATH.open("w") as fh:
                     json.dump(self._data, fh)
-        except Exception as exc:  # pylint: disable=broad-exception-caught  # noqa: BLE001  E501
+        except Exception as exc:  # noqa: BLE001
             _logger.debug("Chainlist fetch failed: %s", exc)
             if not self._data and _CACHE_PATH.exists():
                 try:
                     with _CACHE_PATH.open("r") as fh:
                         self._data = json.load(fh)
-                except Exception:  # pylint: disable=broad-exception-caught  # nosec B110  # noqa: BLE001  E501
+                except Exception:  # nosec B110  # noqa: BLE001
                     pass
             if not self._data:
                 self._data = []
