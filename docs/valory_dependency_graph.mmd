@@ -133,7 +133,8 @@ flowchart LR
 
     %% Operations middleware builds on open-autonomy
     middleware --> open_autonomy
-    propel_client --> middleware
+    %% propel-client depends on open-autonomy directly (pyproject.toml: open-autonomy = "==v0.19.7")
+    propel_client --> open_autonomy
 
     %% Mech ecosystem
     %% open-autonomy packages (via third_party in packages.json)
@@ -165,8 +166,10 @@ flowchart LR
     langchain_trader --> open_autonomy
     pettai --> open_autonomy
     agents_fun_eliza --> open_autonomy
-    eliza_memeooorr_sdk --> memeooorr
-    plugin_memeooorr --> memeooorr
+    %% eliza-memeooorr-olas-sdk is based on olas-sdk-starter (empty packages.json; README is olas-sdk-starter template)
+    eliza_memeooorr_sdk --> olas_sdk_starter
+    %% plugin-memeooorr is a TypeScript/Eliza npm plugin designed for agents-fun-eliza (not a Python meme-ooorr dep)
+    agents_fun_eliza --> plugin_memeooorr
     %% mech packages used directly (protocol/valory/acn_data_share, etc. in third_party)
     trader --> mech
     market_creator --> mech
@@ -188,13 +191,20 @@ flowchart LR
 
     %% Frontends
     frontend_mono --> olas_predict_fe
-    olas_predict_fe --> trader
-    agent_ui --> open_autonomy
+    %% olas-predict queries autonolas-subgraph via GraphQL (NEXT_PUBLIC_SUBGRAPH_API_KEY / REGISTRY_GRAPH_URL in .env)
+    olas_predict_fe --> autonolas_subgraph
+    %% agent-ui-monorepo is a TypeScript/NX frontend; no Python dependency on open-autonomy
 
-    %% Documentation aggregates from major repos
+    %% Documentation aggregates submodules (see docs/.gitmodules)
     docs --> open_aea
     docs --> open_autonomy
-    docs --> middleware
+    docs --> open_acn
+    docs --> mech
+    docs --> mech_tools_dev
+    docs --> mech_client
+    docs --> price_oracle
+    docs --> iekit
+    docs --> hello_world
 
     %% ═══════════════════════════════════════════════════════════════════════════
     %% Repositories in the valory-xyz GitHub org NOT included in this diagram
