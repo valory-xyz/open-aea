@@ -650,7 +650,7 @@ Wrap the make_request.
 ## EthereumApi Objects
 
 ```python
-class EthereumApi(LedgerApi, EthereumHelper)
+class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin)
 ```
 
 Class to interact with the Ethereum Web3 APIs.
