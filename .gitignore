@@ -156,3 +156,8 @@ temp/
 agent_name/
 agent/
 leak_report
+
+# Node.js dependencies (used for local tooling only)
+node_modules/
+package.json
+package-lock.json
