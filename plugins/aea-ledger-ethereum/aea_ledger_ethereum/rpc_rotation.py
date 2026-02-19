@@ -121,6 +121,9 @@ def parse_rpc_urls(address: str) -> List[str]:
 
     Supports a single URL or a comma-separated list.
     Returns a list with at least one URL.
+
+    :param address: single RPC URL or comma-separated list of URLs.
+    :return: list of parsed RPC URL strings.
     """
     if "," in address:
         urls = [url.strip() for url in address.split(",") if url.strip()]
@@ -134,6 +137,9 @@ def classify_error(error: Exception) -> str:
     Returns one of:
     ``"rate_limit"``, ``"connection"``, ``"quota"``, ``"server"``,
     ``"fd_exhaustion"``, or ``"unknown"``.
+
+    :param error: the exception raised by the RPC call.
+    :return: error category string.
     """
     err_text = str(error).lower()
 
@@ -180,6 +186,10 @@ class RPCRotationMixin:
 
         If *chain_id* is provided, enriches *rpc_urls* with validated
         public RPCs from Chainlist.org as fallback endpoints.
+
+        :param rpc_urls: list of RPC endpoint URLs.
+        :param request_kwargs: keyword arguments forwarded to the HTTP provider.
+        :param chain_id: optional chain ID used to fetch public fallback RPCs.
         """
         from aea_ledger_ethereum.chainlist import (  # pylint: disable=import-outside-toplevel
             enrich_rpc_urls,
@@ -228,7 +238,9 @@ class RPCRotationMixin:
         """Rotate to the next healthy RPC endpoint.
 
         Swaps ``self._api.provider`` to the new endpoint, preserving
-        all Web3 middleware.  Returns ``True`` if a rotation occurred.
+        all Web3 middleware.
+
+        :return: ``True`` if a rotation occurred, ``False`` otherwise.
         """
         with self._rotation_lock:
             n = len(self._rpc_urls)
@@ -276,7 +288,9 @@ class RPCRotationMixin:
     ) -> bool:
         """Classify *error*, backoff the failing RPC, and rotate.
 
-        Returns ``True`` if the caller should retry the operation.
+        :param error: the exception raised by the RPC call.
+        :param operation_name: human-readable label for log messages.
+        :return: ``True`` if the caller should retry the operation.
         """
         category = classify_error(error)
 
@@ -325,6 +339,11 @@ class RPCRotationMixin:
         avoid double-submission.
 
         Raises the last exception if all retries are exhausted.
+
+        :param operation: zero-argument callable that performs the RPC call.
+        :param operation_name: human-readable label for log messages.
+        :param is_write: if ``True``, apply stricter retry safety for writes.
+        :return: the value returned by *operation*.
         """
         if not self._rotation_enabled:
             return operation()

@@ -515,6 +515,8 @@ class TestTryMethodsWithRotation:
     ) -> None:
         """_try_send_signed_transaction does NOT retry rate limit (write safety).
 
+        :param mock_sleep: patch fixture for time.sleep.
+
         Note: try_decorator catches the exception and returns None instead of
         raising, so we check the call count and None return value.
         """

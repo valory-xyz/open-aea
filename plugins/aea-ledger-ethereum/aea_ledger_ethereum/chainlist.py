@@ -78,6 +78,10 @@ def probe_rpc(
 
     Returns ``(url, latency_ms, block_number)`` on success, ``None`` on
     failure.
+
+    :param url: RPC endpoint URL to probe.
+    :param timeout: request timeout in seconds.
+    :return: tuple of (url, latency_ms, block_number) or None on failure.
     """
     payload = json.dumps(
         {"jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": 1}
@@ -254,6 +258,11 @@ class ChainlistRPC:
         3. Probe top candidates in parallel with ``eth_blockNumber``.
         4. Discard stale RPCs (block number lagging behind median).
         5. Return up to *max_results* URLs sorted by latency.
+
+        :param chain_id: numeric EVM chain identifier.
+        :param existing_rpcs: URLs already known, used for deduplication.
+        :param max_results: maximum number of validated RPCs to return.
+        :return: list of validated RPC URLs sorted by latency.
         """
         nodes = self.get_rpcs(chain_id)
         if not nodes:
@@ -283,6 +292,11 @@ def enrich_rpc_urls(
 
     If *chain_id* is ``None`` or enrichment fails, returns *rpc_urls*
     unchanged.
+
+    :param rpc_urls: existing RPC URLs to enrich.
+    :param chain_id: numeric EVM chain identifier, or None to skip enrichment.
+    :param max_rpcs: upper bound on total RPC URLs to return.
+    :return: original URLs followed by any validated Chainlist fallbacks.
     """
     if chain_id is None or len(rpc_urls) >= max_rpcs:
         return rpc_urls
