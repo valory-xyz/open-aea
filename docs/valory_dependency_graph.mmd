@@ -136,6 +136,7 @@ flowchart LR
     propel_client --> middleware
 
     %% Mech ecosystem
+    %% open-autonomy packages (via third_party in packages.json)
     mech --> open_autonomy
     mech_predict --> open_autonomy
     mech_agents_fun --> open_autonomy
@@ -145,9 +146,15 @@ flowchart LR
     mech_tools_dev --> open_autonomy
     mech_tools_dev --> mech_client
     mech_tools_dev --> middleware
-    mech_interact --> mech_client
+    %% mech packages (via third_party in packages.json: acn_data_share, agent_mech, mech_abci, etc.)
+    mech_predict --> mech
+    mech_agents_fun --> mech
+    mech_tools_dev --> mech
+    %% mech-interact owns mech_interact_abci skill and depends on mech packages
+    mech_interact --> open_autonomy
+    mech_interact --> mech
 
-    %% AI Agent Services build on open-autonomy
+    %% AI Agent Services build on open-autonomy (via third_party in packages.json)
     trader --> open_autonomy
     market_creator --> open_autonomy
     optimus --> open_autonomy
@@ -160,6 +167,17 @@ flowchart LR
     agents_fun_eliza --> open_autonomy
     eliza_memeooorr_sdk --> memeooorr
     plugin_memeooorr --> memeooorr
+    %% mech packages used directly (protocol/valory/acn_data_share, etc. in third_party)
+    trader --> mech
+    market_creator --> mech
+    memeooorr --> mech
+    iekit --> mech
+    %% mech-interact packages used (skill/valory/mech_interact_abci in third_party)
+    trader --> mech_interact
+    market_creator --> mech_interact
+    memeooorr --> mech_interact
+    iekit --> mech_interact
+    langchain_trader --> mech_interact
 
     %% End-user apps
     pearl --> middleware
