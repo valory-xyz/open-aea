@@ -1,7 +1,7 @@
 ---
 title: Valory-xyz Repository Dependency Graph
 ---
-flowchart TD
+flowchart LR
 
     %% ── Style Classes ──────────────────────────────────────────────────────────
     classDef foundation  fill:#4CAF50,color:#fff,stroke:#388E3C,stroke-width:2px
@@ -17,91 +17,91 @@ flowchart TD
 
     %% ── Subgraph: Foundation ───────────────────────────────────────────────────
     subgraph FOUNDATION["🏗️ Foundation"]
-        open_aea["open-aea\n(AEA Framework)"]:::foundation
-        open_acn["open-acn\n(Agent Communication Network)"]:::foundation
-        tomte["tomte\n(Dev Tooling Library)"]:::devtools
+        open_aea["open-aea<br>(AEA Framework)"]:::foundation
+        open_acn["open-acn<br>(Agent Communication Network)"]:::foundation
+        tomte["tomte<br>(Dev Tooling Library)"]:::devtools
     end
 
     %% ── Subgraph: On-chain Protocol (Solidity) ─────────────────────────────────
     subgraph ONCHAIN["⛓️ On-chain Protocol"]
-        gov["autonolas-governance\n(OLAS Token & Governance)"]:::onchain
-        reg["autonolas-registries\n(Component / Agent / Service Registry)"]:::onchain
-        tok["autonolas-tokenomics\n(Tokenomics)"]:::onchain
-        stk["autonolas-staking-programmes\n(Staking)"]:::onchain
-        mkt["autonolas-marketplace\n(AI Agent Marketplace)"]:::onchain
-        near_reg["registries-near\n(Near Registries)"]:::onchain
-        sol_tok["autonolas-tokenomics-solana\n(Solana Tokenomics)"]:::onchain
+        gov["autonolas-governance<br>(OLAS Token & Governance)"]:::onchain
+        reg["autonolas-registries<br>(Component / Agent / Service Registry)"]:::onchain
+        tok["autonolas-tokenomics<br>(Tokenomics)"]:::onchain
+        stk["autonolas-staking-programmes<br>(Staking)"]:::onchain
+        mkt["autonolas-marketplace<br>(AI Agent Marketplace)"]:::onchain
+        near_reg["registries-near<br>(Near Registries)"]:::onchain
+        sol_tok["autonolas-tokenomics-solana<br>(Solana Tokenomics)"]:::onchain
     end
 
     %% ── Subgraph: Core Agent Services Framework ────────────────────────────────
     subgraph CORE["🤖 Core Agent Services Framework"]
-        open_autonomy["open-autonomy\n(Autonomous Agent Services Framework)"]:::framework
+        open_autonomy["open-autonomy<br>(Autonomous Agent Services Framework)"]:::framework
     end
 
     %% ── Subgraph: Operations & Middleware ──────────────────────────────────────
     subgraph OPS["⚙️ Operations & Middleware"]
-        middleware["olas-operate-middleware\n(Operate Middleware — Run / Stake / Earn)"]:::operations
+        middleware["olas-operate-middleware<br>(Operate Middleware — Run / Stake / Earn)"]:::operations
     end
 
     %% ── Subgraph: Mech Ecosystem ───────────────────────────────────────────────
     subgraph MECH["🔧 Mech Ecosystem"]
-        mech["mech\n(Base Mech Agent)"]:::mecheco
-        mech_predict["mech-predict\n(Prediction Mech)"]:::mecheco
-        mech_agents_fun["mech-agents-fun\n(Agents.fun Mech)"]:::mecheco
-        mech_client["mech-client\n(Mech Client SDK)"]:::mecheco
-        mech_tools_dev["mech-tools-dev\n(Mech Dev Toolkit)"]:::mecheco
-        mock_mech["mock-mech\n(Mock Mech for Testing)"]:::mecheco
-        mech_marketplace_legacy["mech-marketplace-legacy\n(v0 Mech Marketplace)"]:::mecheco
+        mech["mech<br>(Base Mech Agent)"]:::mecheco
+        mech_predict["mech-predict<br>(Prediction Mech)"]:::mecheco
+        mech_agents_fun["mech-agents-fun<br>(Agents.fun Mech)"]:::mecheco
+        mech_client["mech-client<br>(Mech Client SDK)"]:::mecheco
+        mech_tools_dev["mech-tools-dev<br>(Mech Dev Toolkit)"]:::mecheco
+        mock_mech["mock-mech<br>(Mock Mech for Testing)"]:::mecheco
+        mech_marketplace_legacy["mech-marketplace-legacy<br>(v0 Mech Marketplace)"]:::mecheco
     end
 
     %% ── Subgraph: AI Agent Services & Applications ─────────────────────────────
     subgraph AGENTS["🧠 AI Agent Services & Applications"]
-        trader["trader\n(Prediction Market Trader)"]:::agent
-        market_creator["market-creator\n(Prediction Market Creator)"]:::agent
-        optimus["optimus\n(BabyDegen DeFi Agent)"]:::agent
-        memeooorr["meme-ooorr\n(Meme Coin Deployer)"]:::agent
-        governatooorr["governatooorr\n(AI Governance Delegate)"]:::agent
-        contribution["contribution-service\n(Dynamic NFT Contribution Service)"]:::agent
-        iekit["IEKit\n(Impact Evaluator Service)"]:::agent
-        auto_fund["autonomous-fund\n(Autonomous Fund Manager)"]:::agent
-        apy_oracle["apy-oracle\n(APY Oracle Service)"]:::agent
-        price_oracle["price-oracle\n(Price Oracle Service)"]:::agent
-        hello_world["hello-world\n(Hello World Example)"]:::agent
-        langchain_trader["langchain-trader\n(LangChain Trader)"]:::agent
-        pettai["pettai-agent\n(PettAI Agent)"]:::agent
-        prediction_markets["prediction-markets\n(Prediction Markets Demo Monorepo)"]:::agent
-        agents_fun_eliza["agents-fun-eliza\n(Eliza Framework Agent)"]:::agent
-        zkml["ZK-ML-Verifier\n(ZK-ML Verification Service)"]:::agent
-        celo_trader["celo-trader\n(Celo Trader)"]:::agent
+        trader["trader<br>(Prediction Market Trader)"]:::agent
+        market_creator["market-creator<br>(Prediction Market Creator)"]:::agent
+        optimus["optimus<br>(BabyDegen DeFi Agent)"]:::agent
+        memeooorr["meme-ooorr<br>(Meme Coin Deployer)"]:::agent
+        governatooorr["governatooorr<br>(AI Governance Delegate)"]:::agent
+        contribution["contribution-service<br>(Dynamic NFT Contribution Service)"]:::agent
+        iekit["IEKit<br>(Impact Evaluator Service)"]:::agent
+        auto_fund["autonomous-fund<br>(Autonomous Fund Manager)"]:::agent
+        apy_oracle["apy-oracle<br>(APY Oracle Service)"]:::agent
+        price_oracle["price-oracle<br>(Price Oracle Service)"]:::agent
+        hello_world["hello-world<br>(Hello World Example)"]:::agent
+        langchain_trader["langchain-trader<br>(LangChain Trader)"]:::agent
+        pettai["pettai-agent<br>(PettAI Agent)"]:::agent
+        prediction_markets["prediction-markets<br>(Prediction Markets Demo Monorepo)"]:::agent
+        agents_fun_eliza["agents-fun-eliza<br>(Eliza Framework Agent)"]:::agent
+        zkml["ZK-ML-Verifier<br>(ZK-ML Verification Service)"]:::agent
+        celo_trader["celo-trader<br>(Celo Trader)"]:::agent
     end
 
     %% ── Subgraph: End-User Applications & Quickstarts ──────────────────────────
     subgraph ENDUSER["🖥️ End-User Applications & Quickstarts"]
-        pearl["olas-operate-app (Pearl)\n(Run Agents — Stake & Earn)"]:::enduser
-        quickstart["quickstart\n(Olas Agent Quickstart)"]:::enduser
-        trader_qs["trader-quickstart\n(Trader Quickstart)"]:::enduser
-        modius_qs["modius-quickstart\n(Modius/DeFi Agent Quickstart)"]:::enduser
-        optimus_qs["optimus-quickstart\n(Optimus Quickstart)"]:::enduser
-        mech_qs["mech-quickstart\n(Mech Quickstart)"]:::enduser
-        olas_sdk_starter["olas-sdk-starter\n(Olas SDK Starter)"]:::enduser
-        open_autonomy_client["open-autonomy-client\n(Autonomous Service Client SDK)"]:::enduser
+        pearl["olas-operate-app (Pearl)<br>(Run Agents — Stake & Earn)"]:::enduser
+        quickstart["quickstart<br>(Olas Agent Quickstart)"]:::enduser
+        trader_qs["trader-quickstart<br>(Trader Quickstart)"]:::enduser
+        modius_qs["modius-quickstart<br>(Modius/DeFi Agent Quickstart)"]:::enduser
+        optimus_qs["optimus-quickstart<br>(Optimus Quickstart)"]:::enduser
+        mech_qs["mech-quickstart<br>(Mech Quickstart)"]:::enduser
+        olas_sdk_starter["olas-sdk-starter<br>(Olas SDK Starter)"]:::enduser
+        open_autonomy_client["open-autonomy-client<br>(Autonomous Service Client SDK)"]:::enduser
     end
 
     %% ── Subgraph: Frontends ────────────────────────────────────────────────────
     subgraph FRONTEND["🌐 Frontends"]
-        registry_fe["autonolas-registry-frontend\n(Registry dApp)"]:::frontend
-        tokenomics_fe["autonolas-tokenomics-frontend\n(Tokenomics dApp)"]:::frontend
-        frontend_mono["autonolas-frontend-mono\n(Olas Network Apps Monorepo)"]:::frontend
-        contribution_fe["autonolas-contribution-service-frontend\n(Contribution dApp)"]:::frontend
-        ai_mech_fe["ai-registry-mech-frontend\n(AI Mech Registry dApp)"]:::frontend
-        olas_predict_fe["olas-predict\n(Olas Predict UI)"]:::frontend
-        operate_fe["autonolas-operate-frontend\n(Operate dApp)"]:::frontend
-        agent_ui["agent-ui-monorepo\n(Agent UI Monorepo)"]:::frontend
+        registry_fe["autonolas-registry-frontend<br>(Registry dApp)"]:::frontend
+        tokenomics_fe["autonolas-tokenomics-frontend<br>(Tokenomics dApp)"]:::frontend
+        frontend_mono["autonolas-frontend-mono<br>(Olas Network Apps Monorepo)"]:::frontend
+        contribution_fe["autonolas-contribution-service-frontend<br>(Contribution dApp)"]:::frontend
+        ai_mech_fe["ai-registry-mech-frontend<br>(AI Mech Registry dApp)"]:::frontend
+        olas_predict_fe["olas-predict<br>(Olas Predict UI)"]:::frontend
+        operate_fe["autonolas-operate-frontend<br>(Operate dApp)"]:::frontend
+        agent_ui["agent-ui-monorepo<br>(Agent UI Monorepo)"]:::frontend
     end
 
     %% ── Subgraph: Documentation ────────────────────────────────────────────────
     subgraph DOCS["📚 Documentation"]
-        docs["docs\n(Olas Ecosystem Docs Aggregator)"]:::docs
+        docs["docs<br>(Olas Ecosystem Docs Aggregator)"]:::docs
     end
 
     %% ═══════════════════════════════════════════════════════════════════════════
@@ -183,3 +183,64 @@ flowchart TD
     docs --> open_aea
     docs --> open_autonomy
     docs --> middleware
+
+    %% ═══════════════════════════════════════════════════════════════════════════
+    %% Repositories in the valory-xyz GitHub org NOT included in this diagram
+    %% (archived, experimental, event-specific, website-only, or stand-alone):
+    %%
+    %%  academy-learning-service          — Academy learning service (no public deps)
+    %%  academy-learning-service-template — Template for the academy learning service
+    %%  academy-solutions                 — Academy exercise solutions
+    %%  aea-babyagi                       — BabyAGI adaptation in Open AEA (standalone demo)
+    %%  agent-academy-1                   — Agent Academy 1 participant repo
+    %%  agent-academy-2                   — Agent Academy 2 participant repo
+    %%  agent-stats                       — Agent statistics & parameters (JS tool)
+    %%  ai-registry-mech-graph            — AI registry mech graph (TypeScript tool)
+    %%  airdrop-helper                    — Olas ecosystem participation measurement tool
+    %%  autonolas-aip                     — Autonolas Improvement Proposals (docs only)
+    %%  autonolas-build-frontend          — build.olas.network frontend
+    %%  autonolas-member-frontend         — member.olas.network frontend
+    %%  autonolas-subgraph                — Autonolas subgraph (The Graph)
+    %%  autonolas-subgraph-studio         — Autonolas Subgraphs Monorepo
+    %%  autonolas-v1                      — Legacy Autonolas v1 on-chain protocol (JS)
+    %%  autonolas-website                 — autonolas.network website
+    %%  ceramic-py                        — Simple Ceramic Network Python client
+    %%  co-owned-ai-website               — co-owned.ai website
+    %%  community-nfts                    — Community NFT contracts
+    %%  contracts-amm                     — AMM contracts (experimental)
+    %%  contracts-aks                     — Autonomous Keeper Service job registry
+    %%  dev-template                      — open-autonomy project template
+    %%  dkg-predictions                   — DKG example on OriginTrail (standalone demo)
+    %%  dynamic-contribution              — Autonolas dynamic contribution contracts
+    %%  el-collectooorr-frontend          — El Collectooorr front-end
+    %%  eliza-memeooorr-olas-sdk          — Run Meme-ooorr via Eliza + Olas SDK
+    %%  eth-lisbon-23                     — ETH Lisbon 2023 hack (Shorts.wtf)
+    %%  ethlisbon                         — ETH Lisbon ArtBlocks NFT agent (archived)
+    %%  ethereum-optimism.github.io       — Fork of Optimism token list
+    %%  gnosis-mech                       — Copy of gnosis/mech (original deleted)
+    %%  governance-near                   — Governance contracts on Near
+    %%  governatooorr-frontend            — governatooorr.autonolas.network frontend
+    %%  governatooorr-solana              — Governatooorr on Solana (experimental)
+    %%  legacy-lockbox-solana             — Legacy Solana lockbox contracts
+    %%  liquidity-rebalancing             — Liquidity rebalancing agent (experimental)
+    %%  lockbox-solana                    — Lockbox contracts on Solana
+    %%  mech-eth-lisbon-2023              — Shorts.wtf smart contracts (ETH Lisbon 2023)
+    %%  mech-ethdenver-2024               — Mech extension for ETH Denver 2024
+    %%  mech-interact                     — Mech interaction helper
+    %%  mech-predict-markets              — Mech predict markets (experimental)
+    %%  mech-tool-template                — Template for authoring new mech tools
+    %%  olas                              — OLAS market-statistics server
+    %%  olas-predict-benchmark            — Olas Predict benchmark of Mech tools
+    %%  olas-website                      — olas.network website
+    %%  open-operator-aks                 — Deploy Autonomous Keeper Agent on AWS
+    %%  plugin-memeooorr                  — Eliza plugin for Meme-ooorr
+    %%  press-kit-valory                  — Valory brand guidelines / press kit
+    %%  propel-client                     — Python client for Valory PaaS Propel
+    %%  registries-solana                 — Autonolas registry contracts on Solana
+    %%  santa-nft                         — Valory Santa NFT 2021
+    %%  shorts-frontend                   — Shorts.wtf frontend (ETH Lisbon 2023)
+    %%  solana-sandbox                    — Solana sandbox / experiments
+    %%  test-deployment-envs              — Internal test deployment environments
+    %%  triton-bot                        — Telegram bot for staked Olas services
+    %%  valory-website                    — valory.xyz website
+    %% ═══════════════════════════════════════════════════════════════════════════
