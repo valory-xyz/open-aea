@@ -54,13 +54,49 @@ Its `packages/` directory contains a ready-to-use open-autonomy agent/service sc
 
 ## 2. On-chain Protocol
 
-### `autonolas-governance` → `autonolas-v1`
-autonolas-governance (OLAS token, veOLAS, governance time-lock) builds on top of the
-autonolas-v1 base protocol contracts, inheriting the initial token specification and core
-interfaces defined there.
+### `autonolas-v1` → `autonolas-governance`
+autonolas-v1 is the meta/integration-test repository for the entire Autonolas on-chain protocol.
+It pulls autonolas-governance (OLAS token, veOLAS, governance Timelock) as a Git submodule
+to run cross-repo integration tests.
 
-**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/autonolas-governance/blob/main/README.md#L1)
-— "This repository contains the Autonolas `OLAS` token and the governance part of the on-chain protocol"
+**Declaration:** [`.gitmodules#L1`](https://github.com/valory-xyz/autonolas-v1/blob/main/.gitmodules#L1)
+— `[submodule "lib/autonolas-governance"]`
+
+---
+
+### `autonolas-v1` → `autonolas-registries`
+autonolas-v1 pulls autonolas-registries (ComponentRegistry, AgentRegistry, ServiceRegistry)
+as a Git submodule for integration testing alongside the governance and tokenomics contracts.
+
+**Declaration:** [`.gitmodules#L4`](https://github.com/valory-xyz/autonolas-v1/blob/main/.gitmodules#L4)
+— `[submodule "lib/autonolas-registries"]`
+
+---
+
+### `autonolas-v1` → `autonolas-tokenomics`
+autonolas-v1 pulls autonolas-tokenomics (Treasury, Tokenomics) as a Git submodule
+for full-protocol integration tests.
+
+**Declaration:** [`.gitmodules#L7`](https://github.com/valory-xyz/autonolas-v1/blob/main/.gitmodules#L7)
+— `[submodule "lib/autonolas-tokenomics"]`
+
+---
+
+### `autonolas-v1` → `autonolas-marketplace`
+autonolas-v1 pulls autonolas-marketplace as a Git submodule alongside the other
+protocol contracts for integration testing.
+
+**Declaration:** [`.gitmodules#L13`](https://github.com/valory-xyz/autonolas-v1/blob/main/.gitmodules#L13)
+— `[submodule "lib/autonolas-marketplace"]`
+
+---
+
+### `autonolas-v1` → `autonolas-staking-programmes`
+autonolas-v1 pulls autonolas-staking-programmes as a Git submodule for end-to-end
+staking integration tests with the rest of the protocol.
+
+**Declaration:** [`.gitmodules#L16`](https://github.com/valory-xyz/autonolas-v1/blob/main/.gitmodules#L16)
+— `[submodule "lib/autonolas-staking-programmes"]`
 
 ---
 
@@ -402,7 +438,7 @@ with a shared counter, used in tutorials.
 langchain-trader is an open-autonomy agent service that uses LangChain LLMs to make
 prediction market trading decisions.
 
-**Declaration:** [`packages/packages.json#L32`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json#L32)
+**Declaration:** [`packages/packages.json#L32`](https://github.com/valory-xyz/langchain-trader/blob/master/packages/packages.json#L32)
 — `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
@@ -523,7 +559,7 @@ impact scoring pipeline.
 langchain-trader uses `skill/valory/mech_interact_abci` to dispatch LLM-powered
 prediction tasks to mech agents.
 
-**Declaration:** [`packages/packages.json#L35`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json#L35)
+**Declaration:** [`packages/packages.json#L35`](https://github.com/valory-xyz/langchain-trader/blob/master/packages/packages.json#L35)
 — `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
@@ -615,8 +651,10 @@ agent-ui-monorepo contains three React/TypeScript frontends (BabyDegen UI = opti
 Predict UI = trader, Agents.fun UI = agents-fun-eliza), each providing a visualization
 layer for a corresponding open-autonomy agent service.
 
-**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/agent-ui-monorepo/blob/main/README.md#L1)
-— "designed to provide a UI for various agent-based functionalities"
+**Declaration:** [`apps/babydegen-ui/README.md#L3`](https://github.com/valory-xyz/agent-ui-monorepo/blob/main/apps/babydegen-ui/README.md#L3)
+— "Served by the Modius and Optimus agent, designed to be consumed by the agent and available in Pearl";
+similarly `apps/predict-ui/README.md#L3` and `apps/agentsfun-ui/README.md#L3` name their
+respective open-autonomy agents (trader, agents-fun-eliza)
 
 ---
 

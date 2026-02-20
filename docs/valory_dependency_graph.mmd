@@ -117,7 +117,12 @@ flowchart LR
     dev_template --> open_autonomy
 
     %% On-chain contract hierarchy
-    gov --> autonolas_v1
+    %% autonolas-v1 is a meta-repo that aggregates all on-chain protocol repos as submodules (.gitmodules)
+    autonolas_v1 --> gov
+    autonolas_v1 --> reg
+    autonolas_v1 --> tok
+    autonolas_v1 --> mkt
+    autonolas_v1 --> stk
     reg --> gov
     tok --> gov
     tok --> reg
