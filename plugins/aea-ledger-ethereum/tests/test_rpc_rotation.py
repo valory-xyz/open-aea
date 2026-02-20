@@ -467,7 +467,7 @@ class TestEthereumApiMultiRpc:
     def test_middleware_added_to_onion(
         self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
     ) -> None:
-        """RPCRotationMiddleware is added to the middleware onion."""
+        """Test that RPCRotationMiddleware is added to the middleware onion."""
         from aea_ledger_ethereum.ethereum import EthereumApi
 
         mock_web3 = MagicMock()
