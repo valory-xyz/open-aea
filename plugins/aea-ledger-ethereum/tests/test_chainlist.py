@@ -81,8 +81,9 @@ class TestIsTemplateUrl:
 class TestProbeRpc:
     """Tests for probe_rpc."""
 
+    @patch("aea_ledger_ethereum.chainlist.time.monotonic", side_effect=[1.0, 1.05])
     @patch("aea_ledger_ethereum.chainlist.urllib.request.urlopen")
-    def test_success(self, mock_urlopen: MagicMock) -> None:
+    def test_success(self, mock_urlopen: MagicMock, _mono: MagicMock) -> None:
         """Successful probe returns (url, latency, block)."""
         mock_resp = MagicMock()
         mock_resp.read.return_value = json.dumps(
@@ -96,7 +97,7 @@ class TestProbeRpc:
         assert result is not None
         url, latency, block = result
         assert url == "https://rpc.example.com"
-        assert latency > 0
+        assert latency == 50.0
         assert block == 0x1A4B5C
 
     @patch("aea_ledger_ethereum.chainlist.urllib.request.urlopen")
