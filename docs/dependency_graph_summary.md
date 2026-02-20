@@ -27,7 +27,7 @@ open-autonomy extends the open-aea framework with multi-agent service consensus 
 agent service deployment tooling, and governance scaffolding.
 Every open-autonomy agent service runs on top of an open-aea agent.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/open-autonomy/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L13`](https://github.com/valory-xyz/open-autonomy/blob/main/pyproject.toml#L13)
 — `open-aea = { version = "==2.0.8", extras = ["all"] }`
 
 ---
@@ -37,7 +37,7 @@ open-aea ships three ACN connection packages (`p2p_libp2p`, `p2p_libp2p_client`,
 `p2p_libp2p_mailbox`) that allow AEA agents to communicate peer-to-peer over the
 open-acn network.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/open-aea/blob/main/packages/packages.json)
+**Declaration:** [`packages/packages.json#L19-L21`](https://github.com/valory-xyz/open-aea/blob/main/packages/packages.json#L19-L21)
 — entries `connection/valory/p2p_libp2p/0.1.0`, `connection/valory/p2p_libp2p_client/0.1.0`,
 `connection/valory/p2p_libp2p_mailbox/0.1.0`
 
@@ -47,8 +47,8 @@ open-acn network.
 dev-template is a starter project template for building new open-autonomy agent services.
 Its `packages/` directory contains a ready-to-use open-autonomy agent/service scaffold.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/dev-template/blob/main/packages/packages.json)
-— third_party AEA components sourced from open-autonomy
+**Declaration:** [`README.md#L3`](https://github.com/valory-xyz/dev-template/blob/main/README.md#L3)
+— "A template for development with the open-autonomy framework"
 
 ---
 
@@ -59,8 +59,8 @@ autonolas-governance (OLAS token, veOLAS, governance time-lock) builds on top of
 autonolas-v1 base protocol contracts, inheriting the initial token specification and core
 interfaces defined there.
 
-**Declaration:** [`contracts/`](https://github.com/valory-xyz/autonolas-governance/tree/main/contracts)
-— Solidity contracts extend or call autonolas-v1 base contracts
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/autonolas-governance/blob/main/README.md#L1)
+— "This repository contains the Autonolas `OLAS` token and the governance part of the on-chain protocol"
 
 ---
 
@@ -69,8 +69,8 @@ The registries contracts (ComponentRegistry, AgentRegistry, ServiceRegistry, Ser
 are initialized with the governance contract address as their owner/manager.
 Governance controls all privileged registry operations (upgrades, parameter changes).
 
-**Declaration:** [`hardhat.config.js`](https://github.com/valory-xyz/autonolas-registries/blob/main/hardhat.config.js)
-— governance contract addresses referenced for deployment and integration tests
+**Declaration:** [`contracts/GenericManager.sol#L14`](https://github.com/valory-xyz/autonolas-registries/blob/main/contracts/GenericManager.sol#L14)
+— `address public owner` — set to the governance Timelock address at deployment
 
 ---
 
@@ -78,8 +78,8 @@ Governance controls all privileged registry operations (upgrades, parameter chan
 Tokenomics contracts (Treasury, Tokenomics) require the governance address to control the
 OLAS token minting schedule and policy parameters.
 
-**Declaration:** [`hardhat.config.js`](https://github.com/valory-xyz/autonolas-tokenomics/blob/main/hardhat.config.js)
-— governance and OLAS token addresses used in deployment scripts
+**Declaration:** [`contracts/Tokenomics.sol#L16`](https://github.com/valory-xyz/autonolas-tokenomics/blob/main/contracts/Tokenomics.sol#L16)
+— inline `interface IOLAS` — declares the OLAS token (governance) interface used by Tokenomics
 
 ---
 
@@ -87,8 +87,8 @@ OLAS token minting schedule and policy parameters.
 The Tokenomics contract reads from the ServiceRegistry to calculate per-component OLAS
 incentives (unit fractions), reward epochs, and service donation splits.
 
-**Declaration:** [`hardhat.config.js`](https://github.com/valory-xyz/autonolas-tokenomics/blob/main/hardhat.config.js)
-— registries contract addresses referenced in tests and deployment
+**Declaration:** [`contracts/Tokenomics.sol#L43`](https://github.com/valory-xyz/autonolas-tokenomics/blob/main/contracts/Tokenomics.sol#L43)
+— inline `interface IServiceRegistry` — declares the ServiceRegistry (registries) interface used by Tokenomics
 
 ---
 
@@ -97,7 +97,7 @@ Staking programme contracts (StakingToken, StakingFactory) reference the Service
 to verify service state (registered/deployed/terminated) as a condition for staking
 eligibility.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/autonolas-staking-programmes/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L1`](https://github.com/valory-xyz/autonolas-staking-programmes/blob/main/.gitmodules#L1)
 — `[submodule "lib/autonolas-registries"]` pinned at tag `v1.2.2`
 
 ---
@@ -106,8 +106,8 @@ eligibility.
 Staking contracts call the Tokenomics/Treasury contracts to request OLAS staking rewards
 for eligible stakers.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/autonolas-staking-programmes/blob/main/.gitmodules)
-— tokenomics addresses are used alongside the registries submodule in staking reward flows
+**Declaration:** [`contracts/contribute/Contributors.sol#L69`](https://github.com/valory-xyz/autonolas-staking-programmes/blob/main/contracts/contribute/Contributors.sol#L69)
+— `address public immutable olas` — staking contracts hold and distribute OLAS (minted by Tokenomics) as staking rewards
 
 ---
 
@@ -115,7 +115,7 @@ for eligible stakers.
 The Marketplace contracts look up service records from the ServiceRegistry to list, verify,
 and facilitate trading of AI agent services.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/autonolas-marketplace/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L1`](https://github.com/valory-xyz/autonolas-marketplace/blob/main/.gitmodules#L1)
 — `[submodule "lib/autonolas-registries"]`
 
 ---
@@ -124,8 +124,8 @@ and facilitate trading of AI agent services.
 The DynamicContribution contracts interact with the ServiceRegistry to retrieve
 service/component metadata used for computing dynamic NFT contribution scores.
 
-**Declaration:** [`contracts/`](https://github.com/valory-xyz/dynamic-contribution/tree/main/contracts)
-— Solidity contracts import or call ServiceRegistry interfaces
+**Declaration:** [`contracts/DelegateContribute.sol#L4`](https://github.com/valory-xyz/dynamic-contribution/blob/main/contracts/DelegateContribute.sol#L4)
+— `interface IVEOLAS` — interacts with the veOLAS governance contract from autonolas-registries/governance ecosystem
 
 ---
 
@@ -133,7 +133,7 @@ service/component metadata used for computing dynamic NFT contribution scores.
 registries-solana is a functional port of the EVM ServiceRegistry for the Solana/Anchor
 runtime.  It mirrors the same on-chain registration API and data model as the EVM original.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/registries-solana/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/registries-solana/blob/main/README.md#L1)
 — "Set of Autonolas registries contracts on Solana"
 
 ---
@@ -142,7 +142,7 @@ runtime.  It mirrors the same on-chain registration API and data model as the EV
 governance-near is a functional port of the EVM governance contracts for the NEAR Protocol
 runtime, mirroring the same governance interfaces in Rust/NEAR.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/governance-near/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/governance-near/blob/main/README.md#L1)
 — "Set of Autonolas registries contracts on NEAR"
 
 ---
@@ -151,7 +151,7 @@ runtime, mirroring the same governance interfaces in Rust/NEAR.
 The subgraph indexes on-chain events emitted by the Registries contracts
 (ComponentRegistry, AgentRegistry, ServiceRegistry) to expose a queryable GraphQL API.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/autonolas-subgraph/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L1`](https://github.com/valory-xyz/autonolas-subgraph/blob/main/.gitmodules#L1)
 — `[submodule "autonolas-registries"]` — provides ABIs and contract addresses
 
 ---
@@ -160,8 +160,8 @@ The subgraph indexes on-chain events emitted by the Registries contracts
 The subgraph also indexes Tokenomics and Treasury contract events (incentive epoch
 checkpoints, OLAS minting) alongside the registry data.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/autonolas-subgraph/blob/main/.gitmodules)
-— tokenomics contracts are indexed alongside registries (see `subgraph.yaml` in repo)
+**Declaration:** [`subgraphs/autonolas/subgraph.yaml#L1`](https://github.com/valory-xyz/autonolas-subgraph/blob/main/subgraphs/autonolas/subgraph.yaml#L1)
+— tokenomics contract events are indexed alongside registries in the subgraph
 
 ---
 
@@ -170,7 +170,7 @@ The subgraph-studio monorepo supersedes and extends the original autonolas-subgr
 housing multiple subgraphs (service-registry, tokenomics, staking) while reusing the
 same ABI/schema patterns and referencing the same on-chain contracts.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/autonolas-subgraph-studio/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/autonolas-subgraph-studio/blob/main/README.md#L1)
 — "This repository contains multiple subgraphs … primarily indexing contracts related to
 the Autonolas ecosystem"
 
@@ -183,7 +183,7 @@ The middleware is the Python backend of Pearl (and quickstart).  It uses the ope
 Python SDK to deploy, run, and stop agent services locally, manage service keys, and
 interact with the Autonolas protocol on-chain.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/olas-operate-middleware/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L22`](https://github.com/valory-xyz/olas-operate-middleware/blob/main/pyproject.toml#L22)
 — `open-autonomy = "^0.21.11"`
 
 ---
@@ -192,7 +192,7 @@ interact with the Autonolas protocol on-chain.
 propel-client is a CLI/SDK for interacting with the Valory PaaS (Propel).  It uses the
 open-autonomy Python SDK to understand agent service concepts, service keys, and addresses.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/propel-client/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L14`](https://github.com/valory-xyz/propel-client/blob/main/pyproject.toml#L14)
 — `open-autonomy = "==v0.19.7"`
 
 ---
@@ -203,9 +203,8 @@ open-autonomy Python SDK to understand agent service concepts, service keys, and
 mech is a multi-agent service built on open-autonomy.  Its skills, protocols, and
 connections are AEA packages that depend on the open-autonomy consensus framework.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech/blob/main/packages/packages.json)
-— `third_party` contains open-autonomy AEA packages
-(e.g. `skill/valory/abstract_round_abci`, `connection/valory/abci`)
+**Declaration:** [`packages/packages.json#L42`](https://github.com/valory-xyz/mech/blob/main/packages/packages.json#L42)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -213,8 +212,8 @@ connections are AEA packages that depend on the open-autonomy consensus framewor
 mech-predict extends mech with prediction-specific tools and inherits the full
 open-autonomy ABCI FSM framework via its third_party AEA packages.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-predict/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L55`](https://github.com/valory-xyz/mech-predict/blob/main/packages/packages.json#L55)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -222,8 +221,8 @@ open-autonomy ABCI FSM framework via its third_party AEA packages.
 mech-agents-fun provides agents.fun-specific mech tools.
 Its AEA service packages are built on the open-autonomy framework.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-agents-fun/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L48`](https://github.com/valory-xyz/mech-agents-fun/blob/main/packages/packages.json#L48)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -231,8 +230,8 @@ Its AEA service packages are built on the open-autonomy framework.
 mock-mech is a lightweight mech simulator used in integration testing.
 It depends on open-autonomy for its service scaffolding.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mock-mech/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/mock-mech/blob/main/README.md#L1)
+— "A mock mech to test Olas services"
 
 ---
 
@@ -240,8 +239,8 @@ It depends on open-autonomy for its service scaffolding.
 mech-marketplace-legacy is the v0 mech marketplace service.
 It is a full open-autonomy agent service (all packages are internally owned).
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-marketplace-legacy/blob/main/packages/packages.json)
-— `third_party: {}` — all packages are `dev`-owned, but the service framework is open-autonomy
+**Declaration:** [`pyproject.toml#L19`](https://github.com/valory-xyz/mech-marketplace-legacy/blob/main/pyproject.toml#L19)
+— `open-autonomy = "==0.18.2"`
 
 ---
 
@@ -250,7 +249,7 @@ mech-client is a Python CLI/SDK for requesting tasks from deployed mech services
 It uses olas-operate-middleware for on-chain service interaction, Safe management,
 and OLAS staking.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/mech-client/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L17`](https://github.com/valory-xyz/mech-client/blob/main/pyproject.toml#L17)
 — `olas-operate-middleware = "0.14.16"`
 
 ---
@@ -259,7 +258,7 @@ and OLAS staking.
 mech-tools-dev is the developer toolkit for authoring and testing mech tools.
 It imports the full open-autonomy framework for developing and running mech services.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L19`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml#L19)
 — `open-autonomy = "==0.21.11"`
 
 ---
@@ -268,7 +267,7 @@ It imports the full open-autonomy framework for developing and running mech serv
 mech-tools-dev uses mech-client to invoke deployed mech services during tool development
 and integration testing.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L54`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml#L54)
 — `mech-client = "==0.18.8"`
 
 ---
@@ -277,7 +276,7 @@ and integration testing.
 mech-tools-dev uses olas-operate-middleware for on-chain operations (Safe management,
 staking) during mech tool integration tests.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L55`](https://github.com/valory-xyz/mech-tools-dev/blob/main/pyproject.toml#L55)
 — `olas-operate-middleware = ">=0.14.16"`
 
 ---
@@ -287,9 +286,9 @@ mech-predict imports mech's core AEA packages (agent_mech protocol, mech_abci sk
 acn_data_share protocol) in its `third_party` to reuse mech's prediction-task dispatching
 logic.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-predict/blob/main/packages/packages.json)
-— `third_party` entries `protocol/valory/acn_data_share`,
-`contract/valory/agent_mech`, `skill/valory/mech_abci` (all owned by `mech`)
+**Declaration:** [`packages/packages.json#L34-L60`](https://github.com/valory-xyz/mech-predict/blob/main/packages/packages.json#L34-L60)
+— `third_party` entries `protocol/valory/acn_data_share/0.1.0` (L34), `contract/valory/agent_mech/0.1.0` (L40),
+and `skill/valory/mech_abci/0.1.0` (L60) — all owned by `mech`
 
 ---
 
@@ -297,8 +296,9 @@ logic.
 mech-agents-fun imports mech's core AEA packages in its `third_party` to reuse the mech
 agent framework for agents.fun-specific tasks.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-agents-fun/blob/main/packages/packages.json)
-— `third_party` entries from `mech`
+**Declaration:** [`packages/packages.json#L12-L23`](https://github.com/valory-xyz/mech-agents-fun/blob/main/packages/packages.json#L12-L23)
+— `third_party` entries `protocol/valory/acn_data_share/0.1.0` (L12) and
+`contract/valory/agent_mech/0.1.0` (L23) — owned by `mech`
 
 ---
 
@@ -306,8 +306,9 @@ agent framework for agents.fun-specific tasks.
 mech-tools-dev imports mech AEA packages (agent_mech, mech_abci, etc.) in its `third_party`
 during local development and testing of new mech tools.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-tools-dev/blob/main/packages/packages.json)
-— `third_party` entries from `mech`
+**Declaration:** [`packages/packages.json#L8-L36`](https://github.com/valory-xyz/mech-tools-dev/blob/main/packages/packages.json#L8-L36)
+— `third_party` entries `protocol/valory/acn_data_share/0.1.0` (L8), `contract/valory/agent_mech/0.1.0` (L18),
+and `skill/valory/mech_abci/0.1.0` (L36) — all owned by `mech`
 
 ---
 
@@ -316,8 +317,8 @@ mech-interact provides the `mech_interact_abci` skill for integrating mech reque
 cycles into any open-autonomy agent service.
 It depends on the open-autonomy ABCI FSM framework.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-interact/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L41`](https://github.com/valory-xyz/mech-interact/blob/main/packages/packages.json#L41)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -326,9 +327,8 @@ mech-interact uses mech's core AEA packages (`protocol/valory/acn_data_share`,
 `contract/valory/agent_mech`) to communicate with deployed mech agents on-chain and
 off-chain.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/mech-interact/blob/main/packages/packages.json)
-— `third_party` entries `protocol/valory/acn_data_share` and
-`contract/valory/agent_mech` (owned by `mech`)
+**Declaration:** [`packages/packages.json#L22`](https://github.com/valory-xyz/mech-interact/blob/main/packages/packages.json#L22)
+— `third_party` entry `protocol/valory/acn_data_share/0.1.0` (owned by `mech`)
 
 ---
 
@@ -339,8 +339,8 @@ trader is an open-autonomy multi-agent service that autonomously trades predicti
 positions.  All its skills, connections, and protocols are AEA packages depending on
 the open-autonomy framework.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L71`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json#L71)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -348,8 +348,8 @@ the open-autonomy framework.
 market-creator is an open-autonomy agent service that autonomously creates Omen prediction
 market questions using LLMs. Built on the open-autonomy ABCI FSM.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L52`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json#L52)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -357,8 +357,8 @@ market questions using LLMs. Built on the open-autonomy ABCI FSM.
 optimus (BabyDegen) is an open-autonomy DeFi agent service for autonomous yield
 optimization across DEXes and lending protocols.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/optimus/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L62`](https://github.com/valory-xyz/optimus/blob/main/packages/packages.json#L62)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -366,8 +366,8 @@ optimization across DEXes and lending protocols.
 meme-ooorr is an open-autonomy agent service for autonomous meme coin deployment,
 management, and social promotion.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L62`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json#L62)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -375,8 +375,8 @@ management, and social promotion.
 IEKit is an open-autonomy agent service for evaluating the social impact of web3 projects
 using on-chain and off-chain signals.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L72`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json#L72)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -384,8 +384,8 @@ using on-chain and off-chain signals.
 price-oracle is the canonical open-autonomy demonstration service: multiple agents reach
 BFT consensus on an off-chain price feed.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/price-oracle/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L30`](https://github.com/valory-xyz/price-oracle/blob/main/packages/packages.json#L30)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -393,8 +393,8 @@ BFT consensus on an off-chain price feed.
 hello-world is the simplest canonical open-autonomy example: a single-round FSM service
 with a shared counter, used in tutorials.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/hello-world/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L23`](https://github.com/valory-xyz/hello-world/blob/main/packages/packages.json#L23)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -402,8 +402,8 @@ with a shared counter, used in tutorials.
 langchain-trader is an open-autonomy agent service that uses LangChain LLMs to make
 prediction market trading decisions.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json)
-— `third_party` open-autonomy packages
+**Declaration:** [`packages/packages.json#L32`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json#L32)
+— `third_party` entry `skill/valory/abstract_round_abci/0.1.0` (open-autonomy ABCI FSM skill)
 
 ---
 
@@ -412,8 +412,8 @@ pettai-agent wraps an olas-sdk-starter-based agent service.  The `olas-sdk-start
 subdirectory contains an open-autonomy agent/service scaffold registered on the Autonolas
 protocol.
 
-**Declaration:** [`olas-sdk-starter/packages/packages.json`](https://github.com/valory-xyz/pettai-agent/blob/main/olas-sdk-starter/packages/packages.json)
-— agent/service packages built on open-autonomy
+**Declaration:** [`olas-sdk-starter/packages/packages.json#L3`](https://github.com/valory-xyz/pettai-agent/blob/main/olas-sdk-starter/packages/packages.json#L3)
+— `dev` section agent/service packages built on open-autonomy
 
 ---
 
@@ -421,7 +421,7 @@ protocol.
 agents-fun-eliza is an open-autonomy agent service that integrates the ElizaOS framework
 for autonomous social media actions (Twitter/X).
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/agents-fun-eliza/blob/main/packages/packages.json)
+**Declaration:** [`packages/packages.json#L3`](https://github.com/valory-xyz/agents-fun-eliza/blob/main/packages/packages.json#L3)
 — `third_party` open-autonomy packages
 
 ---
@@ -441,7 +441,7 @@ components are authored locally following the sdk-starter pattern.
 agents-fun-eliza is the open-autonomy backend agent that uses `plugin-memeooorr` as its
 TypeScript/ElizaOS plugin for Twitter interactions and meme-coin decision actions.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/plugin-memeooorr/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/plugin-memeooorr/blob/main/README.md#L1)
 — "specifically designed to be used with agents-fun-eliza"
 
 ---
@@ -451,8 +451,8 @@ trader uses mech's `protocol/valory/acn_data_share` AEA protocol (for mech reque
 routing) and `contract/valory/agent_mech` (for on-chain mech contract interactions)
 in its AEA package set.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json)
-— `third_party` entry `protocol/valory/acn_data_share` (owned by `mech`)
+**Declaration:** [`packages/packages.json#L31`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json#L31)
+— `third_party` entry `protocol/valory/acn_data_share/0.1.0` (owned by `mech`)
 
 ---
 
@@ -460,8 +460,8 @@ in its AEA package set.
 market-creator imports mech's `protocol/valory/acn_data_share` to enable mech task
 delegation for LLM-powered market question creation.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json)
-— `third_party` entry `protocol/valory/acn_data_share` (owned by `mech`)
+**Declaration:** [`packages/packages.json#L20`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json#L20)
+— `third_party` entry `protocol/valory/acn_data_share/0.1.0` (owned by `mech`)
 
 ---
 
@@ -469,8 +469,8 @@ delegation for LLM-powered market question creation.
 meme-ooorr imports mech AEA packages to use mech agents for AI-assisted meme coin
 strategy analysis.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json)
-— `third_party` entries from `mech`
+**Declaration:** [`packages/packages.json#L24`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json#L24)
+— `third_party` entry `protocol/valory/acn_data_share/0.1.0` (owned by `mech`)
 
 ---
 
@@ -478,8 +478,8 @@ strategy analysis.
 IEKit imports mech AEA packages to delegate AI reasoning tasks to mech agents as part
 of its impact evaluation pipeline.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json)
-— `third_party` entries from `mech`
+**Declaration:** [`packages/packages.json#L42`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json#L42)
+— `third_party` entry `protocol/valory/acn_data_share/0.1.0` (owned by `mech`)
 
 ---
 
@@ -487,8 +487,8 @@ of its impact evaluation pipeline.
 trader's prediction market FSM uses the `skill/valory/mech_interact_abci` skill from
 mech-interact to send/receive mech requests during trading rounds.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json)
-— `third_party` entry `skill/valory/mech_interact_abci` (owned by `mech-interact`)
+**Declaration:** [`packages/packages.json#L76`](https://github.com/valory-xyz/trader/blob/main/packages/packages.json#L76)
+— `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
 
@@ -496,8 +496,8 @@ mech-interact to send/receive mech requests during trading rounds.
 market-creator uses `skill/valory/mech_interact_abci` to delegate market question
 creation tasks to mech agents.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json)
-— `third_party` entry `skill/valory/mech_interact_abci` (owned by `mech-interact`)
+**Declaration:** [`packages/packages.json#L57`](https://github.com/valory-xyz/market-creator/blob/main/packages/packages.json#L57)
+— `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
 
@@ -505,8 +505,8 @@ creation tasks to mech agents.
 meme-ooorr uses `skill/valory/mech_interact_abci` to integrate mech-based AI reasoning
 into its meme-coin strategy rounds.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json)
-— `third_party` entry `skill/valory/mech_interact_abci` (owned by `mech-interact`)
+**Declaration:** [`packages/packages.json#L65`](https://github.com/valory-xyz/meme-ooorr/blob/main/packages/packages.json#L65)
+— `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
 
@@ -514,8 +514,8 @@ into its meme-coin strategy rounds.
 IEKit uses `skill/valory/mech_interact_abci` to request mech evaluations as part of its
 impact scoring pipeline.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json)
-— `third_party` entry `skill/valory/mech_interact_abci` (owned by `mech-interact`)
+**Declaration:** [`packages/packages.json#L75`](https://github.com/valory-xyz/IEKit/blob/main/packages/packages.json#L75)
+— `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
 
@@ -523,8 +523,8 @@ impact scoring pipeline.
 langchain-trader uses `skill/valory/mech_interact_abci` to dispatch LLM-powered
 prediction tasks to mech agents.
 
-**Declaration:** [`packages/packages.json`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json)
-— `third_party` entry `skill/valory/mech_interact_abci` (owned by `mech-interact`)
+**Declaration:** [`packages/packages.json#L35`](https://github.com/valory-xyz/langchain-trader/blob/main/packages/packages.json#L35)
+— `third_party` entry `skill/valory/mech_interact_abci/0.1.0` (owned by `mech-interact`)
 
 ---
 
@@ -535,7 +535,7 @@ Pearl is an Electron desktop app for one-click deployment and management of agen
 services.  Its Python backend daemon is olas-operate-middleware, installed as a
 Poetry dependency.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/olas-operate-app/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L13`](https://github.com/valory-xyz/olas-operate-app/blob/main/pyproject.toml#L13)
 — `olas-operate-middleware = "0.14.15"`
 
 ---
@@ -544,7 +544,7 @@ Poetry dependency.
 quickstart is a CLI script for one-click deployment of specific agent services.
 It calls the olas-operate-middleware Python API to manage service lifecycles.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/quickstart/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L13`](https://github.com/valory-xyz/quickstart/blob/main/pyproject.toml#L13)
 — `olas-operate-middleware = "0.14.4"`
 
 ---
@@ -554,7 +554,7 @@ olas-sdk-starter is the official project template for building custom open-auton
 services that can be deployed via Pearl or quickstart.  Its scaffold uses the
 `autonomy` CLI extensively.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/olas-sdk-starter/blob/main/README.md)
+**Declaration:** [`README.md#L3`](https://github.com/valory-xyz/olas-sdk-starter/blob/main/README.md#L3)
 — uses `autonomy init`, `autonomy packages lock`, `autonomy push-all`
 
 ---
@@ -564,7 +564,7 @@ open-autonomy-client is a Python SDK for querying deployed open-autonomy multi-a
 services as if they were a single consensus endpoint, abstracting away the multi-agent
 nature.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/open-autonomy-client/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/open-autonomy-client/blob/main/README.md#L1)
 — "helps to query multi-agent systems built with the open-autonomy framework"
 
 ---
@@ -573,7 +573,7 @@ nature.
 triton-bot is a Telegram bot that queries the local Pearl/middleware node to display
 agent service staking status and metrics to users.
 
-**Declaration:** [`pyproject.toml`](https://github.com/valory-xyz/triton-bot/blob/main/pyproject.toml)
+**Declaration:** [`pyproject.toml#L12`](https://github.com/valory-xyz/triton-bot/blob/main/pyproject.toml#L12)
 — `olas-operate-middleware = "^0.13.1"`
 
 ---
@@ -603,8 +603,8 @@ viewing trader output.
 olas-predict fetches on-chain prediction market data (market registry, staking, token
 supply) from the autonolas-subgraph via GraphQL.
 
-**Declaration:** [`.env.example`](https://github.com/valory-xyz/olas-predict/blob/main/.env.example)
-— `NEXT_PUBLIC_SUBGRAPH_API_KEY`, `NEXT_PUBLIC_REGISTRY_GRAPH_URL`;
+**Declaration:** [`.env.example#L1-L3`](https://github.com/valory-xyz/olas-predict/blob/main/.env.example#L1-L3)
+— `NEXT_PUBLIC_SUBGRAPH_API_KEY` (L1), `NEXT_PUBLIC_REGISTRY_GRAPH_URL` (L3);
 [`package.json`](https://github.com/valory-xyz/olas-predict/blob/main/package.json)
 — `graphql-request` dependency
 
@@ -615,7 +615,7 @@ agent-ui-monorepo contains three React/TypeScript frontends (BabyDegen UI = opti
 Predict UI = trader, Agents.fun UI = agents-fun-eliza), each providing a visualization
 layer for a corresponding open-autonomy agent service.
 
-**Declaration:** [`README.md`](https://github.com/valory-xyz/agent-ui-monorepo/blob/main/README.md)
+**Declaration:** [`README.md#L1`](https://github.com/valory-xyz/agent-ui-monorepo/blob/main/README.md#L1)
 — "designed to provide a UI for various agent-based functionalities"
 
 ---
@@ -626,7 +626,7 @@ layer for a corresponding open-autonomy agent service.
 The docs repo pulls open-aea documentation as a Git submodule, incorporating it into
 the unified Olas ecosystem docs site built with MkDocs.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L1`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L1)
 — `[submodule "open-aea"]`
 
 ---
@@ -634,7 +634,7 @@ the unified Olas ecosystem docs site built with MkDocs.
 ### `docs` → `open-autonomy`
 The docs repo pulls open-autonomy documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L4`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L4)
 — `[submodule "open-autonomy"]`
 
 ---
@@ -642,7 +642,7 @@ The docs repo pulls open-autonomy documentation as a Git submodule.
 ### `docs` → `open-acn`
 The docs repo pulls open-acn documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L7`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L7)
 — `[submodule "open-acn"]`
 
 ---
@@ -650,7 +650,7 @@ The docs repo pulls open-acn documentation as a Git submodule.
 ### `docs` → `mech`
 The docs repo pulls mech documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L10`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L10)
 — `[submodule "mech"]`
 
 ---
@@ -658,7 +658,7 @@ The docs repo pulls mech documentation as a Git submodule.
 ### `docs` → `mech-tools-dev`
 The docs repo pulls mech-tools-dev developer tool documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L13`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L13)
 — `[submodule "mech-tools-dev"]`
 
 ---
@@ -666,7 +666,7 @@ The docs repo pulls mech-tools-dev developer tool documentation as a Git submodu
 ### `docs` → `mech-client`
 The docs repo pulls mech-client API reference documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L16`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L16)
 — `[submodule "mech-client"]`
 
 ---
@@ -674,7 +674,7 @@ The docs repo pulls mech-client API reference documentation as a Git submodule.
 ### `docs` → `price-oracle`
 The docs repo pulls price-oracle tutorial/example documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L19`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L19)
 — `[submodule "price-oracle"]`
 
 ---
@@ -682,7 +682,7 @@ The docs repo pulls price-oracle tutorial/example documentation as a Git submodu
 ### `docs` → `IEKit`
 The docs repo pulls IEKit documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L22`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L22)
 — `[submodule "IEKit"]`
 
 ---
@@ -690,5 +690,5 @@ The docs repo pulls IEKit documentation as a Git submodule.
 ### `docs` → `hello-world`
 The docs repo pulls hello-world tutorial documentation as a Git submodule.
 
-**Declaration:** [`.gitmodules`](https://github.com/valory-xyz/docs/blob/main/.gitmodules)
+**Declaration:** [`.gitmodules#L25`](https://github.com/valory-xyz/docs/blob/main/.gitmodules#L25)
 — `[submodule "hello-world"]`
