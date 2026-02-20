@@ -30,11 +30,10 @@ import threading
 import time
 from typing import Any, Dict, FrozenSet, List, Optional, Union
 
+from aea_ledger_ethereum.chainlist import enrich_rpc_urls
 from web3 import AsyncWeb3, HTTPProvider, Web3
 from web3.middleware.base import Web3MiddlewareBuilder
 from web3.types import RPCEndpoint, RPCResponse
-
-from aea_ledger_ethereum.chainlist import enrich_rpc_urls
 
 
 _logger = logging.getLogger("aea.ledger_apis.ethereum.rpc_rotation")
