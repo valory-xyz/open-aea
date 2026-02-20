@@ -646,18 +646,6 @@ supply) from the autonolas-subgraph via GraphQL.
 
 ---
 
-### `agent-ui-monorepo` → `open-autonomy`
-agent-ui-monorepo contains three React/TypeScript frontends (BabyDegen UI = optimus,
-Predict UI = trader, Agents.fun UI = agents-fun-eliza), each providing a visualization
-layer for a corresponding open-autonomy agent service.
-
-**Declaration:** [`apps/babydegen-ui/README.md#L3`](https://github.com/valory-xyz/agent-ui-monorepo/blob/main/apps/babydegen-ui/README.md#L3)
-— "Served by the Modius and Optimus agent, designed to be consumed by the agent and available in Pearl";
-similarly `apps/predict-ui/README.md#L3` and `apps/agentsfun-ui/README.md#L3` name their
-respective open-autonomy agents (trader, agents-fun-eliza)
-
----
-
 ## 8. Documentation
 
 ### `docs` → `open-aea`
