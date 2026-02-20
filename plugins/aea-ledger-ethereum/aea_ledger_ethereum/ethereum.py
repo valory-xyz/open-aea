@@ -34,7 +34,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 import ipfshttpclient  # noqa: F401 # pylint: disable=unused-import
-from aea_ledger_ethereum.rpc_rotation import RPCRotationMixin, parse_rpc_urls
+from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware, parse_rpc_urls
 from eth_account import Account
 from eth_account._utils.legacy_transactions import (
     encode_transaction,
@@ -959,7 +959,7 @@ class CachedChainIdMiddleware(Web3MiddlewareBuilder):
         return middleware
 
 
-class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
+class EthereumApi(LedgerApi, EthereumHelper):
     """Class to interact with the Ethereum Web3 APIs."""
 
     identifier = _ETHEREUM
@@ -988,7 +988,15 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
                 request_kwargs=request_kwargs,
             )
         )
-        self._init_rotation(rpc_urls, request_kwargs, chain_id=self._chain_id)
+        # RPC rotation middleware — handles failover and retry across endpoints
+        self._rpc_rotation: RPCRotationMiddleware = (
+            RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+                rpc_urls=rpc_urls,
+                request_kwargs=request_kwargs,
+                chain_id=self._chain_id,
+            )
+        )(self._api)  # build the instance immediately so we can hold a reference
+        self._api.middleware_onion.add(self._rpc_rotation)
         # cache the chain id and use it for all the `eth_chainId` calls to avoid excess RPC usage
         cached_chain_id = (
             CachedChainIdMiddleware.build(  # pylint: disable=no-value-for-parameter
@@ -1026,6 +1034,16 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
         """Get the underlying API object."""
         return self._api
 
+    @property
+    def current_rpc_url(self) -> str:
+        """Return the currently active RPC URL."""
+        return self._rpc_rotation.current_rpc_url
+
+    @property
+    def rpc_count(self) -> int:
+        """Return the number of configured RPC endpoints."""
+        return self._rpc_rotation.rpc_count
+
     def get_balance(
         self, address: Address, raise_on_try: bool = False
     ) -> Optional[int]:
@@ -1036,12 +1054,7 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
     def _try_get_balance(self, address: Address, **_kwargs: Any) -> Optional[int]:
         """Get the balance of a given account."""
         check_address = self._api.to_checksum_address(address)
-        return self._execute_with_rpc_rotation(
-            lambda: self._api.eth.get_balance(
-                check_address
-            ),  # pylint: disable=no-member
-            operation_name="get_balance",
-        )
+        return self._api.eth.get_balance(check_address)  # pylint: disable=no-member
 
     def get_state(
         self, callable_name: str, *args: Any, raise_on_try: bool = False, **kwargs: Any
@@ -1064,10 +1077,7 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
             )
             kwargs.pop("raise_on_try")
 
-        response = self._execute_with_rpc_rotation(
-            lambda: getattr(self._api.eth, callable_name)(*args, **kwargs),
-            operation_name=f"get_state({callable_name})",
-        )
+        response = getattr(self._api.eth, callable_name)(*args, **kwargs)
 
         if isinstance(response, AttributeDict):
             result = AttributeDictTranslator.to_dict(response)
@@ -1234,20 +1244,14 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
             return None
         gas_price_strategy, gas_price_strategy_callable = retrieved_strategy
 
-        def _rpc_call() -> Any:
-            prior_strategy = (
-                self._api.eth._gas_price_strategy  # pylint: disable=protected-access
-            )
-            try:
-                self._api.eth.set_gas_price_strategy(gas_price_strategy_callable)
-                return self._api.eth.generate_gas_price()
-            finally:
-                self._api.eth.set_gas_price_strategy(prior_strategy)  # pragma: nocover
-
-        gas_price = self._execute_with_rpc_rotation(
-            _rpc_call,
-            operation_name="get_gas_pricing",
+        prior_strategy = (
+            self._api.eth._gas_price_strategy  # pylint: disable=protected-access
         )
+        try:
+            self._api.eth.set_gas_price_strategy(gas_price_strategy_callable)
+            gas_price = self._api.eth.generate_gas_price()
+        finally:
+            self._api.eth.set_gas_price_strategy(prior_strategy)  # pragma: nocover
 
         if gas_price is None or old_price is None:
             return gas_price
@@ -1275,12 +1279,7 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
     ) -> Optional[int]:
         """Try get the transaction count."""
         check_address = self._api.to_checksum_address(address)
-        return self._execute_with_rpc_rotation(
-            lambda: self._api.eth.get_transaction_count(
-                check_address
-            ),  # pylint: disable=no-member
-            operation_name="get_transaction_count",
-        )
+        return self._api.eth.get_transaction_count(check_address)  # pylint: disable=no-member
 
     def update_with_gas_estimate(  # pylint: disable=arguments-differ
         self, transaction: JSONLike, raise_on_try: bool = False
@@ -1308,29 +1307,23 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
         transaction = deepcopy(transaction)
         del transaction["gas"]
 
-        def _rpc_call() -> int:
-            try:
-                return self._api.eth.estimate_gas(  # pylint: disable=no-member
-                    transaction=cast(TxParams, transaction)
-                )
-            except (ContractLogicError, ValueError) as e:
-                _default_logger.warning(
-                    f"Unable to estimate gas with default state , "
-                    f"{type(e).__name__}: {str(e)}"
-                )
-                # gas estimation might fail when repricing txs
-                # to avoid effects of pending txs when estimating gas
-                # we can set the block identifier to "latest" block
-                # this might fail if the node doesn't support the `block_identifier` param
-                return self._api.eth.estimate_gas(  # pylint: disable=no-member
-                    transaction=cast(TxParams, transaction),
-                    block_identifier="latest",
-                )
-
-        return self._execute_with_rpc_rotation(
-            _rpc_call,
-            operation_name="estimate_gas",
-        )
+        try:
+            return self._api.eth.estimate_gas(  # pylint: disable=no-member
+                transaction=cast(TxParams, transaction)
+            )
+        except (ContractLogicError, ValueError) as e:
+            _default_logger.warning(
+                f"Unable to estimate gas with default state , "
+                f"{type(e).__name__}: {str(e)}"
+            )
+            # gas estimation might fail when repricing txs
+            # to avoid effects of pending txs when estimating gas
+            # we can set the block identifier to "latest" block
+            # this might fail if the node doesn't support the `block_identifier` param
+            return self._api.eth.estimate_gas(  # pylint: disable=no-member
+                transaction=cast(TxParams, transaction),
+                block_identifier="latest",
+            )
 
     def get_l1_data_fee(self, transaction: JSONLike) -> int:
         """
@@ -1395,12 +1388,8 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
         :return: tx_digest, if present
         """
         signed_transaction = SignedTransactionTranslator.from_dict(tx_signed)
-        hex_value = self._execute_with_rpc_rotation(
-            lambda: self._api.eth.send_raw_transaction(  # pylint: disable=no-member
-                signed_transaction.raw_transaction
-            ),
-            operation_name="send_raw_transaction",
-            is_write=True,
+        hex_value = self._api.eth.send_raw_transaction(  # pylint: disable=no-member
+            signed_transaction.raw_transaction
         )
         tx_digest = hex_value.to_0x_hex()
         _default_logger.debug(
@@ -1446,11 +1435,8 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx receipt, if present
         """
-        tx_receipt = self._execute_with_rpc_rotation(
-            lambda: self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
-                cast(HexStr, tx_digest)
-            ),
-            operation_name="get_transaction_receipt",
+        tx_receipt = self._api.eth.get_transaction_receipt(  # pylint: disable=no-member
+            cast(HexStr, tx_digest)
         )
         return AttributeDictTranslator.to_dict(tx_receipt)
 
@@ -1481,12 +1467,7 @@ class EthereumApi(LedgerApi, EthereumHelper, RPCRotationMixin):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx, if found
         """
-        tx = self._execute_with_rpc_rotation(
-            lambda: self._api.eth.get_transaction(
-                cast(HexStr, tx_digest)
-            ),  # pylint: disable=no-member
-            operation_name="get_transaction",
-        )
+        tx = self._api.eth.get_transaction(cast(HexStr, tx_digest))  # pylint: disable=no-member
         return AttributeDictTranslator.to_dict(tx)
 
     @try_decorator(

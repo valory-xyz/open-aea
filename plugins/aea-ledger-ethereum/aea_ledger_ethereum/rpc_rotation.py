@@ -17,24 +17,38 @@
 #
 # ------------------------------------------------------------------------------
 
-"""RPC rotation support for EthereumApi with automatic failover and backoff.
+"""RPC rotation support for EthereumApi as a web3 middleware.
 
-When multiple RPC endpoints are provided (comma-separated), the plugin
-automatically rotates to healthy endpoints on rate-limit, connection,
-or quota errors.  With a single RPC URL the mixin is effectively a no-op.
+When multiple RPC endpoints are provided (comma-separated), the
+:class:`RPCRotationMiddleware` automatically fails over to healthy
+endpoints on rate-limit, connection, or quota errors.  With a single
+RPC URL the middleware is a transparent pass-through.
 """
 
 import logging
 import threading
 import time
-from typing import Any, Callable, Dict, List, Optional, TypeVar
+from typing import Any, Dict, FrozenSet, List, Optional, Union
 
-from web3 import HTTPProvider
+from toolz import curry  # type: ignore
+from web3 import AsyncWeb3, HTTPProvider, Web3
+from web3.middleware.base import Web3MiddlewareBuilder
+from web3.types import RPCEndpoint, RPCResponse
+
+from aea_ledger_ethereum.chainlist import enrich_rpc_urls
 
 
 _logger = logging.getLogger("aea.ledger_apis.ethereum.rpc_rotation")
 
-T = TypeVar("T")
+MakeRequestFn = Any  # web3 typing alias
+
+# ---------------------------------------------------------------------------
+# Write RPC methods — retried only on clear pre-send failures
+# ---------------------------------------------------------------------------
+
+WRITE_RPC_METHODS: FrozenSet[str] = frozenset(
+    {"eth_sendRawTransaction", "eth_sendTransaction"}
+)
 
 # ---------------------------------------------------------------------------
 # Error classification signals
@@ -157,52 +171,85 @@ def classify_error(error: Exception) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Mixin
+# Middleware
 # ---------------------------------------------------------------------------
 
 
-class RPCRotationMixin:
-    """Mixin providing RPC rotation capabilities for EthereumApi.
+class RPCRotationMiddleware(Web3MiddlewareBuilder):
+    """Web3 middleware that rotates RPC endpoints on transport failures.
 
-    Manages a pool of RPC endpoints with per-endpoint health tracking,
-    automatic failover on errors, and exponential-backoff retry logic.
+    Manages a pool of :class:`~web3.HTTPProvider` instances with
+    per-endpoint health tracking, automatic failover, and
+    exponential-backoff retry logic.
 
-    When a single RPC URL is provided the mixin is effectively a no-op:
-    ``_rotation_enabled`` is ``False`` and ``_execute_with_rpc_rotation``
-    simply calls the operation once.
+    For **write** operations (``eth_sendRawTransaction``,
+    ``eth_sendTransaction``) only clear pre-send connection failures are
+    retried to prevent double-submission.
+
+    Usage::
+
+        rpc_rotation = RPCRotationMiddleware.build(
+            rpc_urls=["https://rpc1.example.com", "https://rpc2.example.com"],
+            request_kwargs={"timeout": 10},
+            chain_id=100,
+        )
+        web3.middleware_onion.add(rpc_rotation)
     """
 
-    # ------------------------------------------------------------------
-    # Initialisation (called from EthereumApi.__init__)
-    # ------------------------------------------------------------------
+    # Set by build()
+    _rpc_urls: List[str]
+    _request_kwargs: Dict[str, Any]
+    _providers: List[HTTPProvider]
+    _current_index: int
+    _backoff_until: Dict[int, float]
+    _lock: threading.Lock
+    _rotation_enabled: bool
+    _last_rotation_time: float
 
-    def _init_rotation(
-        self,
-        rpc_urls: List[str],
-        request_kwargs: Dict[str, Any],
-        chain_id: Optional[int] = None,
-    ) -> None:
-        """Initialise rotation state.
+    @staticmethod
+    @curry
+    def build(
+        w3: Union[AsyncWeb3, Web3], **kwargs: Any
+    ) -> "RPCRotationMiddleware":
+        """Build the middleware.
 
-        If *chain_id* is provided, enriches *rpc_urls* with validated
-        public RPCs from Chainlist.org as fallback endpoints.
-
-        :param rpc_urls: list of RPC endpoint URLs.
-        :param request_kwargs: keyword arguments forwarded to the HTTP provider.
-        :param chain_id: optional chain ID used to fetch public fallback RPCs.
+        :param w3: the Web3 instance.
+        :param kwargs: keyword arguments:
+            - ``rpc_urls``: list of RPC endpoint URL strings (required).
+            - ``request_kwargs``: dict forwarded to each HTTPProvider.
+            - ``chain_id``: optional chain ID for Chainlist fallback enrichment.
+        :return: configured :class:`RPCRotationMiddleware` instance.
         """
-        from aea_ledger_ethereum.chainlist import (  # pylint: disable=import-outside-toplevel
-            enrich_rpc_urls,
-        )
+        rpc_urls: List[str] = kwargs["rpc_urls"]
+        request_kwargs: Dict[str, Any] = kwargs.get("request_kwargs", {})
+        chain_id: Optional[int] = kwargs.get("chain_id")
 
         rpc_urls = enrich_rpc_urls(rpc_urls, chain_id=chain_id)
-        self._rpc_urls: List[str] = rpc_urls
-        self._rpc_request_kwargs: Dict[str, Any] = request_kwargs
-        self._current_rpc_index: int = 0
-        self._rpc_backoff_until: Dict[int, float] = {}
-        self._last_rotation_time: float = 0.0
-        self._rotation_lock: threading.Lock = threading.Lock()
-        self._rotation_enabled: bool = len(rpc_urls) > 1
+
+        mw = RPCRotationMiddleware(w3)
+        mw._rpc_urls = rpc_urls
+        mw._request_kwargs = request_kwargs
+        mw._providers = [
+            HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
+            for url in rpc_urls
+        ]
+        mw._current_index = 0
+        mw._backoff_until = {}
+        mw._lock = threading.Lock()
+        mw._rotation_enabled = len(rpc_urls) > 1
+        mw._last_rotation_time = 0.0
+        return mw
+
+    def __call__(self, w3: Any = None) -> "RPCRotationMiddleware":
+        """Allow this pre-built instance to be stored directly in the middleware onion.
+
+        web3's ``combine_middleware`` calls ``mw(w3)`` on each entry; returning
+        ``self`` ensures the already-initialised instance is reused unchanged.
+
+        :param w3: web3 instance (ignored — already set on build).
+        :return: this middleware instance.
+        """
+        return self
 
     # ------------------------------------------------------------------
     # Public introspection
@@ -211,7 +258,7 @@ class RPCRotationMixin:
     @property
     def current_rpc_url(self) -> str:
         """Return the currently active RPC URL."""
-        return self._rpc_urls[self._current_rpc_index]
+        return self._rpc_urls[self._current_index]
 
     @property
     def rpc_count(self) -> int:
@@ -224,73 +271,60 @@ class RPCRotationMixin:
 
     def _mark_rpc_backoff(self, index: int, seconds: float) -> None:
         """Mark an RPC as temporarily unavailable for *seconds*."""
-        self._rpc_backoff_until[index] = time.monotonic() + seconds
+        self._backoff_until[index] = time.monotonic() + seconds
 
     def _is_rpc_healthy(self, index: int) -> bool:
         """Return ``True`` if the RPC at *index* is not in backoff."""
-        return time.monotonic() >= self._rpc_backoff_until.get(index, 0.0)
+        return time.monotonic() >= self._backoff_until.get(index, 0.0)
 
     # ------------------------------------------------------------------
     # Provider rotation
     # ------------------------------------------------------------------
 
-    def _rotate_provider(self) -> bool:
+    def _rotate(self) -> bool:
         """Rotate to the next healthy RPC endpoint.
-
-        Swaps ``self._api.provider`` to the new endpoint, preserving
-        all Web3 middleware.
 
         :return: ``True`` if a rotation occurred, ``False`` otherwise.
         """
-        with self._rotation_lock:
+        with self._lock:
             n = len(self._rpc_urls)
             if n <= 1:
                 return False
 
             now = time.monotonic()
             if now - self._last_rotation_time < ROTATION_COOLDOWN:
-                return False  # cooldown: prevent cascade rotations
+                return False
 
-            # Find next healthy RPC (round-robin)
             best: Optional[int] = None
             for offset in range(1, n):
-                candidate = (self._current_rpc_index + offset) % n
+                candidate = (self._current_index + offset) % n
                 if self._is_rpc_healthy(candidate):
                     best = candidate
                     break
 
             if best is None:
-                # All in backoff — pick the one expiring soonest
                 best = min(
-                    (i for i in range(n) if i != self._current_rpc_index),
-                    key=lambda i: self._rpc_backoff_until.get(i, 0.0),
+                    (i for i in range(n) if i != self._current_index),
+                    key=lambda i: self._backoff_until.get(i, 0.0),
                 )
 
-            self._current_rpc_index = best
-            # Hot-swap the provider (middleware stack is preserved)
-            self._api.provider = HTTPProvider(  # type: ignore[attr-defined]
-                endpoint_uri=self._rpc_urls[best],
-                request_kwargs=self._rpc_request_kwargs,
-            )
+            self._current_index = best
             self._last_rotation_time = now
-
             _logger.info("Rotated RPC to #%d: %s", best, self._rpc_urls[best])
             return True
 
     # ------------------------------------------------------------------
-    # Error handling + rotation trigger
+    # Error handling
     # ------------------------------------------------------------------
 
-    def _handle_rpc_error_and_maybe_rotate(
-        self,
-        error: Exception,
-        operation_name: str = "",
+    def _handle_error_and_rotate(
+        self, error: Exception, operation: str
     ) -> bool:
-        """Classify *error*, backoff the failing RPC, and rotate.
+        """Classify *error*, apply backoff, and rotate.
 
-        :param error: the exception raised by the RPC call.
-        :param operation_name: human-readable label for log messages.
-        :return: ``True`` if the caller should retry the operation.
+        :param error: the transport-level exception.
+        :param operation: human-readable label for log messages.
+        :return: ``True`` if the caller should retry.
         """
         category = classify_error(error)
 
@@ -301,80 +335,71 @@ class RPCRotationMixin:
             )
             for i in range(len(self._rpc_urls)):
                 self._mark_rpc_backoff(i, FD_EXHAUSTION_BACKOFF)
+            self._rotate()
             return True
 
         if category == "unknown":
-            return False  # don't retry unknown errors
+            return False
 
         backoff = _BACKOFF_MAP.get(category, 0.0)
-        self._mark_rpc_backoff(self._current_rpc_index, backoff)
+        self._mark_rpc_backoff(self._current_index, backoff)
         _logger.warning(
             "RPC #%d %s error (backoff %ds) during %s: %.120s",
-            self._current_rpc_index,
+            self._current_index,
             category.upper(),
             int(backoff),
-            operation_name,
+            operation,
             str(error),
         )
-        self._rotate_provider()
+        self._rotate()
         return True
 
     # ------------------------------------------------------------------
-    # Retry wrapper
+    # wrap_make_request
     # ------------------------------------------------------------------
 
-    def _execute_with_rpc_rotation(
-        self,
-        operation: Callable[[], T],
-        operation_name: str = "rpc_call",
-        is_write: bool = False,
-    ) -> T:
-        """Execute *operation* with RPC rotation and retry logic.
+    def wrap_make_request(self, make_request: MakeRequestFn) -> MakeRequestFn:
+        """Wrap the JSON-RPC make_request with retry and rotation logic.
 
-        For **read** operations: retries across RPCs on recoverable errors.
-
-        For **write** operations (``is_write=True``): retries only on
-        clear connection failures that occurred *before* the request
-        reached the node.  Ambiguous timeouts are never retried to
-        avoid double-submission.
-
-        Raises the last exception if all retries are exhausted.
-
-        :param operation: zero-argument callable that performs the RPC call.
-        :param operation_name: human-readable label for log messages.
-        :param is_write: if ``True``, apply stricter retry safety for writes.
-        :return: the value returned by *operation*.
+        :param make_request: the next function in the middleware chain.
+        :return: wrapped make_request function.
         """
-        if not self._rotation_enabled:
-            return operation()
 
-        max_retries = min(MAX_RETRIES, len(self._rpc_urls) * 2)
-        last_error: Optional[Exception] = None
+        def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
+            """Middleware function to override the request with."""
+            if not self._rotation_enabled:
+                return make_request(method, params)
 
-        for attempt in range(max_retries + 1):
-            try:
-                return operation()
-            except Exception as exc:  # pylint: disable=broad-exception-caught
-                last_error = exc
-                category = classify_error(exc)
+            is_write = method in WRITE_RPC_METHODS
+            max_retries = min(MAX_RETRIES, len(self._rpc_urls) * 2)
+            last_error: Optional[Exception] = None
 
-                # Write safety: only retry on clear pre-send failures
-                if is_write and category not in ("connection", "fd_exhaustion"):
-                    raise
+            for attempt in range(max_retries + 1):
+                try:
+                    return self._providers[self._current_index].make_request(
+                        method, params
+                    )
+                except Exception as exc:  # pylint: disable=broad-exception-caught
+                    last_error = exc
+                    category = classify_error(exc)
 
-                should_retry = self._handle_rpc_error_and_maybe_rotate(
-                    exc, operation_name
-                )
-                if not should_retry or attempt >= max_retries:
-                    raise
+                    # Write safety: only retry on clear pre-send failures
+                    if is_write and category not in ("connection", "fd_exhaustion"):
+                        raise
 
-                delay = min(RETRY_DELAY * (2**attempt), MAX_RETRY_DELAY)
-                _logger.info(
-                    "%s attempt %d failed, retrying in %.1fs …",
-                    operation_name,
-                    attempt + 1,
-                    delay,
-                )
-                time.sleep(delay)
+                    should_retry = self._handle_error_and_rotate(exc, str(method))
+                    if not should_retry or attempt >= max_retries:
+                        raise
 
-        raise last_error  # type: ignore[misc]  # unreachable but keeps mypy happy
+                    delay = min(RETRY_DELAY * (2**attempt), MAX_RETRY_DELAY)
+                    _logger.info(
+                        "%s attempt %d failed, retrying in %.1fs …",
+                        method,
+                        attempt + 1,
+                        delay,
+                    )
+                    time.sleep(delay)
+
+            raise last_error  # type: ignore[misc]
+
+        return middleware

@@ -433,46 +433,47 @@ class TestEnrichRpcUrls:
 
 
 # ---------------------------------------------------------------------------
-# Integration: RPCRotationMixin._init_rotation with chain_id
+# Integration: RPCRotationMiddleware.build with chain_id → Chainlist enrichment
 # ---------------------------------------------------------------------------
 
 
 class TestRotationMixinChainlistIntegration:
-    """Test that _init_rotation enriches RPCs when chain_id is given."""
+    """Test that RPCRotationMiddleware enriches RPCs when chain_id is given."""
 
     @patch("aea_ledger_ethereum.chainlist.ChainlistRPC")
     def test_init_rotation_enriches_with_chain_id(self, mock_cl_cls: MagicMock) -> None:
-        """_init_rotation enriches RPCs when chain_id is provided."""
-        from aea_ledger_ethereum.rpc_rotation import RPCRotationMixin
+        """build() enriches RPCs when chain_id is provided."""
+        from unittest.mock import MagicMock as _MM
+
+        from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware
 
         mock_cl = mock_cl_cls.return_value
         mock_cl.get_validated_rpcs.return_value = ["https://extra.com"]
 
-        class FakeApi(RPCRotationMixin):
-            def __init__(self):
-                self._api = MagicMock()
-                self._init_rotation(
-                    ["https://original.com"],
-                    {},
-                    chain_id=100,
-                )
+        mock_w3 = _MM()
+        mw = RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+            rpc_urls=["https://original.com"],
+            request_kwargs={},
+            chain_id=100,
+        )(mock_w3)
 
-        api = FakeApi()
-        assert api.rpc_count == 2
-        assert api._rpc_urls == ["https://original.com", "https://extra.com"]
+        assert mw.rpc_count == 2
+        assert mw._rpc_urls == ["https://original.com", "https://extra.com"]
 
     @patch("aea_ledger_ethereum.chainlist.ChainlistRPC")
     def test_init_rotation_no_chain_id_no_enrichment(
         self, mock_cl_cls: MagicMock
     ) -> None:
-        """_init_rotation skips enrichment when no chain_id is given."""
-        from aea_ledger_ethereum.rpc_rotation import RPCRotationMixin
+        """build() skips enrichment when no chain_id is given."""
+        from unittest.mock import MagicMock as _MM
 
-        class FakeApi(RPCRotationMixin):
-            def __init__(self):
-                self._api = MagicMock()
-                self._init_rotation(["https://only.com"], {})
+        from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware
 
-        api = FakeApi()
-        assert api.rpc_count == 1
+        mock_w3 = _MM()
+        mw = RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+            rpc_urls=["https://only.com"],
+            request_kwargs={},
+        )(mock_w3)
+
+        assert mw.rpc_count == 1
         mock_cl_cls.assert_not_called()
