@@ -58,7 +58,10 @@ jobs:
 
         # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
       - name: Snyk Open Source monitor
-        run: snyk monitor --all-projects
+        run: |
+            echo "SNYK_TOKEN length: ${#SNYK_TOKEN}"
+            snyk config set api=${SNYK_TOKEN}
+            snyk monitor --all-projects --debug
 
       #   # Runs Snyk Infrastructure as Code (IaC) analysis and uploads result to Snyk.
       #   # Use || true to not fail the pipeline.
