@@ -50,6 +50,14 @@ jobs:
         #  with:
         #    node-version: 20
 
+      - name: Snyk test 1
+        run: |
+          echo "SNYK_TOKEN is set? Length = ${#SNYK_TOKEN}"   # Should print ~36-50 chars
+          snyk --version
+          snyk whoami || true   # Shows authenticated user/org if token works
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
         # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
         # Use || true to not fail the pipeline
       - name: Snyk Code test
