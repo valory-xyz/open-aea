@@ -30,7 +30,6 @@ import threading
 import time
 from typing import Any, Dict, FrozenSet, List, Optional, Union
 
-from toolz import curry  # type: ignore
 from web3 import AsyncWeb3, HTTPProvider, Web3
 from web3.middleware.base import Web3MiddlewareBuilder
 from web3.types import RPCEndpoint, RPCResponse
@@ -189,6 +188,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     Usage::
 
         rpc_rotation = RPCRotationMiddleware.build(
+            w3,
             rpc_urls=["https://rpc1.example.com", "https://rpc2.example.com"],
             request_kwargs={"timeout": 10},
             chain_id=100,
@@ -206,38 +206,39 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     _rotation_enabled: bool
     _last_rotation_time: float
 
-    @staticmethod
-    @curry
-    def build(
-        w3: Union[AsyncWeb3, Web3], **kwargs: Any
+    @classmethod
+    def build(  # pylint: disable=arguments-differ
+        cls,
+        w3: Union[AsyncWeb3, Web3],
+        rpc_urls: List[str],
+        request_kwargs: Optional[Dict[str, Any]] = None,
+        chain_id: Optional[int] = None,
     ) -> "RPCRotationMiddleware":
         """Build the middleware.
 
         :param w3: the Web3 instance.
-        :param kwargs: keyword arguments:
-            - ``rpc_urls``: list of RPC endpoint URL strings (required).
-            - ``request_kwargs``: dict forwarded to each HTTPProvider.
-            - ``chain_id``: optional chain ID for Chainlist fallback enrichment.
+        :param rpc_urls: list of RPC endpoint URL strings (required).
+        :param request_kwargs: dict forwarded to each HTTPProvider.
+        :param chain_id: optional chain ID for Chainlist fallback enrichment.
         :return: configured :class:`RPCRotationMiddleware` instance.
         """
-        rpc_urls: List[str] = kwargs["rpc_urls"]
-        request_kwargs: Dict[str, Any] = kwargs.get("request_kwargs", {})
-        chain_id: Optional[int] = kwargs.get("chain_id")
+        if request_kwargs is None:
+            request_kwargs = {}
 
         rpc_urls = enrich_rpc_urls(rpc_urls, chain_id=chain_id)
 
-        mw = RPCRotationMiddleware(w3)
-        mw._rpc_urls = rpc_urls
-        mw._request_kwargs = request_kwargs
-        mw._providers = [
+        mw = cls(w3)
+        mw._rpc_urls = rpc_urls  # pylint: disable=protected-access
+        mw._request_kwargs = request_kwargs  # pylint: disable=protected-access
+        mw._providers = [  # pylint: disable=protected-access
             HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
             for url in rpc_urls
         ]
-        mw._current_index = 0
-        mw._backoff_until = {}
-        mw._lock = threading.Lock()
-        mw._rotation_enabled = len(rpc_urls) > 1
-        mw._last_rotation_time = 0.0
+        mw._current_index = 0  # pylint: disable=protected-access
+        mw._backoff_until = {}  # pylint: disable=protected-access
+        mw._lock = threading.Lock()  # pylint: disable=protected-access
+        mw._rotation_enabled = len(rpc_urls) > 1  # pylint: disable=protected-access
+        mw._last_rotation_time = 0.0  # pylint: disable=protected-access
         return mw
 
     def __call__(self, w3: Any = None) -> "RPCRotationMiddleware":
@@ -317,9 +318,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     # Error handling
     # ------------------------------------------------------------------
 
-    def _handle_error_and_rotate(
-        self, error: Exception, operation: str
-    ) -> bool:
+    def _handle_error_and_rotate(self, error: Exception, operation: str) -> bool:
         """Classify *error*, apply backoff, and rotate.
 
         :param error: the transport-level exception.

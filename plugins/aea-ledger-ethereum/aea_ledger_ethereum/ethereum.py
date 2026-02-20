@@ -989,13 +989,12 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
         )
         # RPC rotation middleware — handles failover and retry across endpoints
-        self._rpc_rotation: RPCRotationMiddleware = (
-            RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
-                rpc_urls=rpc_urls,
-                request_kwargs=request_kwargs,
-                chain_id=self._chain_id,
-            )
-        )(self._api)  # build the instance immediately so we can hold a reference
+        self._rpc_rotation: RPCRotationMiddleware = RPCRotationMiddleware.build(
+            self._api,
+            rpc_urls=rpc_urls,
+            request_kwargs=request_kwargs,
+            chain_id=self._chain_id,
+        )
         self._api.middleware_onion.add(self._rpc_rotation)
         # cache the chain id and use it for all the `eth_chainId` calls to avoid excess RPC usage
         cached_chain_id = (
@@ -1279,7 +1278,9 @@ class EthereumApi(LedgerApi, EthereumHelper):
     ) -> Optional[int]:
         """Try get the transaction count."""
         check_address = self._api.to_checksum_address(address)
-        return self._api.eth.get_transaction_count(check_address)  # pylint: disable=no-member
+        return self._api.eth.get_transaction_count(
+            check_address
+        )  # pylint: disable=no-member
 
     def update_with_gas_estimate(  # pylint: disable=arguments-differ
         self, transaction: JSONLike, raise_on_try: bool = False
@@ -1467,7 +1468,9 @@ class EthereumApi(LedgerApi, EthereumHelper):
             `raise_on_try`: bool flag specifying whether the method will raise or log on error (used by `try_decorator`)
         :return: the tx, if found
         """
-        tx = self._api.eth.get_transaction(cast(HexStr, tx_digest))  # pylint: disable=no-member
+        tx = self._api.eth.get_transaction(
+            cast(HexStr, tx_digest)
+        )  # pylint: disable=no-member
         return AttributeDictTranslator.to_dict(tx)
 
     @try_decorator(

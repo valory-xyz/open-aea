@@ -129,11 +129,15 @@ class TestClassifyError:
 def _make_middleware(rpc_urls, request_kwargs=None):
     """Build an RPCRotationMiddleware with a mock web3 instance."""
     mock_w3 = MagicMock()
-    with patch("aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls", side_effect=lambda urls, **kw: urls):
-        mw = RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+    with patch(
+        "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
+        side_effect=lambda urls, **kw: urls,
+    ):
+        mw = RPCRotationMiddleware.build(
+            mock_w3,
             rpc_urls=rpc_urls,
             request_kwargs=request_kwargs or {},
-        )(mock_w3)
+        )
     return mw
 
 
@@ -253,7 +257,10 @@ class TestHandleErrorAndRotate:
     def test_rate_limit_triggers_backoff_and_rotation(self) -> None:
         """Rate limit backs off current RPC and rotates."""
         mw = _make_middleware(["http://a", "http://b"])
-        assert mw._handle_error_and_rotate(Exception("429 Too Many Requests"), "op") is True
+        assert (
+            mw._handle_error_and_rotate(Exception("429 Too Many Requests"), "op")
+            is True
+        )
         assert mw._is_rpc_healthy(0) is False
         assert mw._current_index == 1
 
@@ -327,7 +334,9 @@ class TestWrapMakeRequestMultiRpc:
         """Raises last exception after exhausting retries."""
         mw = _make_middleware(["http://a", "http://b"])
         for provider in mw._providers:
-            provider.make_request = MagicMock(side_effect=Exception("connection refused"))
+            provider.make_request = MagicMock(
+                side_effect=Exception("connection refused")
+            )
         middleware_fn = mw.wrap_make_request(MagicMock())
         with pytest.raises(Exception, match="connection refused"):
             middleware_fn("eth_blockNumber", [])
@@ -409,7 +418,10 @@ class TestEthereumApiMultiRpc:
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
-    @patch("aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls", side_effect=lambda urls, **kw: urls)
+    @patch(
+        "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
+        side_effect=lambda urls, **kw: urls,
+    )
     def test_single_rpc_rotation_disabled(
         self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
     ) -> None:
@@ -427,7 +439,10 @@ class TestEthereumApiMultiRpc:
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
-    @patch("aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls", side_effect=lambda urls, **kw: urls)
+    @patch(
+        "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
+        side_effect=lambda urls, **kw: urls,
+    )
     def test_multi_rpc_rotation_enabled(
         self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
     ) -> None:
@@ -445,7 +460,10 @@ class TestEthereumApiMultiRpc:
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
-    @patch("aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls", side_effect=lambda urls, **kw: urls)
+    @patch(
+        "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
+        side_effect=lambda urls, **kw: urls,
+    )
     def test_middleware_added_to_onion(
         self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
     ) -> None:

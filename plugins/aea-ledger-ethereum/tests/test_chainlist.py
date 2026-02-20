@@ -451,11 +451,12 @@ class TestRotationMixinChainlistIntegration:
         mock_cl.get_validated_rpcs.return_value = ["https://extra.com"]
 
         mock_w3 = _MM()
-        mw = RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+        mw = RPCRotationMiddleware.build(
+            mock_w3,
             rpc_urls=["https://original.com"],
             request_kwargs={},
             chain_id=100,
-        )(mock_w3)
+        )
 
         assert mw.rpc_count == 2
         assert mw._rpc_urls == ["https://original.com", "https://extra.com"]
@@ -470,10 +471,11 @@ class TestRotationMixinChainlistIntegration:
         from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware
 
         mock_w3 = _MM()
-        mw = RPCRotationMiddleware.build(  # pylint: disable=no-value-for-parameter
+        mw = RPCRotationMiddleware.build(
+            mock_w3,
             rpc_urls=["https://only.com"],
             request_kwargs={},
-        )(mock_w3)
+        )
 
         assert mw.rpc_count == 1
         mock_cl_cls.assert_not_called()
