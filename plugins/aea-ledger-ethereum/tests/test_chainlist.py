@@ -232,9 +232,7 @@ class TestRankAndSelect:
             ("https://ok.com", 60.0, 999),
         ]
         selected = _rank_and_select(results, [], chain_id=100, max_results=5)
-        assert "https://stale.com" not in selected
-        assert "https://fresh.com" in selected
-        assert "https://ok.com" in selected
+        assert selected == ["https://fresh.com", "https://ok.com"]
 
     def test_respects_max_results(self) -> None:
         """Output is capped at max_results."""
