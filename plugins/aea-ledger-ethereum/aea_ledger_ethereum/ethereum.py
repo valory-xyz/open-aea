@@ -1033,16 +1033,6 @@ class EthereumApi(LedgerApi, EthereumHelper):
         """Get the underlying API object."""
         return self._api
 
-    @property
-    def current_rpc_url(self) -> str:
-        """Return the currently active RPC URL."""
-        return self._rpc_rotation.current_rpc_url
-
-    @property
-    def rpc_count(self) -> int:
-        """Return the number of configured RPC endpoints."""
-        return self._rpc_rotation.rpc_count
-
     def get_balance(
         self, address: Address, raise_on_try: bool = False
     ) -> Optional[int]:

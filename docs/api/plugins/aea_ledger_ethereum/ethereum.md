@@ -680,28 +680,6 @@ def api() -> Web3
 
 Get the underlying API object.
 
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.current_rpc_url"></a>
-
-#### current`_`rpc`_`url
-
-```python
-@property
-def current_rpc_url() -> str
-```
-
-Return the currently active RPC URL.
-
-<a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.rpc_count"></a>
-
-#### rpc`_`count
-
-```python
-@property
-def rpc_count() -> int
-```
-
-Return the number of configured RPC endpoints.
-
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.get_balance"></a>
 
 #### get`_`balance

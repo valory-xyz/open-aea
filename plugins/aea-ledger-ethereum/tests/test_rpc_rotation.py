@@ -434,8 +434,8 @@ class TestEthereumApiMultiRpc:
 
         api = EthereumApi(address="http://localhost:8545")
         assert api._rpc_rotation._rotation_enabled is False
-        assert api.rpc_count == 1
-        assert api.current_rpc_url == "http://localhost:8545"
+        assert api._rpc_rotation.rpc_count == 1
+        assert api._rpc_rotation.current_rpc_url == "http://localhost:8545"
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
@@ -455,8 +455,8 @@ class TestEthereumApiMultiRpc:
 
         api = EthereumApi(address="http://rpc1.example.com,http://rpc2.example.com")
         assert api._rpc_rotation._rotation_enabled is True
-        assert api.rpc_count == 2
-        assert api.current_rpc_url == "http://rpc1.example.com"
+        assert api._rpc_rotation.rpc_count == 2
+        assert api._rpc_rotation.current_rpc_url == "http://rpc1.example.com"
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
