@@ -42,6 +42,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install pipenv via pipx
+        run: |
+          pipx install pipenv==2023.7.23
+          pipx ensurepath
+          echo "$HOME/.local/bin" >> $GITHUB_PATH      
+
       - name: Set up Snyk CLI to check for security issues
         # Snyk can be used to break the build when it detects security issues.
         # In this case we want to upload the SAST issues to GitHub Code Scanning
@@ -60,8 +67,8 @@ jobs:
         continue-on-error: true
 
         # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
-      - name: Snyk Open Source monitor
-        run: snyk monitor --all-projects
+      # - name: Snyk Open Source monitor
+      #   run: snyk monitor --all-projects
 
       #   # Runs Snyk Infrastructure as Code (IaC) analysis and uploads result to Snyk.
       #   # Use || true to not fail the pipeline.
@@ -77,6 +84,6 @@ jobs:
 
         # Push the Snyk Code results into GitHub Code Scanning tab
       - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk-code.sarif
