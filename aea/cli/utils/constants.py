@@ -64,7 +64,7 @@ DEFAULT_CLI_CONFIG = {
         "settings": {
             REGISTRY_REMOTE: {
                 REMOTE_HTTP: {
-                    "auth_token": None,  # auth token for registry
+                    "auth_token": None,  # auth token for registry  # nosec
                     "registry_api_url": None,  # registry url
                 },
                 REMOTE_IPFS: {"ipfs_node": None},  # IPFS url (in multiaddr format)

@@ -194,7 +194,7 @@ async def test_erc1155_get_raw_message(erc1155_contract, ledger_apis_connection)
             {
                 "from_address": ETHEREUM_ADDRESS_ONE,
                 "to_address": ETHEREUM_ADDRESS_ONE,
-                "token_id": 1,
+                "token_id": 1,  # nosec
                 "from_supply": 10,
                 "to_supply": 0,
                 "value": 0,

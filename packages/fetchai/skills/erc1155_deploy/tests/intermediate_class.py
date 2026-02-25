@@ -192,7 +192,7 @@ class ERC1155DeployTestCase(BaseSkillTestCase):
         cls.mocked_proposal = Description(
             {
                 "contract_address": "some_contract_address",
-                "token_id": "123456",
+                "token_id": "123456",  # nosec
                 "trade_nonce": "876438756348568",
                 "from_supply": "543",
                 "to_supply": "432",

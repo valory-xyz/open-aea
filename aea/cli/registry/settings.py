@@ -49,7 +49,7 @@ DEFAULT_REGISTRY_CONFIG: Dict = {
         REGISTRY_REMOTE: {
             "default": None,
             REMOTE_HTTP: {
-                "auth_token": None,  # auth token for registry
+                "auth_token": None,  # auth token for registry  # nosec
                 "registry_api_url": None,  # registry url
             },
             REMOTE_IPFS: {"ipfs_node": None},  # IPFS url (in multiaddr format)

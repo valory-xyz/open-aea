@@ -48,4 +48,4 @@ class LoginTestCase(TestCase):
         )
         self.assertEqual(result.output, expected_output)
         registry_login_mock.assert_called_once_with(username, password)
-        update_cli_config_mock.assert_called_once_with({"auth_token": "token"})
+        update_cli_config_mock.assert_called_once_with({"auth_token": "token"})  # nosec
