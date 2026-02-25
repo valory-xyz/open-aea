@@ -26,4 +26,5 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.valory.protocols.acn.message import AcnMessage
 from packages.valory.protocols.acn.serialization import AcnSerializer
 
+
 AcnMessage.serializer = AcnSerializer

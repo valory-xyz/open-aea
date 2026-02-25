@@ -8,20 +8,20 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
-  base.py: bafybeicibxlywffu5f6lg2betosq2tamnrdubblvgqgvzhfjhpimngmqle
-  connection.py: bafybeicydkymhz2feqmihtkiwdfg7pp4pww2elqv4tijuhjcplyvawdk74
-  contract_dispatcher.py: bafybeiegp25e4fhgnyhx33s5lz3xxeftuszomtkewdr5frsyllmoef7w3u
-  ledger_dispatcher.py: bafybeidx6taabp6av6osal65uc7dwt7qgdv7xw6k277wlgtnsvyoksv6v4
+  base.py: bafybeifghgrbfxfiw5rykpm5lndpodwk6255zdjurh7if6ierhbhchtz74
+  connection.py: bafybeicz37uto2qojuxni3uph6dwbce5fwqjx6jfhtbqvmqynssuhkambe
+  contract_dispatcher.py: bafybeias3dytemo362renphtmei5kren6avncma3nx4qlup3brirfii4oe
+  ledger_dispatcher.py: bafybeifrir677vt7apvmjgv5tclpmizjarzdgac3ma6laemlsg2ihpf3oa
   tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
-  tests/conftest.py: bafybeid7vo7e2m76ey5beeadtbxywxx5ukefd5slwbc362rwmhht6i45ou
-  tests/test_contract_dispatcher.py: bafybeiag5lnpc7h25w23ash4hk4cowxsy5buxgpr474l3tfewnhf56eqyq
-  tests/test_ledger.py: bafybeigcedfr3yv3jse3xwrerrgwbelgb56uhgrvdus527d3daekh6dx4m
-  tests/test_ledger_api.py: bafybeiaicxq56bujtdqxy5czakzr5wpnf23q7ya4fc6oaimh5b5ydjhahi
+  tests/conftest.py: bafybeibvvorlz3xqgyq2htiazeygbcytvyn2cqkscg54lgylnqk2d5d4mm
+  tests/test_contract_dispatcher.py: bafybeihgqhn4ptzniim74p5iakey42vsjw6kplwybrbhfcnp2vxtaxopie
+  tests/test_ledger.py: bafybeig5qo7dpnwzshjgh4q36vbmk3gmvy664fvs27i5iee2jciiqmilva
+  tests/test_ledger_api.py: bafybeiaks6xivh6ijh6taui3qlhee36ou74ltvg2qvkhm2yzcnlveipclq
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/contract_api:1.0.0:bafybeigl7mxuyxngk4gztgygeccbgdfrllx73kwbvvkjvtkfw6ionyd56q
-- valory/ledger_api:1.0.0:bafybeig7yk77pmebqcb33jbavodcslmltitz2uolq6s5arklvsvu5bvp7y
+- valory/contract_api:1.0.0:bafybeia56fhzrbccgd42alztzpiauerqohtpq65wdjn5j2wy4dokybppgq
+- valory/ledger_api:1.0.0:bafybeifnlmi56cexqz6waacqvx4h566n3bqi34hj5wzqzbniv6s6nbr27y
 class_name: LedgerConnection
 config:
   ledger_apis:

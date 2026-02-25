@@ -26,4 +26,5 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.fetchai.protocols.tac.message import TacMessage
 from packages.fetchai.protocols.tac.serialization import TacSerializer
 
+
 TacMessage.serializer = TacSerializer

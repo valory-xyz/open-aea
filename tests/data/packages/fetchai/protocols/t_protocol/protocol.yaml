@@ -14,7 +14,7 @@ fingerprint:
   message.py: bafybeiecqees2oryxohnxdpy7zvwufyhbremi7iaghwvigxontnwalayee
   serialization.py: bafybeib22ms3sh3smcu4rmi56ctihyybjoqedxbbtewemdavtbd6de4rgu
   t_protocol.proto: bafybeiapaievom3jzw3vjdzcoo3bok7tecznwgccbbjc6thmseeww5fp2m
-  t_protocol_pb2.py: bafybeicbg2hmmd776v3m7bir5iwm6rtmawei54vwcvaf2ozmp4shza4sra
+  t_protocol_pb2.py: bafybeihvrr75sei72w4pzhws4atzrb4qktvgajjqqdhw4vhmbfrzgjwmym
   tests/test_t_protocol_dialogues.py: bafybeidxzkiqbbyo5zu37udk6v6jcwrvwsm6eqznurvmljxjia7xk3qgcy
   tests/test_t_protocol_messages.py: bafybeibzqolqclgo4td6yzxsvn4l7ht5qoe2jq5edo7kj532pd2nvdpdae
 fingerprint_ignore_patterns: []

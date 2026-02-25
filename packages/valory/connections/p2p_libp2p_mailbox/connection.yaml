@@ -10,11 +10,11 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeibs3yp2sx6ax6h7isibyffq5unamfdxupmrb4wybjrhcjjmoycksq
   __init__.py: bafybeid2azroxglu6fl7bxdfcsv3j77vyzgpikjnfwpxg73zeb5orez6ju
-  connection.py: bafybeihrrgko622exvb3l2nmhgunmxb3n3vsakpfcch6e266o2ljce3po4
+  connection.py: bafybeiaefp3d5gqlywpctbiycbvnoecwfx34irraudofpc7z4mfbtz7rq4
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/acn:1.1.0:bafybeih6o2ts4thjluddizqesxbrcqkaciz3zlbolq6e77dgblqdnht2rm
+- valory/acn:1.1.0:bafybeihqsuhk6j2scror3mj6kljkco6mm3xzfvqlwv3cmsoxzg3hs2dtzy
 class_name: P2PLibp2pMailboxConnection
 config:
   connect_retries: 3

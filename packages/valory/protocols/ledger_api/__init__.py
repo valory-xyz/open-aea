@@ -26,4 +26,5 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 from packages.valory.protocols.ledger_api.serialization import LedgerApiSerializer
 
+
 LedgerApiMessage.serializer = LedgerApiSerializer

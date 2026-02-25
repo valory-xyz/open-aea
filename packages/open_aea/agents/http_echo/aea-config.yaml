@@ -8,14 +8,14 @@ fingerprint:
   README.md: bafybeide6e3netkj62dtt26l5os7opkbbaotgrzmxmxp4gvrhzx453hguu
 fingerprint_ignore_patterns: []
 connections:
-- valory/http_server:0.22.0:bafybeigyjwg6nfwmdkwzt7i56n4zv3oj6hii2mkkgstuaztyunscjifdee
+- valory/http_server:0.22.0:bafybeicha7kwh3nybevwgphnpbikv4qjyuhnbr6xzgkj7awgfhruehb3fq
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeifukwkfigvviysebfb4qzagkf5ykfpyxb5vpszsrfodfgi36o2uw4
-- open_aea/signing:1.0.0:bafybeiei6h5suazzfta7n3uyq7bsz26zkmdiiylptu5i44p7s2wiygxt24
-- valory/http:1.0.0:bafybeia4tq7ycivm3dnekelrnlzdwb4qnrjdykk6gf5tizq6djr66adotm
+- fetchai/default:1.0.0:bafybeifipcrdiu27t5vg3zgvqc4dpcspskhtq4iqyugg5ktumf7ca7w46q
+- open_aea/signing:1.0.0:bafybeidx5kukmszm4dkabob6jciifiz6t7exvrrxl4b7y76kyd2rn2if74
+- valory/http:1.0.0:bafybeiaqxv3hlfnwf5tvbspxlwtqcrpkpxzaeymvoobvjws3z5htoayb6u
 skills:
-- fetchai/http_echo:0.20.0:bafybeibdd6hwak3a3mdiwwlfxuscvvub5ut5mzfecciutcm6deizhvksqi
+- fetchai/http_echo:0.20.0:bafybeic65b7ziykcczdgiub7lnd7dckjrrzuhkccvqwqbo4nu5k6o6hqbi
 default_ledger: ethereum
 required_ledgers:
 - ethereum

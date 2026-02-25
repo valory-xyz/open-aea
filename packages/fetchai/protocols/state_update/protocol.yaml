@@ -13,9 +13,9 @@ fingerprint:
   message.py: bafybeifdpw2ezf5slmhxmlws7krjtbp4nb4lbxmu3t2fcwhuknucrecl4a
   serialization.py: bafybeicmaqfr7ehsnmc6gh4bcjjyoocaqlvg4vd3pfunpnrvlcxcfajgvm
   state_update.proto: bafybeifb4w4hhbfulbsj3uoazthtcywhqkxabhtztwycsx3dtsmq6x43re
-  state_update_pb2.py: bafybeigxg6dl2sgh2ivlu6my5osijmkkd6rl4ntrdzwd5tv7dwf5zdl73m
+  state_update_pb2.py: bafybeibcyfbagw76gwzw4rbxi2bb5opcokyn2i7664a4kp73ptnvzvfesi
   tests/__init__.py: bafybeicf4p3m6qv3qkvd3ahxemeslvkrzjegetayjwrvjoch4ajoqezgpq
-  tests/test_state_update.py: bafybeicjeibmkt2tsq2qqdmk7xqtkslrk7yavcr3vm7jnytgiog4he5feq
+  tests/test_state_update.py: bafybeidixbll5mqev6odrnnlrlblt6bgndsh4uaeq4h5hta64l5b6wlmpa
   tests/test_state_update_dialogues.py: bafybeiadrik76dnme5r3b2idoso3mbygbg245pprphgolifofoig6sxh6i
   tests/test_state_update_messages.py: bafybeibnquco7j2jkw3g4dfw5cpzxvvfpy4clbiqh3yshf3plshfwnzvy4
 fingerprint_ignore_patterns: []

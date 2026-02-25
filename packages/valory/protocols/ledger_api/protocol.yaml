@@ -12,11 +12,11 @@ fingerprint:
   custom_types.py: bafybeiefoqbszkmctw6fep4pot6rdlm4irfy2dydoihlcb7g6i3v47gu4m
   dialogues.py: bafybeibxw45e4dsfnn5z4cptyskh232pwztsklzffxnj6a6aync6r2b4jm
   ledger_api.proto: bafybeidsmls6jcbeqv4kokizh3kvwzrlae2penr7ntungtosk6m4lxzd4u
-  ledger_api_pb2.py: bafybeidr67zlm6gt5gc3ar2gel37d2jd2nirg6ucppkjv7mu6mar5dulgm
+  ledger_api_pb2.py: bafybeih6ixi7od4tptnopd5cotwtdy527hji7wjvomcnuswkowjqt7yeba
   message.py: bafybeihrv4d4mdnzj46hkkjc3zhz777tbakmemw2drj5l4b7eb7t76kz6u
   serialization.py: bafybeihw3v5ygjhfrhuyzvrnw2l5nfotj6zyfyjoslqowlxbcaxiu7dnxe
   tests/__init__.py: bafybeih2pvd62uql4qcvrrzqx6evsuu3apqok6wu63qq4r5qm3rikbfsmy
-  tests/test_ledger_api.py: bafybeiayvznmhqqy66rfqffyurysjc5jfp3bywhcv4zfvwr7kdwj25qjpa
+  tests/test_ledger_api.py: bafybeicn4uu5ggm34lzhyuegsboi636g4zdh7aphx6oaob6dgfnpv744fe
   tests/test_ledger_api_dialogues.py: bafybeiaq4ia6kvbwblyyuq7l64vwlluf57lpdkfddohbkbf2osiolrjeku
   tests/test_ledger_api_messages.py: bafybeif4abvermxrxcqqfp65blbajadzl5ymnfjmwx62obj6n45emnlzuu
 fingerprint_ignore_patterns: []

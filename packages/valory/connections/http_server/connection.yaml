@@ -9,17 +9,17 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeifepluovb4so2eem34ulpcp4svegb2dqfpmtojtofhfkb3j2xanui
   __init__.py: bafybeifykou5sazojmc7hdqnsdp4mncd4zh3xys3mdgdzwks23mvhzu2ga
-  connection.py: bafybeignsd6wsv74wz2eutbqurehgtc6qrgd4fbuqt57gbxnys5cbnqx4m
+  connection.py: bafybeif66seo662w2c4ezx7zvtppdbnykjuv3mailsosqmdioj32ozx3ce
   tests/__init__.py: bafybeifqaf7cnc4oczjkbwmv4ahrkbiqxrojwgowej3kbri3skz4lzt43i
   tests/data/certs/server.crt: bafybeiev5i3xxkvn36wflf633gkumuxexsw4y2bubwbvl7edrz4igfgv34
   tests/data/certs/server.csr: bafybeicvp7xdl5w3o4bzikkudpduitss3bpp6xqfwlxbw6kabdangohy5u
   tests/data/certs/server.key: bafybeiabvpkpqr4fctrbssfal6pviv5otgmu32qyrfpyhcql5wgmlzjtoe
   tests/data/petstore_sim.yaml: bafybeiaekkfxljlv57uviz4ug6isdqbzsnuxpsgy3dvhzh22daql3xh2i4
-  tests/test_http_server.py: bafybeia2cax2paqaygr6xgzbgmiqepsyjkdx4joi5qukpg6ewnz5yckk7m
+  tests/test_http_server.py: bafybeicnuquxfndazconnqefxwhi653b6unc6prorcwobxmtnv42wy5uny
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeia4tq7ycivm3dnekelrnlzdwb4qnrjdykk6gf5tizq6djr66adotm
+- valory/http:1.0.0:bafybeiaqxv3hlfnwf5tvbspxlwtqcrpkpxzaeymvoobvjws3z5htoayb6u
 class_name: HTTPServerConnection
 config:
   api_spec_path: null

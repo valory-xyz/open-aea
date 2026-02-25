@@ -26,4 +26,5 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.default.serialization import DefaultSerializer
 
+
 DefaultMessage.serializer = DefaultSerializer

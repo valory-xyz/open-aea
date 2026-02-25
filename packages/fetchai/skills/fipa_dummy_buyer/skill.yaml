@@ -7,15 +7,15 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeibvlhhopizopyoly5ciiarmwdq2casbkc5zk7vec72oc3o66wracu
-  __init__.py: bafybeibo4h6frngou3bba3e7sxxo46kky7bm7ok5rpuaee4eqngby27v5y
+  __init__.py: bafybeih6dmyomvc2ajpbullsfj6smb44lgff3gltntjb3puzfs6phqab3q
   behaviours.py: bafybeidoqfhcsefrhjjcwbvfrjtt7kezrmrtdd3bq6kzfcz4hxolyrwh2u
-  dialogues.py: bafybeidqtzrqju57jnesnvyy7m5atjscaszprwekuzzwno47aeyutxqag4
-  handlers.py: bafybeifkzc6xzqwyzmrzhsf3eh3sjfdtiv5x3t3xetyczh4csqsjqlqr6y
+  dialogues.py: bafybeieiw2rshtm4lppfrx7i6lw3ivx4a2t4iu5x6uj3x4jj56g4afmhme
+  handlers.py: bafybeices3kfaou6f5ey7jqmgcuu3eel4iwgh6twnvgtrr7u7lrdetkjj4
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols:
-- fetchai/fipa:1.0.0:bafybeia4hv7ainot2zlau2hqekcifkrkbhtgxw66oxvnuyeyg7hqhxd5he
+- fetchai/fipa:1.0.0:bafybeihkobgl3sg5gbsodb3kbxyza4wd6vxrdjl2xsoewr7fey7geppmse
 skills: []
 behaviours:
   initializer:

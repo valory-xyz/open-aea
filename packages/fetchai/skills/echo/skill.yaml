@@ -7,19 +7,19 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiecz4czxtvzwfsfal5rtcjo4gma3ojxu3yxd7phgcfi6vfhnm622y
-  __init__.py: bafybeigqsnja54qqvj6bmxkpj27v4ejqydklqhapdui44v4qj4e3nqyw24
+  __init__.py: bafybeigg5el5iyfiwrmwis2ofyn4q2ggz3hdd2kospeywopigaso5dqfua
   behaviours.py: bafybeigwlodaanmbtfszhvsnqwozur4dynt2q3qw6dhoyajjsnjklb2hmi
-  dialogues.py: bafybeici4rlde6qdpjtftn4xgelrrphpwzzymvhjrgua7frx7qvyw32gue
-  handlers.py: bafybeihjjglefhpwbprqu6anjpmhj3nn7p53nsci3kmueab7hnhchfcmsi
+  dialogues.py: bafybeicw5uvdy6shpdfjfwkytbmlydkwwrw2qxgbreqpl5c5dgxmhgnwl4
+  handlers.py: bafybeierwcnle2kb2oocguzzjliqhfrp7ngmbz7nxffhvftf572bqa42c4
   tests/__init__.py: bafybeidedsb72is3z5jndaoh232r7y5qvqb3acotjm6xi4pea3bmkoq6le
-  tests/test_behaviours.py: bafybeiaainn272wn52rlnuomeczgglwvvuj2mdrim3hjajuunw6d2dqnw4
-  tests/test_dialogues.py: bafybeifslpfv7xqji4zkpbqlm2ndnoixuxb23w5374npvc6sz3dmqwqqii
-  tests/test_handlers.py: bafybeih3w5m7nc3fodxlisps5azpo5jeuun223bhnwejlyfkgquy6ou5b4
+  tests/test_behaviours.py: bafybeic3acjnsvmd5ar7pcodkmjebjglbwwhqt6tl6yjjrka5hxodq4dnq
+  tests/test_dialogues.py: bafybeibhfktuleh47borwuuoqna3xhr4yhs4fztmk56vps6eiwcapec54m
+  tests/test_handlers.py: bafybeih5yy6kcblv2usggezwrh7i2wm6ivjxfdlg3lis3tqzsscitvwbhy
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols:
-- fetchai/default:1.0.0:bafybeifukwkfigvviysebfb4qzagkf5ykfpyxb5vpszsrfodfgi36o2uw4
+- fetchai/default:1.0.0:bafybeifipcrdiu27t5vg3zgvqc4dpcspskhtq4iqyugg5ktumf7ca7w46q
 skills: []
 behaviours:
   echo:

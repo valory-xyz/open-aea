@@ -13,7 +13,7 @@ fingerprint:
   message.py: bafybeih76rhvfzgkia4cjrk5dpkm23wgrgscgbrzb6cqatwqvdhxdafqvm
   serialization.py: bafybeiemdij5ncg4z43zlfdwbvm7lwle7eaok5z5dtw3gpsm6t4mdaogva
   t_protocol_no_ct.proto: bafybeietptuflcrk6bh3zc4kn5efqt2ygpmtmpv66m7pmkmf3renn3yujy
-  t_protocol_no_ct_pb2.py: bafybeigopyyx5irbujmxgxcslmkunnird67shanthmvxzyrq67xvx6fgq4
+  t_protocol_no_ct_pb2.py: bafybeiaoq4u46yfcfymzclppa4d7o5tzeupexox2vprxne2jv3cwds7wnm
   tests/test_t_protocol_no_ct_dialogues.py: bafybeiaxlzdqlexxvdexe6kjom3zgweqe4yofl55fvnff2ym6a5ourbaxa
   tests/test_t_protocol_no_ct_messages.py: bafybeihdkuilfrhtkijrn2dqp6z3oqeeqqkyjqcfo5dj3j5weldhdvyaby
 fingerprint_ignore_patterns: []

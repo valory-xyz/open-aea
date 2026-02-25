@@ -9,14 +9,14 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiht3qtxpf2meyrveoghidjtdsz433wguz4wlxhzsiixpafkrjv7yy
   __init__.py: bafybeihw7l7zie5dxycptwwiynqgnqfesnhr3epali5e4tmzhy54lxjnbq
-  connection.py: bafybeigvflilveyzw6vmgwpnnkupzpqpytybocdhvlqlwomes3qnqson5i
+  connection.py: bafybeigfhhugdcdly7fgd4yzfs4uk75p4neak5luqplfn4n2egay5vkqju
   tests/__init__.py: bafybeiadaetciszcob7cchexib74l7vecczthsx2pzaan7sp7csrkgjxce
-  tests/test_stub.py: bafybeigdhz55jb6hagw4qfwtz7rxquojze47i3k3zcsrt4xqedsdwjxouq
+  tests/test_stub.py: bafybeidbmcbkleocbmpzdqctrrkkwxjwyeohunbzgssfbbsk2y5ftw3u2q
 fingerprint_ignore_patterns:
 - ./input_file
 connections: []
 protocols:
-- fetchai/default:1.0.0:bafybeifukwkfigvviysebfb4qzagkf5ykfpyxb5vpszsrfodfgi36o2uw4
+- fetchai/default:1.0.0:bafybeifipcrdiu27t5vg3zgvqc4dpcspskhtq4iqyugg5ktumf7ca7w46q
 class_name: StubConnection
 config:
   input_file: ./input_file

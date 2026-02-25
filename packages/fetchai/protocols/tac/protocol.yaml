@@ -15,9 +15,9 @@ fingerprint:
   message.py: bafybeiho5x7fzsy6l33dsyvgppv3lsqpycazq66i66zahq7po2ovq74ozq
   serialization.py: bafybeifiq6tj2flakahm5svl5rsjkqws4uzd2cjpsjzqq43ppuexp4ocbe
   tac.proto: bafybeig5yaqdqk5vzxibwbfkmd2oqsty4nsyhjihphjtq6q3ht7lyc334u
-  tac_pb2.py: bafybeiabsnnzts4i23455dxdrsdyips2ggkaoo6mlik7u5ek7ya26ikq2a
+  tac_pb2.py: bafybeigxe4rjtxrrapdauyheua7oedl4h7qxp4vb6bevlpdmxj2tm4puse
   tests/__init__.py: bafybeigio4dcbzdb4zxbycaredo4l4a72z4rk6wt5bbvubhu6fdj73t6oe
-  tests/test_tac.py: bafybeicwgqy3xhgaad3m7zlbk5yytoch45lvysf4l4g62hoyvb7lhzqobq
+  tests/test_tac.py: bafybeihzunnq2kssxnzc7ufzh5eiiczj7ukhpfknptvmu2iwcepojummv4
   tests/test_tac_dialogues.py: bafybeigqdsgi3uecuf2vg3jz6fpowlto36777laz6bnsw5u3dfvbppjdei
   tests/test_tac_messages.py: bafybeibjvtcqgr3yzfxvc4u64upqsyl7ewkhld6wvhxfwn4s3xihypsr7a
 fingerprint_ignore_patterns: []

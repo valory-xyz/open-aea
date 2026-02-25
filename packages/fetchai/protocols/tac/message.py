@@ -29,6 +29,7 @@ from aea.protocols.base import Message  # type: ignore
 
 from packages.fetchai.protocols.tac.custom_types import ErrorCode as CustomErrorCode
 
+
 _default_logger = logging.getLogger("aea.packages.fetchai.protocols.tac.message")
 
 DEFAULT_BODY_SIZE = 4

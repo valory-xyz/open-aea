@@ -28,4 +28,5 @@ from tests.data.packages.fetchai.protocols.t_protocol.serialization import (
     TProtocolSerializer,
 )
 
+
 TProtocolMessage.serializer = TProtocolSerializer

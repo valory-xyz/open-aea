@@ -22,6 +22,7 @@
 from enum import Enum
 from typing import Any, Dict
 
+
 CODE_TO_MSG: Dict[int, str] = {
     0: "Unexpected error.",
     1: "Request not recognized",

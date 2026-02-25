@@ -31,6 +31,7 @@ from aea.helpers.transaction.base import Terms as BaseTerms
 from aea.helpers.transaction.base import TransactionDigest as BaseTransactionDigest
 from aea.helpers.transaction.base import TransactionReceipt as BaseTransactionReceipt
 
+
 RawTransaction = BaseRawTransaction
 SignedTransaction = BaseSignedTransaction
 State = BaseState

@@ -14,9 +14,9 @@ fingerprint:
   message.py: bafybeiehs4g6z4j45fvavksmjvnaolqzhbream5ffsmaqjpjvxgjmfxwme
   serialization.py: bafybeieh2afnvy23vxyclonj3fefguijvmkfjzd5a563kqd2obkk25iluu
   signing.proto: bafybeigbzr6x5wdmqzc7eanlz5xmvaoiwb4kwozgg3cugq63b7esicusra
-  signing_pb2.py: bafybeig5sfgd3zkclg4fwfpkq7mfh2vtv27jjgpmlzrnk2ti2po5ciysiq
+  signing_pb2.py: bafybeicb4mvfducuqj3d3ipimhyy6amda236i3y4kzr4uibw55kifa2agq
   tests/__init__.py: bafybeiaraxpv2z6r4e5rgmvnvdfv5rlrjdwbhqyjocxm2z2wkzpluezdey
-  tests/test_signing.py: bafybeifaiu6jzymbxhglisc57taub3igt5ftvs6c37s3ddonk7hxr2ni7i
+  tests/test_signing.py: bafybeiamu2x7yjqwh2efyogsin3wduqqmzawko56xqdjjl3thjysnfkagq
   tests/test_signing_dialogues.py: bafybeiewiya7lfnq4uiw3g2apa5mrxnzsy6lsu2xrbd5ljrm43rszrue7m
   tests/test_signing_messages.py: bafybeiaiq6nx5v3tihclumgqpl32aqq7lr6vecqhifdefqze7inba67x6m
 fingerprint_ignore_patterns: []

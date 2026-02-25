@@ -43,6 +43,7 @@ from packages.fetchai.protocols.fipa.message import (
     _default_logger as fipa_message_logger,
 )
 
+
 logger = logging.getLogger(__name__)
 
 
