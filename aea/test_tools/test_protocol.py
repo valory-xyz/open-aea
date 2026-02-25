@@ -18,7 +18,6 @@
 # ------------------------------------------------------------------------------
 """This module contains test case classes based on pytest for AEA protocol testing."""
 
-
 from abc import ABC, abstractmethod
 from typing import List, Type
 from unittest.mock import patch

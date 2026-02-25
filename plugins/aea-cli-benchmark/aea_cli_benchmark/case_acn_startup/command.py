@@ -30,7 +30,6 @@ from aea_cli_benchmark.utils import (
     with_packages,
 )
 
-
 PACKAGES = [
     ("protocol", "valory/acn"),
     ("connection", "valory/p2p_libp2p"),

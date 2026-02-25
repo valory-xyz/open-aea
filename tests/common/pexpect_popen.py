@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Wrapper for Pexpect to use in tests."""
+
 import os
 import platform
 import signal

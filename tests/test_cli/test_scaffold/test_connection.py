@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea scaffold connection` sub-command."""
+
 import json
 import logging
 import os

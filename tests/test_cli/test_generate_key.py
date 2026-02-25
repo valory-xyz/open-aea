@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests for the `aea generate-key` sub-command."""
+
 import json
 import os
 import random

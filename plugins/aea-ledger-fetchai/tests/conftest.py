@@ -19,11 +19,11 @@
 # ------------------------------------------------------------------------------
 
 """Conftest module for Pytest."""
+
 import inspect
 import os
 
 from aea_ledger_fetchai import FetchAICrypto
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 ROOT_DIR = os.path.join(CUR_PATH, "..")

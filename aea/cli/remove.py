@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea remove' subcommand."""
+
 import os
 import shutil
 from collections import defaultdict

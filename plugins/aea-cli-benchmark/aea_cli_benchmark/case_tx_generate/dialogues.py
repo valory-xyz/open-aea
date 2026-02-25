@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Ledger TX generation and processing benchmark."""
+
 from typing import Any, Optional, Type
 
 from aea.common import Address
@@ -45,7 +46,6 @@ from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 DefaultDialogue = BaseDefaultDialogue
 

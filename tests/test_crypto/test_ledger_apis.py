@@ -36,7 +36,6 @@ from aea.exceptions import AEAEnforceError
 
 from tests.conftest import COSMOS_ADDRESS_ONE
 
-
 logger = logging.getLogger(__name__)
 
 

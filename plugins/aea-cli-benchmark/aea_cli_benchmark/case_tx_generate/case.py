@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Ledger TX generation and processing benchmark."""
+
 import threading
 import time
 from pathlib import Path
@@ -73,7 +74,6 @@ from packages.valory.connections.ledger.connection import (
     PUBLIC_ID as LEDGER_CONNECTION_PUBLIC_ID,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 AEA_DIR = Path(_AEA_DIR)

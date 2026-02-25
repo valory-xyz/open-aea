@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Test module for Registry publish methods."""
+
 from pathlib import Path
 from unittest import TestCase, mock
 from unittest.mock import mock_open

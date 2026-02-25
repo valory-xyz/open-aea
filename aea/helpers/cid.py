@@ -32,7 +32,6 @@ import multicodec
 import multihash as mh
 from morphys import ensure_bytes, ensure_unicode
 
-
 DEFAULT_ENCODING = "base32"
 BTC_ENCODING = "base58btc"
 

@@ -45,7 +45,6 @@ from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p.test_communic
     TestP2PLibp2pConnectionRouting,
 )
 
-
 DEFAULT_CLIENTS_PER_NODE = 1
 
 

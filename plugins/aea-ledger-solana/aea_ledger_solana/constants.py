@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Constants for the solana ledger."""
+
 _VERSION = "1.24.17"
 _SOLANA = "solana"
 TESTNET_NAME = "n/a"

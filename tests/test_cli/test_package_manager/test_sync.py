@@ -19,7 +19,6 @@
 
 """Test `aea packages sync` command."""
 
-
 import json
 import logging
 import re

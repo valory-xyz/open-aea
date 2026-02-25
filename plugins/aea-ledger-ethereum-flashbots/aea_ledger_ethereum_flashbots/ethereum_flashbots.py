@@ -39,7 +39,6 @@ from web3.exceptions import TransactionNotFound
 from aea.common import JSONLike
 from aea.helpers.base import try_decorator
 
-
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum_flashbots")
 
 _ETHEREUM_FLASHBOTS = "ethereum_flashbots"

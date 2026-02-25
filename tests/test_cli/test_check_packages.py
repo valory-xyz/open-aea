@@ -37,7 +37,6 @@ from aea.cli.check_packages import (
 )
 from aea.test_tools.test_cases import BaseAEATestCase
 
-
 check_author_patch = mock.patch("aea.cli.check_packages.check_author")
 check_dependencies_patch = mock.patch("aea.cli.check_packages.check_dependencies")
 find_all_packages_ids_patch = mock.patch(

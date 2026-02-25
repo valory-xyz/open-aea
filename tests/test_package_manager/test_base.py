@@ -19,7 +19,6 @@
 
 """Test package manager base."""
 
-
 import logging
 import re
 from collections import OrderedDict
@@ -43,7 +42,6 @@ from aea.package_manager.base import (
 from aea.test_tools.test_cases import BaseAEATestCase
 
 from tests.conftest import ROOT_DIR
-
 
 EXAMPLE_PACKAGE_ID = PackageId(
     package_type=PackageType.PROTOCOL,

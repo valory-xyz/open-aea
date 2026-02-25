@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of `benchmark` cli command."""
+
 import collections
 import sys
 from collections import namedtuple

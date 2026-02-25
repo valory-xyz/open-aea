@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea get_public_key' subcommand."""
+
 from typing import Optional, cast
 
 import click

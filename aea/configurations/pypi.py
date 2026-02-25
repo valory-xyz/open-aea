@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains a checker for PyPI version consistency."""
+
 import operator
 from collections import defaultdict
 from copy import deepcopy

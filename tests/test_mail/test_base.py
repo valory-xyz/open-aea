@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for Envelope of mail.base.py."""
+
 import unittest.mock
 
 import pytest
@@ -35,7 +36,6 @@ from packages.fetchai.protocols.default.message import DefaultMessage
 
 from tests.common.utils import wait_for_condition
 from tests.conftest import _make_dummy_connection, _make_local_connection
-
 
 TIMEOUT = 30
 

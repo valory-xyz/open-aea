@@ -19,7 +19,6 @@
 
 """Test if constants are valid."""
 
-
 from pathlib import Path
 
 from aea.configurations.constants import PACKAGES, SIGNING_PROTOCOL_WITH_HASH

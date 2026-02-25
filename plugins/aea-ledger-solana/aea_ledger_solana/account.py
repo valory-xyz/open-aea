@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Solana account implementation."""
+
 from dataclasses import dataclass
 
 from solders.instruction import AccountMeta

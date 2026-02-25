@@ -22,7 +22,6 @@ import logging
 import zlib
 from typing import Any
 
-
 default_logger = logging.getLogger("aea.ledger_apis.solana")
 
 

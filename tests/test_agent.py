@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the agent module."""
+
 import asyncio
 from threading import Thread
 from unittest.mock import Mock

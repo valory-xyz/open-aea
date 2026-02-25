@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests of the local OEF node implementation."""
+
 # pylint: skip-file
 
 import asyncio
@@ -37,7 +38,6 @@ from aea.multiplexer import Multiplexer
 from packages.fetchai.connections.local.connection import LocalNode, OEFLocalConnection
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.fipa.message import FipaMessage
-
 
 TIMEOUT = 5
 

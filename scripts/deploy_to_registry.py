@@ -43,7 +43,6 @@ from aea.configurations.constants import (
     DEFAULT_SKILL_CONFIG_FILE,
 )
 
-
 CONFIG_FILE_NAMES: List[str] = [
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,

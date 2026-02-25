@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the code-blocks in the skill.md file."""
+
 from pathlib import Path
 
 import mistune

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Tests package for the 'valory/contract_api' protocol."""
+
 from abc import abstractmethod
 from typing import Callable, Type
 from unittest import mock
@@ -41,7 +42,6 @@ from packages.valory.protocols.contract_api.dialogues import (
 from packages.valory.protocols.contract_api.message import (
     _default_logger as contract_api_message_logger,
 )
-
 
 LEDGER_ID = "ethereum"
 CONTRACT_ID = "contract_id_stub"

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tasks for the 'dummy' skill."""
+
 from aea.skills.tasks import Task
 
 

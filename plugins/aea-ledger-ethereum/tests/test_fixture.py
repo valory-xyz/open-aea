@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ethereum module."""
+
 import pytest
 import requests
 from _pytest.compat import get_real_func

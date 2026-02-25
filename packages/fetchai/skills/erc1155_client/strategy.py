@@ -28,7 +28,6 @@ from aea.skills.base import Model
 
 from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as CONTRACT_ID
 
-
 DEFAULT_LOCATION = {"longitude": 0.1270, "latitude": 51.5194}
 DEFAULT_SEARCH_QUERY = {
     "search_key": "seller_service",

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the yaml utils module."""
+
 import io
 import random
 import string

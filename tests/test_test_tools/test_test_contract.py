@@ -31,7 +31,6 @@ from aea.test_tools.utils import as_context, copy_class
 
 from tests.data.dummy_contract.contract import DummyContract
 
-
 DUMMY_TX = {"gasPrice": 0, "nonce": 0, "gas": 0}
 TX_RECEIPT = {"raw_log": ""}
 PATH_TO_DUMMY_CONTRACT = Path(*DummyContract.__module__.split(".")).parent.absolute()

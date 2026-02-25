@@ -33,7 +33,6 @@ from packages.valory.connections.p2p_libp2p.consts import (
     LIBP2P_CERT_NOT_BEFORE,
 )
 
-
 CONNECTIONS = Path(__file__).parent.parent.parent
 
 P2P_LIBP2P_MODULES = (

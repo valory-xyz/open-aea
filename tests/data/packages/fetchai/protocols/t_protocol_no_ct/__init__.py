@@ -30,5 +30,4 @@ from tests.data.packages.fetchai.protocols.t_protocol_no_ct.serialization import
     TProtocolNoCtSerializer,
 )
 
-
 TProtocolNoCtMessage.serializer = TProtocolNoCtSerializer

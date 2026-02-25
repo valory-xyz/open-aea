@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the strategy class of the generic seller skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -44,7 +45,6 @@ from packages.fetchai.skills.generic_seller.strategy import (
     GenericStrategy,
     SIMPLE_SERVICE_MODEL,
 )
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 

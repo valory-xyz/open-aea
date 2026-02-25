@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 """This CLI tool takes the main dependencies of the Pipfile.lock and prints it to stdout in requirements.txt format."""
+
 import argparse
 import json
 

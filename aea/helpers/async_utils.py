@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the misc utils for async code."""
+
 import asyncio
 import datetime
 import logging
@@ -43,7 +44,6 @@ from typing import (
     Union,
     cast,
 )
-
 
 _default_logger = logging.getLogger(__file__)
 

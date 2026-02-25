@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the AgentConfigManager."""
+
 import json
 import os
 from collections import OrderedDict
@@ -55,7 +56,6 @@ from aea.helpers.env_vars import apply_env_variables_on_agent_config
 from aea.helpers.io import open_file
 from aea.helpers.storage.backends.base import JSON_TYPES
 from aea.helpers.yaml_utils import yaml_load_all
-
 
 ALLOWED_PATH_ROOTS = [
     AGENT,

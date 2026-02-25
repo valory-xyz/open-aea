@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of AEA agents project configuration."""
+
 import os
 from copy import deepcopy
 from pathlib import Path

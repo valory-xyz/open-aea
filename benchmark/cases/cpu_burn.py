@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Example performance test using benchmark framework. Just test CPU usage with empty while loop."""
+
 import time
 
 from benchmark.framework.benchmark import BenchmarkControl

@@ -39,7 +39,6 @@ from aea_cli_ipfs.exceptions import (
     RemoveError,
 )
 
-
 DEFAULT_IPFS_URI_BASE = str(os.environ.get("OPEN_AEA_IPFS_ADDR_BASE", "api/v0"))
 DEFAULT_IPFS_URL = "/dns/registry.autonolas.tech/tcp/443/https"
 DEFAULT_IPFS_URL_LOCAL = "/ip4/127.0.0.1/tcp/5001"

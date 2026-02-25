@@ -31,7 +31,6 @@ from aea.exceptions import AEASetupError, AEATeardownError, parse_exception
 from aea.helpers.logging import WithLogger, get_logger
 from aea.skills.base import Behaviour, Handler, Model
 
-
 Item = TypeVar("Item")
 ItemId = TypeVar("ItemId")
 SkillComponentType = TypeVar("SkillComponentType", Handler, Behaviour, Model)

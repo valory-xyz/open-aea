@@ -33,7 +33,6 @@ from aea.mail.base import Envelope
 from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 
-
 sys.modules["packages.fetchai.connections.gym"] = locate(  # isort:skip
     "packages.fetchai.connections.gym"
 )
@@ -56,7 +55,6 @@ from packages.fetchai.protocols.gym.message import (  # noqa: E402  # pylint: di
 )
 
 from .agent import ProxyAgent  # noqa: E402  # pylint: disable=wrong-import-position
-
 
 Action = Any
 Observation = Any

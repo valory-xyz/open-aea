@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.valory.protocols.http.message import HttpMessage
 from packages.valory.protocols.http.serialization import HttpSerializer
 
-
 HttpMessage.serializer = HttpSerializer

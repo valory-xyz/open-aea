@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the 'aea transfer' subcommand."""
+
 import time
 from typing import Optional, cast
 
@@ -36,7 +37,6 @@ from aea.cli.utils.package_utils import (
 from aea.common import Address
 from aea.crypto.ledger_apis import LedgerApis
 from aea.crypto.registries import ledger_apis_registry
-
 
 DEFAULT_SETTLE_TIMEOUT = 60
 

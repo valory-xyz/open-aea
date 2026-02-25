@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests behaviour storage access."""
+
 import json
 import os
 from typing import List, Set

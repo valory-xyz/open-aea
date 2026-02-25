@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains definitions of agent components."""
+
 import importlib.util
 import logging
 import re
@@ -40,7 +41,6 @@ from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageIdPrefix, PackageType
 from aea.exceptions import AEAEnforceError, AEAPackageLoadingError, enforce
 from aea.helpers.logging import WithLogger
-
 
 ENCODING = "utf-8"
 _default_logger = logging.getLogger(__name__)

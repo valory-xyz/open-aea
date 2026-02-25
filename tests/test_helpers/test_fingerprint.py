@@ -38,7 +38,6 @@ from aea.helpers.fingerprint import (
 
 from tests.conftest import PACKAGES_DIR
 
-
 CONFIG_CLASSES = {k.value: v for k, v in PACKAGE_TYPE_TO_CONFIG_CLASS.items()}
 CONFIG_FILES = {k: Path(PACKAGES_DIR).rglob(f_name) for k, f_name in COMPONENTS}
 

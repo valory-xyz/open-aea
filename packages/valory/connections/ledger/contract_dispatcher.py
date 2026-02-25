@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the implementation of the contract API request dispatcher."""
+
 import inspect
 import logging
 from collections.abc import Mapping
@@ -41,7 +42,6 @@ from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
-
 
 _default_logger = logging.getLogger(
     "aea.packages.valory.connections.ledger.contract_dispatcher"

@@ -34,7 +34,6 @@ from packages.fetchai.connections.gym.connection import GymConnection
 from tests.common.pexpect_popen import PexpectWrapper
 from tests.conftest import ROOT_DIR, env_path_separator
 
-
 DIRECTORIES = ["packages", "examples"]
 
 

@@ -34,7 +34,6 @@ from aea.multiplexer import Multiplexer
 from packages.fetchai.connections.stub.connection import StubConnection
 from packages.fetchai.protocols.default.message import DefaultMessage
 
-
 INPUT_FILE = "input.txt"
 OUTPUT_FILE = "output.txt"
 

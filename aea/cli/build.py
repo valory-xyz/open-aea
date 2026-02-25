@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea build' subcommand."""
+
 from pathlib import Path
 from typing import cast
 

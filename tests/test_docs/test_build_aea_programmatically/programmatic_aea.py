@@ -32,7 +32,6 @@ from aea.crypto.helpers import PRIVATE_KEY_PATH_SCHEMA, create_private_key
 from aea.helpers.file_io import write_with_lock
 from aea.skills.base import Skill
 
-
 ROOT_DIR = "./"
 INPUT_FILE = "input_file"
 OUTPUT_FILE = "output_file"

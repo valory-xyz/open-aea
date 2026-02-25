@@ -46,7 +46,6 @@ from packages.valory.connections.test_libp2p.tests.base import (
     ports,
 )
 
-
 DONE_FUTURE: asyncio.Future = asyncio.Future()
 DONE_FUTURE.set_result(None)
 

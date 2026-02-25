@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """AEA configuration utils."""
+
 from functools import singledispatch
 from typing import Dict, Optional, Set
 

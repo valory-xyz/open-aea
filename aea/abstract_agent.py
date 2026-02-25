@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the interface definition of the abstract agent."""
+
 import datetime
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple

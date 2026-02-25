@@ -35,7 +35,6 @@ from web3 import AsyncWeb3, HTTPProvider, Web3
 from web3.middleware.base import Web3MiddlewareBuilder
 from web3.types import RPCEndpoint, RPCResponse
 
-
 _logger = logging.getLogger("aea.ledger_apis.ethereum.rpc_rotation")
 
 MakeRequestFn = Any  # web3 typing alias

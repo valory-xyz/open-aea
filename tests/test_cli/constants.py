@@ -21,7 +21,6 @@
 
 from aea.configurations.base import DEFAULT_VERSION
 
-
 FORMAT_ITEMS_SAMPLE_OUTPUT = "Correct items"
 
 DEFAULT_TESTING_VERSION = DEFAULT_VERSION

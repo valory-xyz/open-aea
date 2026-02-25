@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helper module."""
+
 from typing import List
 
 import pytest

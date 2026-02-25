@@ -41,7 +41,6 @@ from packages.valory.connections.test_libp2p.tests.base import (
     ports,
 )
 
-
 DEFAULT_CLIENTS_PER_NODE = 1
 
 MockDefaultMessageProtocol = Mock()

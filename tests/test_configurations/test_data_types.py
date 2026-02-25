@@ -43,7 +43,6 @@ from tests.strategies.data_types import (
     version_info_strategy,
 )
 
-
 NUMERIC_TYPES = int, float
 SEQUENCE_TYPES = str, list, tuple
 ITERATOR_TYPES = *SEQUENCE_TYPES, set, frozenset, zip, map

@@ -48,7 +48,6 @@ from tests.conftest import (
     ROOT_DIR,
 )
 
-
 logger = logging.getLogger(__name__)
 
 DEFAULT_EXPECT_TIMEOUT = 40

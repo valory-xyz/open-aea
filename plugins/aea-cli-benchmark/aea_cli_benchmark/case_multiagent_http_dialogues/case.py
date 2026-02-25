@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage across the time."""
+
 import itertools
 import struct
 import time

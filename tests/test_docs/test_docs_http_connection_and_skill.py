@@ -26,6 +26,7 @@ the documentation is contained in the http_echo skill.
 
 Moreover, test that the code is compilable/executable.
 """
+
 from pathlib import Path
 from unittest import mock
 

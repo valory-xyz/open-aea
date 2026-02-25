@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the base classes for the skills."""
+
 import shutil
 import unittest.mock
 from pathlib import Path
@@ -739,8 +740,7 @@ class TestSkillLoadingWarningMessages(BaseAEATestCase):
     _TEST_BEHAVIOUR_CLASS_NAME = "TestBehaviour"
 
     _test_skill_module_path = "skill_module_for_testing.py"
-    _test_skill_module_content = dedent(
-        f"""
+    _test_skill_module_content = dedent(f"""
     from aea.skills.base import Behaviour, Handler
 
     class {_TEST_HANDLER_CLASS_NAME}(Handler):
@@ -764,8 +764,7 @@ class TestSkillLoadingWarningMessages(BaseAEATestCase):
             pass
         def teardown(self):
             pass
-    """
-    )
+    """)
 
     @classmethod
     def setup_class(cls):

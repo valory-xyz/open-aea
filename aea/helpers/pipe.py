@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Portable pipe implementation for Linux, MacOS, and Windows."""
+
 import asyncio
 import errno
 import logging
@@ -32,7 +33,6 @@ from shutil import rmtree
 from typing import IO, Optional
 
 from aea.exceptions import enforce
-
 
 _default_logger = logging.getLogger(__name__)
 

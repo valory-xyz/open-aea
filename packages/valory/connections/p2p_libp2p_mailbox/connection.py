@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the libp2p client connection."""
+
 import asyncio
 import hashlib
 import logging
@@ -48,7 +49,6 @@ from aea.mail.base import Envelope
 
 from packages.valory.protocols.acn import acn_pb2
 from packages.valory.protocols.acn.message import AcnMessage
-
 
 try:
     from asyncio.streams import (  # type: ignore  # pylint: disable=ungrouped-imports

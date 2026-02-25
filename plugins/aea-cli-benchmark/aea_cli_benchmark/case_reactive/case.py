@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Latency and throughput check."""
+
 import time
 from statistics import mean
 from threading import Thread

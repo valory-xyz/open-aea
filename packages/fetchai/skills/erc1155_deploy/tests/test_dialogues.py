@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the dialogue classes of the erc1155_deploy skill."""
+
 # pylint: skip-file
 
 import pytest

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the Multiplexer."""
+
 import asyncio
 import logging
 import os
@@ -67,7 +68,6 @@ from .conftest import (
 from .data.dummy_connection.connection import DummyConnection
 from tests.common.pexpect_popen import PexpectWrapper
 from tests.common.utils import wait_for_condition
-
 
 UnknownProtocolMock = Mock()
 UnknownProtocolMock.protocol_id = UNKNOWN_PROTOCOL_PUBLIC_ID

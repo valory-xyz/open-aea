@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of ledger-integration.md file."""
+
 from importlib import import_module
 from pathlib import Path
 from unittest import mock

@@ -49,7 +49,6 @@ from aea.package_manager.base import (
     load_configuration,
 )
 
-
 GIT_TAGS_URL = "https://api.github.com/repos/{repo}/tags"
 PACKAGE_FILE_REMOTE_URL = (
     "https://raw.githubusercontent.com/{repo}/{tag}/packages/packages.json"

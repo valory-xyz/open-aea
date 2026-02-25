@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea upgrade' subcommand."""
+
 import pprint
 import shutil
 from copy import deepcopy

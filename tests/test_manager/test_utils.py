@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea manager utils."""
+
 import time
 from random import randint
 from tempfile import TemporaryDirectory
@@ -25,7 +26,6 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from aea.manager.utils import run_in_venv
-
 
 pytestmark = pytest.mark.skip(
     reason="Unknown issue: https://github.com/valory-xyz/open-aea/actions/runs/7162860465/job/19500538744?pr=698"

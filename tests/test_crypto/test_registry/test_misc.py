@@ -27,7 +27,6 @@ import pytest
 from aea.crypto.registries.base import Registry
 from aea.exceptions import AEAException
 
-
 logger = logging.getLogger(__name__)
 
 

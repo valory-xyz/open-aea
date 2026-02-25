@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea/aea_builder.py."""
+
 import os
 import re
 import shutil
@@ -78,7 +79,6 @@ from tests.conftest import (
     _make_dummy_connection,
 )
 from tests.data.dummy_skill import PUBLIC_ID as DUMMY_SKILL_PUBLIC_ID
-
 
 dummy_skill_path = os.path.join(CUR_PATH, "data", "dummy_skill")
 contract_path = os.path.join(ROOT_DIR, "packages", "fetchai", "contracts", "erc1155")
@@ -744,8 +744,7 @@ class TestFromAEAProjectWithCustomConnectionConfig(AEATestCaseEmpty):
         configuration = aea_config_file.read_text()
         connection_name = StubConnection.connection_id.name
         connection_version = StubConnection.connection_id.version
-        configuration += dedent(
-            f"""
+        configuration += dedent(f"""
         ---
         public_id: fetchai/{connection_name}:{connection_version}
         type: connection
@@ -753,8 +752,7 @@ class TestFromAEAProjectWithCustomConnectionConfig(AEATestCaseEmpty):
             input_file: "{self.expected_input_file}"
             output_file: "{self.expected_output_file}"
         ...
-        """
-        )
+        """)
         aea_config_file.write_text(configuration)
 
     def test_from_project(self):
@@ -785,8 +783,7 @@ class TestFromAEAProjectWithCustomSkillConfig(AEATestCase):
         aea_config_file = Path(cwd, DEFAULT_AEA_CONFIG_FILE)
         configuration = aea_config_file.read_text()
         # here we change all the dummy skill configurations
-        configuration += dedent(
-            f"""
+        configuration += dedent(f"""
         ---
         public_id: dummy_author/dummy:0.1.0
         type: skill
@@ -803,8 +800,7 @@ class TestFromAEAProjectWithCustomSkillConfig(AEATestCase):
             args:
             {indent(yaml.dump(self.new_model_args), "  ")}
         ...
-        """
-        )
+        """)
         aea_config_file.write_text(configuration)
 
     def test_from_project(self):
@@ -840,15 +836,13 @@ class TestFromAEAProjectMakeSkillAbstract(AEATestCase):
         aea_config_file = Path(cwd, DEFAULT_AEA_CONFIG_FILE)
         configuration = aea_config_file.read_text()
         # here we change all the dummy skill configurations
-        configuration += dedent(
-            """
+        configuration += dedent("""
         ---
         public_id: dummy_author/dummy:0.1.0
         type: skill
         is_abstract: true
         ...
-        """
-        )
+        """)
         aea_config_file.write_text(configuration)
 
     def test_from_project(self):
@@ -872,14 +866,12 @@ class TestFromAEAProjectCustomConfigFailsWhenComponentNotDeclared(AEATestCaseEmp
         cwd = self._get_cwd()
         aea_config_file = Path(cwd, DEFAULT_AEA_CONFIG_FILE)
         configuration = aea_config_file.read_text()
-        configuration += dedent(
-            """
+        configuration += dedent("""
         ---
         public_id: some_author/non_existing_package:0.1.0
         type: protocol
         ...
-        """
-        )
+        """)
         aea_config_file.write_text(configuration)
 
     def test_from_project(self):
@@ -1078,8 +1070,7 @@ class TestApplyEnvironmentVariables(AEATestCaseEmpty, CleanDirectoryClass):
     """Test builder set from project dir, to make a skill 'abstract'."""
 
     path_to_aea = Path(ROOT_DIR) / "tests" / "data" / "dummy_aea"
-    override = dedent(
-        """
+    override = dedent("""
         ---
         public_id: dummy_author/dummy:0.1.0
         type: skill
@@ -1088,8 +1079,7 @@ class TestApplyEnvironmentVariables(AEATestCaseEmpty, CleanDirectoryClass):
             args:
                 model_arg_1: ${HOST:int:8}
         ...
-        """
-    )
+        """)
 
     def _add_skill_override_config(self):
         """Add custom stub connection config."""

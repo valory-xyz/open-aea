@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the behaviour class of the echo skill."""
+
 # pylint: skip-file
 
 import inspect
@@ -30,7 +31,6 @@ from unittest.mock import patch
 from aea.test_tools.test_skill import BaseSkillTestCase
 
 from packages.fetchai.skills.echo.behaviours import EchoBehaviour
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 

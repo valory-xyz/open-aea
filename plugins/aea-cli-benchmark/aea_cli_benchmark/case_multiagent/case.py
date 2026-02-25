@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Envelopes generation speed for Behaviour act test."""
+
 import itertools
 import struct
 import time

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea launch' subcommand."""
+
 import os
 import sys
 from collections import OrderedDict

@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Test confiugurations for the package."""
+
 # pylint: skip-file
 
 import logging
@@ -45,7 +46,6 @@ from aea.crypto.ledger_apis import DEFAULT_LEDGER_CONFIGS, LedgerApi
 from aea.crypto.registries import ledger_apis_registry, make_crypto
 from aea.crypto.wallet import CryptoStore
 from aea.identity.base import Identity
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 

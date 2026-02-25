@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Classes to handle AEA configurations."""
+
 import pprint
 from abc import ABC, abstractmethod
 from collections import OrderedDict
@@ -87,7 +88,6 @@ from aea.helpers.base import (
     recursive_update,
 )
 from aea.helpers.ipfs.base import IPFSHashOnly
-
 
 # for tests
 _ = [PackageId, PackageVersion]

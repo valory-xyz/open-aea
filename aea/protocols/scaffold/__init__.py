@@ -23,5 +23,4 @@
 from aea.protocols.scaffold.message import MyScaffoldMessage
 from aea.protocols.scaffold.serialization import MyScaffoldSerializer
 
-
 MyScaffoldMessage.serializer = MyScaffoldSerializer

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Plug-in system for adding new CLI commands."""
+
 import os
 import sys
 import traceback

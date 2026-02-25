@@ -19,7 +19,6 @@
 
 """Constants."""
 
-
 import os
 from pathlib import Path
 
@@ -31,7 +30,6 @@ from aea_ledger_ethereum.ethereum import (
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
 from aea.crypto.ledger_apis import ETHEREUM_DEFAULT_ADDRESS, ETHEREUM_DEFAULT_CHAIN_ID
-
 
 DATA_DIR = Path(__file__).parent / "data"
 

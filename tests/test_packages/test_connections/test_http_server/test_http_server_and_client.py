@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for the HTTP Client and Server connections together."""
+
 import asyncio
 import email
 import logging
@@ -42,7 +43,6 @@ from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
 
 from tests.conftest import get_host, get_unused_tcp_port
-
 
 logger = logging.getLogger(__name__)
 

@@ -67,7 +67,6 @@ from packages.valory.protocols.ledger_api.dialogues import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 DefaultDialogue = BaseDefaultDialogue
 
 

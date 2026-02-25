@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage of dialogues across the time."""
+
 import time
 import uuid
 from typing import List, Tuple, Union, cast

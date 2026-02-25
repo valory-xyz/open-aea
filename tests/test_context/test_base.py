@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains a test for aea.context."""
+
 import os
 from unittest.mock import Mock
 

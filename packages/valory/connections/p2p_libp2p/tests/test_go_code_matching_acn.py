@@ -37,7 +37,6 @@ from aea.test_tools.utils import remove_test_directory
 
 from packages.valory.connections.p2p_libp2p.tests.base import libp2p_log_on_failure_all
 
-
 PACKAGE = "packages.valory.connections.p2p_libp2p.libp2p_node"
 LIBP2P_NODE_DIRECTORY = str(Path(__file__).parent.parent.absolute() / "libp2p_node")
 

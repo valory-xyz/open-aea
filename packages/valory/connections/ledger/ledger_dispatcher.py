@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of the ledger API request dispatcher."""
+
 import asyncio
 import logging
 from typing import Any, cast
@@ -39,7 +40,6 @@ from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 _default_logger = logging.getLogger(
     "aea.packages.valory.connections.ledger.ledger_dispatcher"

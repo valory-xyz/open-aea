@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Base config data types."""
+
 import functools
 import json
 import re
@@ -59,7 +60,6 @@ from aea.helpers.base import (
     SimpleId,
     SimpleIdOrStr,
 )
-
 
 T = TypeVar("T")
 PackageVersionLike = Union[str, semver.VersionInfo]

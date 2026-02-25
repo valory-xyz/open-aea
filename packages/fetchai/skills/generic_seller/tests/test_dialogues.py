@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the dialogue classes of the generic seller skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -44,7 +45,6 @@ from packages.fetchai.skills.generic_seller.dialogues import (
     OefSearchDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 

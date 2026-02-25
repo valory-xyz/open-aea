@@ -25,7 +25,6 @@ from typing import Any, Dict, List
 from aea.exceptions import enforce
 from aea.helpers.search.models import Attribute, DataModel, Location
 
-
 SUPPORTED_TYPES = {"str": str, "int": int, "float": float, "bool": bool}
 
 

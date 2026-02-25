@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the behaviours for the 'exception' skill."""
+
 from aea.skills.base import Behaviour
 
 

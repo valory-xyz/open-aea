@@ -61,7 +61,6 @@ from aea.configurations.constants import CONNECTION, CONTRACT, PROTOCOL, SKILL
 from aea.configurations.data_types import PublicId
 from aea.helpers.ipfs.base import IPFSHashOnly
 
-
 try:
     from aea_cli_ipfs.exceptions import HashNotProvided  # type: ignore
     from aea_cli_ipfs.registry import fetch_ipfs  # type: ignore

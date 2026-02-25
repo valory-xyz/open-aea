@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Python code execution time limit tools."""
+
 import asyncio
 import concurrent
 import ctypes
@@ -30,7 +31,6 @@ from asyncio.events import AbstractEventLoop
 from threading import Lock
 from types import TracebackType
 from typing import Any, Optional, Type
-
 
 _default_logger = logging.getLogger(__file__)
 

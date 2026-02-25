@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Conftest module for Pytest."""
+
 import inspect
 import logging
 import os
@@ -32,7 +33,6 @@ import pytest
 from aea_ledger_solana import SolanaCrypto
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 ROOT_DIR = os.path.join(CUR_PATH, "..")

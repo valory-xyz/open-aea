@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the dialogue classes of the http_echo skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -33,7 +34,6 @@ from packages.fetchai.skills.http_echo.dialogues import (
     HttpDialogues,
 )
 from packages.valory.protocols.http.message import HttpMessage
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the handler for the 'echo' skill."""
+
 from typing import cast
 
 from aea.protocols.base import Message

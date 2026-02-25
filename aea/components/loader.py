@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains utilities for loading components."""
+
 import re
 from typing import Dict, Type
 

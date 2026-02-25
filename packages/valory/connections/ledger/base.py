@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains base classes for the ledger API connection."""
+
 import asyncio
 import inspect
 from abc import ABC, abstractmethod

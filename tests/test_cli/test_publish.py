@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Test module for Registry publish methods."""
+
 from pathlib import Path
 from shutil import rmtree
 from unittest import TestCase, mock

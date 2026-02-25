@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the fetchai fixture helpers module."""
+
 import platform
 
 import pytest

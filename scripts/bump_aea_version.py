@@ -59,7 +59,6 @@ from packaging.version import Version
 from aea.cli.ipfs_hash import update_hashes
 from aea.helpers.base import compute_specifier_from_version
 
-
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s][%(name)s][%(levelname)s] %(message)s"
 )

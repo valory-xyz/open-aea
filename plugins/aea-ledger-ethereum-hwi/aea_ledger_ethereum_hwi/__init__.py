@@ -21,7 +21,6 @@
 
 import os
 
-
 if os.environ.get("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None) != "python":
     print(
         (

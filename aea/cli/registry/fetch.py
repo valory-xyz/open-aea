@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Methods for CLI fetch functionality."""
+
 import os
 import shutil
 from pathlib import Path

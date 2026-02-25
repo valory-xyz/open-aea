@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea fetch' subcommand."""
+
 import os
 import shutil
 import tempfile
@@ -52,7 +53,6 @@ from aea.configurations.constants import (
 )
 from aea.exceptions import enforce
 from aea.helpers.io import open_file
-
 
 try:
     from aea_cli_ipfs.ipfs_utils import DownloadError, IPFSTool  # type: ignore

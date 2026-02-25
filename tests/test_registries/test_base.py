@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for aea/registries/base.py."""
+
 import os
 import random
 import shutil

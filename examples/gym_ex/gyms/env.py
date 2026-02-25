@@ -26,7 +26,6 @@ import gym
 import numpy as np
 from gym import spaces  # type: ignore
 
-
 BanditId = int
 Price = int
 

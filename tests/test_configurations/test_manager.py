@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the configurations manager module."""
+
 import os
 from copy import deepcopy
 from pathlib import Path
@@ -38,7 +39,6 @@ from aea.configurations.validation import SAME_MARK
 from aea.exceptions import AEAException
 
 from tests.conftest import ROOT_DIR
-
 
 DUMMY_AEA = Path(ROOT_DIR) / "tests" / "data" / "dummy_aea"
 DUMMY_AEA_CONFIG = """

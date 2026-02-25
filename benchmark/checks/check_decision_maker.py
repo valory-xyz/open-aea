@@ -19,6 +19,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage check."""
+
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the HTTP Server connection module."""
+
 # pylint: skip-file
 
 import asyncio
@@ -49,7 +50,6 @@ from packages.valory.connections.http_server.connection import (
 from packages.valory.protocols.http.dialogues import HttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 logger = logging.getLogger(__name__)
 

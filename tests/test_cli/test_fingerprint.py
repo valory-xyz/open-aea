@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for CLI fingerprint command."""
+
 from pathlib import Path
 from unittest import TestCase, mock
 from unittest.mock import MagicMock

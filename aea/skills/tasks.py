@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the classes for tasks."""
+
 import logging
 import signal
 import threading
@@ -27,7 +28,6 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Type, cast
 
 from aea.components.utils import _enlist_component_packages, _populate_packages
 from aea.helpers.logging import WithLogger
-
 
 THREAD_POOL_MODE = "multithread"
 PROCESS_POOL_MODE = "multiprocess"

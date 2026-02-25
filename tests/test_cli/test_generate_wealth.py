@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for commands in aea.cli.generate_wealth module."""
+
 from unittest import TestCase, mock
 from unittest.mock import MagicMock
 

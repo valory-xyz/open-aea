@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains test case classes based on pytest for AEA skill testing."""
+
 import asyncio
 import os
 from abc import ABC, ABCMeta
@@ -38,7 +39,6 @@ from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue, DialogueMessage, Dialogues
 from aea.skills.base import Skill
 from aea.skills.tasks import TaskManager
-
 
 COUNTERPARTY_AGENT_ADDRESS = "counterparty"
 COUNTERPARTY_SKILL_ADDRESS = "some_author/some_skill:0.1.0"

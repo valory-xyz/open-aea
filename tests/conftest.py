@@ -119,7 +119,6 @@ from packages.fetchai.connections.stub.connection import StubConnection
 
 from tests.data.dummy_connection.connection import DummyConnection  # type: ignore
 
-
 logger = logging.getLogger(__name__)
 
 CliRunner = ImportedCliRunner

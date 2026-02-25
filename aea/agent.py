@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the implementation of a generic agent."""
+
 import datetime
 import logging
 from asyncio import AbstractEventLoop
@@ -33,7 +34,6 @@ from aea.identity.base import Identity
 from aea.mail.base import Envelope
 from aea.multiplexer import InBox, OutBox
 from aea.runtime import AsyncRuntime, BaseRuntime, RuntimeStates, ThreadedRuntime
-
 
 _default_logger = logging.getLogger(__name__)
 

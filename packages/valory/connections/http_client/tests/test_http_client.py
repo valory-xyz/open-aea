@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for valory/http_client connection. Adapted from original AEA code."""
+
 # pylint: skip-file
 
 import asyncio
@@ -42,7 +43,6 @@ from packages.valory.connections.http_client.connection import HTTPClientConnect
 from packages.valory.protocols.http.dialogues import HttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 logger = logging.getLogger(__name__)
 

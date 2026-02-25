@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for AsyncFriendlyQueue."""
+
 import asyncio
 import time
 from concurrent.futures._base import CancelledError

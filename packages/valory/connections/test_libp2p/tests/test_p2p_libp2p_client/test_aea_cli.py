@@ -40,7 +40,6 @@ from packages.valory.connections.test_libp2p.tests.base import (
     ports,
 )
 
-
 DEFAULT_HOST = LOCALHOST.hostname
 DEFAULT_CLIENTS_PER_NODE = 4
 DEFAULT_LAUNCH_TIMEOUT = 10

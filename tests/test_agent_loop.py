@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests of the implementation of an agent loop using asyncio."""
+
 import asyncio
 import datetime
 import logging

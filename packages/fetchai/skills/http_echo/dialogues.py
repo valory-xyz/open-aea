@@ -26,6 +26,7 @@ This module contains the classes required for dialogue management.
 - HttpDialogue: The dialogue class maintains state of a dialogue of type http and manages it.
 - HttpDialogues: The dialogues class keeps track of all dialogues of type http.
 """
+
 from typing import Any
 
 from aea.protocols.base import Address, Message
@@ -40,7 +41,6 @@ from packages.fetchai.protocols.default.dialogues import (
 )
 from packages.valory.protocols.http.dialogues import HttpDialogue as BaseHttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
-
 
 DefaultDialogue = BaseDefaultDialogue
 

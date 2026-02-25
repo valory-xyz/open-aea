@@ -36,7 +36,6 @@ from packages.valory.connections.ledger.connection import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 DEFAULT_SERVICES_INTERVAL = 60.0
 DEFAULT_MAX_SOEF_REGISTRATION_RETRIES = 5
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the behaviours for the 'test task skill' skill."""
+
 from typing import Optional
 
 from aea.skills.behaviours import TickerBehaviour

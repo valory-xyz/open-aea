@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helpers/serializers module."""
+
 import pytest
 
 from aea.helpers.serializers import DictProtobufStructSerializer

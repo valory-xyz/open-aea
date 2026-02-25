@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check amount of time for acn connection start."""
+
 import os
 from pathlib import Path
 from typing import Optional, Sequence, Union
@@ -48,7 +49,6 @@ from packages.valory.connections.p2p_libp2p_client.connection import (
 from packages.valory.connections.p2p_libp2p_mailbox.connection import (
     P2PLibp2pMailboxConnection,
 )
-
 
 DEFAULT_DELEGATE_PORT = 11234
 DEFAULT_MAILBOX_PORT = 8888

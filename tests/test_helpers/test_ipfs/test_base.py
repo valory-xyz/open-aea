@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the ipfs helper module."""
+
 import tempfile
 from pathlib import Path
 from tempfile import TemporaryDirectory

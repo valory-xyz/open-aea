@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea add' subcommand."""
+
 from pathlib import Path
 from typing import Dict, Optional, Union, cast
 

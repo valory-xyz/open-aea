@@ -19,6 +19,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check that the dependencies 'gcc' and 'go' are installed in the system."""
+
 import asyncio
 import os
 import platform
@@ -34,7 +35,6 @@ from typing import Iterable, List, Optional, Pattern, Tuple
 
 from aea.exceptions import AEAException
 from aea.helpers.base import ensure_dir
-
 
 try:
     # flake8: noqa

@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 """This script checks that dependencies in tox.ini and Pipfile match."""
+
 import configparser
 import itertools
 import sys
@@ -27,7 +28,6 @@ from typing import Set, Tuple
 
 import tomli
 from packaging.requirements import Requirement as BaseRequirement
-
 
 TOX_INI = "tox.ini"
 PIPFILE = "Pipfile"

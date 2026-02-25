@@ -23,7 +23,6 @@ import os
 
 from aea.manager.helpers import AEAProject
 
-
 PROJECT_CONTENT = [
     "contracts",
     "connections",

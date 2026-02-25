@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of skill-testing.md file."""
+
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock

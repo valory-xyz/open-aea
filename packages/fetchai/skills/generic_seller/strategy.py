@@ -37,7 +37,6 @@ from aea.helpers.search.models import Description, Location, Query
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
-
 DEFAULT_IS_LEDGER_TX = True
 
 DEFAULT_UNIT_PRICE = 4

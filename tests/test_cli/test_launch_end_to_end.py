@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea launch` sub-command."""
+
 # import json
 # import os
 # import sqlite3

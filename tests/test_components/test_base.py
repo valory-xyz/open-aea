@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains tests for aea/components/base.py"""
+
 import inspect
 import itertools
 import os

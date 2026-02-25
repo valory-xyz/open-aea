@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains test case classes based on pytest for AEA end-to-end testing."""
+
 import contextlib
 import copy
 import logging
@@ -85,7 +86,6 @@ from aea.test_tools.generic import (
     write_envelope_to_file,
 )
 from aea.test_tools.utils import consume, wait_for_condition
-
 
 _default_logger = logging.getLogger(__name__)
 

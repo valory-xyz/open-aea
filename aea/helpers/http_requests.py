@@ -18,13 +18,13 @@
 #
 # ------------------------------------------------------------------------------
 """Wrapper over requests library."""
+
 from functools import wraps
 from typing import Any, Callable
 
 import requests
 
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
-
 
 DEFAULT_TIMEOUT = NETWORK_REQUEST_DEFAULT_TIMEOUT
 

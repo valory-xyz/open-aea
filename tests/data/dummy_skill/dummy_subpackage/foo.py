@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module is in a skill sub-package (for testing purposes)."""
+
 from aea.protocols.base import Message
 from aea.skills.base import Behaviour, Handler
 

@@ -22,5 +22,4 @@
 
 from aea.configurations.base import PublicId
 
-
 PUBLIC_ID = PublicId.from_str("open_aea/scaffold:0.1.0")

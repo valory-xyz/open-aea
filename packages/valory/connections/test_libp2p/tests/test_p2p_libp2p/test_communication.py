@@ -39,7 +39,6 @@ from packages.valory.connections.test_libp2p.tests.base import (
     _make_libp2p_connection,
 )
 
-
 DEFAULT_NET_SIZE = 4
 
 

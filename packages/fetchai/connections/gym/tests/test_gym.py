@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the gym connection module."""
+
 # type: ignore # noqa: E800
 # pylint: skip-file
 
@@ -41,7 +42,6 @@ from packages.fetchai.connections.gym.connection import GymConnection
 from packages.fetchai.protocols.gym.dialogues import GymDialogue
 from packages.fetchai.protocols.gym.dialogues import GymDialogues as BaseGymDialogues
 from packages.fetchai.protocols.gym.message import GymMessage
-
 
 logger = logging.getLogger(__name__)
 

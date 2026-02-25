@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains a custom crypto class for testing purposes."""
+
 from typing import Any, Optional, Tuple, Union
 
 from aea.common import Address

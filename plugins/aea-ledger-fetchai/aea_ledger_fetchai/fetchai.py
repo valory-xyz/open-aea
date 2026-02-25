@@ -32,7 +32,6 @@ from aea_ledger_cosmos.cosmos import (
 
 from aea.common import JSONLike
 
-
 _ = MAXIMUM_GAS_AMOUNT
 _FETCHAI = "fetchai"
 _FETCH = "fetch"

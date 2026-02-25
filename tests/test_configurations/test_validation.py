@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the aea.configurations.validation module."""
+
 from aea.configurations.validation import (
     SAME_MARK,
     filter_data,

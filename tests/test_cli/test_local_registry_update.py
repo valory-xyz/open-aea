@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea local-registry-sync"""
+
 import os
 from tempfile import TemporaryDirectory
 from unittest import mock

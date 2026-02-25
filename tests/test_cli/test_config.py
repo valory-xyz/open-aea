@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea config` sub-command."""
+
 import json
 import os
 import shutil

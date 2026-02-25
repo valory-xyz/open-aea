@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the base message and serialization definition."""
+
 import importlib
 import inspect
 import logging
@@ -33,7 +34,6 @@ from aea.components.base import Component, load_aea_package
 from aea.configurations.base import ComponentType, ProtocolConfig, PublicId
 from aea.configurations.loader import load_component_configuration
 from aea.exceptions import AEAComponentLoadException, enforce
-
 
 _default_logger = logging.getLogger(__name__)
 

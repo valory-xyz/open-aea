@@ -40,7 +40,6 @@ from typing import (
     Union,
 )
 
-
 FULL_PERMISSION = 0o40777
 
 

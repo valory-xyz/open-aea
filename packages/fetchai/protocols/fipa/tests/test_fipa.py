@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests of the fipa protocol package."""
+
 # pylint: skip-file
 
 import logging
@@ -41,7 +42,6 @@ from packages.fetchai.protocols.fipa.message import FipaMessage
 from packages.fetchai.protocols.fipa.message import (
     _default_logger as fipa_message_logger,
 )
-
 
 logger = logging.getLogger(__name__)
 

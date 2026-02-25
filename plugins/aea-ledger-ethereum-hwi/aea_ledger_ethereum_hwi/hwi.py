@@ -37,7 +37,6 @@ from eth_account.signers.local import LocalAccount
 from aea.common import JSONLike
 from aea.crypto.base import Crypto
 
-
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum_hwi")
 
 SignedTransactionTranslator = BaseSignedTransactionTranslator

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the behaviours."""
+
 from collections import Counter
 from unittest import TestCase, mock
 

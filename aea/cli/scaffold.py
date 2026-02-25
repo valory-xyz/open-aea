@@ -61,7 +61,6 @@ from aea.configurations.loader import ConfigLoader
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
 
-
 COPYRIGHT_HEADER = """\
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------

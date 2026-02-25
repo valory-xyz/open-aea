@@ -20,6 +20,7 @@
 
 
 """This module contains the tests for the aea.configurations.loader module."""
+
 import os
 from collections import OrderedDict
 from io import StringIO

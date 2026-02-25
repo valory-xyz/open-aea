@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Conftest module for Pytest."""
+
 import inspect
 import logging
 import os
@@ -40,7 +41,6 @@ from aea_ledger_ethereum.ethereum import (
 from aea_ledger_ethereum.test_tools.docker_images import DockerImage, GanacheDockerImage
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 ROOT_DIR = os.path.join(CUR_PATH, "..")

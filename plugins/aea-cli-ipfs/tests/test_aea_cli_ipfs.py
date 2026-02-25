@@ -35,14 +35,12 @@ from urllib3.exceptions import NewConnectionError as ConnectionError
 from aea.cli.core import cli
 from aea.test_tools.click_testing import CliRunner, CliTest
 
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from aea_cli_ipfs.core import (  # noqa # type: ignore  # pylint: disable=wrong-import-position
     PublishError,
     ipfs,
 )
-
 
 DUMMY_HASH = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR"
 

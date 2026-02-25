@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for aea/aea.py."""
+
 import os
 import tempfile
 import time

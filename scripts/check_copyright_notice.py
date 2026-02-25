@@ -39,7 +39,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Iterator, Optional, Tuple, cast
 
-
 CURRENT_YEAR = datetime.now().year
 VALORY_FORK_DATE = datetime.strptime(
     "Sun Nov 01 00:00:00 2021 +0000", "%a %b %d %X %Y %z"

@@ -30,6 +30,7 @@ the desired outcomes.
 
 It requires the `aea` package, `black` and `isort` tools.
 """
+
 import logging
 import os
 import pprint
@@ -60,7 +61,6 @@ from aea.exceptions import enforce
 from aea.helpers.git import check_working_tree_is_dirty
 from aea.helpers.protocols import get_protocol_specification_from_readme
 from aea.manager.helpers import AEAProject
-
 
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
 LIBPROTOC_VERSION = "libprotoc 24.3"

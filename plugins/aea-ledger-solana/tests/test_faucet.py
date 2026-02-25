@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the solana module."""
+
 import logging
 
 import pytest

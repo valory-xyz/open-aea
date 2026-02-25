@@ -43,7 +43,6 @@ from packaging.version import Version
 from aea.cli.ipfs_hash import update_hashes
 from aea.helpers.base import compute_specifier_from_version
 
-
 ROOT_DIR = Path(__file__).parent.parent
 PLUGINS_DIR = Path("plugins")
 SETUP_PY_NAME_REGEX = re.compile(r"\Wname=\"(.*)\",")

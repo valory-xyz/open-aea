@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea sync-local-registry' subcommand."""
+
 import os
 import shutil
 from pathlib import Path
@@ -34,7 +35,6 @@ from aea.cli.utils.decorators import pass_ctx
 from aea.cli.utils.loggers import logger
 from aea.configurations.data_types import PackageId, PackageType, PublicId
 from aea.configurations.loader import load_package_configuration
-
 
 PACKAGES_DIRS = [i.to_plural() for i in PackageType]
 

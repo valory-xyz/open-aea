@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage of huge amount of messages."""
+
 import time
 from typing import Any, List, Tuple, Union
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for aea/registries/filter.py."""
+
 import unittest.mock
 from unittest.mock import MagicMock
 

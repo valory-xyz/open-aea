@@ -35,7 +35,6 @@ from tests.test_docs.test_standalone_transaction.standalone_transaction import (
     run,
 )
 
-
 MD_FILE = "docs/standalone-transaction.md"
 PY_FILE = "test_docs/test_standalone_transaction/standalone_transaction.py"
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """A module with context tools of the aea cli."""
+
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast

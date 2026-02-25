@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains mocking utils testing purposes."""
+
 import re
 import unittest
 from contextlib import contextmanager

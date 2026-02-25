@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the environment variables support."""
+
 import json
 import re
 from collections.abc import Mapping as MappingType
@@ -31,7 +32,6 @@ from aea.helpers.constants import (
     JSON_TYPES,
     NULL_EQUIVALENTS,
 )
-
 
 ENV_VARIABLE_RE = re.compile(r"^\$\{(([A-Z0-9_]+):?)?([a-z]+)?(:(.+))?}$")
 MODELS = "models"

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for commands in aea.cli.get_multiaddress module."""
+
 from unittest import mock
 
 import base58

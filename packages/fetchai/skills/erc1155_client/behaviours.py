@@ -35,7 +35,6 @@ from packages.valory.connections.ledger.connection import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 DEFAULT_SEARCH_INTERVAL = 5.0
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 

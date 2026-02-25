@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea issue_certificates' subcommand."""
+
 from typing import Dict, List, Optional, cast
 
 import click

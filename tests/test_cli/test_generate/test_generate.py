@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the aea.cli.generate sub-module."""
+
 from unittest import TestCase, mock
 
 import yaml

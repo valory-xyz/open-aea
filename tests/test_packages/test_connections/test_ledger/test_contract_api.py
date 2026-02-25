@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ledger API connection for the contract APIs."""
+
 import asyncio
 import logging
 import os
@@ -53,7 +54,6 @@ from packages.valory.protocols.contract_api.dialogues import (
 from packages.valory.protocols.contract_api.message import ContractApiMessage
 
 from tests.conftest import ROOT_DIR
-
 
 SOME_SKILL_ID = "some/skill:0.1.0"
 

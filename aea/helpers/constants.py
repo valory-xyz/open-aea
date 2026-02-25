@@ -18,8 +18,8 @@
 #
 # ------------------------------------------------------------------------------
 """Module with helpers constants."""
-from typing import Dict, List, Union
 
+from typing import Dict, List, Union
 
 FALSE_EQUIVALENTS = ["f", "false", "False", "0"]
 NULL_EQUIVALENTS = ["Null", "null", "None", "none"]

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains a scaffold of the error handler class."""
+
 from logging import Logger
 
 from aea.error_handler.base import AbstractErrorHandler

@@ -20,6 +20,7 @@
 
 
 """This test module contains the tests for the `aea build` sub-command."""
+
 import re
 from pathlib import Path
 from unittest import mock

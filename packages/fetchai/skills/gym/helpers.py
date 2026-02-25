@@ -36,7 +36,6 @@ from packages.fetchai.connections.gym.connection import (
 from packages.fetchai.protocols.gym.message import GymMessage
 from packages.fetchai.skills.gym.dialogues import GymDialogue, GymDialogues
 
-
 Action = Any
 Observation = Any
 Reward = float

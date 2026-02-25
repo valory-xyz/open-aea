@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Test package manager base."""
+
 import copy
 import json
 import logging
@@ -54,7 +55,6 @@ from tests.test_package_manager.test_base import (
     EXAMPLE_PACKAGE_ID,
     PACKAGE_JSON_FILE,
 )
-
 
 TEST_SKILL_ID = PackageId(
     package_type=PackageType.SKILL,

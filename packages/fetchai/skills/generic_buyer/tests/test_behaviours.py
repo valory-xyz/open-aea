@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the behaviour classes of the generic buyer skill."""
+
 # pylint: skip-file
 
 import logging
@@ -46,7 +47,6 @@ from packages.fetchai.skills.generic_buyer.dialogues import (
 from packages.fetchai.skills.generic_buyer.strategy import GenericStrategy
 from packages.valory.connections.ledger.connection import PUBLIC_ID as LEDGER_PUBLIC_ID
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 ETHEREUM = "ethereum"
 PACKAGE_ROOT = Path(__file__).parent.parent

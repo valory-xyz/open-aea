@@ -19,7 +19,6 @@
 # ------------------------------------------------------------------------------
 """This module contains the tests for MultiAddr helper class."""
 
-
 import tempfile
 from shutil import rmtree
 
@@ -28,7 +27,6 @@ import pytest
 from aea.configurations.constants import _FETCHAI_IDENTIFIER
 from aea.crypto.registries import make_crypto
 from aea.helpers.multiaddr.base import MultiAddr
-
 
 HOST = "127.0.0.1"
 PORT = 13000

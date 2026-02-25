@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the abstract error handler class."""
+
 from abc import ABC, abstractmethod
 from logging import Logger
 from typing import Any, Dict

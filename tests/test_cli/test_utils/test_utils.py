@@ -80,7 +80,6 @@ from tests.test_cli.tools_for_testing import (
     raise_stoptest,
 )
 
-
 AUTHOR = "author"
 
 

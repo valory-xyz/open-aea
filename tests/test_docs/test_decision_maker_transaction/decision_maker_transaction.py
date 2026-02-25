@@ -46,7 +46,6 @@ from packages.open_aea.protocols.signing.message import SigningMessage
 
 from tests.conftest import get_wealth_if_needed
 
-
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)
 

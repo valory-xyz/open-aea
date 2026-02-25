@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains tests for the scaffold skill."""
+
 from unittest.mock import MagicMock
 
 import pytest

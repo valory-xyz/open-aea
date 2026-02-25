@@ -41,7 +41,6 @@ from typing import (
 import aea.helpers.search.models_pb2 as models_pb2
 from aea.exceptions import enforce
 
-
 _default_logger = logging.getLogger(__name__)
 
 proto_value = {

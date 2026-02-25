@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check amount of time and mem for agent setup."""
+
 import os
 import time
 from pathlib import Path
@@ -30,7 +31,6 @@ from click.testing import CliRunner
 
 from aea import AEA_DIR as _AEA_DIR
 from aea.aea_builder import AEABuilder
-
 
 AEA_DIR = Path(_AEA_DIR)
 PACKAGES_DIR = AEA_DIR.parent / "packages"

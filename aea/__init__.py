@@ -26,13 +26,11 @@ import inspect
 import os
 import sys
 
-
 # Patch to fix https://github.com/protocolbuffers/protobuf/issues/3276
 
 _google_upb_message = sys.modules.pop("google._upb._message", None)
 
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
-
 
 if _google_upb_message is not None:
     sys.modules["google._upb._message"] = _google_upb_message
@@ -51,7 +49,6 @@ from aea.__version__ import (
     __version__,
 )
 from aea.crypto.plugin import load_all_plugins
-
 
 AEA_DIR = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 

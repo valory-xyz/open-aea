@@ -27,7 +27,6 @@ from aea.configurations.loader import load_protocol_specification_from_string
 from aea.exceptions import enforce
 from aea.helpers.logging import setup_logger
 
-
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
 PROTOCOL_SPECIFICATION_ID_IN_SPECIFICATION_REGEX = re.compile(
     "^protocol_specification_id: (.*)$", re.MULTILINE

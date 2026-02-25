@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the base classes for the skills."""
+
 import datetime
 import inspect
 import logging
@@ -58,7 +59,6 @@ from aea.mail.base import Envelope, EnvelopeContext
 from aea.multiplexer import MultiplexerStatus, OutBox
 from aea.protocols.base import Message
 from aea.skills.tasks import TaskManager
-
 
 _default_logger = logging.getLogger(__name__)
 

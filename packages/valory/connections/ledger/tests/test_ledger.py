@@ -53,7 +53,6 @@ from packages.valory.protocols.contract_api import ContractApiMessage
 from packages.valory.protocols.ledger_api import LedgerApiMessage
 from packages.valory.protocols.ledger_api.custom_types import Kwargs
 
-
 SOME_SKILL_ID = "some/skill:0.1.0"
 NON_BLOCKING_TIME = 1
 BLOCKING_TIME = 100

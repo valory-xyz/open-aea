@@ -65,7 +65,6 @@ from tests.conftest import MAX_FLAKY_RERUNS, MY_FIRST_AEA_PUBLIC_ID
 from tests.data import dummy_aea
 from tests.test_cli import test_generate_wealth
 
-
 TestWealthCommandsPositiveNoPass = test_generate_wealth.TestWealthCommandsPositiveNoPass
 TestWealthCommandsPositiveFakePass = (
     test_generate_wealth.TestWealthCommandsPositiveFakePass

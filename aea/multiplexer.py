@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module for the multiplexer class and related classes."""
+
 import asyncio
 import queue
 import threading

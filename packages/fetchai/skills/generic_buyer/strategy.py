@@ -35,7 +35,6 @@ from aea.helpers.search.models import (
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
 
-
 DEFAULT_IS_LEDGER_TX = True
 
 DEFAULT_MAX_UNIT_PRICE = 5

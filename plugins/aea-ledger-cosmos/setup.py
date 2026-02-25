@@ -23,7 +23,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="open-aea-ledger-cosmos",
     version="2.0.8",

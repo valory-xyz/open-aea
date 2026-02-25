@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the scaffold connection."""
+
 import os
 import sys
 from unittest.mock import MagicMock

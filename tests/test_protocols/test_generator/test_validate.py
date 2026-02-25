@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for generator/validate.py module."""
+
 import logging
 from unittest import TestCase, mock
 
@@ -53,7 +54,6 @@ from aea.protocols.generator.validate import (
     _validate_termination,
     validate,
 )
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

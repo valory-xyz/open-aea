@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests of the ledger API connection module."""
+
 # pylint: skip-file
 
 import asyncio
@@ -70,7 +71,6 @@ from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 SOME_SKILL_ID = "some/skill:0.1.0"
 PACKAGE_DIR = Path(__file__).parent.parent

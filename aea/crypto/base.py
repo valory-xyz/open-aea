@@ -27,7 +27,6 @@ from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 from aea.common import Address, JSONLike
 from aea.helpers.io import open_file
 
-
 EntityClass = TypeVar("EntityClass")
 
 

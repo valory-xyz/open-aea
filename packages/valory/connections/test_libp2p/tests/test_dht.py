@@ -52,7 +52,6 @@ from packages.valory.connections.test_libp2p.tests.conftest import (
     public_nodes,
 )
 
-
 AEA_DEFAULT_LAUNCH_TIMEOUT = 30
 AEA_LIBP2P_LAUNCH_TIMEOUT = 30
 

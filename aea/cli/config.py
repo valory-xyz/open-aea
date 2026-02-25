@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea config' subcommand."""
+
 import contextlib
 import json
 from typing import Optional, cast

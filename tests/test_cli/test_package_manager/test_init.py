@@ -19,7 +19,6 @@
 
 """Test `aea packages init` command."""
 
-
 import click
 import pytest
 

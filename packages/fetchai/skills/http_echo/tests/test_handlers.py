@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the handler class of the http_echo skill."""
+
 # pylint: skip-file
 
 import json
@@ -33,7 +34,6 @@ from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.skills.http_echo.dialogues import HttpDialogues
 from packages.fetchai.skills.http_echo.handlers import HttpHandler
 from packages.valory.protocols.http.message import HttpMessage
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 

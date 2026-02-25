@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of quickstart.md file."""
+
 from pathlib import Path
 
 from packages.fetchai.protocols.default.message import DefaultMessage

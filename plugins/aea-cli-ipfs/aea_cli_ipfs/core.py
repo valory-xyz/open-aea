@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Core components for `ipfs cli command`."""
+
 import os
 from glob import glob
 from pathlib import Path

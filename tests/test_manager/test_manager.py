@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea manager."""
+
 import contextlib
 import logging
 import os
@@ -57,7 +58,6 @@ from tests.conftest import (
     PACKAGES_DIR,
     ROOT_DIR,
 )
-
 
 try:
     from multiprocessing.popen_spawn_posix import _DupFd  # type: ignore # noqa: F401

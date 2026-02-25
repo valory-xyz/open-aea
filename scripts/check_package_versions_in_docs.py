@@ -26,6 +26,7 @@ Run this script from the root of the project directory:
     python scripts/check_package_versions_in_docs.py
 
 """
+
 import re
 import sys
 from itertools import chain
@@ -43,7 +44,6 @@ from aea.configurations.constants import (
     DEFAULT_PROTOCOL_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,
 )
-
 
 PUBLIC_ID_REGEX = PublicId.PUBLIC_ID_REGEX[1:-1]
 """This regex removes the '^' and '$' respectively, at the beginning and at the end."""

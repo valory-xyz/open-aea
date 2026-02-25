@@ -28,7 +28,6 @@ import pytest
 
 from aea.helpers.io import from_csv, open_file, to_csv
 
-
 DUMMY_CSV_DATA = {
     "key_0": "value_0",
     "key_1": "value_1",

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the stub connection."""
+
 import asyncio
 import logging
 import os
@@ -37,7 +38,6 @@ from aea.configurations.constants import (
 from aea.connections.base import Connection, ConnectionStates
 from aea.helpers.file_io import envelope_from_bytes, lock_file, write_envelope
 from aea.mail.base import Envelope
-
 
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.stub")
 

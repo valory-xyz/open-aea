@@ -38,7 +38,6 @@ from typing import Dict, List, Tuple, Type
 from aea.helpers.async_utils import Runnable
 from aea.helpers.profiler_type_black_list import PROFILER_TYPE_BLACK_LIST
 
-
 BYTES_TO_MBYTES = 1024**-2
 
 lock = threading.Lock()
@@ -155,8 +154,7 @@ class Profiling(Runnable):
         """Render profiling data and call output_function."""
         data = self.get_profile_data()
         text = (
-            textwrap.dedent(
-                f"""
+            textwrap.dedent(f"""
         Profiling details for current AEA process: {datetime.datetime.now()}
         =============================================
         Run time: {data["run_time"]:.6f} seconds
@@ -165,8 +163,7 @@ class Profiling(Runnable):
         Memory: {data["mem"]:.6f} MB [Peak {data["mem_peak"]:.6f} MB]
         Threads: {data["threads"]['amount']}  {data["threads"]['names']}
         Objects present:
-        """
-            )
+        """)
             + "\n".join(
                 [
                     f" * {i.__name__} (present):  {c}"

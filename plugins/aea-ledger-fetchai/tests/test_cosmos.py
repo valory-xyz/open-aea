@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the fetchai._cosmos module."""
+
 from unittest.mock import Mock, patch
 
 import pytest

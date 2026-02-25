@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of AEA multiple instances runner."""
+
 import asyncio
 import logging
 from asyncio import iscoroutine
@@ -35,7 +36,6 @@ from aea.helpers.multiple_executor import (
     ThreadExecutor,
 )
 from aea.runtime import AsyncRuntime
-
 
 _default_logger = logging.getLogger(__name__)
 

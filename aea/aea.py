@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of an autonomous economic agent (AEA)."""
+
 import datetime
 from asyncio import AbstractEventLoop
 from logging import Logger

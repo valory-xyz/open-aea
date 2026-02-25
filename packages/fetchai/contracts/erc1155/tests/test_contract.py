@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """The tests module contains the tests of the packages/contracts/erc1155 dir."""
+
 # type: ignore # noqa: E800
 # pylint: skip-file
 
@@ -50,7 +51,6 @@ from aea.configurations.loader import (
 )
 from aea.contracts.base import Contract, contract_registry
 from aea.test_tools.test_contract import BaseContractTestCase
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 MAX_FLAKY_RERUNS = 3

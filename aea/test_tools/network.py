@@ -22,7 +22,6 @@
 import socket
 from urllib.parse import urlparse
 
-
 LOCALHOST = urlparse("http://127.0.0.1")
 
 

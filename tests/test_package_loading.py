@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for AEA package loading."""
+
 import os
 import sys
 from unittest.mock import Mock

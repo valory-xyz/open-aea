@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea push' subcommand."""
+
 import os
 from pathlib import Path
 from shutil import copytree
@@ -47,7 +48,6 @@ from aea.cli.utils.package_utils import (
 )
 from aea.configurations.data_types import PublicId
 from aea.helpers.cid import to_v1
-
 
 try:
     from aea_cli_ipfs.core import IPFSTool  # type: ignore

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of an agent loop using asyncio."""
+
 import asyncio
 import datetime
 from abc import ABC, abstractmethod

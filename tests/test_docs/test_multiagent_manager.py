@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of multi-agent-manager.md file."""
+
 import os
 import shutil
 import tempfile

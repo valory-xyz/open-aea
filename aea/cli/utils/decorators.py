@@ -50,7 +50,6 @@ from aea.exceptions import AEAException, AEAValidationError, enforce
 from aea.helpers.base import decorator_with_optional_params
 from aea.helpers.io import open_file
 
-
 pass_ctx = click.make_pass_decorator(Context)
 
 

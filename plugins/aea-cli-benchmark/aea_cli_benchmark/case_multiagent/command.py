@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Envelopes generation speed for Behaviour act test."""
+
 from typing import Any, List, Tuple
 
 import click
@@ -28,7 +29,6 @@ from aea_cli_benchmark.utils import (
     print_results,
     with_packages,
 )
-
 
 PACKAGES = [
     ("protocol", "open_aea/signing"),

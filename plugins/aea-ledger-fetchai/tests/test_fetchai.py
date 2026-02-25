@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the fetchai module."""
+
 import base64
 import json
 import logging

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea/components/utils.py"""
+
 from itertools import chain
 from unittest.mock import patch
 

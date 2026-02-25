@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helper module."""
+
 import os
 import platform
 import re
@@ -68,7 +69,6 @@ from packages.valory.connections.http_server.connection import HTTPServerConnect
 
 from tests.conftest import CUR_PATH, ROOT_DIR, skip_test_windows
 from tests.data.dummy_skill import PUBLIC_ID as DUMMY_SKILL_PUBLIC_ID
-
 
 NOT_BEFORE = "2022-01-01"
 NOT_AFTER = "2023-01-01"

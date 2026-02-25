@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the aea.configurations.base module."""
+
 import hashlib
 import json
 import re

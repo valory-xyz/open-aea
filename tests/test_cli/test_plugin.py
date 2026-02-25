@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Test the CLI plugin mechanism."""
+
 import inspect
 from importlib.metadata import Distribution, EntryPoint
 from pathlib import Path
@@ -31,7 +32,6 @@ from aea.cli.plugin import with_plugins
 from aea.test_tools.click_testing import CliRunner
 
 from tests.conftest import ROOT_DIR
-
 
 # We need to compute the right dotted path w.r.t. the current module location.
 # Instead of hard-coding it, we compute it on-the-fly.

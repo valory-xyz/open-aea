@@ -26,7 +26,6 @@ from gyms.env import BanditNArmedRandom  # noqa: I201
 from proxy.env import ProxyEnv  # type: ignore # noqa: I201
 from rl.agent import RLAgent  # noqa: I201
 
-
 DEFAULT_NB_GOODS = 10
 DEFAULT_NB_PRICES_PER_GOOD = 100
 DEFAULT_NB_STEPS = 4000

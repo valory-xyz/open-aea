@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for the pipe module."""
+
 import asyncio
 from threading import Thread
 from unittest import mock

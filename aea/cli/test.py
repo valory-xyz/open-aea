@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the 'aea test' command."""
+
 import contextlib
 import os
 import sys
@@ -64,7 +65,6 @@ from aea.configurations.loader import (
 from aea.configurations.manager import find_component_directory_from_component_id
 from aea.exceptions import enforce
 from aea.package_manager.v1 import PackageManagerV1
-
 
 COVERAGERC_FILE = ".coveragerc"
 COVERAGERC_CONFIG = """[run]

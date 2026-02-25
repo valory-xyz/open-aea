@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests for the `aea init` sub-command."""
+
 import os
 import shutil
 import tempfile

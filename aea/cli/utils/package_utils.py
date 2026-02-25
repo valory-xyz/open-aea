@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module with package utils of the aea cli."""
+
 import os
 import re
 import shutil
@@ -72,7 +73,6 @@ from aea.helpers.dependency_tree import COMPONENTS
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
 from aea.helpers.sym_link import create_symlink
-
 
 DISTRIBUTED_PACKAGES = [PublicId.from_str(dp) for dp in DISTRIBUTED_PACKAGES_STR]
 ROOT = Path(".")

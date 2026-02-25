@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains some utils for testing purposes."""
+
 import asyncio
 import filecmp
 import os
@@ -40,7 +41,6 @@ from aea.skills.base import Behaviour, Handler
 from packages.fetchai.protocols.default.message import DefaultMessage
 
 from tests.conftest import ROOT_DIR
-
 
 DEFAULT_SLEEP = 0.0001
 DEFAULT_TIMEOUT = 3

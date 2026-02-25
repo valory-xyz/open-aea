@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tools used for CLI registry testing."""
+
 from typing import Any, Dict, List, Set
 from unittest.mock import Mock
 

@@ -38,7 +38,6 @@ from packages.valory.connections.ledger.connection import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 DEFAULT_MAX_PROCESSING = 120
 DEFAULT_TX_INTERVAL = 2.0
 DEFAULT_SEARCH_INTERVAL = 5.0

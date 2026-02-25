@@ -29,7 +29,6 @@ from aea.configurations.constants import DOTTED_PATH_MODULE_ELEMENT_SEPARATOR
 from aea.exceptions import AEAException
 from aea.helpers.base import RegexConstrainedString, SIMPLE_ID_REGEX
 
-
 """A regex to match a Python identifier (i.e. a module/class name)."""
 PY_ID_REGEX = r"[^\d\W]\w*"
 ITEM_ID_REGEX = rf"({SIMPLE_ID_REGEX})|{PublicId.PUBLIC_ID_REGEX}"

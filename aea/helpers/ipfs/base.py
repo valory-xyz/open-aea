@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains helper methods and classes for the 'aea' package."""
+
 import codecs
 import hashlib
 import io
@@ -32,7 +33,6 @@ import base58
 from aea.helpers.cid import to_v1
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.utils import _protobuf_python_implementation
-
 
 # https://github.com/multiformats/multicodec/blob/master/table.csv
 SHA256_ID = "12"  # 0x12

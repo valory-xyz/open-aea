@@ -74,7 +74,6 @@ from aea.crypto.helpers import DecryptError, KeyIsIncorrect
 
 from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 
-
 RPC_ENV_VAR_PREFIX = "RPC_"
 
 

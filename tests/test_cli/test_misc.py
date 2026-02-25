@@ -45,9 +45,7 @@ def test_flag_help():
     """Test that the flag '--help' works correctly."""
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
-    assert (
-        result.stdout
-        == """Usage: aea [OPTIONS] COMMAND [ARGS]...
+    assert result.stdout == """Usage: aea [OPTIONS] COMMAND [ARGS]...
 
   Command-line tool for setting up an Autonomous Economic Agent (AEA).
 
@@ -105,4 +103,3 @@ Commands:
   transfer                Transfer wealth associated with a private key of...
   upgrade                 Upgrade the packages of the agent.
 """
-    )

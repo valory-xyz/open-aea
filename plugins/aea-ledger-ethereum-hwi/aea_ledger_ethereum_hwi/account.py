@@ -55,7 +55,6 @@ from ledgerwallet.transport import enumerate_devices
 
 from aea.common import JSONLike
 
-
 address = rlp.sedes.Binary.fixed_length(20, allow_empty=True)
 access_list_sede_type = rlp.sedes.CountableList(
     rlp.sedes.List(

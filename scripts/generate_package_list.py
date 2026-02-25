@@ -19,11 +19,11 @@
 # ------------------------------------------------------------------------------
 
 """Script to generate a markdown package table."""
+
 from pathlib import Path
 from typing import Dict
 
 from aea.cli.packages import get_package_manager
-
 
 COL_WIDTH = 61
 

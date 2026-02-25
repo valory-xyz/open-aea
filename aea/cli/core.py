@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Core definitions for the AEA command-line tool."""
+
 from importlib.metadata import entry_points
 from typing import Optional
 

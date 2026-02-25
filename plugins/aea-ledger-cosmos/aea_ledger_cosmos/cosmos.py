@@ -131,9 +131,9 @@ class DataEncrypt:
         """
         key, salt = cls._password_to_key_and_salt(password)
         cipher = AES.new(key, AES.MODE_EAX)
-        ciphertext, tag = cipher.encrypt_and_digest(data)  # type:ignore
+        ciphertext, tag = cipher.encrypt_and_digest(data)  # type: ignore
 
-        return ciphertext, cipher.nonce, tag, salt  # type:ignore
+        return ciphertext, cipher.nonce, tag, salt  # type: ignore
 
     @staticmethod
     def _password_to_key_and_salt(
@@ -161,7 +161,7 @@ class DataEncrypt:
         key, _ = cls._password_to_key_and_salt(password, salt)
         cipher = AES.new(key, AES.MODE_EAX, nonce)
         try:
-            decrypted_data = cipher.decrypt_and_verify(  # type:ignore
+            decrypted_data = cipher.decrypt_and_verify(  # type: ignore
                 encrypted_data, tag
             )
         except ValueError as e:

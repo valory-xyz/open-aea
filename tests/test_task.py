@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the task manager."""
+
 from multiprocessing.pool import AsyncResult
 
 import pytest

@@ -45,7 +45,6 @@ from aea.configurations.data_types import PackageId, PublicId
 from aea.exceptions import AEAPackageLoadingError
 from aea.helpers.yaml_utils import _AEAYamlDumper, _AEAYamlLoader
 
-
 COMPONENTS = [
     (AGENT, DEFAULT_AEA_CONFIG_FILE),
     (SKILL, DEFAULT_SKILL_CONFIG_FILE),

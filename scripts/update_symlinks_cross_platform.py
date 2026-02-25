@@ -31,7 +31,6 @@ from functools import reduce
 from pathlib import Path
 from typing import Generator, List, Tuple, Union
 
-
 SCRIPTS_PATH = Path(os.path.dirname(inspect.getfile(inspect.currentframe())))  # type: ignore
 ROOT_PATH = SCRIPTS_PATH.parent.absolute()
 TEST_DATA = ROOT_PATH / "tests" / "data"

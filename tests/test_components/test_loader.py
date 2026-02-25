@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea/components/loader.py"""
+
 from pathlib import Path
 from unittest import mock
 

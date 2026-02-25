@@ -26,6 +26,7 @@ This module contains the classes required for dialogue management.
 - GymDialogue: The dialogue class maintains state of a dialogue of type gym and manages it.
 - GymDialogues: The dialogues class keeps track of all dialogues of type gym.
 """
+
 from typing import Any
 
 from aea.protocols.base import Address, Message
@@ -40,7 +41,6 @@ from packages.fetchai.protocols.default.dialogues import (
 )
 from packages.fetchai.protocols.gym.dialogues import GymDialogue as BaseGymDialogue
 from packages.fetchai.protocols.gym.dialogues import GymDialogues as BaseGymDialogues
-
 
 DefaultDialogue = BaseDefaultDialogue
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for commands in aea.cli.get_address module."""
+
 from unittest import TestCase, mock
 from unittest.mock import MagicMock
 

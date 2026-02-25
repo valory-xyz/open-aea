@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Envelopes generation speed for Behaviour act test."""
+
 import time
 from threading import Thread
 from typing import List, Tuple, Union, cast

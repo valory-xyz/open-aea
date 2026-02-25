@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module with click utils of the aea cli."""
+
 import os
 from collections import OrderedDict
 from contextlib import contextmanager

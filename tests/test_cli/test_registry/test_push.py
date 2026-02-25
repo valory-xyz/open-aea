@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Test module for Registry push methods."""
+
 import os
 from unittest import TestCase, mock
 from unittest.mock import mock_open, patch

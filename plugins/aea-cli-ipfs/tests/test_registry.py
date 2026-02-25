@@ -37,7 +37,6 @@ from aea_cli_ipfs.registry import (
 
 from aea.configurations.data_types import PublicId
 
-
 DUMMY_REGISTRY_DATA = LOCAL_REGISTRY_DEFAULT.copy()
 DUMMY_REGISTRY_DATA["protocols"] = {
     "default_author/component:0.1.0": "hash_1",

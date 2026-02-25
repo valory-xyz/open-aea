@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for the aea.helpers.pypi module."""
+
 import pytest
 from packaging.specifiers import SpecifierSet
 

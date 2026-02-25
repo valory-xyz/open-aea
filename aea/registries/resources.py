@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the resources class."""
+
 from contextlib import suppress
 from typing import Dict, List, Optional, cast
 

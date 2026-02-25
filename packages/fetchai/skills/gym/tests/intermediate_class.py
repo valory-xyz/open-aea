@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module sets up test environment for gym skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -38,7 +39,6 @@ from packages.fetchai.skills.gym.handlers import GymHandler
 from packages.fetchai.skills.gym.helpers import ProxyEnv
 from packages.fetchai.skills.gym.rl_agent import GoodPriceModel, MyRLAgent, PriceBandit
 from packages.fetchai.skills.gym.tasks import GymTask
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of generic-storage.md file."""
+
 import inspect
 import re
 from pathlib import Path

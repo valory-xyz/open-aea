@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea add_key' subcommand."""
+
 import os
 from typing import Optional, cast
 
@@ -33,7 +34,6 @@ from aea.configurations.constants import (
 from aea.crypto.helpers import try_validate_private_key_path
 from aea.crypto.registries import crypto_registry
 from aea.helpers.io import open_file
-
 
 key_file_argument = click.Path(
     exists=True, file_okay=True, dir_okay=False, readable=True

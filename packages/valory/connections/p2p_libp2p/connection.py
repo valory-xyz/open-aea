@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the p2p libp2p connection."""
+
 import asyncio
 import logging
 import os
@@ -44,7 +45,6 @@ from aea.mail.base import Envelope
 from packages.valory.connections.p2p_libp2p.consts import LIBP2P_NODE_MODULE_NAME
 from packages.valory.protocols.acn import acn_pb2
 from packages.valory.protocols.acn.message import AcnMessage
-
 
 _default_logger = logging.getLogger("aea.packages.valory.connections.p2p_libp2p")
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea runtime."""
+
 import asyncio
 import contextlib
 import logging

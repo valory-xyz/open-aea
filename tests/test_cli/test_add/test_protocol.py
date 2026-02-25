@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea add protocol` sub-command."""
+
 import os
 import re
 import shutil

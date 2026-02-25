@@ -34,7 +34,6 @@ from aea.skills.base import Model
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
 
-
 FipaDialogue = BaseFipaDialogue
 
 

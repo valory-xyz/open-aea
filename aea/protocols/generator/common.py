@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains utility code for generator modules."""
+
 import inspect
 import os
 import re
@@ -37,7 +38,6 @@ from aea.configurations.constants import (
 )
 from aea.configurations.loader import ConfigLoader
 from aea.helpers.io import open_file
-
 
 SPECIFICATION_PRIMITIVE_TYPES = ["pt:bytes", "pt:int", "pt:float", "pt:bool", "pt:str"]
 SPECIFICATION_COMPOSITIONAL_TYPES = [

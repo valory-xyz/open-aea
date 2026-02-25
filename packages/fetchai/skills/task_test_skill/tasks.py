@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tasks for the 'task test skill' skill."""
+
 import time
 from typing import Any
 

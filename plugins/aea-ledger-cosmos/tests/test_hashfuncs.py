@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Test for hashfunc utility module."""
+
 from aea_ledger_fetchai.hashfuncs import ripemd160, sha256
 
 

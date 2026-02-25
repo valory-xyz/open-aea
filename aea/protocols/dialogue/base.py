@@ -24,6 +24,7 @@ This module contains the classes required for dialogue management.
 - Dialogue: The dialogue class maintains state of a dialogue and manages it.
 - Dialogues: The dialogues class keeps track of all dialogues.
 """
+
 import inspect
 import secrets
 import sys
@@ -50,7 +51,6 @@ from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.storage.generic_storage import SyncCollection
 from aea.protocols.base import Message
 from aea.skills.base import SkillComponent
-
 
 if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 7):
     DialogueMessage = namedtuple(  # pragma: no cover

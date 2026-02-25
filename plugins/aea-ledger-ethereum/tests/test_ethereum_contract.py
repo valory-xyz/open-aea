@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ethereum module."""
+
 import logging
 import time
 from pathlib import Path

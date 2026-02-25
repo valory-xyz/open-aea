@@ -38,7 +38,6 @@ from packages.valory.connections.ledger.ledger_dispatcher import (
 from packages.valory.protocols.contract_api import ContractApiMessage
 from packages.valory.protocols.ledger_api import LedgerApiMessage
 
-
 PUBLIC_ID = PublicId.from_str("valory/ledger:0.19.0")
 
 

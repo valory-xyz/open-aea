@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the manager modules."""
-from aea.manager.manager import MultiAgentManager
 
+from aea.manager.manager import MultiAgentManager
 
 __all__ = ["MultiAgentManager"]

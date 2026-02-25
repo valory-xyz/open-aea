@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the storage implementation."""
+
 import asyncio
 from typing import Any, Coroutine, List, Optional
 from urllib.parse import urlparse
@@ -30,7 +31,6 @@ from aea.helpers.storage.backends.base import (
     OBJECT_ID_AND_BODY,
 )
 from aea.helpers.storage.backends.sqlite import SqliteStorageBackend
-
 
 BACKENDS = {"sqlite": SqliteStorageBackend}
 

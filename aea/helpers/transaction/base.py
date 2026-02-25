@@ -29,7 +29,6 @@ from aea.crypto.ledger_apis import LedgerApis
 from aea.exceptions import enforce
 from aea.helpers.serializers import DictProtobufStructSerializer
 
-
 Address = str
 
 

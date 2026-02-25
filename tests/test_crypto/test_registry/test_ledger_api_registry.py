@@ -36,7 +36,6 @@ from aea_ledger_fetchai.test_tools.constants import (
 
 import aea.crypto
 
-
 logger = logging.getLogger(__name__)
 
 

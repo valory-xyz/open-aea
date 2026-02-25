@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """The base contract."""
+
 import inspect
 import logging
 import re
@@ -34,7 +35,6 @@ from aea.crypto.base import LedgerApi
 from aea.crypto.registries import Registry, ledger_apis_registry, make_ledger_api_cls
 from aea.exceptions import AEAComponentLoadException, AEAException
 from aea.helpers.base import load_module
-
 
 contract_registry: Registry["Contract"] = Registry["Contract"]()
 _default_logger = logging.getLogger(__name__)

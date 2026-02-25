@@ -33,7 +33,6 @@ from aea.package_manager.v0 import PackageManagerV0
 from aea.package_manager.v1 import PackageManagerV1
 from aea.test_tools.test_cases import BaseAEATestCase
 
-
 TEST_PACKAGE = PublicId(
     "open_aea",
     "signing",

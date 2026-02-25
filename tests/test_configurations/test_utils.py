@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests configuration utils."""
+
 from unittest.mock import MagicMock
 
 from aea.configurations.base import (

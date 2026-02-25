@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This package contains handlers for the fipa dummy buyer skill."""
+
 from typing import Optional, cast
 
 from aea.configurations.base import PublicId

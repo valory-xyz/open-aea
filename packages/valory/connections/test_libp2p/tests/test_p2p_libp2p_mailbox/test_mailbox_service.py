@@ -36,7 +36,6 @@ from packages.valory.connections.test_libp2p.tests.base import BaseP2PLibp2pTest
 from packages.valory.protocols.acn import acn_pb2
 from packages.valory.protocols.acn.message import AcnMessage
 
-
 MockDefaultMessageProtocol = Mock()
 MockDefaultMessageProtocol.protocol_id = DefaultMessage.protocol_id
 MockDefaultMessageProtocol.protocol_specification_id = (

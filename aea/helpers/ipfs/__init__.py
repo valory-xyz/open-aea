@@ -18,8 +18,8 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains helper methods and classes for the 'aea' package."""
-from aea.helpers.ipfs.utils import _protobuf_python_implementation
 
+from aea.helpers.ipfs.utils import _protobuf_python_implementation
 
 # fix for ipfs hashes, preload protobuf classes with protobuf python implementation
 with _protobuf_python_implementation():

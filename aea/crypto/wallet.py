@@ -27,7 +27,6 @@ from aea.common import JSONLike
 from aea.crypto.base import Crypto
 from aea.crypto.registries import make_crypto
 
-
 _default_logger = logging.getLogger(__name__)
 
 

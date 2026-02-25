@@ -39,7 +39,6 @@ from aea.configurations.data_types import (
 )
 from aea.helpers.base import IPFSHash, SimpleId
 
-
 positive_integer_strategy = st.integers(min_value=0)
 user_string_pattern = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]{0,127}")
 user_string_strategy = st.from_regex(user_string_pattern, fullmatch=True)

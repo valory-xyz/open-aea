@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of runtime for economic agent (AEA)."""
+
 import asyncio
 from asyncio.events import AbstractEventLoop
 from concurrent.futures._base import CancelledError

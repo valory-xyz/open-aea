@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the handler classes of the ml_train skill."""
+
 from typing import Tuple
 
 import numpy as np
@@ -27,7 +28,7 @@ def produce_data(batch_size) -> Tuple:
     """Produce the data."""
     from tensorflow import keras  # pylint: disable=import-outside-toplevel
 
-    ((train_x, train_y), _) = keras.datasets.fashion_mnist.load_data()
+    (train_x, train_y), _ = keras.datasets.fashion_mnist.load_data()
 
     idx = np.arange(train_x.shape[0])
     mask = np.zeros_like(idx, dtype=bool)

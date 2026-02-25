@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the dialogue/base.py module."""
+
 import re
 from typing import FrozenSet, Tuple, Type, cast
 from unittest.mock import Mock, patch

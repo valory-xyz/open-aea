@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the implementation of AsyncFriendlyQueue."""
+
 import asyncio
 import queue
 import threading

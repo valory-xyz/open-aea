@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Helper to install python dependencies."""
+
 import subprocess  # nosec
 import sys
 from itertools import chain

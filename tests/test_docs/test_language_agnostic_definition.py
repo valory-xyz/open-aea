@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of language-agnostic-definition.md file."""
+
 from pathlib import Path
 from typing import Dict
 
@@ -27,7 +28,6 @@ from aea.configurations.data_types import PublicId
 
 from tests.conftest import ROOT_DIR
 from tests.test_docs.helper import BaseTestMarkdownDocs
-
 
 MAIL_BASE_PROTO = Path(AEA_DIR) / "mail" / "base.proto"
 DEFAULT_MESSAGE_PROTO = (

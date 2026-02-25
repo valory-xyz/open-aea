@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Solana module wrapping the public and private key cryptography and ledger api."""
+
 import json
 import logging
 import time
@@ -64,7 +65,6 @@ from solders.system_program import (  # type: ignore; SYS_PROGRAM_ID,
 from aea.common import Address, JSONLike
 from aea.crypto.base import LedgerApi
 from aea.helpers.base import try_decorator
-
 
 DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 0
 DEFAULT_MAX_RETRIES = 3

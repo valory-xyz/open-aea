@@ -20,9 +20,7 @@
 
 """This is a module with constants for test tools."""
 
-
 from aea.configurations.data_types import PublicId
-
 
 DEFAULT_AUTHOR = "default_author"
 

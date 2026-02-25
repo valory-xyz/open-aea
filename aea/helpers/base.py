@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Miscellaneous helpers."""
+
 import builtins
 import contextlib
 import datetime
@@ -59,7 +60,6 @@ from packaging.version import Version
 
 from aea.common import PathLike
 from aea.exceptions import enforce
-
 
 STRING_LENGTH_LIMIT = 128
 SIMPLE_ID_REGEX = rf"[a-z_][a-z0-9_]{{0,{STRING_LENGTH_LIMIT - 1}}}"

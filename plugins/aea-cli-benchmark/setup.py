@@ -23,7 +23,6 @@
 from setuptools import find_packages  # type: ignore
 from setuptools import setup  # type: ignore
 
-
 setup(
     name="open-aea-cli-benchmark",
     version="2.0.8",

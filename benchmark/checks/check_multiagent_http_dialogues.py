@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage across the time."""
+
 import itertools
 import os
 import struct
@@ -54,7 +55,6 @@ from packages.fetchai.connections.local.connection import (  # noqa: E402 # pyli
 )
 from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 ROOT_PATH = os.path.join(os.path.abspath(__file__), "..", "..")
 sys.path.append(ROOT_PATH)

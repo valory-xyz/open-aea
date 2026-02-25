@@ -36,6 +36,7 @@
 #
 # ------------------------------------------------------------------------------
 """A module with config tools of the aea cli."""
+
 import json
 import os
 from pathlib import Path

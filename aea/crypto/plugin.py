@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of plug-in mechanism for cryptos."""
+
 import itertools
 import pprint
 from importlib.metadata import EntryPoint, entry_points
@@ -35,7 +36,6 @@ from aea.crypto import register_crypto, register_faucet_api, register_ledger_api
 from aea.crypto.registries.base import EntryPoint as EntryPointString
 from aea.crypto.registries.base import ItemId
 from aea.exceptions import AEAException, AEAPluginError, enforce
-
 
 _from_group_to_register_callable = {
     CRYPTO_PLUGIN_GROUP: register_crypto,

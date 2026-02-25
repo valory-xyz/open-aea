@@ -19,9 +19,9 @@
 # ------------------------------------------------------------------------------
 
 """Module to declare constants."""
+
 from pathlib import Path
 from typing import Dict, List
-
 
 AEA_DIR = Path(__file__).parent.parent
 _FETCHAI_IDENTIFIER = "fetchai"

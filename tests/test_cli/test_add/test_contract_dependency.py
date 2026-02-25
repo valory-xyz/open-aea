@@ -37,7 +37,6 @@ from aea.test_tools.click_testing import CliRunner
 
 from tests.conftest import AUTHOR, CLI_LOG_OPTION, ROOT_DIR
 
-
 REGISTRY_PATH = Path(ROOT_DIR) / "tests" / "data" / "packages"
 
 

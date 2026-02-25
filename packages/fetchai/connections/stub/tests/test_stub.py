@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the stub connection."""
+
 # type: ignore # noqa: E800
 # pylint: skip-file
 
@@ -46,7 +47,6 @@ from packages.fetchai.connections.stub.connection import (
     write_envelope,
 )
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 SEPARATOR = ","
 PACKAGE_DIR = Path(__file__).parent.parent

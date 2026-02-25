@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the dialogue classes of the generic buyer skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -47,7 +48,6 @@ from packages.fetchai.skills.generic_buyer.dialogues import (
 )
 from packages.open_aea.protocols.signing.message import SigningMessage
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 

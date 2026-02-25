@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module wrapping the helpers of public and private key cryptography."""
+
 import logging
 import os
 from pathlib import Path
@@ -29,7 +30,6 @@ from aea.crypto.registries import crypto_registry, make_crypto, make_faucet_api
 from aea.crypto.wallet import Wallet
 from aea.helpers.base import ensure_dir
 from aea.helpers.env_vars import is_env_variable
-
 
 _default_logger = logging.getLogger(__name__)
 

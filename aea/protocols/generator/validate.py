@@ -31,7 +31,6 @@ from aea.protocols.generator.common import (
     _is_compositional_type,
 )
 
-
 # The following names are reserved for standard message fields and cannot be
 # used as user defined names for performative or contents
 RESERVED_NAMES = {"_body", "message_id", "dialogue_reference", "target", "performative"}

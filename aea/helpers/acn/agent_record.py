@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains types and helpers for ACN Proof-of-Representation."""
+
 from typing import Optional
 
 from aea.common import PathLike

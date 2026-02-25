@@ -29,7 +29,6 @@ from ecdsa import VerifyingKey, curves, keys
 
 from aea.helpers.multiaddr.crypto_pb2 import KeyType, PublicKey  # type: ignore
 
-
 # NOTE:
 # - Reference: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys
 # - Implementation inspired from https://github.com/libp2p/py-libp2p

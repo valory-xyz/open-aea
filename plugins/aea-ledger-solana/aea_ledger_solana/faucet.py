@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the Faucet implementation for the solana ledger."""
+
 import json
 import time
 from typing import Optional, Union

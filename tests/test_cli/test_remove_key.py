@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea remove-key` sub-command."""
+
 import pytest
 from click.exceptions import ClickException
 

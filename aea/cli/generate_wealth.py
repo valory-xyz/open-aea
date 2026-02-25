@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea generate_wealth' subcommand."""
+
 from typing import Optional, cast
 
 import click

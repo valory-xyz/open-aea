@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helpers/logging module."""
+
 import logging
 from unittest.mock import patch
 

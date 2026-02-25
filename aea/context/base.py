@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the agent context class."""
+
 from queue import Queue
 from types import SimpleNamespace
 from typing import Any, Callable, Dict, Optional, Union

@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Constants."""
+
 import logging
 import time
 from typing import Any, Dict, List, Optional
@@ -26,7 +27,6 @@ import requests
 
 from aea.exceptions import enforce
 from aea.test_tools.docker_image import DockerImage
-
 
 try:
     from docker import DockerClient

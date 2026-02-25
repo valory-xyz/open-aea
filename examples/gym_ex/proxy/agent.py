@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This contains the proxy agent class."""
+
 import os
 import sys
 from queue import Queue
@@ -31,7 +32,6 @@ from aea.helpers.base import locate
 from aea.identity.base import Identity
 from aea.mail.base import Envelope
 
-
 sys.modules["packages.fetchai.connections.gym"] = locate(  # isort:skip
     "packages.fetchai.connections.gym"
 )
@@ -40,7 +40,6 @@ sys.modules["packages.fetchai.connections.gym"] = locate(  # isort:skip
 from packages.fetchai.connections.gym.connection import (  # noqa: E402  # pylint: disable=wrong-import-position
     GymConnection,
 )
-
 
 ADDRESS = "some_address"
 PUBLIC_KEY = "some_public_key"

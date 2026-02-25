@@ -52,7 +52,6 @@ from aea.skills.base import Handler, Skill, SkillContext
 from packages.valory.connections.http_client.connection import HTTPClientConnection
 from packages.valory.protocols.http.message import HttpMessage
 
-
 logger = logging.getLogger(__name__)
 
 

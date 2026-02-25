@@ -26,7 +26,6 @@ from typing import Any, Dict, Tuple
 import gym
 import numpy as np
 
-
 BanditId = int
 Price = int
 

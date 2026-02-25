@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains tests for aea.contracts.base."""
+
 import logging
 import os
 import platform
@@ -53,7 +54,6 @@ from aea.exceptions import AEAComponentLoadException
 from aea.package_manager.v1 import PackageManagerV1
 
 from tests.conftest import ROOT_DIR, make_uri
-
 
 logger = logging.getLogger(__name__)
 

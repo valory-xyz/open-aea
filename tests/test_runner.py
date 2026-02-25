@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea runner."""
+
 import time
 from unittest.mock import call, patch
 

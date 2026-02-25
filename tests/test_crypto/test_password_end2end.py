@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the private key password support."""
+
 from pathlib import Path
 
 import pytest

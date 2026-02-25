@@ -19,7 +19,6 @@
 
 """Base manager class."""
 
-
 import json
 import logging
 import re
@@ -40,7 +39,6 @@ from aea.helpers.dependency_tree import DependencyTree, dump_yaml, load_yaml
 from aea.helpers.fingerprint import update_fingerprint
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
-
 
 PACKAGES_FILE = "packages.json"
 PACKAGE_SOURCE_RE = re.compile(r"([a-z-_0-9A-Z]+\/[a-z-_0-9A-Z]+)((:)([a-z\.0-9_-]+))?")

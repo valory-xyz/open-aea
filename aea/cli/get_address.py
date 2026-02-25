@@ -20,6 +20,7 @@
 
 
 """Implementation of the 'aea get_address' subcommand."""
+
 from typing import Optional, cast
 
 import click

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea run' subcommand."""
+
 from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from typing import Generator, List, Optional, Sequence, Tuple, cast

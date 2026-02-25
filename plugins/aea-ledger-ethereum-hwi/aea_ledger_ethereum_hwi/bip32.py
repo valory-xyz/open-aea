@@ -26,7 +26,6 @@ Original implementation: https://github.com/LedgerHQ/apduboy/blob/master/apduboy
 from dataclasses import dataclass, field
 from typing import List
 
-
 BIP32_HARDEN_BIT = 0x80000000
 
 

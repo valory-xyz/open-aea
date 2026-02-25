@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the helpers to run multiple stoppable tasks in different modes: async, threaded, multiprocess ."""
+
 import asyncio
 import logging
 from abc import ABC, abstractmethod
@@ -40,7 +41,6 @@ from typing import (
     Union,
     cast,
 )
-
 
 _default_logger = logging.getLogger(__name__)
 

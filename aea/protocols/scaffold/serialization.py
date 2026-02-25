@@ -20,7 +20,6 @@
 
 """Serialization for the scaffold protocol."""
 
-
 from aea.protocols.base import Message, Serializer
 
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for CLI Registry fetch methods."""
+
 import os
 import shutil
 import sys

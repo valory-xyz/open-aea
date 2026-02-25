@@ -63,7 +63,6 @@ from aea.configurations.constants import (
 )
 from aea.helpers.cid import to_v0, to_v1
 
-
 try:
     from aea_cli_ipfs.ipfs_utils import IPFSTool  # type: ignore
 

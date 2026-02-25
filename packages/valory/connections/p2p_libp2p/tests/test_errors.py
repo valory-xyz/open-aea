@@ -29,7 +29,6 @@ import pytest
 from packages.valory.connections.p2p_libp2p.connection import Libp2pNode
 from packages.valory.protocols.acn.message import AcnMessage
 
-
 DEFAULT_NET_SIZE = 4
 
 

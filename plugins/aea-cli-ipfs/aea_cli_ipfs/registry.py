@@ -34,7 +34,6 @@ from aea.cli.registry.settings import DEFAULT_IPFS_URL_LOCAL
 from aea.cli.utils.config import get_ipfs_node_multiaddr
 from aea.configurations.base import PublicId
 
-
 _default_logger = logging.getLogger(__name__)
 
 LocalRegistry = Dict[str, Dict[str, str]]

@@ -19,7 +19,6 @@
 # ------------------------------------------------------------------------------
 """This module contains a test for aea.test_tools.test_protocol."""
 
-
 from typing import List, Type
 
 from aea.protocols.base import Message
@@ -38,7 +37,6 @@ from tests.data.packages.fetchai.protocols.t_protocol.message import (
     CustomDataModel,
     TProtocolMessage,
 )
-
 
 custom_data_model = CustomDataModel(
     bool_field=True,

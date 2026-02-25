@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the handler classes of the generic seller skill."""
+
 # pylint: skip-file
 
 import logging
@@ -54,7 +55,6 @@ from packages.fetchai.skills.generic_seller.handlers import (
 )
 from packages.fetchai.skills.generic_seller.strategy import GenericStrategy
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 

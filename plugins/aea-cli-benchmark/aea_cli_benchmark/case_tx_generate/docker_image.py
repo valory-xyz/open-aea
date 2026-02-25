@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains testing utilities."""
+
 import logging
 import os
 import re
@@ -34,7 +35,6 @@ from docker.models.containers import Container
 
 from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
-
 
 logger = logging.getLogger(__name__)
 

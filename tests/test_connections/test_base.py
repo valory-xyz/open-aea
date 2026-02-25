@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the base module."""
+
 import asyncio
 import os
 import unittest

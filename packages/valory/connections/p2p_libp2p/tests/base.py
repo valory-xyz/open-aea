@@ -19,7 +19,6 @@
 
 """Constants, utility functions and base classes for ACN p2p_libp2p tests"""
 
-
 import functools
 import inspect
 import itertools
@@ -31,7 +30,6 @@ from unittest import mock
 import pytest
 
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 TIMEOUT = 20
 TEMP_LIBP2P_TEST_DIR = tempfile.mkdtemp()

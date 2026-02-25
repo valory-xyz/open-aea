@@ -41,7 +41,6 @@ from packages.fetchai.protocols.gym.dialogues import GymDialogue
 from packages.fetchai.protocols.gym.dialogues import GymDialogues as BaseGymDialogues
 from packages.fetchai.protocols.gym.message import GymMessage
 
-
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.gym")
 
 PUBLIC_ID = PublicId.from_str("fetchai/gym:0.19.0")

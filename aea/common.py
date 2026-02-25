@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the common types and interfaces used in the AEA framework."""
+
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-
 
 Address = str
 

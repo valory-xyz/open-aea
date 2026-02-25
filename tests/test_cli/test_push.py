@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Test module for Registry push methods."""
+
 import filecmp
 import os
 from pathlib import Path

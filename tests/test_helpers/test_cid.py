@@ -25,7 +25,6 @@ import pytest
 
 from aea.helpers.cid import CID, CIDv0, CIDv1, to_v0, to_v1
 
-
 HASH_V0 = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR"
 HASH_V1 = "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"
 

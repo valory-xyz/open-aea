@@ -19,9 +19,7 @@
 # ------------------------------------------------------------------------------
 """Settings for operating Registry with CLI."""
 
-
 from typing import Dict, Tuple
-
 
 REGISTRY_CONFIG_KEY: str = "registry_config"
 

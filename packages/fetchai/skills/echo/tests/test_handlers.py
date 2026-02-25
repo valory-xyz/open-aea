@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the handler class of the echo skill."""
+
 # pylint: skip-file
 
 import inspect
@@ -33,7 +34,6 @@ from aea.test_tools.test_skill import BaseSkillTestCase
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.skills.echo.dialogues import DefaultDialogues
 from packages.fetchai.skills.echo.handlers import EchoHandler
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 

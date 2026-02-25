@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Extension to the Local Node."""
+
 import asyncio
 import logging
 import threading
@@ -43,7 +44,6 @@ from packages.fetchai.protocols.oef_search.dialogues import (
     OefSearchDialogues as BaseOefSearchDialogues,
 )
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-
 
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.local")
 

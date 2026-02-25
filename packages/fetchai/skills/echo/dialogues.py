@@ -33,7 +33,6 @@ from packages.fetchai.protocols.default.dialogues import (
     DefaultDialogues as BaseDefaultDialogues,
 )
 
-
 DefaultDialogue = BaseDefaultDialogue
 
 

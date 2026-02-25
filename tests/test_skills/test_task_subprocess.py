@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for subprocess task manager/tasl_test_skill."""
+
 from aea.test_tools.test_cases import AEATestCaseEmpty
 
 

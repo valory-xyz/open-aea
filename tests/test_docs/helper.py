@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains helper function to extract code from the .md files."""
+
 import traceback
 from functools import partial
 from pathlib import Path
@@ -26,7 +27,6 @@ from typing import Dict, List, Optional
 
 import mistune
 import pytest
-
 
 MISTUNE_BLOCK_CODE_ID = "block_code"
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """HTTP server connection, channel, server, and handler."""
+
 import asyncio
 import email
 import logging
@@ -57,7 +58,6 @@ from aea.protocols.dialogue.base import DialogueLabel
 from packages.valory.protocols.http.dialogues import HttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 SUCCESS = 200
 NOT_FOUND = 404

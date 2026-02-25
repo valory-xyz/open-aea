@@ -43,7 +43,6 @@ from packages.valory.connections.p2p_libp2p.tests.base import (
     libp2p_log_on_failure_all,
 )
 
-
 p2p_libp2p_path = f"vendor.{p2p_libp2p.__name__.split('.', 1)[-1]}"
 DEFAULT_NET_SIZE = 4
 LIBP2P_LAUNCH_TIMEOUT = 20  # may downloads up to ~66Mb

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains utility methods for ipfs helpers."""
+
 import contextlib
 import os
 import sys

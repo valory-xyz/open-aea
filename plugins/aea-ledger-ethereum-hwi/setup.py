@@ -22,7 +22,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="open-aea-ledger-ethereum-hwi",
     version="2.0.8",

@@ -43,7 +43,6 @@ from packages.fetchai.skills.error.handlers import ErrorHandler
 from tests.common.utils import wait_for_condition
 from tests.conftest import CUR_PATH, _make_dummy_connection
 
-
 logger = logging.getLogger(__file__)
 
 

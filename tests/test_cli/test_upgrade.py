@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests for the `aea add connection` sub-command."""
+
 # import filecmp
 # import os
 # import shutil

@@ -50,7 +50,6 @@ from packages.valory.protocols.http.dialogues import HttpDialogue as BaseHttpDia
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
 
-
 SUCCESS = 200
 NOT_FOUND = 404
 REQUEST_TIMEOUT = 408

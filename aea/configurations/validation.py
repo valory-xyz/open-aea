@@ -42,7 +42,6 @@ from aea.helpers.base import dict_to_path_value, update_nested_dict
 from aea.helpers.env_vars import is_env_variable
 from aea.helpers.io import open_file
 
-
 _CUR_DIR = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 _SCHEMAS_DIR = os.path.join(_CUR_DIR, "schemas")
 

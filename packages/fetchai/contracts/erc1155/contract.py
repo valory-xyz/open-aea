@@ -34,7 +34,6 @@ from aea.configurations.base import PublicId
 from aea.contracts.base import Contract
 from aea.crypto.base import LedgerApi
 
-
 _default_logger = logging.getLogger("aea.packages.fetchai.contracts.erc1155.contract")
 MAX_UINT_256 = 2 ^ 256 - 1
 

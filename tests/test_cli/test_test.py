@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for CLI test command."""
+
 import shutil
 import subprocess  # nosec
 import sys
@@ -44,7 +45,6 @@ from aea.configurations.data_types import (
 from aea.helpers.base import cd
 from aea.package_manager.v1 import PackageManagerV1
 from aea.test_tools.test_cases import AEATestCaseEmpty, CLI_LOG_OPTION
-
 
 OK_PYTEST_EXIT_CODE = ExitCode.OK
 NO_TESTS_COLLECTED_PYTEST_EXIT_CODE = ExitCode.NO_TESTS_COLLECTED
@@ -156,14 +156,10 @@ class BaseAEATestCommand(AEATestCaseEmpty):
     @classmethod
     def write_dummy_test_module(cls, path_to_module: Path) -> None:
         """Write dummy test module."""
-        path_to_module.write_text(
-            dedent(
-                """\
+        path_to_module.write_text(dedent("""\
         def test_dummy_function():
             assert True
-        """
-            )
-        )
+        """))
 
     @classmethod
     def _get_dummy_package_name(cls, package_type: ComponentType) -> str:

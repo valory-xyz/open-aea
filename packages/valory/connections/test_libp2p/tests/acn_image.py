@@ -27,7 +27,6 @@ from typing import Dict, List
 from aea.exceptions import enforce
 from aea.test_tools.docker_image import Container, DockerClient, DockerImage
 
-
 META_ADDRESS = "0.0.0.0"  # nosec
 
 # created agent: bootstrap_peer

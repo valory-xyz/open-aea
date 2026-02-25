@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the helpers.search.models."""
+
 import re
 from unittest.mock import MagicMock
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the search feature of the local OEF node."""
+
 # pylint: skip-file
 
 import unittest.mock
@@ -55,7 +56,6 @@ from packages.fetchai.protocols.oef_search.dialogues import (
     OefSearchDialogues as BaseOefSearchDialogues,
 )
 from packages.fetchai.protocols.oef_search.message import OefSearchMessage
-
 
 MAX_FLAKY_RERUNS = 3
 

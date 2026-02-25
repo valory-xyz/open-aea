@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the classes for specific behaviours."""
+
 import datetime
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Set

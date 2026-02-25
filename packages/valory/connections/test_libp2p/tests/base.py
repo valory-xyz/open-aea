@@ -83,7 +83,6 @@ from packages.valory.connections.test_libp2p.tests.conftest import (
     NodeConfig,
 )
 
-
 DEFAULT_HOST = LOCALHOST.hostname
 
 

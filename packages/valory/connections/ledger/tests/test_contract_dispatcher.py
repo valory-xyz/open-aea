@@ -45,7 +45,6 @@ from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
 
-
 SOME_SKILL_ID = "some/skill:0.1.0"
 NON_BLOCKING_TIME = 1
 BLOCKING_TIME = 100

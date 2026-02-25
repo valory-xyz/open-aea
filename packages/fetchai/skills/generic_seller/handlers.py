@@ -49,7 +49,6 @@ from packages.valory.connections.ledger.connection import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 
 

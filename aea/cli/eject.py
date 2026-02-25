@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the 'aea eject' subcommand."""
+
 import shutil
 from pathlib import Path
 from typing import cast

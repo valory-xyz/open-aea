@@ -18,12 +18,12 @@
 #
 # ------------------------------------------------------------------------------
 """Logging helpers."""
+
 import logging
 from logging import Logger, LoggerAdapter
 from typing import Any, MutableMapping, Optional, Tuple, cast
 
 from aea.helpers.base import _get_aea_logger_name_prefix
-
 
 DEFAULT_FORMAT = "[%(asctime)s][%(levelname)s] %(message)s"
 

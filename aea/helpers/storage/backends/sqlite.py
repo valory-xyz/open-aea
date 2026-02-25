@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains sqlite storage backend implementation."""
+
 import asyncio
 import json
 import os

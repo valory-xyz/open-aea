@@ -31,7 +31,6 @@ from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_a
     TestP2PLibp2pClientConnectionAEARunning as Base,
 )
 
-
 DEFAULT_HOST = LOCALHOST.hostname
 
 

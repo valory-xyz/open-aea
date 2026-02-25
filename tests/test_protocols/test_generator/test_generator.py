@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains miscellaneous tests for the protocol generator."""
+
 import logging
 import os
 import shutil
@@ -49,7 +50,6 @@ from tests.test_protocols.test_generator.common import (
     PATH_TO_T_PROTOCOL_SPECIFICATION,
     T_PROTOCOL_NAME,
 )
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

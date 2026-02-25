@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Test helper to install python dependecies."""
+
 from unittest import mock
 from unittest.case import TestCase
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage across the time."""
+
 from typing import Any, List, Tuple
 
 import click
@@ -29,7 +30,6 @@ from aea_cli_benchmark.utils import (
     runtime_mode_deco,
     with_packages,
 )
-
 
 PACKAGES = [
     ("protocol", "open_aea/signing"),

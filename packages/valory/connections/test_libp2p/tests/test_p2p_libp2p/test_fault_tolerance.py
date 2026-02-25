@@ -33,7 +33,6 @@ from packages.valory.connections.p2p_libp2p.tests.base import (
 )
 from packages.valory.connections.test_libp2p.tests.base import BaseP2PLibp2pTest
 
-
 TIMEOUT = 10
 
 

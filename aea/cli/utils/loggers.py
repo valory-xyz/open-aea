@@ -26,7 +26,6 @@ from typing import Any, Callable
 
 import click
 
-
 OFF = 100
 logging.addLevelName(OFF, "OFF")
 

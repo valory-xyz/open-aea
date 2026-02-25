@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """Helpers for Windows."""
+
 import ctypes
 import logging
 import platform
-
 
 _default_logger = logging.getLogger(__name__)
 

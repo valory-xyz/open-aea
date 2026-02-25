@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests for the JSON schemas of the configuration files."""
+
 import itertools
 import json
 import os
