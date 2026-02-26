@@ -8,11 +8,11 @@ fingerprint:
   README.md: bafybeig75bdp2xp2k44ohxt277etnzeqhwdkwsjfciz7upwgymawmfo2vm
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/stub:0.21.0:bafybeid2q5iama6oahyarhm4unw7tcvhevh4t6cogfxh6iebtpotn3odr4
+- fetchai/stub:0.21.0:bafybeicrtlv4mvokl2o73bou4qey443vl6yclhh57v6il2iqt6ozjc4x34
 contracts: []
 protocols: []
 skills:
-- fetchai/error_test_skill:0.1.0:bafybeiclf3qlci56sk5bw2jh3k52dc4o3hsqmn34msfud5qlsm65j7nrtm
+- fetchai/error_test_skill:0.1.0:bafybeidjtr3p7wbnrbzbkjhxllohybmeuwfid7l6xfjqexgk3y4lq3acbu
 default_connection: fetchai/stub:0.21.0
 default_ledger: fetchai
 required_ledgers:

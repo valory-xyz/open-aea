@@ -21,7 +21,6 @@
 
 import codecs
 import hashlib
-import io
 import os
 import platform
 import re
@@ -281,13 +280,7 @@ class IPFSHashOnly:
     @classmethod
     def _serialize(cls, pb_node: PBNode) -> bytes:  # type: ignore
         """Serialize PBNode instance with fixed fields sequence."""
-        f = io.BytesIO()
-        # type: ignore
-        for field_descriptor, field_value in reversed(pb_node.ListFields()):
-            field_descriptor._encoder(  # pylint: disable=protected-access
-                f.write, field_value, True
-            )
-        return f.getvalue()
+        return pb_node.SerializeToString(deterministic=True)
 
     @classmethod
     def _pb_serialize_bytes(cls, data: bytes) -> Tuple[bytes, int]:
