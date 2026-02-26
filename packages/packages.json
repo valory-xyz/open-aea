@@ -15,7 +15,7 @@
         "connection/fetchai/gym/0.19.0": "bafybeibexbzjyynsbkamkrihux62fsrvbtxhrvvjylab6a5gkj6lcd5qya",
         "connection/fetchai/stub/0.21.0": "bafybeicrtlv4mvokl2o73bou4qey443vl6yclhh57v6il2iqt6ozjc4x34",
         "connection/valory/ledger/0.19.0": "bafybeibdtmjir27ls7mzcjznla5uxcrv2dkro7mlqkprfjuncmhfknweyq",
-        "connection/valory/http_server/0.22.0": "bafybeihee232wlfd24inxdlommhdvunsqejwgnkukxdwshjrqsg5264rha",
+        "connection/valory/http_server/0.22.0": "bafybeiedypxjqr4balbjmnrrrmrv65fo7xj2lkk5sxppoml3ddur6fckbi",
         "connection/valory/p2p_libp2p/0.1.0": "bafybeiffk26zwxfv4zcwgbr6wvfy334ddjg7wrhunr2g44n22q4iq32zcu",
         "connection/valory/p2p_libp2p_client/0.1.0": "bafybeigzgoh3ldi5jd4tegc5wjsorq3ivfkoysvx6kjzbrqsz3jwbv4yda",
         "connection/valory/p2p_libp2p_mailbox/0.1.0": "bafybeiawkprhpnctkmain6uaklqaismya5wtufo275oabubze6jgly3nka",
@@ -37,7 +37,7 @@
         "agent/fetchai/gym_aea/0.25.0": "bafybeifqcr5kivf3nkhu3p24zgxremw23wkky24rggcgzsj2olaovwnsdq",
         "agent/fetchai/my_first_aea/0.27.0": "bafybeifa3bxggptrjjmebz3yzb4hloc2yfr7wenbgbizvxv4lvnxphnjby",
         "agent/open_aea/gym_aea/0.1.0": "bafybeihdoynlis2ugzy2mwcuvqzxbkhzhjfzmam5nptadaq42cyxhm5z6y",
-        "agent/open_aea/http_echo/0.1.0": "bafybeidmz5pt3vj2qx2gxkagzwgvt7sbcoiuloz6ulgpzzjfyxemeyqhbu",
+        "agent/open_aea/http_echo/0.1.0": "bafybeigqtw5vveewsfbza2sccs3ksqd2agwfy6tpgynjonmjf7r634zbji",
         "agent/open_aea/my_first_aea/0.1.0": "bafybeic4n24fjsolgw5yuo4juixau4yxyrm57wg7zp7exqy4enidmnlzp4"
     },
     "third_party": {}
