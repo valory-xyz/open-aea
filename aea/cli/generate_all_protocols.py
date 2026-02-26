@@ -39,7 +39,6 @@ import shutil
 import subprocess  # nosec
 import sys
 import tempfile
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from pathlib import Path
 from typing import Any, List, Tuple, cast
 
@@ -175,9 +174,10 @@ def _fix_generated_protocol(package_path: Path) -> None:
     tests_module = package_path / AEA_TEST_DIRNAME
     if tests_module.is_dir():
         log(f"Restore original `tests` directory in {package_path}")
-        copy_tree(
+        shutil.copytree(
             str(tests_module),
             str(Path(PROTOCOLS, package_path.name, AEA_TEST_DIRNAME)),
+            dirs_exist_ok=True,
         )
 
 

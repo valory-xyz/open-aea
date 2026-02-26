@@ -28,7 +28,6 @@ import shutil
 import subprocess  # nosec
 import sys
 import tempfile
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from itertools import islice
 from subprocess import Popen, TimeoutExpired  # nosec
 from typing import Iterable, List, Optional, Pattern, Tuple
@@ -221,7 +220,7 @@ def _golang_module_build(
 def build_node(build_dir: str) -> None:
     """Build node placed inside build_dir."""
     with tempfile.TemporaryDirectory() as dirname:
-        copy_tree(LIBP2P_NODE_MODULE, dirname)
+        shutil.copytree(LIBP2P_NODE_MODULE, dirname)
         err_str = _golang_module_build(dirname)
         if err_str:  # pragma: nocover
             raise RuntimeError(f"Node build failed: {err_str}")

@@ -10,7 +10,7 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiabkdibf7iv3y33xkaemvuwiuhrjedrlvuklgjgty3gzggkgr5d5q
   __init__.py: bafybeibtknmpggpj77fflwndllcqvvbolpds7doymdp4fjd277metq6oxy
-  check_dependencies.py: bafybeicklq3ek2gn3xpncgclns23u7acsyieucys7aybba3pu4qebrhxeq
+  check_dependencies.py: bafybeigusdvysv7hfljlydni2yns6mxkltum6spogh2drbbd7wbyhsqp6u
   connection.py: bafybeib7ao3f2zhsx2bkx6du6l53lpdy2hgmjvdo5nwhgrnfglc7t475c4
   consts.py: bafybeihrr6ms7ctgqldwff4jrqph443vmlt4fblapkk6wlrh3mljerdlfm
   libp2p_node/Makefile: bafybeieuy4mut3oz2aqhtgt3dtky23do7g7tjg6fni4e256i3zg2onzmim
