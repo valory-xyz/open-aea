@@ -20,7 +20,7 @@ asn1crypto = "<1.5.0,>=1.4.0"
 bech32 = "==1.2.0"
 defusedxml = "==0.6.0"
 # ^ still used?
-docker = "==4.2.0"
+docker = "==7.1.0"
 ecdsa = ">=0.15"
 eth-account = ">=0.13.0,<0.14.0"
 gym = "==0.15.6"
