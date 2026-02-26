@@ -42,7 +42,6 @@ from typing import Callable, Dict, Generator, List, Optional, Tuple, cast
 from unittest.mock import MagicMock, patch
 
 import docker as docker
-import gym
 import pytest
 import pytest_asyncio
 from _pytest.monkeypatch import MonkeyPatch  # type: ignore
@@ -147,8 +146,6 @@ CONTRACT_CONFIGURATION_SCHEMA = os.path.join(
 PROTOCOL_SPEC_CONFIGURATION_SCHEMA = os.path.join(
     CONFIGURATION_SCHEMA_DIR, "protocol-specification_schema.json"
 )
-
-DUMMY_ENV = gym.GoalEnv
 
 
 # URL to local Ganache instance
