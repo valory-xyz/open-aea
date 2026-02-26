@@ -33,6 +33,7 @@ import pytest
 import yaml
 
 import aea
+import aea.configurations
 from aea.configurations.base import (
     AgentConfig,
     PackageConfiguration,

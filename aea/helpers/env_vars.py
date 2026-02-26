@@ -188,7 +188,7 @@ def apply_env_variables(
 def convert_value_str_to_type(value: str, type_str: str) -> JSON_TYPES:
     """Convert value by type name to native python type."""
     try:
-        type_ = FROM_STRING_TO_TYPE[type_str]
+        type_: Optional[type] = FROM_STRING_TO_TYPE[type_str]
         if type_ == bool:
             return value not in FALSE_EQUIVALENTS
         if type_ is None or value in NULL_EQUIVALENTS:
