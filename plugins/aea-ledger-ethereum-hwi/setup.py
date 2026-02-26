@@ -43,7 +43,7 @@ setup(
         "eth-account>=0.13.0,<0.14.0",
         "open-aea-ledger-ethereum~=2.0.8",
         "ledgerwallet==0.1.3",
-        "protobuf<4.25.0,>=4.21.6",
+        "protobuf<6,>=5",
         "construct<=2.10.61",
     ],
     tests_require=["pytest"],
