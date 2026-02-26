@@ -62,7 +62,7 @@ class BaseTestLibp2pRelay(BaseP2PLibp2pTest):
 class TestLibp2pConnectionRelayNodeRestart(BaseTestLibp2pRelay):
     """Test that connection will reliably forward envelopes after its relay node restarted"""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Set up the individual test method"""
 
         self.genesis = self.make_connection()
@@ -78,7 +78,7 @@ class TestLibp2pConnectionRelayNodeRestart(BaseTestLibp2pRelay):
         self.multiplexer1 = self.multiplexers[2]
         self.multiplexer2 = self.multiplexers[3]
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Teardown"""
         self._disconnect()
         self.multiplexers.clear()

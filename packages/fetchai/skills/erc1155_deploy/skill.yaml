@@ -14,16 +14,16 @@ fingerprint:
   handlers.py: bafybeibcuyqbinbswjddu7lwovpuwaopf4ucxjbuhe5ld62itmifidyzi4
   strategy.py: bafybeihbwteten4znwio5ptf3op6ism7fwxtim53tzktfy3biif3k3kcfm
   tests/__init__.py: bafybeig6dkwpgzga7j7xtr4m2lue5geufhea2wrhrr4t24maf3qb6f7ofq
-  tests/intermediate_class.py: bafybeiaxdgmjzav3eho75fupu3rjmapqstxgi5wctjzngrisglugpuoeqe
+  tests/intermediate_class.py: bafybeidy266fsvjhousu3xasarxd7utkw7cmcvrt5c52juooxakiu2tedy
   tests/test_behaviours.py: bafybeidodknp2jkm76jz267dt6yzal2intmwr5tyhzlfjtvrhxy5hjtdgu
   tests/test_dialogues.py: bafybeigcgyjvh624ziciqqpof3oopyqhhe4nljxoljcdwyk3otrtk2joiu
   tests/test_handlers.py: bafybeif3xuqg7bqgaixmmhcuz2b3bsnvv6x55gd6nohag3egiiyujcm4sa
   tests/test_strategy.py: bafybeidbfxev4oq6g5kkl7uk6bjfyes55577ae3d65hcqube6bmnbryrwe
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeibdtmjir27ls7mzcjznla5uxcrv2dkro7mlqkprfjuncmhfknweyq
+- valory/ledger:0.19.0:bafybeidqmtogcnvvsldrtm5od4ogyrmez67bx7sxx56rhmkh7utlgzxulm
 contracts:
-- fetchai/erc1155:0.22.0:bafybeiccpkvhe36f3thcpbimvdhk34njashnknvnavvt22e5557yoqfefy
+- fetchai/erc1155:0.22.0:bafybeiaj5343g32fd5elhdiytuorx77eymj6g7ajpgo57wan4qdimxy3qu
 protocols:
 - fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u
 - fetchai/fipa:1.0.0:bafybeigodegj6qobvfw4z3z6esv472oapcf34jobw5sze2fdjofbfa7v2i

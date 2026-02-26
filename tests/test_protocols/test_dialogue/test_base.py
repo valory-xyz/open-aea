@@ -238,7 +238,7 @@ class TestDialogueLabel:
 class TestDialogueBase:
     """Test for Dialogue."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.incomplete_reference = (str(1), "")
         self.complete_reference = (str(1), str(1))
@@ -973,7 +973,7 @@ class TestDialogueBase:
 class TestDialogueStats:
     """Test for DialogueStats."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Initialise the environment to test DialogueStats."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1035,7 +1035,7 @@ class TestDialogueStats:
 class TestDialoguesBase:
     """Test for Dialogues."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1697,7 +1697,7 @@ class TestDialoguesBase:
 class TestPersistDialoguesStorage:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test PersistDialogueStorage."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1719,7 +1719,7 @@ class TestPersistDialoguesStorage:
         wait_for_condition(lambda: self.generic_storage.is_connected, timeout=10)
         self.skill_component.context.storage = self.generic_storage
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test PersistDialogueStorage."""
         self.generic_storage.stop()
         self.generic_storage.wait_completed(sync=True, timeout=10)
@@ -1846,7 +1846,7 @@ class TestPersistDialoguesStorage:
 class TestPersistDialoguesStorageOffloading:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test PersistDialogueStorage."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1867,7 +1867,7 @@ class TestPersistDialoguesStorageOffloading:
         wait_for_condition(lambda: self.generic_storage.is_connected, timeout=10)
         self.skill_component.context.storage = self.generic_storage
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test PersistDialogueStorage."""
         self.generic_storage.stop()
         self.generic_storage.wait_completed(sync=True, timeout=10)
@@ -1970,7 +1970,7 @@ class TestPersistDialoguesStorageOffloading:
 class TestBaseDialoguesStorage:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.incomplete_reference = (str(1), "")
         self.complete_reference = (str(1), str(1))
@@ -2158,7 +2158,7 @@ class TestBaseDialoguesStorage:
             == 0
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test BaseDialogueStorage."""
 
 
@@ -2170,10 +2170,10 @@ def test_find_caller_object():
             super().__init__(*args, **kwargs)
             self.storage = PersistDialoguesStorage(self)
 
-        def setup(self):
+        def setup_method(self):
             pass
 
-        def teardown(self):
+        def teardown_method(self):
             pass
 
         @classmethod

@@ -72,7 +72,7 @@ v1.7.0
 AEA configurations successfully initialized: {'author': 'fetchai'}
 ```
 ``` bash
-aea fetch open_aea/my_first_aea:0.1.0:bafybeic4n24fjsolgw5yuo4juixau4yxyrm57wg7zp7exqy4enidmnlzp4 --remote
+aea fetch open_aea/my_first_aea:0.1.0:bafybeifii3674fbefcbpg7vhkiutiuxtim37s2wjjryyj2rgiolrty63vu --remote
 cd my_first_aea
 ```
 ``` bash
@@ -152,12 +152,12 @@ aea delete my_first_aea
 
 
 ``` bash
-aea fetch open_aea/my_first_aea:0.1.0:bafybeic4n24fjsolgw5yuo4juixau4yxyrm57wg7zp7exqy4enidmnlzp4 --remote
+aea fetch open_aea/my_first_aea:0.1.0:bafybeifii3674fbefcbpg7vhkiutiuxtim37s2wjjryyj2rgiolrty63vu --remote
 cd my_first_aea
 ```
 
 ``` bash
-aea fetch open_aea/my_first_aea:0.1.0:bafybeic4n24fjsolgw5yuo4juixau4yxyrm57wg7zp7exqy4enidmnlzp4 --remote
+aea fetch open_aea/my_first_aea:0.1.0:bafybeifii3674fbefcbpg7vhkiutiuxtim37s2wjjryyj2rgiolrty63vu --remote
 cd my_first_aea
 ```
 

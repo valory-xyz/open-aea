@@ -61,7 +61,7 @@ class TestPackageManagerV0(BaseAEATestCase):
     use_packages_dir: bool = True
     packages_json_file: Path
 
-    def setup(
+    def setup_method(
         self,
     ) -> None:
         """Setup test."""

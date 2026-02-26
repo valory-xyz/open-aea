@@ -62,18 +62,18 @@ def _parametrize_class(test_cls: Type) -> Type:
     def teardown_class(cls) -> None:
         """Don't call super teardown method."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup after every test execution."""
         old_setup_class()  # type: ignore
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Tear down after every test execution."""
         old_teardown_class()  # type: ignore
 
     test_cls.setup_class = setup_class
     test_cls.teardown_class = teardown_class
-    test_cls.setup = setup
-    test_cls.teardown = teardown
+    test_cls.setup = setup_method
+    test_cls.teardown = teardown_method
 
     return test_cls
 

@@ -136,7 +136,7 @@ class TestClientServer:
             self.client_agent_skill_id, role_from_first_message=role_from_first_message
         )
 
-    def setup(self):
+    def setup_method(self):
         """Set up test case."""
         self.setup_server()
         self.setup_client()
@@ -264,7 +264,7 @@ class TestClientServer:
             == response.message.dialogue_reference[0]
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down testcase."""
         self.loop.run_until_complete(self.client.disconnect())
         self.loop.run_until_complete(self.server.disconnect())

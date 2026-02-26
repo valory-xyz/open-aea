@@ -197,10 +197,10 @@ class TestIPFSToolDownload(CliTest):
 
     cli_options = ("ipfs", "download")
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup"""
 
-        super().setup()
+        super().setup_method()
         self.some_ipfs_hash = "not_a_real_ipfs_hash"
         self.target_dir = self.t / "target_dir"
         self.args = self.some_ipfs_hash, str(self.target_dir)

@@ -135,6 +135,6 @@ class GymTestCase(BaseSkillTestCase):
             DialogueMessage(GymMessage.Performative.CLOSE, {}),
         )
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
         self.setup_class()

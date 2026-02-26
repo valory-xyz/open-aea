@@ -8,7 +8,7 @@ fingerprint:
   README.md: bafybeide6e3netkj62dtt26l5os7opkbbaotgrzmxmxp4gvrhzx453hguu
 fingerprint_ignore_patterns: []
 connections:
-- valory/http_server:0.22.0:bafybeiedypxjqr4balbjmnrrrmrv65fo7xj2lkk5sxppoml3ddur6fckbi
+- valory/http_server:0.22.0:bafybeihv36lcyi3frzrq47wori6pw4h7rhfolr4rmsttvq22vn7slnezk4
 contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u

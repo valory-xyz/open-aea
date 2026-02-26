@@ -606,7 +606,7 @@ class TestConfigNestedGetSet:
     INITIAL_VALUE = 1
     NEW_VALUE = 100
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.cwd = os.getcwd()
         self.t = tempfile.mkdtemp()
@@ -618,7 +618,7 @@ class TestConfigNestedGetSet:
         os.chdir(Path(self.t, "dummy_aea"))
         self.runner = CliRunner()
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear dowm the test."""
         os.chdir(self.cwd)
         try:

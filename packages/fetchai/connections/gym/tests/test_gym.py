@@ -80,7 +80,7 @@ class GymDialogues(BaseGymDialogues):
 class TestGymConnection:
     """Test the packages/connection/gym/connection.py."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the class."""
         self.env = gym.GoalEnv()
         configuration = ConnectionConfig(connection_id=GymConnection.connection_id)
@@ -100,7 +100,7 @@ class TestGymConnection:
         self.skill_id = "some/skill:0.1.0"
         self.dialogues = GymDialogues(self.skill_id)
 
-    def teardown(self):
+    def teardown_method(self):
         """Clean up after tests."""
         self.loop.run_until_complete(self.gym_con.disconnect())
 

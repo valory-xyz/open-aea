@@ -124,7 +124,7 @@ class BaseTestDecisionMaker:
         cls.info = {"some_info_key": "some_info_value"}
         cls.ledger_id = FetchAICrypto.identifier
 
-    def setup(self):
+    def setup_method(self):
         """Setup test method."""
         self.decision_maker = DecisionMaker(self.decision_maker_handler)
         self.decision_maker.start()
@@ -499,7 +499,7 @@ class BaseTestDecisionMaker:
         signing_msg_response = self.decision_maker.message_out_queue.get(timeout=2)
         assert signing_msg_response is not None
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear the tests down."""
         self.decision_maker.stop()
 

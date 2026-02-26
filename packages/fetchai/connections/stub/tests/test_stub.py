@@ -84,7 +84,7 @@ def make_test_envelope() -> Envelope:
 class TestStubConnectionReception:
     """Test that the stub connection is implemented correctly."""
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.cwd = os.getcwd()
         self.tmpdir = Path(tempfile.mkdtemp())
@@ -171,7 +171,7 @@ class TestStubConnectionReception:
         actual_envelope = self.multiplexer.get(block=True, timeout=3.0)
         assert expected_envelope == actual_envelope
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the test."""
         os.chdir(self.cwd)
         try:

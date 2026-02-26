@@ -13,13 +13,13 @@ fingerprint:
   handlers.py: bafybeigucrzqp4hppz2g3ioz2oycpaybggka6wapxvptptvqutu3cn7yie
   strategy.py: bafybeihtsdt4gwpxvmy77xpqfxwcb5rffz74gmyue6qttbnxy4shjcldsu
   tests/__init__.py: bafybeid6od3orr5gjysmm4lbcn6xcul22n2dlc7qafppiqvkvcov2pftiu
-  tests/test_behaviours.py: bafybeifa574efwzoa3vmiu452wzo4pux73fngdfnqyhsr2pa2kpvvtv6l4
+  tests/test_behaviours.py: bafybeibxnoxjy5gmsp7imp3dxt657rl6pvwb3q734yuwrwh2iynfh4xs34
   tests/test_dialogues.py: bafybeiahtibaxicgp3c4csym52he3nu7dd2chtizlakslgptkx7w5scdpq
-  tests/test_handlers.py: bafybeibjmrdrwtk4ho6cuacjleav3jkoxupztmutxqvsbb76h2eq7wbzu4
-  tests/test_models.py: bafybeih2qhfhkfqb23636k3dntg2jqti4tjniiglaveasrxw5vfflkka7e
+  tests/test_handlers.py: bafybeihqfm6lxb7strimhokxiwu3yh5ix5m4mj6f5jtdwwu6gibexwtppe
+  tests/test_models.py: bafybeihozbwc567lluqtsxzdh3ymasakssjdjaymgzo5j2yttfbmk4oij4
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeibdtmjir27ls7mzcjznla5uxcrv2dkro7mlqkprfjuncmhfknweyq
+- valory/ledger:0.19.0:bafybeidqmtogcnvvsldrtm5od4ogyrmez67bx7sxx56rhmkh7utlgzxulm
 contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u

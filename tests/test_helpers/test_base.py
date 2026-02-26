@@ -736,7 +736,7 @@ def test_decorator_with_optional_params():
 class TestDeleteDirectoryContents:
     """Test utility 'delete_directory_contents'."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test."""
         self.root = Path(tempfile.mkdtemp())
         # create a file
@@ -760,7 +760,7 @@ class TestDeleteDirectoryContents:
         assert self.root.exists()
         assert len(list(self.root.iterdir())) == 0
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the test."""
         shutil.rmtree(str(self.root), ignore_errors=True)
 

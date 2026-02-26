@@ -15,7 +15,7 @@ fingerprint:
   tasks.py: bafybeifvuancp2y57rjgwuzxgrzxiqkc4gzzbskgwch3uze5vlbvptlswm
   tests/__init__.py: bafybeihojk75sixkhbsmwxbrzdaqwouq6dh2oo6u7zk2clqcgxqrhklhny
   tests/helpers.py: bafybeidurd2gal3ayyanne7nvkuosqghnu5zmxowd34ufpd4uv7r4wwvt4
-  tests/intermediate_class.py: bafybeiawuvmuy4u2uklbzyyvaw3adaw6wzucpsqiax2zdhgqrcujd32qt4
+  tests/intermediate_class.py: bafybeifyp26nbw3jdwrokzamteoazfvdbalmipl447amhwhxiwdmi5j6ou
   tests/test_dialogues.py: bafybeieyxtsbkfb6cxhyykw36avpmubawnytm4wrns7s6jwldl3carxv6i
   tests/test_handlers.py: bafybeic3tji3qu3l3o2a6krdosypfx44bqz5qqtikalvsripytmssnoqbi
   tests/test_helpers.py: bafybeiaqauepgl2stqbqz65vnr2qbdrnhktm63imnxud24omb2h5kxic2u
@@ -23,7 +23,7 @@ fingerprint:
   tests/test_task.py: bafybeiaixb6lhl46m2sdnmgntvm4k53qxlhinrep6oadcr6dapb6srqjpa
 fingerprint_ignore_patterns: []
 connections:
-- fetchai/gym:0.19.0:bafybeibexbzjyynsbkamkrihux62fsrvbtxhrvvjylab6a5gkj6lcd5qya
+- fetchai/gym:0.19.0:bafybeihfavqqrkbt6jxyb5fdckwq22khw3w6b5vp5zjzzywy2wlsfxy4li
 contracts: []
 protocols:
 - fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u
