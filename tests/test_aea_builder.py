@@ -94,14 +94,14 @@ class CleanDirectoryClass(BaseAEATestCase):
     working_dir = None
     path_to_aea = Path(ROOT_DIR) / "tests" / "data" / "dummy_aea"
 
-    def setup(self):
+    def setup_method(self):
         """Sets up the working directory for the test method."""
         self.old_cwd = os.getcwd()
         self.working_dir = Path(tempfile.TemporaryDirectory().name)
         shutil.copytree(self.path_to_aea, self.working_dir)
         os.chdir(self.working_dir)
 
-    def teardown(self):
+    def teardown_method(self):
         """Removes the over-ride"""
         shutil.rmtree(self.working_dir, ignore_errors=True)
         os.chdir(self.old_cwd)
@@ -935,9 +935,9 @@ class TestExtraDeps(AEATestCaseEmpty):
 class TestBuildEntrypoint(AEATestCaseEmpty, CleanDirectoryClass):
     """Test build entrypoint."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test."""
-        super().setup()
+        super().setup_method()
 
         self.builder = AEABuilder.from_aea_project(Path(self.working_dir))
         self.component_id = "component_id"

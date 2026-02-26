@@ -9,7 +9,7 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeifepluovb4so2eem34ulpcp4svegb2dqfpmtojtofhfkb3j2xanui
   __init__.py: bafybeifykou5sazojmc7hdqnsdp4mncd4zh3xys3mdgdzwks23mvhzu2ga
-  connection.py: bafybeif66seo662w2c4ezx7zvtppdbnykjuv3mailsosqmdioj32ozx3ce
+  connection.py: bafybeibm5qwg4y7mqda5v7zyofavxelipt2ikycyqo6aouq56hgbndhle4
   tests/__init__.py: bafybeifqaf7cnc4oczjkbwmv4ahrkbiqxrojwgowej3kbri3skz4lzt43i
   tests/data/certs/server.crt: bafybeiev5i3xxkvn36wflf633gkumuxexsw4y2bubwbvl7edrz4igfgv34
   tests/data/certs/server.csr: bafybeicvp7xdl5w3o4bzikkudpduitss3bpp6xqfwlxbw6kabdangohy5u
@@ -36,9 +36,9 @@ dependencies:
   aiohttp:
     version: <4.0.0,>=3.8.5
   openapi-core:
-    version: ==0.15.0
+    version: ==0.22.0
   openapi-spec-validator:
-    version: <0.5.0,>=0.4.0
+    version: <0.8.0,>=0.7.0
   werkzeug: {}
   attrs: {}
 is_abstract: false

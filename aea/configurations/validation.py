@@ -30,9 +30,9 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import jsonschema
 from jsonschema import Draft4Validator
+from jsonschema._keywords import additionalProperties
 from jsonschema._types import TypeChecker
 from jsonschema._utils import find_additional_properties
-from jsonschema._validators import additionalProperties
 from jsonschema.validators import extend
 
 from aea.configurations.constants import AGENT

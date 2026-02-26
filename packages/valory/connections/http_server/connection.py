@@ -32,18 +32,12 @@ from traceback import format_exc
 from typing import Any, Dict, Optional, cast
 from urllib.parse import parse_qs, urlparse
 
+import yaml
 from aiohttp import web
 from aiohttp.web_request import BaseRequest
-from openapi_core import validate_request
-from openapi_core.schema.specs import Spec
+from openapi_core import Config, OpenAPI
 from openapi_core.validation.request.datatypes import RequestParameters
-from openapi_core.validation.request.validators import RequestValidator
-from openapi_spec_validator.exceptions import (  # pylint: disable=wrong-import-order
-    OpenAPIValidationError,
-)
-from openapi_spec_validator.schemas import (  # pylint: disable=wrong-import-order
-    read_yaml_file,
-)
+from openapi_spec_validator.exceptions import OpenAPISpecValidatorError
 from werkzeug.datastructures import (  # pylint: disable=wrong-import-order
     ImmutableMultiDict,
 )
@@ -268,22 +262,19 @@ class APISpec:
         :param server: the server url
         :param logger: the logger
         """
-        self._validator = None  # type: Optional[RequestValidator]
+        self.openapi = None
         self.logger = logger
         if api_spec_path is not None:
             try:
-                api_spec_dict = read_yaml_file(api_spec_path)
+                with open(api_spec_path, "r") as f:
+                    api_spec_dict = yaml.safe_load(f)
                 if server is not None:
                     api_spec_dict["servers"] = [{"url": server}]
-                self.api_spec = Spec.create(data=api_spec_dict)
-                self._validator = RequestValidator(self.api_spec)
-            except OpenAPIValidationError as e:  # pragma: nocover
+                config = Config()
+                self.openapi = OpenAPI.from_dict(api_spec_dict, config=config)
+            except OpenAPISpecValidatorError as e:
                 self.logger.error(
                     f"API specification YAML source file not correctly formatted: {str(e)}"
-                )
-            except Exception:
-                self.logger.exception(
-                    "API specification YAML source file not correctly formatted."
                 )
                 raise
 
@@ -294,16 +285,12 @@ class APISpec:
         :param request: the request object
         :return: whether or not the request conforms with the API spec
         """
-        if self._validator is None:
+        if self.openapi is None:
             self.logger.debug("Skipping API verification!")
             return True
 
         try:
-            validate_request(
-                spec=self.api_spec,
-                request=request,
-                validator=self._validator,
-            )
+            self.openapi.validate_request(request)
         except Exception:  # pragma: nocover # pylint: disable=broad-except
             self.logger.exception("APISpec verify error")
             return False
