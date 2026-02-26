@@ -35,7 +35,9 @@ from packages.fetchai.protocols.default.dialogues import (
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue as BaseFipaDialogue
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogues as BaseFipaDialogues
 from packages.fetchai.protocols.fipa.message import FipaMessage
-from packages.open_aea.protocols.signing.dialogues import SigningDialogue
+from packages.open_aea.protocols.signing.dialogues import (
+    SigningDialogue,
+)
 from packages.open_aea.protocols.signing.dialogues import (
     SigningDialogues as BaseSigningDialogues,
 )

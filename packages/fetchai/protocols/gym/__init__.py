@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.fetchai.protocols.gym.message import GymMessage
 from packages.fetchai.protocols.gym.serialization import GymSerializer
 
-
 GymMessage.serializer = GymSerializer

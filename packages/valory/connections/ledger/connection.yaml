@@ -10,18 +10,18 @@ fingerprint:
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
   base.py: bafybeifghgrbfxfiw5rykpm5lndpodwk6255zdjurh7if6ierhbhchtz74
   connection.py: bafybeicz37uto2qojuxni3uph6dwbce5fwqjx6jfhtbqvmqynssuhkambe
-  contract_dispatcher.py: bafybeias3dytemo362renphtmei5kren6avncma3nx4qlup3brirfii4oe
-  ledger_dispatcher.py: bafybeifrir677vt7apvmjgv5tclpmizjarzdgac3ma6laemlsg2ihpf3oa
+  contract_dispatcher.py: bafybeicnsfw2lvsx73f3bvc44sd7p3q2imhxt3yg5tvuw36ktjfgd7lxpm
+  ledger_dispatcher.py: bafybeiehqptlnjwzeuhhczcei4anbbl2ykpfik5wz2f3kjl2ondopexkkq
   tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
   tests/conftest.py: bafybeibvvorlz3xqgyq2htiazeygbcytvyn2cqkscg54lgylnqk2d5d4mm
-  tests/test_contract_dispatcher.py: bafybeihgqhn4ptzniim74p5iakey42vsjw6kplwybrbhfcnp2vxtaxopie
+  tests/test_contract_dispatcher.py: bafybeih6qu32kqj2enq3poc4i2capp4lipxwgsiv7d5amdyyx6brggrtby
   tests/test_ledger.py: bafybeig5qo7dpnwzshjgh4q36vbmk3gmvy664fvs27i5iee2jciiqmilva
-  tests/test_ledger_api.py: bafybeiaks6xivh6ijh6taui3qlhee36ou74ltvg2qvkhm2yzcnlveipclq
+  tests/test_ledger_api.py: bafybeiah4oj5vas4oxj7d6kf577eldo5yf4bac75jm2ln2r2q3zstxxtfa
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/contract_api:1.0.0:bafybeia56fhzrbccgd42alztzpiauerqohtpq65wdjn5j2wy4dokybppgq
-- valory/ledger_api:1.0.0:bafybeifnlmi56cexqz6waacqvx4h566n3bqi34hj5wzqzbniv6s6nbr27y
+- valory/contract_api:1.0.0:bafybeibld2xb5m7kyluiptkamp4nrt6oeomkohz7a3yppbv2oo7qw2e4la
+- valory/ledger_api:1.0.0:bafybeiecq56phjfws36rgrefw6niyo4ezesloodsfis647mpm5ygqo4ysi
 class_name: LedgerConnection
 config:
   ledger_apis:

@@ -38,7 +38,9 @@ from aea.protocols.dialogue.base import Dialogues as BaseDialogues
 
 from packages.valory.connections.ledger.base import RequestDispatcher
 from packages.valory.protocols.contract_api import ContractApiMessage
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )

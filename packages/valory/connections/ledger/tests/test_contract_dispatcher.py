@@ -40,7 +40,9 @@ from packages.valory.connections.ledger.contract_dispatcher import (
 
 # pylint: skip-file
 from packages.valory.protocols.contract_api import ContractApiMessage
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )

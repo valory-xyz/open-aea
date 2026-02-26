@@ -43,7 +43,6 @@ from packages.valory.protocols.contract_api.message import (
     _default_logger as contract_api_message_logger,
 )
 
-
 LEDGER_ID = "ethereum"
 CONTRACT_ID = "contract_id_stub"
 CALLABLE = "callable_stub"

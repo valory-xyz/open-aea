@@ -8,15 +8,15 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeigac52kctrdctmazuxnehvurx7zj6xrjwuljsp5cbeuek3kd7chnq
-  __init__.py: bafybeifhy7sd56pfudnnyger6pt2qmt4b7ap7nk2g64xwcx25nsnerebiy
+  __init__.py: bafybeihqqoh5jmbqghw62adpj34f3av2qvi4xpd67njerbkq2mebilbxtq
   custom_types.py: bafybeiaqxtoq6b4xnve3p2uiw55povolzg3yon3ptvzxbeg2wtssiumxkq
   dialogues.py: bafybeigwbknucapshzh7zfmldmo22czxeqxumg2bye35mooimiagxbvt2u
-  message.py: bafybeiecqees2oryxohnxdpy7zvwufyhbremi7iaghwvigxontnwalayee
+  message.py: bafybeibxhkxpy26q7tnvclo6lgleuzawwwuu6zdkg6pmxpa46kg7xqpdei
   serialization.py: bafybeib22ms3sh3smcu4rmi56ctihyybjoqedxbbtewemdavtbd6de4rgu
   t_protocol.proto: bafybeiapaievom3jzw3vjdzcoo3bok7tecznwgccbbjc6thmseeww5fp2m
   t_protocol_pb2.py: bafybeihvrr75sei72w4pzhws4atzrb4qktvgajjqqdhw4vhmbfrzgjwmym
   tests/test_t_protocol_dialogues.py: bafybeidxzkiqbbyo5zu37udk6v6jcwrvwsm6eqznurvmljxjia7xk3qgcy
-  tests/test_t_protocol_messages.py: bafybeibzqolqclgo4td6yzxsvn4l7ht5qoe2jq5edo7kj532pd2nvdpdae
+  tests/test_t_protocol_messages.py: bafybeidzfkf3x4hxtcnloeezpcrze7vrrhiwndvecw5xn32ky4esmufimu
 fingerprint_ignore_patterns: []
 dependencies:
   protobuf: {}

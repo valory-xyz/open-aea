@@ -39,7 +39,6 @@ from packages.valory.protocols.http.message import (
     _default_logger as http_message_logger,
 )
 
-
 LEDGER_ID = "ethereum"
 
 

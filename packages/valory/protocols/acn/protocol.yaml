@@ -8,12 +8,12 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeigqnacvyixfdiko3u5f6ydwymlqi4p4xymitcj2jynwndk5xln62m
-  __init__.py: bafybeiatxesbv5xbrkyrk3zvlbnrj3sgzoq63y33btxi4hhisz3qh4gkv4
+  __init__.py: bafybeicqjdgijpav6szrqjcxsn4ztm7vupgbodgs6qlltyko3zorhpuflu
   acn.proto: bafybeidkun7o75sxpyk2sixt7dsykgty62f6dnixnes2irbunyamilqsh4
   acn_pb2.py: bafybeibjs4fta63b6stqsrpswgcddrv7pa6o2fm2aczh6vci5ephsqyjse
   custom_types.py: bafybeibcwyiilixtni6c7dmifqfodhupnvpls7xsxbvbfqofgrfz5bfed4
   dialogues.py: bafybeihkpqeo6bcemhmx7nwzawbbwwddblcp74ddgrrzlu7r6ywbczsio4
-  message.py: bafybeiamlvchrnxsegzcwndufwhr5dtwef5g5e7khgj7deuvhlxn4njeb4
+  message.py: bafybeifig6cwtd6ziavcrhflv2ltvlgje2gzr2gyjhg5437js57jm5eosm
   serialization.py: bafybeiacgi5s25waelsej4dqrixvracitgup6fb3vhaa3n2ctx2vuoh6pu
   tests/__init__.py: bafybeidteufp2npjd77ekcftk5e4gbaquq3gike5nxtk5xfmnusls56keu
   tests/test_acn.py: bafybeignjgdtlfdnj25hc5necmg7zl3kvngsmzkjgcwfm5qg36liqa63ki

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,9 @@ from aea.identity.base import Identity
 from aea.protocols.base import Address, Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 
-from packages.open_aea.protocols.signing.dialogues import SigningDialogue
+from packages.open_aea.protocols.signing.dialogues import (
+    SigningDialogue,
+)
 from packages.open_aea.protocols.signing.dialogues import (
     SigningDialogues as BaseSigningDialogues,
 )

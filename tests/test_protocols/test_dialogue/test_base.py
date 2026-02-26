@@ -30,9 +30,15 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError
 from aea.helpers.storage.generic_storage import Storage
 from aea.protocols.base import Message
-from aea.protocols.dialogue.base import BasicDialoguesStorage
+from aea.protocols.dialogue.base import (
+    BasicDialoguesStorage,
+)
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
-from aea.protocols.dialogue.base import DialogueLabel, DialogueMessage, DialogueStats
+from aea.protocols.dialogue.base import (
+    DialogueLabel,
+    DialogueMessage,
+    DialogueStats,
+)
 from aea.protocols.dialogue.base import Dialogues as BaseDialogues
 from aea.protocols.dialogue.base import (
     InvalidDialogueMessage,

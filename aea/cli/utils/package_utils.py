@@ -48,7 +48,10 @@ from aea.configurations.base import (
     _compute_fingerprint,
     _get_default_configuration_file_name_from_type,
 )
-from aea.configurations.constants import AGENT, DEFAULT_AEA_CONFIG_FILE
+from aea.configurations.constants import (
+    AGENT,
+    DEFAULT_AEA_CONFIG_FILE,
+)
 from aea.configurations.constants import (
     DISTRIBUTED_PACKAGES as DISTRIBUTED_PACKAGES_STR,
 )
