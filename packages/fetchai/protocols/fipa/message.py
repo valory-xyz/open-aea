@@ -32,7 +32,6 @@ from packages.fetchai.protocols.fipa.custom_types import (
 )
 from packages.fetchai.protocols.fipa.custom_types import Query as CustomQuery
 
-
 _default_logger = logging.getLogger("aea.packages.fetchai.protocols.fipa.message")
 
 DEFAULT_BODY_SIZE = 4

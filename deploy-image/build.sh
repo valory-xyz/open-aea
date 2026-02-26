@@ -2,7 +2,7 @@
 set -e
 
 # setup the agent
-aea fetch open_aea/my_first_aea:0.1.0:bafybeigivc5ht4tg44x22m2vxosooj43vgyy6clcbplbsynvbj2rxwihl4 --remote
+aea fetch open_aea/my_first_aea:0.1.0:bafybeifmvtpwbsirfv6mswf3ez65477fcevumuzlfru5feq4alzobv3wti --remote
 cd my_first_aea/
 aea install
 aea build

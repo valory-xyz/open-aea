@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.fetchai.protocols.state_update.message import StateUpdateMessage
 from packages.fetchai.protocols.state_update.serialization import StateUpdateSerializer
 
-
 StateUpdateMessage.serializer = StateUpdateSerializer

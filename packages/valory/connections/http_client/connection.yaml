@@ -15,7 +15,7 @@ fingerprint:
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/http:1.0.0:bafybeiaqxv3hlfnwf5tvbspxlwtqcrpkpxzaeymvoobvjws3z5htoayb6u
+- valory/http:1.0.0:bafybeidxkp3vga7t6x2pbt2tpkgyaxa5bgpdgryao54py7w3yxyzr7neoy
 class_name: HTTPClientConnection
 config:
   host: 127.0.0.1
