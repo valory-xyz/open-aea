@@ -86,18 +86,18 @@ def package_manager(
     help="Recalculate hashes in packages.json so that they match the local packages.",
 )
 @click.option(
-    "--dev",
-    "sync_type",
-    flag_value=SyncTypes.DEV,
-    help="To sync dev packages.",
-    default=False,
-)
-@click.option(
     "--third-party",
     "sync_type",
     flag_value=SyncTypes.THIRD_PARTY,
     help="To sync third party packages (default).",
     default=True,
+)
+@click.option(
+    "--dev",
+    "sync_type",
+    flag_value=SyncTypes.DEV,
+    help="To sync dev packages.",
+    default=False,
 )
 @click.option(
     "--all",
