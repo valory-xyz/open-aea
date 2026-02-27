@@ -2170,10 +2170,10 @@ def test_find_caller_object():
             super().__init__(*args, **kwargs)
             self.storage = PersistDialoguesStorage(self)
 
-        def setup_method(self):
+        def setup(self):
             pass
 
-        def teardown_method(self):
+        def teardown(self):
             pass
 
         @classmethod

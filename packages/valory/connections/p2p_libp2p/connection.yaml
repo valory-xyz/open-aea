@@ -42,7 +42,7 @@ fingerprint:
   libp2p_node/dht/monitoring/service.go: bafybeicgbzqxi4jpae3w4es4owhdt63rd4limt4o46gbdanaia2buxddhy
   libp2p_node/go.mod: bafybeifwgai5xlbrgrhxltkvnup6zctm7bo57rhh4hfcz2hzioptbquq3q
   libp2p_node/go.sum: bafybeih4qcqv6lul6rtjwzp4pdgl2slg3ao7xue2qgjrrdefgbcxc3utou
-  libp2p_node/libp2p_node: bafybeigvte6op6hbwxu7fzrrnibrbm5o3thww4axfrsoho6ao4phekw2wy
+  libp2p_node/libp2p_node: bafybeigywp2ajrrl5knupteqbyncflk4chxemsptjly2gesj3p3k5wz3vm
   libp2p_node/libp2p_node.go: bafybeidlrp77xdocjddey6mbnqpsvdtughhvi7wq3dbducbe4cetkoze2q
   libp2p_node/link: bafybeifuo6aafgbc72npli5d7p4dunjkgcygalrkhcqdcvz6dghjabd7ou
   libp2p_node/mocks/mock_host.go: bafybeih3v5b2dlqdto2irk3g6gi4giqg2a5ulfjte2cmoeb33bqyz7f5gi
@@ -64,8 +64,8 @@ fingerprint_ignore_patterns: []
 build_entrypoint: check_dependencies.py
 connections: []
 protocols:
-- fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u
-- valory/acn:1.1.0:bafybeiehrsjhbpjxb6pnu37cpnojeqbhxpl4mnppzftz2s6zg6y2jn4wbi
+- fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou
+- valory/acn:1.1.0:bafybeiea66z4k6cgcazxd6qzvnkllulyjzbnxufkoenge7qzh4qfogrvoa
 class_name: P2PLibp2pConnection
 config:
   delegate_uri: 127.0.0.1:11000

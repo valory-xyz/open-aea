@@ -69,7 +69,7 @@ class FetchAgentLocallyTestCase(TestCase):
 
     @mock.patch("aea.cli.fetch._is_version_correct", return_value=True)
     @mock.patch("aea.cli.fetch.os.path.exists", return_value=False)
-    @mock.patch("aea.cli.fetch.copy_tree")
+    @mock.patch("aea.cli.fetch.shutil.copytree")
     def test_fetch_agent_locally_positive(self, copy_tree, *mocks):
         """Test for fetch_agent_locally method positive result."""
         ctx = ContextMock()
@@ -79,7 +79,7 @@ class FetchAgentLocallyTestCase(TestCase):
 
     @mock.patch("aea.cli.fetch._is_version_correct", return_value=True)
     @mock.patch("aea.cli.fetch.os.path.exists", return_value=True)
-    @mock.patch("aea.cli.fetch.copy_tree")
+    @mock.patch("aea.cli.fetch.shutil.copytree")
     def test_fetch_agent_locally_already_exists(self, *mocks):
         """Test for fetch_agent_locally method agent already exists."""
         ctx = ContextMock()
@@ -89,7 +89,7 @@ class FetchAgentLocallyTestCase(TestCase):
 
     @mock.patch("aea.cli.fetch._is_version_correct", return_value=False)
     @mock.patch("aea.cli.fetch.os.path.exists", return_value=True)
-    @mock.patch("aea.cli.fetch.copy_tree")
+    @mock.patch("aea.cli.fetch.shutil.copytree")
     def test_fetch_agent_locally_incorrect_version(self, *mocks):
         """Test for fetch_agent_locally method incorrect agent version."""
         ctx = ContextMock()
@@ -100,7 +100,7 @@ class FetchAgentLocallyTestCase(TestCase):
     @mock.patch("aea.cli.fetch._is_version_correct", return_value=True)
     @mock.patch("aea.cli.fetch.add_item")
     @mock.patch("aea.cli.fetch.os.path.exists", return_value=False)
-    @mock.patch("aea.cli.fetch.copy_tree")
+    @mock.patch("aea.cli.fetch.shutil.copytree")
     def test_fetch_agent_locally_with_deps_positive(self, *mocks):
         """Test for fetch_agent_locally method with deps positive result."""
         public_id = PublicIdMock.from_str("author/name:0.1.0")
@@ -115,7 +115,7 @@ class FetchAgentLocallyTestCase(TestCase):
 
     @mock.patch("aea.cli.fetch._is_version_correct", return_value=True)
     @mock.patch("aea.cli.fetch.os.path.exists", return_value=False)
-    @mock.patch("aea.cli.fetch.copy_tree")
+    @mock.patch("aea.cli.fetch.shutil.copytree")
     @mock.patch("aea.cli.fetch.add_item", _raise_click_exception)
     def test_fetch_agent_locally_with_deps_fail(self, *mocks):
         """Test for fetch_agent_locally method with deps ClickException catch."""

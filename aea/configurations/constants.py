@@ -30,7 +30,7 @@ _COSMOS_IDENTIFIER = "cosmos"
 _SOLANA_IDENTIFIER = "solana"
 SIGNING_PROTOCOL = "open_aea/signing:latest"
 SIGNING_PROTOCOL_WITH_HASH = (
-    "open_aea/signing:1.0.0:bafybeibovz6ixe636jsvel3etkcik33nl6sqj6pwutkykcwsukyrsgegmy"
+    "open_aea/signing:1.0.0:bafybeifsjmldwyki3beqyvdt5lzenrg6wyrqaar5plc5rpnvtc4zlentye"
 )
 DEFAULT_LEDGER = _ETHEREUM_IDENTIFIER
 PRIVATE_KEY_PATH_SCHEMA = "{}_private_key.txt"

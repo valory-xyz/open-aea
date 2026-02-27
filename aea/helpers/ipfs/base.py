@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
 
 import base58
+from google.protobuf.descriptor import FieldDescriptor
 
 from aea.helpers.cid import to_v1
 from aea.helpers.io import open_file
@@ -280,7 +281,23 @@ class IPFSHashOnly:
     @classmethod
     def _serialize(cls, pb_node: PBNode) -> bytes:  # type: ignore
         """Serialize PBNode instance with fixed fields sequence."""
-        return pb_node.SerializeToString(deterministic=True)
+        _chunks = []
+        for field_descriptor, field_value in reversed(pb_node.ListFields()):
+            partial_node = type(pb_node)()
+            if field_descriptor.label == FieldDescriptor.LABEL_REPEATED:
+                repeated_field = getattr(partial_node, field_descriptor.name)
+                if field_descriptor.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE:
+                    for item in field_value:
+                        repeated_field.add().CopyFrom(item)
+                else:
+                    repeated_field.extend(field_value)
+            else:
+                if field_descriptor.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE:
+                    getattr(partial_node, field_descriptor.name).CopyFrom(field_value)
+                else:
+                    setattr(partial_node, field_descriptor.name, field_value)
+            _chunks.append(partial_node.SerializeToString(deterministic=True))
+        return b"".join(_chunks)
 
     @classmethod
     def _pb_serialize_bytes(cls, data: bytes) -> Tuple[bytes, int]:

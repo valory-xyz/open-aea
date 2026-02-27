@@ -111,7 +111,7 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
         setup = getattr(self, "setup", None)
         teardown = getattr(self, "teardown", None)
         if callable(setup) and callable(teardown):
-            setup()
+            setup()  # pylint: disable=not-callable
             request.addfinalizer(teardown)
 
     runner: CliRunner  # CLI runner

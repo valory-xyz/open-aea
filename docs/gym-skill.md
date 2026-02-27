@@ -19,7 +19,7 @@ Follow the <a href="../quickstart/#preliminaries">Preliminaries</a> and <a href=
 
 First, fetch the gym AEA:
 ``` bash
-aea fetch open_aea/gym_aea:0.1.0:bafybeidvo5wi7ku6t7664poqpxkvr7cbzvtyew6isc6ro42brjtbxtpdiq --remote
+aea fetch open_aea/gym_aea:0.1.0:bafybeieoxnbqvf35xnpzxtjzjtpjbh22vfwuohnlvijoyr2c3lbsiytoou --remote
 cd gym_aea
 aea install
 ```
@@ -36,7 +36,7 @@ cd my_gym_aea
 
 ### Add the gym skill
 ``` bash
-aea add skill fetchai/gym:0.20.0:bafybeibbijy6i77zif7slkbqnai476ofhha4rawvgv6rflwg6p77j6c6wm --remote
+aea add skill fetchai/gym:0.20.0:bafybeibyp3qnxzmgw3iiu3hz7xzisrlocvdts3qh662pun23no7tt6olq4 --remote
 ```
 
 ### Set gym connection as default
