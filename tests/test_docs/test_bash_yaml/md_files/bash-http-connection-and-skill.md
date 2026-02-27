@@ -3,7 +3,7 @@ aea create my_aea
 cd my_aea
 ```
 ``` bash
-aea add connection valory/http_server:0.22.0:bafybeiedypxjqr4balbjmnrrrmrv65fo7xj2lkk5sxppoml3ddur6fckbi --remote
+aea add connection valory/http_server:0.22.0:bafybeiddvj2y25mccqvm5w6bzrn7fnoox7raabhkvpzfldbznxrxkbutmi --remote
 ```
 ``` bash
 aea config set agent.default_connection valory/http_server:0.22.0
@@ -48,11 +48,11 @@ models:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection valory/http_server:0.22.0:bafybeiedypxjqr4balbjmnrrrmrv65fo7xj2lkk5sxppoml3ddur6fckbi --remote
+aea add connection valory/http_server:0.22.0:bafybeiddvj2y25mccqvm5w6bzrn7fnoox7raabhkvpzfldbznxrxkbutmi --remote
 aea push connection valory/http_server --local
-aea add protocol fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u --remote
+aea add protocol fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou --remote
 aea push protocol fetchai/default --local
-aea add protocol valory/http:1.0.0:bafybeihoaje2mipaitmso2jfartdrqguof4qmly2tbeqebynnw2jfoagd4 --remote
+aea add protocol valory/http:1.0.0:bafybeidxkp3vga7t6x2pbt2tpkgyaxa5bgpdgryao54py7w3yxyzr7neoy --remote
 aea push protocol valory/http --local
 cd ..
 aea delete my_aea

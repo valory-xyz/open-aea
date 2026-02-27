@@ -216,7 +216,7 @@ class TestRunAgent(AEATestCaseEmpty):
 class TestTeardownClassTimeout:
     """Test BaseAEATestCase.teardown_class timeout"""
 
-    def setup(self):
+    def setup_method(self):
         """Setup test"""
         BaseAEATestCase.setup_class()
         self.test = BaseAEATestCase()

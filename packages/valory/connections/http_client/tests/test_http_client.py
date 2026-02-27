@@ -96,7 +96,7 @@ class HttpDialogues(BaseHttpDialogues):
 class TestHTTPClientConnect:
     """Tests the http client connection's 'connect' functionality."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Initialise the class."""
         self.address = get_host()
         self.port = get_unused_tcp_port()

@@ -749,7 +749,7 @@ class TestMultiAgentManagerPackageConsistencyError:
 
     EXPECTED_ERROR_MESSAGE = """cannot add project 'open_aea/my_first_aea:0.1.0': the following AEA dependencies have conflicts with previously added projects"""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test case."""
         self.project_public_id = MY_FIRST_AEA_PUBLIC_ID
         self.tmp_dir = TemporaryDirectory()
@@ -781,7 +781,7 @@ class TestMultiAgentManagerPackageConsistencyError:
             with patch.object(self.manager, "_versionless_projects_set"):
                 self.manager.add_project(my_first_aea_id)
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down test case."""
         try:
             self.manager.stop_manager()
@@ -803,7 +803,7 @@ class TestMultiAgentManagerWithPotentiallyConflictingPackages:
     are not in fact conflicting, the operation is completed successfully.
     """
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test case."""
         self.project_public_id = MY_FIRST_AEA_PUBLIC_ID
         self.tmp_dir = TemporaryDirectory()
@@ -827,7 +827,7 @@ class TestMultiAgentManagerWithPotentiallyConflictingPackages:
         with patch.object(self.manager, "_versionless_projects_set"):
             self.manager.add_project(my_first_aea_id)
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down test case."""
         try:
             self.manager.stop_manager()

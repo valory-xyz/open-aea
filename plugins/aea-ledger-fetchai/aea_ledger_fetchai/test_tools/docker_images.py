@@ -119,7 +119,6 @@ class FetchLedgerDockerImage(DockerImage):
             network="host",
             volumes=volumes,
             entrypoint=str(entrypoint),
-            ports=self.PORTS,
         )
         return container
 

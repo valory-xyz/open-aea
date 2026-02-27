@@ -11,12 +11,12 @@ fingerprint:
   __init__.py: bafybeihw7l7zie5dxycptwwiynqgnqfesnhr3epali5e4tmzhy54lxjnbq
   connection.py: bafybeigfhhugdcdly7fgd4yzfs4uk75p4neak5luqplfn4n2egay5vkqju
   tests/__init__.py: bafybeiadaetciszcob7cchexib74l7vecczthsx2pzaan7sp7csrkgjxce
-  tests/test_stub.py: bafybeidbmcbkleocbmpzdqctrrkkwxjwyeohunbzgssfbbsk2y5ftw3u2q
+  tests/test_stub.py: bafybeifhpf6rbwwa4e3t6yncaqbbmukmkfrakcybk474ziwjk73sahxic4
 fingerprint_ignore_patterns:
 - ./input_file
 connections: []
 protocols:
-- fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u
+- fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou
 class_name: StubConnection
 config:
   input_file: ./input_file

@@ -569,14 +569,14 @@ class TestGenericOefSearchHandler(BaseSkillTestCase):
             ),
         )
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
 
     def test_setup(self):

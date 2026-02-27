@@ -122,7 +122,7 @@ class Request:
         method: str,
         parameters: RequestParameters,
         body: bytes,
-        mimetype: str,
+        content_type: str,
     ) -> None:
         """Initialize Request object."""
         self.host_url = host_url
@@ -131,7 +131,7 @@ class Request:
         self.method = method
         self.parameters = parameters
         self.body = body
-        self.mimetype = mimetype
+        self.content_type = content_type
 
     @property
     def is_id_set(self) -> bool:
@@ -175,7 +175,7 @@ class Request:
             method=method,
             parameters=parameters,
             body=body,
-            mimetype=mimetype,
+            content_type=mimetype,
         )
         return request
 

@@ -156,13 +156,16 @@ class TestRequestDispatcher:
     dispatcher: RequestDispatcher
     loop: asyncio.AbstractEventLoop
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test vars."""
-        logger = logging.getLogger(type(self).__class__.__name__)
-        state = AsyncState(ConnectionStates.connected)
-        self.loop = asyncio.get_event_loop()
+        self.logger = logging.getLogger(type(self).__class__.__name__)
+        self.state = AsyncState(ConnectionStates.connected)
+
+    def _setup_dispatcher_for_running_loop(self) -> None:
+        """Setup dispatcher bound to the currently running loop."""
+        self.loop = asyncio.get_running_loop()
         self.dispatcher = DummyRequestDispatcher(
-            logger=logger, connection_state=state, loop=self.loop
+            logger=self.logger, connection_state=self.state, loop=self.loop
         )
 
     def dummy_func(self, sleep: float) -> bool:
@@ -178,6 +181,8 @@ class TestRequestDispatcher:
     @pytest.mark.asyncio
     async def test_wait_for_happy_path(self) -> None:
         """Tests that wait_for works when timeout is bigger than execution time of callable."""
+        self._setup_dispatcher_for_running_loop()
+
         should_finish_in = 0.5
         tolerance = 0.5
         timeout = should_finish_in + tolerance
@@ -190,6 +195,8 @@ class TestRequestDispatcher:
     @pytest.mark.asyncio
     async def test_wait_for_raise_excp(self) -> None:
         """Tests that wait_for works when timeout is less than execution time of callable."""
+        self._setup_dispatcher_for_running_loop()
+
         timeout = 0.25
         timeout_increase = 0.5
         should_finish_in = timeout + timeout_increase
@@ -202,6 +209,8 @@ class TestRequestDispatcher:
     @pytest.mark.asyncio
     async def test_wait_for_coroutine(self) -> None:
         """Tests that an error is thrown when a coroutine is passed."""
+        self._setup_dispatcher_for_running_loop()
+
         should_finish_in = 0.0  # this value is irrelevant to the result of the test
         with pytest.raises(AEAEnforceError):
             await self.dispatcher.wait_for(self.dummy_async_func, should_finish_in)

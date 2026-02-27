@@ -71,14 +71,14 @@ class TestSearchBehaviour(BaseSkillTestCase):
 
         cls.logger = cls._skill.skill_context.logger
 
-    def setup(self):
+    def setup_method(self):
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
         self.tx_behaviour.waiting.clear()
 
@@ -204,9 +204,9 @@ class TestTransactionBehaviour(BaseSkillTestCase):
             ),
         )
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
         fipa_dialogue = cast(
             FipaDialogue,
@@ -234,9 +234,9 @@ class TestTransactionBehaviour(BaseSkillTestCase):
         self.ledger_api_dialogue = ledger_api_dialogue
         self.fipa_dialogue = fipa_dialogue
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
         self.transaction_behaviour.teardown()
 

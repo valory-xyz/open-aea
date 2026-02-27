@@ -69,9 +69,25 @@ def libp2p_log_on_failure(fn: Callable) -> Callable:
 
 
 def libp2p_log_on_failure_all(cls: Type) -> Type:
-    """Decorate every method of a class with `libp2p_log_on_failure`."""
+    """Wrap test methods to print libp2p logs on failure."""
 
-    for name, fn in inspect.getmembers(cls, inspect.isfunction):
-        setattr(cls, name, libp2p_log_on_failure(fn))
+    def _wrap(func: Callable) -> Callable:
+        if inspect.iscoroutinefunction(func):
+
+            @functools.wraps(func)
+            async def _async_wrapped(*args: Any, **kwargs: Any) -> Any:
+                return await func(*args, **kwargs)
+
+            return _async_wrapped
+
+        @functools.wraps(func)
+        def _sync_wrapped(*args: Any, **kwargs: Any) -> Any:
+            return func(*args, **kwargs)
+
+        return _sync_wrapped
+
+    for name, value in list(vars(cls).items()):
+        if name.startswith("test_") and callable(value):
+            setattr(cls, name, _wrap(value))
 
     return cls

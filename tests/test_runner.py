@@ -63,7 +63,7 @@ class TestThreadedRunner:
         builder.set_runtime_mode("async")
         return builder
 
-    def setup(self):
+    def setup_method(self):
         """Set up AEA instances."""
         self.aea1 = self._builder("agent1").build()
         self.aea2 = self._builder("agent2").build()

@@ -117,7 +117,7 @@ class TestCreate:
         assert "Contract stub_0 initialized." in outputs
         assert "Contract stub_1 initialized." in outputs
 
-    def teardown(
+    def teardown_method(
         self,
     ):
         """Test teardown."""

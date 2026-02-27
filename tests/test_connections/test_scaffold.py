@@ -37,7 +37,7 @@ from tests.conftest import ROOT_DIR
 class TestScaffoldConnectionReception:
     """Test that the stub connection is implemented correctly."""
 
-    def setup(self):
+    def setup_method(self):
         """Set case up."""
         configuration = ConnectionConfig(
             connection_id=MyScaffoldAsyncConnection.connection_id,
@@ -65,7 +65,7 @@ class TestScaffoldConnectionReception:
 class TestScaffoldConnectionAndRun(AEATestCaseEmpty):
     """Test that the scaffold connection created."""
 
-    def setup(self):
+    def setup_method(self):
         """Set case up."""
         result = self.invoke("scaffold", "connection", "my_con")
         assert result.exit_code == 0

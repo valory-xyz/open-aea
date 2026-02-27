@@ -6,9 +6,9 @@ First, get the required packages from IPFS.
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add protocol fetchai/default:1.0.0:bafybeifgerpr2pyffg2uxit6nettwoo2lhg2eqrdckjxl426pw2xipss4u --remote
+aea add protocol fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou --remote
 aea push connection fetchai/default --local
-aea add connection fetchai/stub:0.21.0:bafybeicrtlv4mvokl2o73bou4qey443vl6yclhh57v6il2iqt6ozjc4x34 --remote
+aea add connection fetchai/stub:0.21.0:bafybeihjlr7xeurjm56ckji3gjjlao4pykkgk5xcdmfpjraxwyaljmlh4q --remote
 aea push connection fetchai/stub --local
 cd ..
 aea delete my_aea
@@ -30,7 +30,6 @@ from aea.multiplexer import Multiplexer
 
 from packages.fetchai.connections.stub.connection import StubConnection
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 INPUT_FILE = "input.txt"
 OUTPUT_FILE = "output.txt"
@@ -159,7 +158,6 @@ from aea.multiplexer import Multiplexer
 
 from packages.fetchai.connections.stub.connection import StubConnection
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 INPUT_FILE = "input.txt"
 OUTPUT_FILE = "output.txt"

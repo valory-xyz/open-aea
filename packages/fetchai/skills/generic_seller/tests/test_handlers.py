@@ -545,9 +545,9 @@ class TestGenericFipaHandler(BaseSkillTestCase):
         assert self.fipa_handler.teardown() is None
         self.assert_quantity_in_outbox(0)
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy)
 
 
@@ -1032,10 +1032,10 @@ class TestGenericOefSearchHandler(BaseSkillTestCase):
             ),
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
 
-        super().teardown()
+        super().teardown_method()
         init_kwargs = self._init_service_registration_behaviour_kwargs
         self.service_registration_behaviour.__dict__.update(init_kwargs)
 
