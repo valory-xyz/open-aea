@@ -80,6 +80,8 @@ async def test_sync_connection():
     con = SampleConnection(conf, MagicMock())
     await asyncio.wait_for(con.connect(), timeout=10)
     assert con.is_connected
+    # Allow main() to complete in the thread pool before sends claim all workers
+    await asyncio.sleep(0.1)
     envelope = Mock()
 
     for i in range(10):

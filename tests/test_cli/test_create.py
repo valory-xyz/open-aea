@@ -226,7 +226,7 @@ class TestCreate:
     @classmethod
     def teardown_class(cls):
         """Tear the test down."""
-        cls.cli_config_patch.start()
+        cls.cli_config_patch.stop()
         os.chdir(cls.cwd)
         try:
             shutil.rmtree(cls.t)

@@ -537,6 +537,8 @@ async def test_callable_cannot_find(erc1155_contract, ledger_apis_connection, ca
 
 def test_build_response_fails_on_bad_data_type():
     """Test internal build_response functions for data type check."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     dispatcher = ContractApiRequestDispatcher(MagicMock(), connection_id="test_id")
     with patch.object(
         dispatcher,
