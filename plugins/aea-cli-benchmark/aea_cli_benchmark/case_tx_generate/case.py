@@ -69,7 +69,9 @@ from aea.skills.base import Handler
 
 from packages.open_aea.protocols.signing.dialogues import SigningDialogue
 from packages.open_aea.protocols.signing.message import SigningMessage
-from packages.valory.connections.ledger.connection import LedgerConnection
+from packages.valory.connections.ledger.connection import (
+    LedgerConnection,
+)
 from packages.valory.connections.ledger.connection import (
     PUBLIC_ID as LEDGER_CONNECTION_PUBLIC_ID,
 )

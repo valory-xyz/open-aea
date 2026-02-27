@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,7 +141,7 @@ def test_cli_runner_invoke_raises(kwargs, capfd: CaptureFixture):
 class TestCliTest:
     """Test CliTest"""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test"""
         # `copy` the class to avoid test interference
         self.test_cls = cast(CliTest, copy_class(CliTest))
@@ -151,7 +151,7 @@ class TestCliTest:
 
         self.test_cls.setup_class()
         test_instance = self.test_cls()  # type: ignore
-        test_instance.setup()
+        test_instance.setup_method()
         return test_instance
 
     def test_setup_cls_and_setup(self) -> None:
@@ -163,7 +163,7 @@ class TestCliTest:
         assert not hasattr(self.test_cls, "_t")
 
         test_instance = self.test_cls()  # type: ignore
-        test_instance.setup()
+        test_instance.setup_method()
         assert isinstance(test_instance._t, Path)
 
     def test_teardown_and_teardown_cls(self) -> None:
@@ -175,7 +175,7 @@ class TestCliTest:
         assert not test_instance._t == cwd
         os.chdir(test_instance._t)
         assert test_instance._t == Path.cwd()
-        test_instance.teardown()
+        test_instance.teardown_method()
         assert not hasattr(self.test_cls, "_t")
 
         test_instance.teardown_class()

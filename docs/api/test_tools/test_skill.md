@@ -277,12 +277,12 @@ Only called once at the beginning before test methods on the test class are call
 
 - `kwargs`: the keyword arguments passed to _prepare_skill
 
-<a id="aea.test_tools.test_skill.BaseSkillTestCase.setup"></a>
+<a id="aea.test_tools.test_skill.BaseSkillTestCase.setup_method"></a>
 
-#### setup
+#### setup`_`method
 
 ```python
-def setup(**kwargs: Any) -> None
+def setup_method(**kwargs: Any) -> None
 ```
 
 Set up the test method.
@@ -293,12 +293,12 @@ Called each time before a test method is called.
 
 - `kwargs`: the keyword arguments passed to _prepare_skill
 
-<a id="aea.test_tools.test_skill.BaseSkillTestCase.teardown"></a>
+<a id="aea.test_tools.test_skill.BaseSkillTestCase.teardown_method"></a>
 
-#### teardown
+#### teardown`_`method
 
 ```python
-def teardown() -> None
+def teardown_method() -> None
 ```
 
 Teardown the test method.

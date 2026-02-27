@@ -47,7 +47,9 @@ from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as ERC1155_PUB
 from packages.valory.connections.ledger.contract_dispatcher import (
     ContractApiRequestDispatcher,
 )
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )

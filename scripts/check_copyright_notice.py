@@ -45,7 +45,7 @@ VALORY_FORK_DATE = datetime.strptime(
 )
 GIT_PATH = shutil.which("git")
 START_YEARS_FETCHAI = (2018, 2019, 2020, 2021)
-START_YEARS_VALORY = (2021, 2022, 2023, 2024, 2025)
+START_YEARS_VALORY = set(range(2021, CURRENT_YEAR + 1))
 FETCHAI = "FetchAI"
 VALORY = "Valory"
 MIXED = "Mixed"
@@ -467,7 +467,6 @@ def main() -> None:
         Path("tests").glob("**/*.py"),
         Path("plugins").glob("**/*.py"),
         Path("scripts").glob("**/*.py"),
-        Path("examples", "gym_ex").glob("**/*.py"),
         Path("examples", "ml_ex").glob("**/*.py"),
         [Path("setup.py")],
     )

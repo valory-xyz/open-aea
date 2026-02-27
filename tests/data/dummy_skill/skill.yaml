@@ -6,13 +6,13 @@ description: a dummy_skill for testing purposes.
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  __init__.py: bafybeichkx2ckqoynbchlmslrzrnf2fxaong63tw7gg2apsdvkxdn2tv2y
+  __init__.py: bafybeid4cg5rz4hnqlgh5eayjq74xqxx6xr7ka54e4bsyuiuuokaxt5d64
   behaviours.py: bafybeidwtvqueyxrvjaboefepoh4kqmpxmlqtp7qtqusrpbif4iilweas4
   dummy.py: bafybeifiol6lqsrifi5qyaoqowfsb757l2pekrrha3iy6ivkpegzcloe6u
   dummy_subpackage/__init__.py: bafybeiggmtowjgzipzltz2alx7hfhpj6c6uzwk4zvptcvdnnnmwxkig3b4
-  dummy_subpackage/foo.py: bafybeieo7qjgnysk2kz35koufsaxhlnhitsnpkpsjsegnuxrt7wxpi7wmu
+  dummy_subpackage/foo.py: bafybeignhxm6yxfgakitmqwqjngk2gseb7zcyedcrfmpbcgd67f6piiave
   handlers.py: bafybeicpyry2q67vnecogtsflnsvtdzhx6b6tyyhhoxeg2dbkdmmdhhpfm
-  tasks.py: bafybeiaaxcmvpo2xdaox6nz6nvqdpt5ldpyzepv3sm5dd73nevec5da6t4
+  tasks.py: bafybeigr2d3j62zzf4mgwmqiog4pnsqspmqexbvu4xv5insapq72fixnfa
 fingerprint_ignore_patterns: []
 contracts: []
 protocols:

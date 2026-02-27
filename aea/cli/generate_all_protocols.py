@@ -39,7 +39,6 @@ import shutil
 import subprocess  # nosec
 import sys
 import tempfile
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from pathlib import Path
 from typing import Any, List, Tuple, cast
 
@@ -57,7 +56,7 @@ from aea.configurations.constants import (
 )
 from aea.configurations.data_types import PackageId, PublicId
 from aea.configurations.loader import ConfigLoaders, load_component_configuration
-from aea.exceptions import enforce
+from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.git import check_working_tree_is_dirty
 from aea.helpers.protocols import get_protocol_specification_from_readme
 from aea.manager.helpers import AEAProject
@@ -70,6 +69,11 @@ PROTOCOL_GENERATOR_DOCSTRING_REGEX = "It was created with protocol buffer compil
 logging.basicConfig(format="[%(asctime)s][%(levelname)s] %(message)s")
 logger = logging.getLogger("generate_all_protocols")
 logger.setLevel(logging.INFO)
+
+
+def _compile_regex(pattern: str) -> Any:
+    """Compile regex pattern."""
+    return re.compile(pattern)
 
 
 def find_protocols_in_local_registry(packages_dir: Path) -> List[Path]:
@@ -122,29 +126,25 @@ def run_isort_and_black(directory: Path, **kwargs: Any) -> None:
     kwargs["stdout"] = subprocess.PIPE
 
     try:
-        # check if black and isort is installed
-        import black  # type: ignore  # noqa  # pylint: disable=unused-import,import-outside-toplevel
-        import isort  # type: ignore  # noqa  # pylint: disable=unused-import,import-outside-toplevel
-    except ImportError as e:
+        AEAProject.run_cli(
+            sys.executable,
+            "-m",
+            "black",
+            "-q",
+            str(directory.absolute()),
+            **kwargs,
+        )
+        AEAProject.run_cli(
+            sys.executable,
+            "-m",
+            "isort",
+            "--settings-path",
+            "setup.cfg",
+            str(directory.absolute()),
+            **kwargs,
+        )
+    except AEAEnforceError as e:
         raise click.ClickException(str(e)) from e
-
-    AEAProject.run_cli(
-        sys.executable,
-        "-m",
-        "black",
-        "-q",
-        str(directory.absolute()),
-        **kwargs,
-    )
-    AEAProject.run_cli(
-        sys.executable,
-        "-m",
-        "isort",
-        "--settings-path",
-        "setup.cfg",
-        str(directory.absolute()),
-        **kwargs,
-    )
 
 
 def _fix_generated_protocol(package_path: Path) -> None:
@@ -175,9 +175,10 @@ def _fix_generated_protocol(package_path: Path) -> None:
     tests_module = package_path / AEA_TEST_DIRNAME
     if tests_module.is_dir():
         log(f"Restore original `tests` directory in {package_path}")
-        copy_tree(
+        shutil.copytree(
             str(tests_module),
             str(Path(PROTOCOLS, package_path.name, AEA_TEST_DIRNAME)),
+            dirs_exist_ok=True,
         )
 
 
@@ -217,7 +218,7 @@ def _parse_generator_docstring(package_path: Path) -> str:
     :return: the docstring
     """
     content = (package_path / "__init__.py").read_text()
-    regex = re.compile(PROTOCOL_GENERATOR_DOCSTRING_REGEX)
+    regex = _compile_regex(PROTOCOL_GENERATOR_DOCSTRING_REGEX)
     match = regex.search(content)
     if match is None:
         raise ValueError("protocol generator docstring not found")

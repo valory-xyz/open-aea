@@ -352,8 +352,9 @@ class ThreadedAsyncRunner(Thread):
         _default_logger.debug("Stopped.")
 
 
-ready_future: Future = Future()
-ready_future.set_result(None)
+def _ready_awaitable() -> Coroutine[Any, Any, None]:
+    """Return an already-completed awaitable without requiring a pre-existing loop."""
+    return asyncio.sleep(0)
 
 
 class Runnable(ABC):
@@ -490,14 +491,14 @@ class Runnable(ABC):
         """
         if not self._task:
             _default_logger.warning("Runnable is not started")
-            return ready_future
+            return _ready_awaitable()
 
         if self._got_result and not force_result:
-            return ready_future
+            return _ready_awaitable()
 
         if sync:
             self._wait_sync(timeout)
-            return ready_future
+            return _ready_awaitable()
 
         return asyncio.wait_for(self._wait_async(timeout), timeout=timeout)
 

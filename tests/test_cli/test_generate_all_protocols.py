@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -208,7 +208,10 @@ class TestGenerateAllProtcols(BaseGenerateAllProtocolsTestCase):
 
         with self.find_packages_patch, mock.patch.object(
             AEAProject, "run_cli", new=_run_cli_patch
-        ), mock.patch("re.compile", return_value=mock.MagicMock(search=lambda _: None)):
+        ), mock.patch(
+            "aea.cli.generate_all_protocols._compile_regex",
+            return_value=mock.MagicMock(search=lambda _: None),
+        ):
             with pytest.raises(
                 ValueError, match="protocol generator docstring not found"
             ):

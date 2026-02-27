@@ -36,7 +36,7 @@ def get_all_extras() -> Dict:
         "packaging==26",
         "pytest>=8.2,<10",
         "coverage>=6.4.4,<8.0.0",
-        "jsonschema<4.4.0,>=4.3.0",
+        "jsonschema<4.24.0,>=4.3.0",
         "semver>=2.9.1,<3.0.0",
     ]
 
@@ -55,12 +55,12 @@ all_extras = get_all_extras()
 base_deps = [
     "semver>=2.9.1,<3.0.0",
     "base58>=1.0.3,<3.0.0",
-    "jsonschema<4.4.0,>=4.3.0",
+    "jsonschema<4.24.0,>=4.3.0",
     "packaging==26",
-    "protobuf<4.25.0,>=4.21.6",
+    "protobuf<6,>=5",
     "pymultihash==0.8.2",
     "pyyaml>=6.0.1,<7",
-    "requests>=2.28.1,<3",
+    "requests>=2.32.5,<3",
     "python-dotenv>=0.14.0,<1.0.1",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",

@@ -511,7 +511,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         cls._outbox = OutBox(cast(Multiplexer, cls._multiplexer))
         cls._skill = cls._prepare_skill(**kwargs)
 
-    def setup(self, **kwargs: Any) -> None:
+    def setup_method(self, **kwargs: Any) -> None:
         """
         Set up the test method.
 
@@ -571,7 +571,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
 
         return Skill.from_config(skill_config, agent_context)
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """
         Teardown the test method.
 

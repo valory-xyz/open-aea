@@ -808,7 +808,7 @@ def test_multiplexer_setup():
 class TestExceptionHandlingOnConnectionSend:
     """Test exception handling policy on connection.send."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up test case."""
         self.connection = _make_dummy_connection()
         self.multiplexer = Multiplexer(
@@ -825,7 +825,7 @@ class TestExceptionHandlingOnConnectionSend:
         )
         self.exception = ValueError("expected")
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down test case."""
         self.multiplexer.disconnect()
 
@@ -889,7 +889,7 @@ class TestExceptionHandlingOnConnectionSend:
 class TestMultiplexerDisconnectsOnTermination:  # pylint: disable=attribute-defined-outside-init
     """Test multiplexer disconnects on  agent process keyboard interrupted."""
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.proc = None
         self.runner = CliRunner()
@@ -1032,7 +1032,7 @@ class TestMultiplexerDisconnectsOnTermination:  # pylint: disable=attribute-defi
             timeout=20,
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear the test down."""
         if self.proc:
             self.proc.wait_to_complete(10)

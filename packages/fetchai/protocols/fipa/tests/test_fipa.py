@@ -38,7 +38,9 @@ from aea.protocols.dialogue.base import DialogueLabel
 
 from packages.fetchai.protocols.fipa import message
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue, FipaDialogues
-from packages.fetchai.protocols.fipa.message import FipaMessage
+from packages.fetchai.protocols.fipa.message import (
+    FipaMessage,
+)
 from packages.fetchai.protocols.fipa.message import (
     _default_logger as fipa_message_logger,
 )

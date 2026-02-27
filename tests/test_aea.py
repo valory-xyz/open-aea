@@ -711,7 +711,7 @@ class TestAeaExceptionPolicy:
         """Raise exception for tests."""
         raise ExpectedExcepton("we wait it!")
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Set test cae instance."""
         agent_name = "my_agent"
 
@@ -851,7 +851,7 @@ class TestAeaExceptionPolicy:
 
         assert not self.aea.is_running
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Stop AEA if not stopped."""
         self.aea.stop()
 

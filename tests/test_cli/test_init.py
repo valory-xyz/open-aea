@@ -37,7 +37,7 @@ from tests.conftest import CLI_LOG_OPTION, CliRunner, random_string
 class TestDoInit:
     """Test that the command 'aea init'."""
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.runner = CliRunner()
         self.agent_name = "myagent"
@@ -132,7 +132,7 @@ class TestDoInit:
         )
         assert result.exit_code == 0
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear the test down."""
         self.cli_config_patch.stop()
         os.chdir(self.cwd)

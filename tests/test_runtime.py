@@ -47,7 +47,7 @@ class BaseTestRuntime:
     # set a copy to prevent lasting state changes via class attributes
     RUNTIME: Type[BaseRuntime]
 
-    def setup(self):
+    def setup_method(self):
         """Set up case."""
         agent_name = "my_agent"
         private_key_path = os.path.join(CUR_PATH, "data", DEFAULT_PRIVATE_KEY_FILE)
@@ -73,7 +73,7 @@ class BaseTestRuntime:
         )
         self.agent._runtime = self.runtime
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down."""
         self.runtime.stop()
         self.runtime.wait_completed(sync=True)

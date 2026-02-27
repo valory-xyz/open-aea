@@ -38,7 +38,9 @@ from aea.registries.resources import Resources
 from aea.runner import AEARunner
 from aea.skills.base import Handler
 from benchmark.checks.utils import get_mem_usage_in_mb  # noqa: I100
-from benchmark.checks.utils import PACKAGES_DIR
+from benchmark.checks.utils import (
+    PACKAGES_DIR,
+)
 from benchmark.checks.utils import make_agent as base_make_agent
 from benchmark.checks.utils import (
     make_skill,

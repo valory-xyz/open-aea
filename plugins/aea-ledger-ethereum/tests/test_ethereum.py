@@ -89,7 +89,7 @@ class EIP1559Networks(Enum):
     OPTIMISM = "https://mainnet.optimism.io"
     BASE = "https://mainnet.base.org"
     MODE = "https://mainnet.mode.network"
-    POLYGON = "https://polygon-rpc.com"
+    POLYGON = "https://polygon.drpc.org"
     FRAXTAL = "https://rpc.frax.com"
 
 
@@ -1015,7 +1015,12 @@ def test_try_get_gas_pricing(
             },
             False,
         ),
-        ({"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137}, None, True),
+        pytest.param(
+            {"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137},
+            None,
+            True,
+            marks=pytest.mark.xfail(reason="Polygon RPC is flaky on CI"),
+        ),
         ({"address": RPCS[EIP1559Networks.FRAXTAL], "chain_id": 252}, None, False),
     ),
 )

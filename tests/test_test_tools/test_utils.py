@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class TestCopyClass:
     cls: Type
     copy_of_cls: Type
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
 
         # redefine for each test

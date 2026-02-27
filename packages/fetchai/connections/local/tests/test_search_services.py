@@ -51,7 +51,9 @@ from packages.fetchai.connections.local.tests.test_misc import make_local_connec
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue, FipaDialogues
 from packages.fetchai.protocols.fipa.message import FipaMessage
-from packages.fetchai.protocols.oef_search.dialogues import OefSearchDialogue
+from packages.fetchai.protocols.oef_search.dialogues import (
+    OefSearchDialogue,
+)
 from packages.fetchai.protocols.oef_search.dialogues import (
     OefSearchDialogues as BaseOefSearchDialogues,
 )
@@ -212,7 +214,7 @@ class TestEmptySearch:
 class TestSimpleSearchResult:
     """Test that a simple search result return the expected result."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test."""
         self.node = LocalNode()
         self.node.start()
@@ -282,7 +284,7 @@ class TestSimpleSearchResult:
         assert search_result.performative == OefSearchMessage.Performative.SEARCH_RESULT
         assert search_result.agents == (self.address_1,)
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown the test."""
         self.multiplexer.disconnect()
         self.node.stop()
