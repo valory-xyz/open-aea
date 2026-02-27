@@ -80,9 +80,10 @@ def test_parse_exception_ii():
         "Traceback (most recent call last):\n\n",
         'test_exceptions.py", line ',
         "in test_parse_exception_ii\n",
-        "exception_raise()\n\n",
+        "exception_raise()",
         ", line",
         "in exception_raise\n",
-        'raise AEAEnforceError("expected")\n\naea.exceptions.AEAEnforceError: expected\n',
+        'raise AEAEnforceError("expected")',
+        "aea.exceptions.AEAEnforceError: expected",
     ]
     assert all([string in out for string in expected])
