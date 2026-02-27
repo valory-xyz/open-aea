@@ -71,6 +71,11 @@ logger = logging.getLogger("generate_all_protocols")
 logger.setLevel(logging.INFO)
 
 
+def _compile_regex(pattern: str) -> Any:
+    """Compile regex pattern."""
+    return re.compile(pattern)
+
+
 def find_protocols_in_local_registry(packages_dir: Path) -> List[Path]:
     """Find all protocols in local registry."""
     return [
@@ -217,7 +222,7 @@ def _parse_generator_docstring(package_path: Path) -> str:
     :return: the docstring
     """
     content = (package_path / "__init__.py").read_text()
-    regex = re.compile(PROTOCOL_GENERATOR_DOCSTRING_REGEX)
+    regex = _compile_regex(PROTOCOL_GENERATOR_DOCSTRING_REGEX)
     match = regex.search(content)
     if match is None:
         raise ValueError("protocol generator docstring not found")
