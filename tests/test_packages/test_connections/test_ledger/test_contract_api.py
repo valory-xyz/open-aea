@@ -539,38 +539,43 @@ def test_build_response_fails_on_bad_data_type():
     """Test internal build_response functions for data type check."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    dispatcher = ContractApiRequestDispatcher(MagicMock(), connection_id="test_id")
-    with patch.object(
-        dispatcher,
-        "dispatch_request",
-        lambda x, x1, x2, fn: fn(data=b"some_data", dialogue=MagicMock()),
-    ), pytest.raises(
-        ValueError, match=r"Invalid state type, got=<class '.+'>, expected=typing.Dict"
-    ):
-        dispatcher.get_state(MagicMock(), MagicMock(), MagicMock())
-
-    with patch.object(
-        dispatcher,
-        "dispatch_request",
-        lambda x, x1, x2, fn: fn(raw_message=12, dialogue=MagicMock()),
-    ), pytest.raises(ValueError, match=r"Invalid message type"):
-        dispatcher.get_raw_message(MagicMock(), MagicMock(), MagicMock())
-
-    with patch.object(
-        dispatcher,
-        "dispatch_request",
-        lambda x, x1, x2, fn: fn(transaction=b"some_data", dialogue=MagicMock()),
-    ):
-        with pytest.raises(
+    try:
+        dispatcher = ContractApiRequestDispatcher(MagicMock(), connection_id="test_id")
+        with patch.object(
+            dispatcher,
+            "dispatch_request",
+            lambda x, x1, x2, fn: fn(data=b"some_data", dialogue=MagicMock()),
+        ), pytest.raises(
             ValueError,
-            match=r"Invalid transaction type, got=<class '.+'>, expected=typing.Dict",
+            match=r"Invalid state type, got=<class '.+'>, expected=typing.Dict",
         ):
-            dispatcher.get_deploy_transaction(MagicMock(), MagicMock(), MagicMock())
-        with pytest.raises(
-            ValueError,
-            match=r"Invalid transaction type, got=<class '.+'>, expected=typing.Dict",
+            dispatcher.get_state(MagicMock(), MagicMock(), MagicMock())
+
+        with patch.object(
+            dispatcher,
+            "dispatch_request",
+            lambda x, x1, x2, fn: fn(raw_message=12, dialogue=MagicMock()),
+        ), pytest.raises(ValueError, match=r"Invalid message type"):
+            dispatcher.get_raw_message(MagicMock(), MagicMock(), MagicMock())
+
+        with patch.object(
+            dispatcher,
+            "dispatch_request",
+            lambda x, x1, x2, fn: fn(transaction=b"some_data", dialogue=MagicMock()),
         ):
-            dispatcher.get_raw_transaction(MagicMock(), MagicMock(), MagicMock())
+            with pytest.raises(
+                ValueError,
+                match=r"Invalid transaction type, got=<class '.+'>, expected=typing.Dict",
+            ):
+                dispatcher.get_deploy_transaction(MagicMock(), MagicMock(), MagicMock())
+            with pytest.raises(
+                ValueError,
+                match=r"Invalid transaction type, got=<class '.+'>, expected=typing.Dict",
+            ):
+                dispatcher.get_raw_transaction(MagicMock(), MagicMock(), MagicMock())
+    finally:
+        asyncio.set_event_loop(None)
+        loop.close()
 
 
 def test_validate_and_call_callable():

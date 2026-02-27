@@ -393,3 +393,9 @@ docs
 EIP-1559
 RPCs
 pyinstaller
+CLAUDE
+claude
+isort
+asyncio
+lifecycle
+Envelopes
