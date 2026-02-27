@@ -27,7 +27,6 @@ from unittest import mock
 import click
 import pytest
 
-from aea.cli.packages import SyncTypes
 from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageId
 from aea.package_manager.base import PACKAGES_FILE
