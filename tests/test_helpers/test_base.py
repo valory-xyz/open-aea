@@ -81,14 +81,14 @@ class TestHelpersBase:
         """Test the locate function to locate modules."""
         cwd = os.getcwd()
         os.chdir(os.path.join(CUR_PATH, ".."))
-        gym_package = locate(
-            "packages.fetchai.connections.gym.connection.GymConnection"
+        local_package = locate(
+            "packages.fetchai.connections.local.connection.OEFLocalConnection"
         )
         non_existing_package = locate(
             "packages.fetchai.connections.non_existing_connection"
         )
         os.chdir(cwd)
-        assert gym_package is not None
+        assert local_package is not None
         assert non_existing_package is None
 
     def test_locate_class(self):
@@ -133,12 +133,12 @@ def test_regex_constrained_string_initialization():
 def test_load_module():
     """Test load module from filepath and dotted notation."""
     load_module(
-        "packages.fetchai.connections.gym.connection",
+        "packages.fetchai.connections.local.connection",
         Path(ROOT_DIR)
         / "packages"
         / "fetchai"
         / "connections"
-        / "gym"
+        / "local"
         / "connection.py",
     )
 

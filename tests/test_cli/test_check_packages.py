@@ -83,7 +83,7 @@ class TestCheckPackagesCommand(BaseAEATestCase):
             cls.t / "packages" / "fetchai" / "agents" / "error_test" / "aea-config.yaml"
         )
         cls.test_connection_config = (
-            cls.t / "packages" / "fetchai" / "connections" / "gym" / "connection.yaml"
+            cls.t / "packages" / "fetchai" / "connections" / "local" / "connection.yaml"
         )
 
     def test_invocation(
@@ -197,7 +197,7 @@ class TestCheckPackagesCommand(BaseAEATestCase):
                     "find_public_id_assignments": "",
                 },
                 exit_code=1,
-                message="expected unique definition of PUBLIC_ID for package fetchai/gym:0.19.0 of type connection; found 0",
+                message="expected unique definition of PUBLIC_ID for package fetchai/local:0.20.0 of type connection; found 0",
             ),
             _TestPublicIdParameters(
                 mocked_values={
@@ -205,12 +205,12 @@ class TestCheckPackagesCommand(BaseAEATestCase):
                     "find_public_id_from_str": "match",
                 },
                 exit_code=1,
-                message="expected fetchai/gym:0.19.0 for package of type connection; found 'match'",
+                message="expected fetchai/local:0.20.0 for package of type connection; found 'match'",
             ),
             _TestPublicIdParameters(
                 mocked_values={
                     "find_public_id_assignments": [None],
-                    "find_public_id_from_str": "fetchai/gym:0.19.0",
+                    "find_public_id_from_str": "fetchai/local:0.20.0",
                 },
                 exit_code=0,
                 message="OK!",
@@ -222,13 +222,13 @@ class TestCheckPackagesCommand(BaseAEATestCase):
                     "find_public_id_components": [None, None, None],
                 },
                 exit_code=1,
-                message="expected fetchai/gym:0.19.0 for package of type connection; found 'None/None:None'",
+                message="expected fetchai/local:0.20.0 for package of type connection; found 'None/None:None'",
             ),
             _TestPublicIdParameters(
                 mocked_values={
                     "find_public_id_assignments": [None],
                     "find_public_id_from_str": None,
-                    "find_public_id_components": ["fetchai", "gym", "0.19.0"],
+                    "find_public_id_components": ["fetchai", "local", "0.20.0"],
                 },
                 exit_code=0,
                 message="OK!",
@@ -240,7 +240,7 @@ class TestCheckPackagesCommand(BaseAEATestCase):
                     "find_public_id_components": None,
                 },
                 exit_code=1,
-                message="expected fetchai/gym:0.19.0 for package of type connection; found ",
+                message="expected fetchai/local:0.20.0 for package of type connection; found ",
             ),
         ],
     )

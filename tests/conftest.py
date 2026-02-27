@@ -280,7 +280,6 @@ protocol_config_files = [
     os.path.join(VALORY_REF, "protocols", "contract_api", PROTOCOL_YAML),
     os.path.join(FETCHAI_PREF, "protocols", "default", PROTOCOL_YAML),
     os.path.join(FETCHAI_PREF, "protocols", "fipa", PROTOCOL_YAML),
-    os.path.join(FETCHAI_PREF, "protocols", "gym", PROTOCOL_YAML),
     os.path.join(VALORY_REF, "protocols", "http", PROTOCOL_YAML),
     os.path.join(VALORY_REF, "protocols", "ledger_api", PROTOCOL_YAML),
     os.path.join(FETCHAI_PREF, "protocols", "oef_search", PROTOCOL_YAML),
@@ -293,7 +292,6 @@ protocol_config_files = [
 
 connection_config_files = [
     os.path.join(ROOT_DIR, "aea", "connections", "scaffold", CONNECTION_YAML),
-    os.path.join(FETCHAI_PREF, "connections", "gym", CONNECTION_YAML),
     os.path.join(VALORY_REF, "connections", "http_client", CONNECTION_YAML),
     os.path.join(VALORY_REF, "connections", "ledger", CONNECTION_YAML),
     os.path.join(FETCHAI_PREF, "connections", "local", CONNECTION_YAML),
@@ -303,7 +301,7 @@ connection_config_files = [
     os.path.join(VALORY_REF, "connections", "p2p_libp2p_client", CONNECTION_YAML),
     os.path.join(VALORY_REF, "connections", "p2p_libp2p_mailbox", CONNECTION_YAML),
     os.path.join(CUR_PATH, "data", "dummy_connection", CONNECTION_YAML),
-    os.path.join(CUR_PATH, "data", "gym-connection.yaml"),
+    os.path.join(CUR_PATH, "data", "local-connection.yaml"),
 ]
 
 skill_config_files = [
@@ -314,7 +312,6 @@ skill_config_files = [
     os.path.join(FETCHAI_PREF, "skills", "error", SKILL_YAML),
     os.path.join(FETCHAI_PREF, "skills", "generic_buyer", SKILL_YAML),
     os.path.join(FETCHAI_PREF, "skills", "generic_seller", SKILL_YAML),
-    os.path.join(FETCHAI_PREF, "skills", "gym", SKILL_YAML),
     os.path.join(FETCHAI_PREF, "skills", "http_echo", SKILL_YAML),
     DUMMY_SKILL_PATH,
     os.path.join(CUR_PATH, "data", "dummy_aea", "skills", "dummy", SKILL_YAML),
