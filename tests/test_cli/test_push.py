@@ -94,13 +94,18 @@ class TestPushLocally(AEATestCaseEmpty):
         copy_tree_mock,
     ):
         """Test ok for vendor's item."""
-
-        with mock.patch("click.core._"):
-            with mock.patch(
-                "os.path.exists",
-                side_effect=[False, True, False, False, False, True, False],
-            ):
-                self.invoke("push", "--local", "skill", "fetchai/echo")
+        vendor_path = os.path.join("vendor", "fetchai", "skills", "echo")
+        target_path = os.path.join("target", "fetchai", "skills", "echo")
+        with mock.patch(
+            "aea.cli.push.try_get_item_source_path",
+            side_effect=[ClickException("not found"), vendor_path],
+        ), mock.patch(
+            "aea.cli.push.check_package_public_id",
+        ), mock.patch(
+            "aea.cli.push.try_get_item_target_path",
+            return_value=target_path,
+        ):
+            self.invoke("push", "--local", "skill", "fetchai/echo")
 
         copy_tree_mock.assert_called_once()
         src_path, dst_path = copy_tree_mock.mock_calls[0][1]

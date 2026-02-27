@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,22 +48,28 @@ class Task(AbstractExecutorTask):
 
 def test_task_failed():
     """Test task failed."""
-    task = Task()
-    assert not task.failed
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        task = Task()
+        assert not task.failed
 
-    task.future = asyncio.Future()
-    assert not task.failed
+        task.future = loop.create_future()
+        assert not task.failed
 
-    task.future.set_result(None)
+        task.future.set_result(None)
 
-    assert not task.failed
+        assert not task.failed
 
-    task.future = asyncio.Future()
-    task.future.set_exception(KeyboardInterrupt())
+        task.future = loop.create_future()
+        task.future.set_exception(KeyboardInterrupt())
 
-    assert not task.failed
+        assert not task.failed
 
-    task.future = asyncio.Future()
-    task.future.set_exception(ValueError())
+        task.future = loop.create_future()
+        task.future.set_exception(ValueError())
 
-    assert task.failed
+        assert task.failed
+    finally:
+        asyncio.set_event_loop(None)
+        loop.close()

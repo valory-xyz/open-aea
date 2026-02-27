@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,6 +80,8 @@ async def test_sync_connection():
     con = SampleConnection(conf, MagicMock())
     await asyncio.wait_for(con.connect(), timeout=10)
     assert con.is_connected
+    # Allow main() to complete in the thread pool before sends claim all workers
+    await asyncio.sleep(0.1)
     envelope = Mock()
 
     for i in range(10):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -226,7 +226,7 @@ class TestCreate:
     @classmethod
     def teardown_class(cls):
         """Tear the test down."""
-        cls.cli_config_patch.start()
+        cls.cli_config_patch.stop()
         os.chdir(cls.cwd)
         try:
             shutil.rmtree(cls.t)

@@ -302,11 +302,11 @@ def registry_flag(
 
     def wrapper(f: Callable) -> Callable:
         f = option(
-            "--local",
+            "--mixed",
             "registry",
-            flag_value=REGISTRY_LOCAL,
-            help="To use a local registry.",
-            default=(REGISTRY_LOCAL == default_registry) and mark_default,
+            flag_value=REGISTRY_MIXED,
+            help="To use a local and remote registries.",
+            default=(REGISTRY_MIXED == default_registry) and mark_default,
         )(f)
         f = option(
             "--remote",
@@ -316,11 +316,11 @@ def registry_flag(
             default=(REGISTRY_REMOTE == default_registry) and mark_default,
         )(f)
         f = option(
-            "--mixed",
+            "--local",
             "registry",
-            flag_value=REGISTRY_MIXED,
-            help="To use a local and remote registries.",
-            default=(REGISTRY_MIXED == default_registry) and mark_default,
+            flag_value=REGISTRY_LOCAL,
+            help="To use a local registry.",
+            default=(REGISTRY_LOCAL == default_registry) and mark_default,
         )(f)
         return f
 
@@ -345,18 +345,18 @@ def remote_registry_flag(
 
     def wrapper(f: Callable) -> Callable:
         f = option(
-            "--ipfs",
-            "remote_registry",
-            flag_value=REMOTE_IPFS,
-            help="To use an IPFS registry.",
-            default=(REMOTE_IPFS == default_registry) and mark_default,
-        )(f)
-        f = option(
             "--http",
             "remote_registry",
             flag_value=REMOTE_HTTP,
             help="To use an HTTP registry.",
             default=(REMOTE_HTTP == default_registry) and mark_default,
+        )(f)
+        f = option(
+            "--ipfs",
+            "remote_registry",
+            flag_value=REMOTE_IPFS,
+            help="To use an IPFS registry.",
+            default=(REMOTE_IPFS == default_registry) and mark_default,
         )(f)
         return f
 
