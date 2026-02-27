@@ -254,7 +254,7 @@ class Context:
                                 extra dependencies and agent dependencies have conflicts
                                 the packages from extra dependencies list will be prefered
                                 over the agent dependencies
-        :return: a list of dependency version specification. e.g. ["gym >= 1.0.0"]
+        :return: a list of dependency version specification. e.g. ["web3 >= 1.0.0"]
         """
         dependencies: Dependencies = {}
 

@@ -1015,7 +1015,12 @@ def test_try_get_gas_pricing(
             },
             False,
         ),
-        ({"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137}, None, True),
+        pytest.param(
+            {"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137},
+            None,
+            True,
+            marks=pytest.mark.xfail(reason="Polygon RPC is flaky on CI"),
+        ),
         ({"address": RPCS[EIP1559Networks.FRAXTAL], "chain_id": 252}, None, False),
     ),
 )

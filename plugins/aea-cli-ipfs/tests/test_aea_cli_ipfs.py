@@ -144,7 +144,8 @@ def test_node_not_alive_can_not_be_started():
     ), patch("time.sleep"), patch("subprocess.Popen"), patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs"
     ), patch(
-        "aea_cli_ipfs.ipfs_utils.IPFSDaemon.start"
+        "aea_cli_ipfs.ipfs_utils.IPFSDaemon.start",
+        side_effect=ConnectionError(None, "oops"),
     ), patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
     ):

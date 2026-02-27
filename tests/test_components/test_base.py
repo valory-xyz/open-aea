@@ -264,7 +264,7 @@ def test_load_all_aea_protocol_packages(
 ) -> None:
     """Load all AEA component packages."""
 
-    to_be_skipped = {os.path.join(CUR_PATH, "data", "gym-connection.yaml")}
+    to_be_skipped = {os.path.join(CUR_PATH, "data", "local-connection.yaml")}
 
     if config_file_path in to_be_skipped:
         pytest.skip(
