@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains helper function to extract code from the .md files."""
+
 import traceback
 from functools import partial
 from pathlib import Path
@@ -26,7 +27,6 @@ from typing import Dict, List, Optional
 
 import mistune
 import pytest
-
 
 MISTUNE_BLOCK_CODE_ID = "block_code"
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """The tests module contains the tests of the packages/contracts/erc1155 dir."""
+
 # type: ignore # noqa: E800
 # pylint: skip-file
 
@@ -51,7 +52,6 @@ from aea.configurations.loader import (
 from aea.contracts.base import Contract, contract_registry
 from aea.test_tools.test_contract import BaseContractTestCase
 
-
 PACKAGE_DIR = Path(__file__).parent.parent
 MAX_FLAKY_RERUNS = 3
 
@@ -66,9 +66,9 @@ class TestERC1155ContractEthereum(BaseContractTestCase):
     path_to_contract = PACKAGE_DIR
 
     @classmethod
-    def setup(cls) -> None:
+    def setup_method(cls) -> None:
         """Setup."""
-        super().setup(
+        super().setup_method(
             ledger_config=ETHEREUM_TESTNET_CONFIG,
             deployer_private_key_path=ETHEREUM_PRIVATE_KEY_PATH,
             item_owner_private_key_path=ETHEREUM_PRIVATE_KEY_TWO_PATH,
@@ -1056,7 +1056,7 @@ class TestContractCommon:
             Contract.from_config(configuration)
         cls.contract = contract_registry.make(str(configuration.public_id))
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test method."""
         self.token_ids_a = [
             340282366920938463463374607431768211456,

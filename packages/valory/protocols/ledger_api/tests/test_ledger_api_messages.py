@@ -35,7 +35,6 @@ from packages.valory.protocols.ledger_api.custom_types import (
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 LEDGER_ID = "ethereum"
 
 

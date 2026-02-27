@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,6 @@ from aea.test_tools.test_cases import AEATestCaseEmpty
 
 from tests.common.utils import wait_for_condition
 from tests.conftest import MAX_FLAKY_RERUNS
-
 
 skip_fetchai_test_macos = pytest.mark.skipif(
     condition=(platform.system() == "Darwin"),

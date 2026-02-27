@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains tests for transaction."""
+
 # pylint: skip-file
 
 from typing import List, Type

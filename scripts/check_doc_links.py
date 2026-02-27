@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 """Script to check that all internal doc links are valid."""
+
 import re
 import sys
 import xml.etree.ElementTree as ET  # nosec
@@ -32,7 +33,6 @@ from requests.adapters import HTTPAdapter  # type: ignore
 from requests.packages.urllib3.util.retry import (  # type: ignore # pylint: disable=import-error
     Retry,
 )
-
 
 LINK_PATTERN_MD = re.compile(r"\[([^]]+)]\(\s*([^]]+)\s*\)")
 LINK_PATTERN = re.compile(r'(?<=<a href=")[^"]*')

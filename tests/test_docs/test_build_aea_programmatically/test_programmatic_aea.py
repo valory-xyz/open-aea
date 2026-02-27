@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,6 @@ from aea.test_tools.test_cases import BaseAEATestCase
 from tests.conftest import CUR_PATH, ROOT_DIR
 from tests.test_docs.helper import extract_code_blocks, extract_python_code
 from tests.test_docs.test_build_aea_programmatically.programmatic_aea import run
-
 
 MD_FILE = "docs/build-aea-programmatically.md"
 PY_FILE = "test_docs/test_build_aea_programmatically/programmatic_aea.py"

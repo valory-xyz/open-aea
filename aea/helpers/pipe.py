@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Portable pipe implementation for Linux, MacOS, and Windows."""
+
 import asyncio
 import errno
 import logging
@@ -32,7 +33,6 @@ from shutil import rmtree
 from typing import IO, Optional
 
 from aea.exceptions import enforce
-
 
 _default_logger = logging.getLogger(__name__)
 
@@ -372,10 +372,13 @@ class TCPSocketChannel(IPCChannel):
             await asyncio.wait_for(self._connected.wait(), timeout)
         except asyncio.TimeoutError as e:  # pragma: no cover
             self.logger.debug(f"Error while connecting {e}")
+            if self._server is not None:
+                self._server.close()
+                await self._server.wait_closed()
             return False
 
-        self._server.close()
-        await self._server.wait_closed()
+        if self._server is not None:
+            self._server.close()
 
         return True
 
@@ -415,6 +418,8 @@ class TCPSocketChannel(IPCChannel):
         if self._sock is None:
             raise ValueError("Socket pipe not connected.")  # pragma: nocover
         await self._sock.close()
+        if self._server is not None:
+            await self._server.wait_closed()
 
     @property
     def in_path(self) -> str:

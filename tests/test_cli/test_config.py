@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea config` sub-command."""
+
 import json
 import os
 import shutil
@@ -605,7 +606,7 @@ class TestConfigNestedGetSet:
     INITIAL_VALUE = 1
     NEW_VALUE = 100
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.cwd = os.getcwd()
         self.t = tempfile.mkdtemp()
@@ -617,7 +618,7 @@ class TestConfigNestedGetSet:
         os.chdir(Path(self.t, "dummy_aea"))
         self.runner = CliRunner()
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear dowm the test."""
         os.chdir(self.cwd)
         try:

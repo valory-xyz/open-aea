@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ from aea.helpers.search.models import Constraint, ConstraintType, Location, Quer
 from aea.skills.base import Model
 
 from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as CONTRACT_ID
-
 
 DEFAULT_LOCATION = {"longitude": 0.1270, "latitude": 51.5194}
 DEFAULT_SEARCH_QUERY = {

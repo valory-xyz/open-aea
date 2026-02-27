@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,10 +33,10 @@ def get_all_extras() -> Dict:
     cli_deps = [
         "click>=8.1.0,<8.3.0",
         "pyyaml>=6.0.1,<9",
-        "packaging>=23.1,<24.0",
-        "pytest>=7.0.0,<8.0.0",
+        "packaging==26",
+        "pytest>=8.2,<10",
         "coverage>=6.4.4,<8.0.0",
-        "jsonschema<4.4.0,>=4.3.0",
+        "jsonschema<4.24.0,>=4.3.0",
         "semver>=2.9.1,<3.0.0",
     ]
 
@@ -55,12 +55,12 @@ all_extras = get_all_extras()
 base_deps = [
     "semver>=2.9.1,<3.0.0",
     "base58>=1.0.3,<3.0.0",
-    "jsonschema<4.4.0,>=4.3.0",
-    "packaging>=23.1,<24.0",
-    "protobuf<4.25.0,>=4.21.6",
+    "jsonschema<4.24.0,>=4.3.0",
+    "packaging==26",
+    "protobuf<6,>=5",
     "pymultihash==0.8.2",
     "pyyaml>=6.0.1,<7",
-    "requests>=2.28.1,<3",
+    "requests>=2.32.5,<3",
     "python-dotenv>=0.14.0,<1.0.1",
     "ecdsa>=0.15,<0.17.0",
     "morphys>=1.0",
@@ -116,6 +116,9 @@ if __name__ == "__main__":
             "Operating System :: Unix",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13",
+            "Programming Language :: Python :: 3.14",
             "Topic :: Communications",
             "Topic :: Internet",
             "Topic :: Scientific/Engineering",

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,6 @@ from aea.helpers.search.generic import (
 from aea.helpers.search.models import Description, Location, Query
 from aea.helpers.transaction.base import Terms
 from aea.skills.base import Model
-
 
 DEFAULT_IS_LEDGER_TX = True
 

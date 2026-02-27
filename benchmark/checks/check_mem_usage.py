@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage check."""
+
 import time
 from threading import Thread
 from typing import Any, List, Tuple, Union

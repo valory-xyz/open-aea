@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the behaviour classes of the generic buyer skill."""
+
 # pylint: skip-file
 
 import logging
@@ -47,7 +48,6 @@ from packages.fetchai.skills.generic_buyer.strategy import GenericStrategy
 from packages.valory.connections.ledger.connection import PUBLIC_ID as LEDGER_PUBLIC_ID
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
 
-
 ETHEREUM = "ethereum"
 PACKAGE_ROOT = Path(__file__).parent.parent
 
@@ -71,14 +71,14 @@ class TestSearchBehaviour(BaseSkillTestCase):
 
         cls.logger = cls._skill.skill_context.logger
 
-    def setup(self):
+    def setup_method(self):
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
         self.tx_behaviour.waiting.clear()
 
@@ -204,9 +204,9 @@ class TestTransactionBehaviour(BaseSkillTestCase):
             ),
         )
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
         fipa_dialogue = cast(
             FipaDialogue,
@@ -234,9 +234,9 @@ class TestTransactionBehaviour(BaseSkillTestCase):
         self.ledger_api_dialogue = ledger_api_dialogue
         self.fipa_dialogue = fipa_dialogue
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
         self.transaction_behaviour.teardown()
 

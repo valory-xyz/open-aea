@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for the pipe module."""
+
 import asyncio
 from threading import Thread
 from unittest import mock
@@ -76,11 +77,13 @@ class TestAEAHelperMakePipe:
         client.start()
 
         try:
-            assert await connected, "Failed to connect pipe"
+            assert await asyncio.wait_for(
+                connected, timeout=5.0
+            ), "Failed to connect pipe"
 
             message = b"hello"
             await pipe.write(message)
-            received = await pipe.read()
+            received = await asyncio.wait_for(pipe.read(), timeout=5.0)
 
             assert received == message, "Echoed message differs"
 
@@ -88,7 +91,8 @@ class TestAEAHelperMakePipe:
             raise
         finally:
             await pipe.close()
-            client.join()
+            client.join(timeout=5.0)
+            assert not client.is_alive(), "Echo thread did not terminate in time"
 
 
 @pytest.mark.asyncio
@@ -111,11 +115,13 @@ class TestAEAHelperTCPSocketChannel:
         client.start()
 
         try:
-            assert await connected, "Failed to connect pipe"
+            assert await asyncio.wait_for(
+                connected, timeout=5.0
+            ), "Failed to connect pipe"
 
             message = b"hello"
             await pipe.write(message)
-            received = await pipe.read()
+            received = await asyncio.wait_for(pipe.read(), timeout=5.0)
 
             assert received == message, "Echoed message differs"
 
@@ -123,7 +129,8 @@ class TestAEAHelperTCPSocketChannel:
             raise
         finally:
             await pipe.close()
-            client.join()
+            client.join(timeout=5.0)
+            assert not client.is_alive(), "Echo thread did not terminate in time"
 
     @pytest.mark.asyncio
     async def test_connection_refused(self):
@@ -142,10 +149,16 @@ class TestAEAHelperTCPSocketChannel:
         """Test that TCP socket channel protocol write not set raises"""
 
         pipe = TCPSocketChannel()
-        reader = asyncio.StreamReader()
-        writer = asyncio.StreamWriter(mock.Mock(), mock.Mock(), reader, mock.Mock())
-        pipe._sock = TCPSocketProtocol(reader, writer)
-        assert pipe._sock.writer is writer
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            reader = asyncio.StreamReader()
+            writer = asyncio.StreamWriter(mock.Mock(), mock.Mock(), reader, mock.Mock())
+            pipe._sock = TCPSocketProtocol(reader, writer)
+            assert pipe._sock.writer is writer
+        finally:
+            asyncio.set_event_loop(None)
+            loop.close()
 
 
 def make_future(result) -> asyncio.Future:
@@ -176,11 +189,13 @@ class TestAEAHelperPosixNamedPipeChannel:
         client.start()
 
         try:
-            assert await connected, "Failed to connect pipe"
+            assert await asyncio.wait_for(
+                connected, timeout=5.0
+            ), "Failed to connect pipe"
 
             message = b"hello"
             await pipe.write(message)
-            received = await pipe.read()
+            received = await asyncio.wait_for(pipe.read(), timeout=5.0)
 
             assert received == message, "Echoed message differs"
 
@@ -188,4 +203,5 @@ class TestAEAHelperPosixNamedPipeChannel:
             raise
         finally:
             await pipe.close()
-            client.join()
+            client.join(timeout=5.0)
+            assert not client.is_alive(), "Echo thread did not terminate in time"

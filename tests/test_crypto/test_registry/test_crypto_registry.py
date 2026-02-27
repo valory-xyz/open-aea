@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,6 @@ from aea.crypto.registries.base import EntryPoint
 from aea.exceptions import AEAException
 
 from tests.data.custom_crypto import CustomCrypto
-
 
 logger = logging.getLogger(__name__)
 

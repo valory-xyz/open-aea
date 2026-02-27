@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ from aea_ledger_cosmos import CosmosApi, CosmosCrypto
 from aea.crypto.base import Crypto
 from aea.crypto.registries import make_crypto, make_ledger_api
 from aea.crypto.registries.base import ItemId, Registry
-
 
 COSMOS = CosmosCrypto.identifier
 

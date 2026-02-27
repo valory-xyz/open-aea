@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea launcher."""
+
 import shutil
 import time
 from multiprocessing import Event
@@ -35,7 +36,6 @@ from aea.test_tools.test_cases import AEATestCaseMany
 
 from tests.common.utils import wait_for_condition
 from tests.conftest import CUR_PATH, MAX_FLAKY_RERUNS
-
 
 TIMEOUT = 30
 

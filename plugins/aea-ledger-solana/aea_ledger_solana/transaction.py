@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the transaction helper for the solana module."""
+
 import json
 
 from solana.transaction import Transaction
 from solders.transaction import Transaction as SoldersTransaction
 from solders.transaction import VersionedTransaction as BaseSoldersVersionedTransaction
-
 
 SoldersVersionedTransaction = BaseSoldersVersionedTransaction
 

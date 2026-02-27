@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Conftest module for Pytest."""
+
 import inspect
 import logging
 import os
@@ -40,7 +41,6 @@ from aea_ledger_ethereum.ethereum import (
 from aea_ledger_ethereum.test_tools.docker_images import DockerImage, GanacheDockerImage
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
-
 
 CUR_PATH = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 ROOT_DIR = os.path.join(CUR_PATH, "..")

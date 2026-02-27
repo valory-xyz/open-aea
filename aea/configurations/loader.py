@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the parser for configuration file."""
+
 from io import StringIO
 from pathlib import Path
 from typing import (
@@ -55,7 +56,6 @@ from aea.configurations.validation import ConfigValidator, make_jsonschema_base_
 from aea.exceptions import enforce
 from aea.helpers.io import open_file
 from aea.helpers.yaml_utils import yaml_dump, yaml_dump_all, yaml_load, yaml_load_all
-
 
 _STARTING_INDEX_CUSTOM_CONFIGS = 1
 

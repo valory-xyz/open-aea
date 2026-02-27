@@ -25,7 +25,6 @@ import os
 
 from setuptools import find_packages, setup
 
-
 here = os.path.abspath(os.path.dirname(__file__))
 plugin_dir = os.path.abspath(os.path.join(here, ".."))
 
@@ -63,6 +62,9 @@ setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

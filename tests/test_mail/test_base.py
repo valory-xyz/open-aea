@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for Envelope of mail.base.py."""
+
 import unittest.mock
 
 import pytest
@@ -35,7 +36,6 @@ from packages.fetchai.protocols.default.message import DefaultMessage
 
 from tests.common.utils import wait_for_condition
 from tests.conftest import _make_dummy_connection, _make_local_connection
-
 
 TIMEOUT = 30
 

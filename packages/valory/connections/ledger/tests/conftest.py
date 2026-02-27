@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Test confiugurations for the package."""
+
 # pylint: skip-file
 
 import logging
@@ -45,7 +46,6 @@ from aea.crypto.ledger_apis import DEFAULT_LEDGER_CONFIGS, LedgerApi
 from aea.crypto.registries import ledger_apis_registry, make_crypto
 from aea.crypto.wallet import CryptoStore
 from aea.identity.base import Identity
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 

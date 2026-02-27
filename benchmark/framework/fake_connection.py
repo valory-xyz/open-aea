@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Fake connection to generate test messages."""
+
 import asyncio
 from typing import Any, Optional
 

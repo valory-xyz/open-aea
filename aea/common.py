@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the common types and interfaces used in the AEA framework."""
+
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-
 
 Address = str
 

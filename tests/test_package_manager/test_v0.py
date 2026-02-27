@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 # ------------------------------------------------------------------------------
 
 """Test package manager base."""
-
 
 import json
 import logging
@@ -48,7 +47,6 @@ from tests.test_package_manager.test_base import (
     PACKAGE_JSON_FILE,
 )
 
-
 TEST_SKILL_ID = PackageId(
     package_type=PackageType.SKILL,
     public_id=PublicId.from_str(
@@ -63,7 +61,7 @@ class TestPackageManagerV0(BaseAEATestCase):
     use_packages_dir: bool = True
     packages_json_file: Path
 
-    def setup(
+    def setup_method(
         self,
     ) -> None:
         """Setup test."""

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Helper module for details about function being tested."""
+
 import inspect
 from inspect import Parameter
 from typing import Any, Callable, List

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Test package manager base."""
+
 import copy
 import json
 import logging
@@ -54,7 +55,6 @@ from tests.test_package_manager.test_base import (
     EXAMPLE_PACKAGE_ID,
     PACKAGE_JSON_FILE,
 )
-
 
 TEST_SKILL_ID = PackageId(
     package_type=PackageType.SKILL,

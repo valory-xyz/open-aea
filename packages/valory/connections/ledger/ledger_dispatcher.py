@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of the ledger API request dispatcher."""
+
 import asyncio
 import logging
 from typing import Any, cast
@@ -34,12 +35,13 @@ from packages.valory.protocols.ledger_api.custom_types import (
     TransactionDigests,
     TransactionReceipt,
 )
-from packages.valory.protocols.ledger_api.dialogues import LedgerApiDialogue
+from packages.valory.protocols.ledger_api.dialogues import (
+    LedgerApiDialogue,
+)
 from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 _default_logger = logging.getLogger(
     "aea.packages.valory.connections.ledger.ledger_dispatcher"

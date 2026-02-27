@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,6 @@ from packages.valory.connections.test_libp2p.tests.conftest import (
     public_nodes,
 )
 
-
 AEA_DEFAULT_LAUNCH_TIMEOUT = 30
 AEA_LIBP2P_LAUNCH_TIMEOUT = 30
 
@@ -82,14 +81,14 @@ def delegate_uris_public_keys(request):
 class Libp2pConnectionDHTRelay(BaseP2PLibp2pTest):
     """Test that public DHT's relay service is working properly"""
 
-    def setup(self):
+    def setup_method(self):
         """Setup test"""
         assert len(self.nodes) > 1, "Test requires at least 2 public DHT node"
         for node in self.nodes:
             for _ in range(2):  # make pairs
                 self.make_connection(relay=False, entry_peers=[node.maddr])
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown after test method"""
         self._disconnect()
         self.multiplexers.clear()
@@ -133,7 +132,7 @@ class Libp2pConnectionDHTRelay(BaseP2PLibp2pTest):
 class Libp2pConnectionDHTDelegate(Libp2pConnectionDHTRelay):
     """Test that public DHTs delegate service is working properly"""
 
-    def setup(self):  # overwrite the setup, reuse the rest
+    def setup_method(self):  # overwrite the setup, reuse the rest
         """Set up test"""
 
         assert len(self.nodes) > 1
@@ -262,14 +261,14 @@ class TestDHTRobustness(BaseP2PLibp2pTest, ACNWithBootstrappedEntryNodes):
     nodes = local_nodes
     pytestmark = skip_if_ci_marker
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
 
         for node in self.nodes:
             self.make_connection(relay=False, entry_peers=[node.maddr])
             self.make_client_connection(uri=node.uri, peer_public_key=node.public_key)
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
 
         self._disconnect()

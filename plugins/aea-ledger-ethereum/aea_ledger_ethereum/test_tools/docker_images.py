@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Constants."""
+
 import logging
 import time
 from typing import Any, Dict, List, Optional
@@ -26,7 +27,6 @@ import requests
 
 from aea.exceptions import enforce
 from aea.test_tools.docker_image import DockerImage
-
 
 try:
     from docker import DockerClient

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,14 +39,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Iterator, Optional, Tuple, cast
 
-
 CURRENT_YEAR = datetime.now().year
 VALORY_FORK_DATE = datetime.strptime(
     "Sun Nov 01 00:00:00 2021 +0000", "%a %b %d %X %Y %z"
 )
 GIT_PATH = shutil.which("git")
 START_YEARS_FETCHAI = (2018, 2019, 2020, 2021)
-START_YEARS_VALORY = (2021, 2022, 2023, 2024, 2025)
+START_YEARS_VALORY = set(range(2021, CURRENT_YEAR + 1))
 FETCHAI = "FetchAI"
 VALORY = "Valory"
 MIXED = "Mixed"
@@ -468,7 +467,6 @@ def main() -> None:
         Path("tests").glob("**/*.py"),
         Path("plugins").glob("**/*.py"),
         Path("scripts").glob("**/*.py"),
-        Path("examples", "gym_ex").glob("**/*.py"),
         Path("examples", "ml_ex").glob("**/*.py"),
         [Path("setup.py")],
     )

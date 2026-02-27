@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 #
 # ------------------------------------------------------------------------------
 """Class to test the solana transaction."""
+
 from copy import deepcopy
 
 from aea_ledger_solana import SolanaApi, SolanaTransaction
-
 
 BLANK_TRANSACTION = {
     "signatures": [[0]],

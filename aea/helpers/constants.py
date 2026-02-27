@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
 #
 # ------------------------------------------------------------------------------
 """Module with helpers constants."""
-from typing import Dict, List, Union
 
+from typing import Dict, List, Union
 
 FALSE_EQUIVALENTS = ["f", "false", "False", "0"]
 NULL_EQUIVALENTS = ["Null", "null", "None", "none"]

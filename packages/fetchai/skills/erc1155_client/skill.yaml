@@ -8,29 +8,29 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeid73sgd24psits3e6ktrxrwwin7zd6xb7adxsplxi5bizlrxk5bom
-  __init__.py: bafybeidi6meicrc6tyeokv42f5u7xymlgfy2eua5ueuxmqv272oouhqehu
-  behaviours.py: bafybeifwle5mmpklafdqeptbrntujnj3pees32ibv2hxosuklrjr7ecaeu
+  __init__.py: bafybeifby3dp3b72gsd7c6jy4thuxllopabd4nlwys4by6cder755hui4i
+  behaviours.py: bafybeictuuxvkdw4vet7rdmpk7lk76hsebm2drx6q2pr6hrkszgxalxsdy
   dialogues.py: bafybeig6sjkiage4s7f3zzs72lwcmt35qv5577niz4gd4qyyswyhzvx3qy
-  handlers.py: bafybeidezpqax42c2ylg2v3mfuecpoqmv3kqyfvavl2tazfpa2mem4jvli
-  strategy.py: bafybeifudijy3opr6srw5kik3x3rmv6f75dts2pcqtlhjwkkzcafpad4em
+  handlers.py: bafybeihypryzh373feyc6gnfunkrrwxwgotk74s7u4a6kmlcyiva37n7t4
+  strategy.py: bafybeieztxkdywdyfnh2w3kepol3pti54vu245mzjga2lvkvfw2h7pjarq
   tests/__init__.py: bafybeiagjee55nf2csbyob2o5u3au6r76elv4b6o6qoxnrupinam2brfia
-  tests/intermediate_class.py: bafybeifcvd4xautun4fhi7hh7jywgd3kt4pfzle5qlcqpxza4iz2dhbrku
-  tests/test_behaviours.py: bafybeic6ibptolj4ondl6gie6rhhwyyvsuv35t5vr5vvkk4k7e52qzf7hu
-  tests/test_dialogues.py: bafybeiautieucrrlypj2u5iobaufah63gerlt362pba3d3l5pa5spppqtq
-  tests/test_handlers.py: bafybeigiapgp3inw3yun7wrsbbhrwbr5ah4cwdq6axzdglteagqrp2dgoq
-  tests/test_strategy.py: bafybeieexiz5sou3giv2fwjx7sbt554i3pplsgrouqx2bmpxlaqkmbtyz4
+  tests/intermediate_class.py: bafybeicbr3kxezhmmasrru3kdzdrjsotq34pyg3nud725qsvmpzonxvlfy
+  tests/test_behaviours.py: bafybeibfuwaekfpgcoo6sslsrvbecsmkxrj2gylewhndwmtflwzu324aeu
+  tests/test_dialogues.py: bafybeigh6cy64tqa5z5nr6rxddyxdnyxfn27vnzknxpykdsflydf2xriwm
+  tests/test_handlers.py: bafybeihjxjx2nxqkdmwhgllb7syqroim5v4hzx5v2ymsvd2lzi2aqymuki
+  tests/test_strategy.py: bafybeihcxpqoxd6ignkff6cnnzlnyy3jds7t6qtv64f7dmc6aypvu3op4u
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeigiipjmtjdivz2wd54c7bmbqxbayk5b5st7wcrsvsnqkfc2f2rbaa
+- valory/ledger:0.19.0:bafybeidxzeygks5zcky4u2ztcdufzptssgf6uqytxofnn6yta7qq6jsim4
 contracts:
-- fetchai/erc1155:0.22.0:bafybeiar52w5jgx223ms7kwk3wnvk6p6snsnhtmeea4gh5n4o5k7c3nwm4
+- fetchai/erc1155:0.22.0:bafybeidejj3rt3agmwrcncff7jrbpv6obknhpwi24wr7qq2ufi2b2gswoy
 protocols:
-- fetchai/default:1.0.0:bafybeifukwkfigvviysebfb4qzagkf5ykfpyxb5vpszsrfodfgi36o2uw4
-- fetchai/fipa:1.0.0:bafybeia4hv7ainot2zlau2hqekcifkrkbhtgxw66oxvnuyeyg7hqhxd5he
-- fetchai/oef_search:1.0.0:bafybeidnujgeopiaoxyu2z7myzmstvdrvzszuj5kf6kc3yr6x577vwgnj4
-- open_aea/signing:1.0.0:bafybeiei6h5suazzfta7n3uyq7bsz26zkmdiiylptu5i44p7s2wiygxt24
-- valory/contract_api:1.0.0:bafybeigl7mxuyxngk4gztgygeccbgdfrllx73kwbvvkjvtkfw6ionyd56q
-- valory/ledger_api:1.0.0:bafybeig7yk77pmebqcb33jbavodcslmltitz2uolq6s5arklvsvu5bvp7y
+- fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou
+- fetchai/fipa:1.0.0:bafybeiexw4ccraawqjsl6arrahkhuzo7fuhtqtkgal5v4mo7mmhzj7j76q
+- fetchai/oef_search:1.0.0:bafybeiardyypwak6lc5mmtcrle2vtozudc2fjn772fuk4kvu6ljgkwspg4
+- open_aea/signing:1.0.0:bafybeifsjmldwyki3beqyvdt5lzenrg6wyrqaar5plc5rpnvtc4zlentye
+- valory/contract_api:1.0.0:bafybeibld2xb5m7kyluiptkamp4nrt6oeomkohz7a3yppbv2oo7qw2e4la
+- valory/ledger_api:1.0.0:bafybeiecq56phjfws36rgrefw6niyo4ezesloodsfis647mpm5ygqo4ysi
 skills: []
 behaviours:
   search:

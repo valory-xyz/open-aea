@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,6 @@ from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogue as BaseHttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 SUCCESS = 200
 NOT_FOUND = 404

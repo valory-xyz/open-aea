@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,6 @@ from aea_cli_ipfs.ipfs_utils import DownloadError, IPFSTool, NodeError
 from aea.cli.registry.settings import DEFAULT_IPFS_URL_LOCAL
 from aea.cli.utils.config import get_ipfs_node_multiaddr
 from aea.configurations.base import PublicId
-
 
 _default_logger = logging.getLogger(__name__)
 

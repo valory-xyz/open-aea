@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 """Constants."""
 
-
 import os
 from pathlib import Path
 
@@ -31,7 +30,6 @@ from aea_ledger_ethereum.ethereum import (
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
 from aea.crypto.ledger_apis import ETHEREUM_DEFAULT_ADDRESS, ETHEREUM_DEFAULT_CHAIN_ID
-
 
 DATA_DIR = Path(__file__).parent / "data"
 

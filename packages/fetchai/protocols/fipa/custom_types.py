@@ -19,10 +19,8 @@
 
 """This module contains class representations corresponding to every custom type in the protocol specification."""
 
-
 from aea.helpers.search.models import Description as BaseDescription
 from aea.helpers.search.models import Query as BaseQuery
-
 
 Description = BaseDescription
 

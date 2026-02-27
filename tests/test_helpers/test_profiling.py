@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helpers/profiling module."""
+
 import platform
 import re
 from typing import Dict, List, Optional
@@ -28,7 +29,6 @@ from aea.helpers.profiling import Profiling
 from aea.protocols.base import Message
 
 from tests.common.utils import wait_for_condition
-
 
 if platform.system() == "Windows":  # pragma: nocover
     # type: ignore  # pylint: disable=import-error,import-outside-toplevel,unsed-import

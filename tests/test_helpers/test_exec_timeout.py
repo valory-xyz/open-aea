@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helpers.exec_timout."""
+
 import os
 import time
 import unittest
@@ -36,7 +37,6 @@ from aea.helpers.exec_timeout import (
 
 from tests.common.utils import timeit_context
 from tests.conftest import MAX_FLAKY_RERUNS
-
 
 if os.name == "nt":
     pytest.skip("signal.settimer non available on Windows.", allow_module_level=True)

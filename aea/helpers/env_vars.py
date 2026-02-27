@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the environment variables support."""
+
 import json
 import re
 from collections.abc import Mapping as MappingType
@@ -31,7 +32,6 @@ from aea.helpers.constants import (
     JSON_TYPES,
     NULL_EQUIVALENTS,
 )
-
 
 ENV_VARIABLE_RE = re.compile(r"^\$\{(([A-Z0-9_]+):?)?([a-z]+)?(:(.+))?}$")
 MODELS = "models"
@@ -188,7 +188,7 @@ def apply_env_variables(
 def convert_value_str_to_type(value: str, type_str: str) -> JSON_TYPES:
     """Convert value by type name to native python type."""
     try:
-        type_ = FROM_STRING_TO_TYPE[type_str]
+        type_: Optional[type] = FROM_STRING_TO_TYPE[type_str]
         if type_ == bool:
             return value not in FALSE_EQUIVALENTS
         if type_ is None or value in NULL_EQUIVALENTS:

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage across the time."""
+
 import itertools
 import os
 import struct
@@ -37,7 +38,9 @@ from aea.registries.resources import Resources
 from aea.runner import AEARunner
 from aea.skills.base import Handler
 from benchmark.checks.utils import get_mem_usage_in_mb  # noqa: I100
-from benchmark.checks.utils import PACKAGES_DIR
+from benchmark.checks.utils import (
+    PACKAGES_DIR,
+)
 from benchmark.checks.utils import make_agent as base_make_agent
 from benchmark.checks.utils import (
     make_skill,
@@ -54,7 +57,6 @@ from packages.fetchai.connections.local.connection import (  # noqa: E402 # pyli
 )
 from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 ROOT_PATH = os.path.join(os.path.abspath(__file__), "..", "..")
 sys.path.append(ROOT_PATH)

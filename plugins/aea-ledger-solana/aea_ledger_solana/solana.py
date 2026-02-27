@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2025 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Solana module wrapping the public and private key cryptography and ledger api."""
+
 import json
 import logging
 import time
@@ -64,7 +65,6 @@ from solders.system_program import (  # type: ignore; SYS_PROGRAM_ID,
 from aea.common import Address, JSONLike
 from aea.crypto.base import LedgerApi
 from aea.helpers.base import try_decorator
-
 
 DEFAULT_MAX_SUPPORTED_TRANSACTION_VERSION = 0
 DEFAULT_MAX_RETRIES = 3

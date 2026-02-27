@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Base config data types."""
+
 import functools
 import json
 import re
@@ -59,7 +60,6 @@ from aea.helpers.base import (
     SimpleId,
     SimpleIdOrStr,
 )
-
 
 T = TypeVar("T")
 PackageVersionLike = Union[str, semver.VersionInfo]

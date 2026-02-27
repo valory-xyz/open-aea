@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the aea.configurations.base module."""
+
 import hashlib
 import json
 import re
@@ -351,7 +352,7 @@ class TestAgentConfig:
 class TestAgentConfigUpdate:
     """Test methods that change the agent configuration."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Set up the tests."""
         self.aea_config_path = Path(
             CUR_PATH, "data", "dummy_aea", DEFAULT_AEA_CONFIG_FILE
@@ -1136,7 +1137,7 @@ def test_component_id_from_json():
 class TestConfigurationContainingPathSerialization:
     """Test configurations containing paths are deterministic across different OS"""
 
-    def setup(self):
+    def setup_method(self):
         """Setup test"""
 
         # starting from posix-compliant format

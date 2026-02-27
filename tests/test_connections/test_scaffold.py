@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the scaffold connection."""
+
 import os
 import sys
 from unittest.mock import MagicMock
@@ -36,7 +37,7 @@ from tests.conftest import ROOT_DIR
 class TestScaffoldConnectionReception:
     """Test that the stub connection is implemented correctly."""
 
-    def setup(self):
+    def setup_method(self):
         """Set case up."""
         configuration = ConnectionConfig(
             connection_id=MyScaffoldAsyncConnection.connection_id,
@@ -64,7 +65,7 @@ class TestScaffoldConnectionReception:
 class TestScaffoldConnectionAndRun(AEATestCaseEmpty):
     """Test that the scaffold connection created."""
 
-    def setup(self):
+    def setup_method(self):
         """Set case up."""
         result = self.invoke("scaffold", "connection", "my_con")
         assert result.exit_code == 0

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Implementation of the 'aea test' command."""
+
 import contextlib
 import os
 import sys
@@ -64,7 +65,6 @@ from aea.configurations.loader import (
 from aea.configurations.manager import find_component_directory_from_component_id
 from aea.exceptions import enforce
 from aea.package_manager.v1 import PackageManagerV1
-
 
 COVERAGERC_FILE = ".coveragerc"
 COVERAGERC_CONFIG = """[run]

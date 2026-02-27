@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Dummy handler to use in test skills."""
+
 from random import randint
 
 from aea.protocols.base import Message

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the implementation of multiple AEA configs launcher."""
+
 import asyncio
 import logging
 import multiprocessing
@@ -44,7 +45,6 @@ from aea.helpers.multiple_executor import (
     ThreadExecutor,
 )
 from aea.runtime import AsyncRuntime
-
 
 _default_logger = logging.getLogger(__name__)
 

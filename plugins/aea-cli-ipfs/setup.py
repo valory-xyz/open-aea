@@ -22,9 +22,7 @@
 
 """Setup script for the plug-in."""
 
-
 from setuptools import setup  # type: ignore
-
 
 setup(
     name="open-aea-cli-ipfs",
@@ -54,6 +52,9 @@ setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

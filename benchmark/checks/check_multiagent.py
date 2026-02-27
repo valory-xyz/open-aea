@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Envelopes generation speed for Behaviour act test."""
+
 import itertools
 import os
 import struct
@@ -50,7 +51,6 @@ from packages.fetchai.connections.local.connection import (  # noqa: E402 # pyli
     OEFLocalConnection,
 )
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 ROOT_PATH = os.path.join(os.path.abspath(__file__), "..", "..")
 sys.path.append(ROOT_PATH)

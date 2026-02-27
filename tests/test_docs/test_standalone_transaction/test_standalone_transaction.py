@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,6 @@ from tests.test_docs.test_standalone_transaction.standalone_transaction import (
     logger,
     run,
 )
-
 
 MD_FILE = "docs/standalone-transaction.md"
 PY_FILE = "test_docs/test_standalone_transaction/standalone_transaction.py"

@@ -22,7 +22,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="open-aea-ledger-ethereum-hwi",
     version="2.0.8",
@@ -44,7 +43,7 @@ setup(
         "eth-account>=0.13.0,<0.14.0",
         "open-aea-ledger-ethereum~=2.0.8",
         "ledgerwallet==0.1.3",
-        "protobuf<4.25.0,>=4.21.6",
+        "protobuf<6,>=5",
         "construct<=2.10.61",
     ],
     tests_require=["pytest"],
@@ -67,6 +66,9 @@ setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

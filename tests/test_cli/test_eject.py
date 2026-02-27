@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,14 +32,13 @@ from aea.configurations.base import ComponentType, DEFAULT_VERSION, PublicId
 from aea.configurations.loader import load_component_configuration
 from aea.test_tools.test_cases import AEATestCaseEmpty, AEATestCaseMany
 
-from packages.fetchai.connections.gym.connection import (
-    PUBLIC_ID as GYM_CONNECTION_PUBLIC_ID,
+from packages.fetchai.connections.local.connection import (
+    PUBLIC_ID as LOCAL_CONNECTION_PUBLIC_ID,
 )
 from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as ERC1155_PUBLIC_ID
 from packages.fetchai.protocols.default import DefaultMessage
-from packages.fetchai.protocols.gym.message import GymMessage
+from packages.fetchai.skills.echo import PUBLIC_ID as ECHO_SKILL_PUBLIC_ID
 from packages.fetchai.skills.error import PUBLIC_ID as ERROR_PUBLIC_ID
-from packages.fetchai.skills.gym import PUBLIC_ID as GYM_SKILL_PUBLIC_ID
 
 
 class TestEjectCommands(AEATestCaseMany):
@@ -52,8 +51,8 @@ class TestEjectCommands(AEATestCaseMany):
 
         self.set_agent_context(agent_name)
         cwd = os.path.join(self.t, agent_name)
-        self.add_item("connection", str(GYM_CONNECTION_PUBLIC_ID))
-        self.add_item("skill", str(GYM_SKILL_PUBLIC_ID))
+        self.add_item("connection", str(LOCAL_CONNECTION_PUBLIC_ID))
+        self.add_item("skill", str(ECHO_SKILL_PUBLIC_ID))
         self.add_item("contract", str(ERC1155_PUBLIC_ID))
         self.scaffold_item("custom", "test")
         shutil.move(
@@ -62,22 +61,22 @@ class TestEjectCommands(AEATestCaseMany):
         )
 
         # the order must be kept as is, because of recursive ejects
-        self.eject_item("skill", str(GYM_SKILL_PUBLIC_ID))
-        assert "gym" not in os.listdir(
+        self.eject_item("skill", str(ECHO_SKILL_PUBLIC_ID))
+        assert "echo" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "skills"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "skills")))
-        self.eject_item("connection", str(GYM_CONNECTION_PUBLIC_ID))
-        assert "gym" not in os.listdir(
+        assert "echo" in os.listdir((os.path.join(cwd, "skills")))
+        self.eject_item("connection", str(LOCAL_CONNECTION_PUBLIC_ID))
+        assert "local" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "connections"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "connections")))
+        assert "local" in os.listdir((os.path.join(cwd, "connections")))
 
-        self.eject_item("protocol", str(GymMessage.protocol_id))
-        assert "gym" not in os.listdir(
+        self.eject_item("protocol", str(DefaultMessage.protocol_id))
+        assert "default" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "protocols"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "protocols")))
+        assert "default" in os.listdir((os.path.join(cwd, "protocols")))
 
         self.eject_item("contract", str(ERC1155_PUBLIC_ID))
         assert "erc1155" not in os.listdir(
@@ -102,26 +101,26 @@ class TestRecursiveEject(AEATestCaseEmpty):
 
         self.set_agent_context(agent_name)
         cwd = os.path.join(self.t, agent_name)
-        self.add_item("connection", str(GYM_CONNECTION_PUBLIC_ID))
-        self.add_item("skill", str(GYM_SKILL_PUBLIC_ID))
+        self.add_item("connection", str(LOCAL_CONNECTION_PUBLIC_ID))
+        self.add_item("skill", str(ECHO_SKILL_PUBLIC_ID))
         self.add_item("contract", str(ERC1155_PUBLIC_ID))
 
-        # ejecting the gym protocol will cause the ejection of
+        # ejecting the default protocol will cause the ejection of
         # all the other packages that depend on it,
-        # that is, gym connection and gym skill.
-        self.eject_item("protocol", str(GymMessage.protocol_id))
-        assert "gym" not in os.listdir(
+        # that is, local connection and echo skill.
+        self.eject_item("protocol", str(DefaultMessage.protocol_id))
+        assert "default" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "protocols"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "protocols")))
-        assert "gym" not in os.listdir(
+        assert "default" in os.listdir((os.path.join(cwd, "protocols")))
+        assert "local" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "connections"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "connections")))
-        assert "gym" not in os.listdir(
+        assert "local" in os.listdir((os.path.join(cwd, "connections")))
+        assert "echo" not in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "skills"))
         )
-        assert "gym" in os.listdir((os.path.join(cwd, "skills")))
+        assert "echo" in os.listdir((os.path.join(cwd, "skills")))
 
 
 class TestRecursiveEjectIsAborted(AEATestCaseEmpty):
@@ -135,24 +134,24 @@ class TestRecursiveEjectIsAborted(AEATestCaseEmpty):
 
         self.set_agent_context(agent_name)
         cwd = os.path.join(self.t, agent_name)
-        self.add_item("connection", str(GYM_CONNECTION_PUBLIC_ID))
-        self.add_item("skill", str(GYM_SKILL_PUBLIC_ID))
+        self.add_item("connection", str(LOCAL_CONNECTION_PUBLIC_ID))
+        self.add_item("skill", str(ECHO_SKILL_PUBLIC_ID))
         self.add_item("contract", str(ERC1155_PUBLIC_ID))
 
         self.run_cli_command(
-            "eject", "protocol", str(GymMessage.protocol_id), cwd=self._get_cwd()
+            "eject", "protocol", str(DefaultMessage.protocol_id), cwd=self._get_cwd()
         )
         # assert packages not ejected
-        assert "gym" in os.listdir(
+        assert "default" in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "protocols"))
         )
-        assert "gym" not in os.listdir((os.path.join(cwd, "protocols")))
-        assert "gym" in os.listdir(
+        assert "default" not in os.listdir((os.path.join(cwd, "protocols")))
+        assert "local" in os.listdir(
             (os.path.join(cwd, "vendor", "fetchai", "connections"))
         )
-        assert "gym" not in os.listdir((os.path.join(cwd, "connections")))
-        assert "gym" in os.listdir((os.path.join(cwd, "vendor", "fetchai", "skills")))
-        assert "gym" not in os.listdir((os.path.join(cwd, "skills")))
+        assert "local" not in os.listdir((os.path.join(cwd, "connections")))
+        assert "echo" in os.listdir((os.path.join(cwd, "vendor", "fetchai", "skills")))
+        assert "echo" not in os.listdir((os.path.join(cwd, "skills")))
 
 
 class BaseTestEjectCommand(AEATestCaseEmpty):

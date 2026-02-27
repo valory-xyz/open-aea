@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the stub connection."""
+
 import asyncio
 import logging
 import os
@@ -37,7 +38,6 @@ from aea.configurations.constants import (
 from aea.connections.base import Connection, ConnectionStates
 from aea.helpers.file_io import envelope_from_bytes, lock_file, write_envelope
 from aea.mail.base import Envelope
-
 
 _default_logger = logging.getLogger("aea.packages.fetchai.connections.stub")
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -123,7 +123,7 @@ class BaseContractTestCase(ABC, metaclass=_MetaBaseContractTestCase):
         cls._contract = contract_registry.make(str(configuration.public_id))
 
     @classmethod
-    def setup(cls, **kwargs: Any) -> None:
+    def setup_method(cls, **kwargs: Any) -> None:
         """Set up the contract test case."""
         _ledger_config: Dict[str, str] = kwargs.pop("ledger_config", {})
         _deployer_private_key_path: Optional[str] = kwargs.pop(

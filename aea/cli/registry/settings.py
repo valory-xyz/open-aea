@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +19,7 @@
 # ------------------------------------------------------------------------------
 """Settings for operating Registry with CLI."""
 
-
 from typing import Dict, Tuple
-
 
 REGISTRY_CONFIG_KEY: str = "registry_config"
 
@@ -49,7 +47,7 @@ DEFAULT_REGISTRY_CONFIG: Dict = {
         REGISTRY_REMOTE: {
             "default": None,
             REMOTE_HTTP: {
-                "auth_token": None,  # auth token for registry
+                "auth_token": None,  # auth token for registry  # nosec
                 "registry_api_url": None,  # registry url
             },
             REMOTE_IPFS: {"ipfs_node": None},  # IPFS url (in multiaddr format)

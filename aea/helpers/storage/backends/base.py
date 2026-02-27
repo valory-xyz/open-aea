@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,12 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains storage abstract backend class."""
+
 import re
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple, Union
 
 from aea.helpers.constants import JSON_TYPES
-
 
 EQUALS_TYPE = Union[int, float, str, bool]
 OBJECT_ID_AND_BODY = Tuple[str, JSON_TYPES]

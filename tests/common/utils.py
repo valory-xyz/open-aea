@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains some utils for testing purposes."""
+
 import asyncio
 import filecmp
 import os
@@ -40,7 +41,6 @@ from aea.skills.base import Behaviour, Handler
 from packages.fetchai.protocols.default.message import DefaultMessage
 
 from tests.conftest import ROOT_DIR
-
 
 DEFAULT_SLEEP = 0.0001
 DEFAULT_TIMEOUT = 3

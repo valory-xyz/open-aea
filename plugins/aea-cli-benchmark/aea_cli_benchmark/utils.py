@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Performance checks utils."""
+
 import asyncio
 import inspect
 import multiprocessing
@@ -54,7 +55,6 @@ from aea.mail.base import Envelope
 from aea.protocols.base import Message, Protocol
 from aea.registries.resources import Resources
 from aea.skills.base import Behaviour, Handler, Skill, SkillContext
-
 
 ERROR_SKILL_NAME = "error"
 ROOT_DIR = os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())))  # type: ignore

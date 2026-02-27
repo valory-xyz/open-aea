@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,6 @@ from packages.fetchai.skills.error import PUBLIC_ID as ERROR_SKILL_PUBLIC_ID
 from tests.conftest import MAX_FLAKY_RERUNS, MY_FIRST_AEA_PUBLIC_ID
 from tests.data import dummy_aea
 from tests.test_cli import test_generate_wealth
-
 
 TestWealthCommandsPositiveNoPass = test_generate_wealth.TestWealthCommandsPositiveNoPass
 TestWealthCommandsPositiveFakePass = (
@@ -217,7 +216,7 @@ class TestRunAgent(AEATestCaseEmpty):
 class TestTeardownClassTimeout:
     """Test BaseAEATestCase.teardown_class timeout"""
 
-    def setup(self):
+    def setup_method(self):
         """Setup test"""
         BaseAEATestCase.setup_class()
         self.test = BaseAEATestCase()

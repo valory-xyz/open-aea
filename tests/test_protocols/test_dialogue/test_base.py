@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the dialogue/base.py module."""
+
 import re
 from typing import FrozenSet, Tuple, Type, cast
 from unittest.mock import Mock, patch
@@ -29,9 +30,15 @@ from aea.configurations.base import PublicId
 from aea.exceptions import AEAEnforceError
 from aea.helpers.storage.generic_storage import Storage
 from aea.protocols.base import Message
-from aea.protocols.dialogue.base import BasicDialoguesStorage
+from aea.protocols.dialogue.base import (
+    BasicDialoguesStorage,
+)
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
-from aea.protocols.dialogue.base import DialogueLabel, DialogueMessage, DialogueStats
+from aea.protocols.dialogue.base import (
+    DialogueLabel,
+    DialogueMessage,
+    DialogueStats,
+)
 from aea.protocols.dialogue.base import Dialogues as BaseDialogues
 from aea.protocols.dialogue.base import (
     InvalidDialogueMessage,
@@ -231,7 +238,7 @@ class TestDialogueLabel:
 class TestDialogueBase:
     """Test for Dialogue."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.incomplete_reference = (str(1), "")
         self.complete_reference = (str(1), str(1))
@@ -966,7 +973,7 @@ class TestDialogueBase:
 class TestDialogueStats:
     """Test for DialogueStats."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Initialise the environment to test DialogueStats."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1028,7 +1035,7 @@ class TestDialogueStats:
 class TestDialoguesBase:
     """Test for Dialogues."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1690,7 +1697,7 @@ class TestDialoguesBase:
 class TestPersistDialoguesStorage:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test PersistDialogueStorage."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1712,7 +1719,7 @@ class TestPersistDialoguesStorage:
         wait_for_condition(lambda: self.generic_storage.is_connected, timeout=10)
         self.skill_component.context.storage = self.generic_storage
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test PersistDialogueStorage."""
         self.generic_storage.stop()
         self.generic_storage.wait_completed(sync=True, timeout=10)
@@ -1839,7 +1846,7 @@ class TestPersistDialoguesStorage:
 class TestPersistDialoguesStorageOffloading:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test PersistDialogueStorage."""
         self.agent_address = "agent 1"
         self.opponent_address = "agent 2"
@@ -1860,7 +1867,7 @@ class TestPersistDialoguesStorageOffloading:
         wait_for_condition(lambda: self.generic_storage.is_connected, timeout=10)
         self.skill_component.context.storage = self.generic_storage
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test PersistDialogueStorage."""
         self.generic_storage.stop()
         self.generic_storage.wait_completed(sync=True, timeout=10)
@@ -1963,7 +1970,7 @@ class TestPersistDialoguesStorageOffloading:
 class TestBaseDialoguesStorage:
     """Test PersistDialoguesStorage."""
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the environment to test Dialogue."""
         self.incomplete_reference = (str(1), "")
         self.complete_reference = (str(1), str(1))
@@ -2151,7 +2158,7 @@ class TestBaseDialoguesStorage:
             == 0
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down the environment to test BaseDialogueStorage."""
 
 

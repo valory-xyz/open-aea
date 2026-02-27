@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains utility code for generator modules."""
+
 import inspect
 import os
 import re
@@ -37,7 +38,6 @@ from aea.configurations.constants import (
 )
 from aea.configurations.loader import ConfigLoader
 from aea.helpers.io import open_file
-
 
 SPECIFICATION_PRIMITIVE_TYPES = ["pt:bytes", "pt:int", "pt:float", "pt:bool", "pt:str"]
 SPECIFICATION_COMPOSITIONAL_TYPES = [
