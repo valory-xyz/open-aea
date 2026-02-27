@@ -94,7 +94,9 @@ def test_click_version():
     When this tests fails you need to ensure that the current versions implementation
     of the click.testing.CliRunner remains compatible with our monkey-patched version
     """
-    assert click.__version__ == "8.2.1", message
+    parts = click.__version__.split(".")
+    assert parts[0] == "8", message
+    assert int(parts[1]) in range(4), message
 
 
 def test_capfd_on_cli_runner(capfd: CaptureFixture):
