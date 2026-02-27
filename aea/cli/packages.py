@@ -21,7 +21,7 @@
 
 import sys
 from pathlib import Path
-from typing import List, cast
+from typing import List, Optional, cast
 from warnings import warn
 
 import click
@@ -90,21 +90,21 @@ def package_manager(
     "sync_type",
     flag_value=SyncTypes.THIRD_PARTY,
     help="To sync third party packages (default).",
-    default=True,
+    default=None,
 )
 @click.option(
     "--dev",
     "sync_type",
     flag_value=SyncTypes.DEV,
     help="To sync dev packages.",
-    default=False,
+    default=None,
 )
 @click.option(
     "--all",
     "sync_type",
     flag_value=SyncTypes.ALL,
     help="To sync all available packages.",
-    default=False,
+    default=None,
 )
 @click.option(
     "-s",
@@ -118,10 +118,13 @@ def sync(
     ctx: Context,
     update_packages: bool,
     update_hashes: bool,
-    sync_type: str,
+    sync_type: Optional[str],
     sources: List[str],
 ) -> None:
     """Sync packages between packages.json and a local registry."""
+
+    if sync_type is None:
+        sync_type = SyncTypes.THIRD_PARTY
 
     if not IS_IPFS_PLUGIN_INSTALLED:
         raise click.ClickException(
