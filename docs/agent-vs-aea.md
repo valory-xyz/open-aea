@@ -195,7 +195,6 @@ from aea.mail.base import Envelope
 from packages.fetchai.connections.stub.connection import StubConnection
 from packages.fetchai.protocols.default.message import DefaultMessage
 
-
 INPUT_FILE = "input_file"
 OUTPUT_FILE = "output_file"
 
