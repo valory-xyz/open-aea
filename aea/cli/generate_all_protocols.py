@@ -56,7 +56,7 @@ from aea.configurations.constants import (
 )
 from aea.configurations.data_types import PackageId, PublicId
 from aea.configurations.loader import ConfigLoaders, load_component_configuration
-from aea.exceptions import enforce
+from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.git import check_working_tree_is_dirty
 from aea.helpers.protocols import get_protocol_specification_from_readme
 from aea.manager.helpers import AEAProject
@@ -126,29 +126,25 @@ def run_isort_and_black(directory: Path, **kwargs: Any) -> None:
     kwargs["stdout"] = subprocess.PIPE
 
     try:
-        # check if black and isort is installed
-        import black  # type: ignore  # noqa  # pylint: disable=unused-import,import-outside-toplevel
-        import isort  # type: ignore  # noqa  # pylint: disable=unused-import,import-outside-toplevel
-    except ImportError as e:
+        AEAProject.run_cli(
+            sys.executable,
+            "-m",
+            "black",
+            "-q",
+            str(directory.absolute()),
+            **kwargs,
+        )
+        AEAProject.run_cli(
+            sys.executable,
+            "-m",
+            "isort",
+            "--settings-path",
+            "setup.cfg",
+            str(directory.absolute()),
+            **kwargs,
+        )
+    except AEAEnforceError as e:
         raise click.ClickException(str(e)) from e
-
-    AEAProject.run_cli(
-        sys.executable,
-        "-m",
-        "black",
-        "-q",
-        str(directory.absolute()),
-        **kwargs,
-    )
-    AEAProject.run_cli(
-        sys.executable,
-        "-m",
-        "isort",
-        "--settings-path",
-        "setup.cfg",
-        str(directory.absolute()),
-        **kwargs,
-    )
 
 
 def _fix_generated_protocol(package_path: Path) -> None:

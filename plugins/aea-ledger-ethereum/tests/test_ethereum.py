@@ -89,7 +89,7 @@ class EIP1559Networks(Enum):
     OPTIMISM = "https://mainnet.optimism.io"
     BASE = "https://mainnet.base.org"
     MODE = "https://mainnet.mode.network"
-    POLYGON = "https://polygon-rpc.com"
+    POLYGON = "https://polygon.drpc.org"
     FRAXTAL = "https://rpc.frax.com"
 
 
