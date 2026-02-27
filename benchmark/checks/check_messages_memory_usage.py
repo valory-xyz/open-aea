@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage of huge amount of messages."""
+
 import os
 import sys
 import time
@@ -35,7 +36,6 @@ from benchmark.checks.utils import (
 )
 
 from packages.fetchai.protocols.default.message import DefaultMessage
-
 
 ROOT_PATH = os.path.join(os.path.abspath(__file__), "..", "..")
 sys.path.append(ROOT_PATH)

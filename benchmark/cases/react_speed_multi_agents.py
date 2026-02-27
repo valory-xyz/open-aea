@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Example performance test using benchmark framework. Test react speed on amount of incoming messages using normal agent operating."""
+
 import time
 
 from aea.configurations.base import SkillConfig

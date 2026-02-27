@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for generator/extract_specification.py module."""
+
 import logging
 import os
 import shutil
@@ -39,7 +40,6 @@ from aea.protocols.generator.extract_specification import (
 )
 
 from tests.test_protocols.test_generator.common import PATH_TO_T_PROTOCOL_SPECIFICATION
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

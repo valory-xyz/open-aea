@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 """This script checks that dependencies in tox.ini and Pipfile match."""
+
 import configparser
 import itertools
 import sys
@@ -27,7 +28,6 @@ from typing import Set, Tuple
 
 import tomli
 from packaging.requirements import Requirement as BaseRequirement
-
 
 TOX_INI = "tox.ini"
 PIPFILE = "Pipfile"

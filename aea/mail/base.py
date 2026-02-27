@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,6 @@ from aea.configurations.base import PublicId
 from aea.exceptions import enforce
 from aea.mail import base_pb2
 from aea.protocols.base import Message
-
 
 _default_logger = logging.getLogger(__name__)
 

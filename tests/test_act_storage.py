@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests behaviour storage access."""
+
 import json
 import os
 from typing import List, Set
@@ -196,7 +197,7 @@ def _storage_all_dialogues_labels(storage: BasicDialoguesStorage) -> Set[Dialogu
 class TestDialogueModelSaveLoad(AEATestCaseEmpty):
     """Test dialogues sved and loaded on agent restart."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test case."""
         self.add_item("skill", "fetchai/echo:latest", local=True)
         pkey_file = os.path.join(self._get_cwd(), "privkey")

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module with constants of the aea cli."""
+
 import os
 from pathlib import Path
 
@@ -41,7 +42,6 @@ from aea.configurations.constants import (
 )
 from aea.configurations.data_types import PublicId
 from aea.helpers.constants import FROM_STRING_TO_TYPE
-
 
 AEA_DIR = str(Path("."))
 ITEM_TYPES = (CONNECTION, CONTRACT, PROTOCOL, SKILL)

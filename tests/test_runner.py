@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea runner."""
+
 import time
 from unittest.mock import call, patch
 
@@ -62,7 +63,7 @@ class TestThreadedRunner:
         builder.set_runtime_mode("async")
         return builder
 
-    def setup(self):
+    def setup_method(self):
         """Set up AEA instances."""
         self.aea1 = self._builder("agent1").build()
         self.aea2 = self._builder("agent2").build()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea get_public_key' subcommand."""
+
 from typing import Optional, cast
 
 import click

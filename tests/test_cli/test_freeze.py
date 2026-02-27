@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ from tests.conftest import (
 class TestFreeze:
     """Test that the command 'aea freeze' works as expected."""
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.schema = json.load(open(AGENT_CONFIGURATION_SCHEMA))
         self.resolver = jsonschema.RefResolver(
@@ -74,7 +74,7 @@ class TestFreeze:
             == """open-aea-ledger-cosmos<3.0.0,>=2.0.0\nopen-aea-ledger-ethereum<3.0.0,>=2.0.0\nopen-aea-ledger-fetchai<3.0.0,>=2.0.0\nprotobuf\n"""
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear the test down."""
         os.chdir(self.cwd)
         try:

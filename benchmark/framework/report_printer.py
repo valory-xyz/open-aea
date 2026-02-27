@@ -16,6 +16,7 @@
 #
 # ------------------------------------------------------------------------------
 """Performance report printer for performance tool."""
+
 import inspect
 from collections import namedtuple
 from datetime import datetime
@@ -191,14 +192,12 @@ class ReportPrinter(ContextPrinter):
 
         :param report: performance report to print header for
         """
-        text = inspect.cleandoc(
-            f"""
+        text = inspect.cleandoc(f"""
             == Report created {report.report_time} ==
             Arguments are `{report.arguments}`
             Number of runs: {report.number_of_runs}
             Number of time terminated: {report.number_of_terminates}
-            """
-        )
+            """)
         print(text)
 
     @staticmethod

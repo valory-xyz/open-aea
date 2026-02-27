@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains tests for aea runtime."""
+
 import asyncio
 import contextlib
 import logging
@@ -46,7 +47,7 @@ class BaseTestRuntime:
     # set a copy to prevent lasting state changes via class attributes
     RUNTIME: Type[BaseRuntime]
 
-    def setup(self):
+    def setup_method(self):
         """Set up case."""
         agent_name = "my_agent"
         private_key_path = os.path.join(CUR_PATH, "data", DEFAULT_PRIVATE_KEY_FILE)
@@ -72,7 +73,7 @@ class BaseTestRuntime:
         )
         self.agent._runtime = self.runtime
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear down."""
         self.runtime.stop()
         self.runtime.wait_completed(sync=True)

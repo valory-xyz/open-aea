@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,7 +60,6 @@ from aea.configurations.constants import (
 from aea.configurations.loader import ConfigLoader
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
-
 
 COPYRIGHT_HEADER = """\
 # -*- coding: utf-8 -*-

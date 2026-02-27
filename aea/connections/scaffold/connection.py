@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,12 @@
 #
 # ------------------------------------------------------------------------------
 """Scaffold connection and channel."""
+
 from typing import Any, Optional
 
 from aea.configurations.base import PublicId
 from aea.connections.base import BaseSyncConnection, Connection
 from aea.mail.base import Envelope
-
 
 """
 Choose one of the possible implementations:

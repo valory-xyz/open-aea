@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Module wrapping all the public and private keys cryptography."""
+
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from aea.common import Address, JSONLike
@@ -36,7 +37,6 @@ from aea.crypto.registries import (
     make_ledger_api_cls,
 )
 from aea.exceptions import enforce
-
 
 COSMOS_DEFAULT_ADDRESS = "INVALID_URL"
 COSMOS_DEFAULT_CURRENCY_DENOM = "INVALID_CURRENCY_DENOM"

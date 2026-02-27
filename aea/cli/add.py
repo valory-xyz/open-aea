@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,7 +60,6 @@ from aea.configurations.base import (
 from aea.configurations.constants import CONNECTION, CONTRACT, PROTOCOL, SKILL
 from aea.configurations.data_types import PublicId
 from aea.helpers.ipfs.base import IPFSHashOnly
-
 
 try:
     from aea_cli_ipfs.exceptions import HashNotProvided  # type: ignore

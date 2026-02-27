@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Ledger TX generation and processing benchmark."""
+
 import time
 from contextlib import contextmanager
 from typing import List
@@ -33,7 +34,6 @@ from cosmpy.common.rest_client import RestClient
 from cosmpy.crypto.address import Address as CosmpyAddress
 from cosmpy.crypto.keypairs import PrivateKey
 from cosmpy.protos.cosmos.base.v1beta1.coin_pb2 import Coin
-
 
 FETCHD_INITIAL_TX_SLEEP = 6
 GAS_PRICE_API_KEY = ""

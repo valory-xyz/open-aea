@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ from typing import Match, cast
 from aea.configurations.loader import load_protocol_specification_from_string
 from aea.exceptions import enforce
 from aea.helpers.logging import setup_logger
-
 
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
 PROTOCOL_SPECIFICATION_ID_IN_SPECIFICATION_REGEX = re.compile(

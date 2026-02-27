@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Utils used for operating Registry with CLI."""
+
 import os
 import tarfile
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -39,7 +40,6 @@ from aea.common import JSONLike
 from aea.configurations.base import PublicId
 from aea.configurations.constants import ITEM_TYPE_TO_PLURAL
 from aea.helpers import http_requests as requests
-
 
 FILE_DOWNLOAD_TIMEOUT = (
     180  # quite big number case possible slow channels and package can be quite big

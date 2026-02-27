@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module sets up test environment for erc1155_client skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -58,7 +59,6 @@ from packages.open_aea.protocols.signing.message import SigningMessage
 from packages.valory.protocols.contract_api.custom_types import Kwargs
 from packages.valory.protocols.contract_api.message import ContractApiMessage
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_DIR = Path(__file__).parent.parent
 

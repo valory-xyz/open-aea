@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains end to end tests for the protocol generator."""
+
 import logging
 import os
 import shutil
@@ -45,7 +46,6 @@ from tests.data.packages.fetchai.protocols.t_protocol.message import (
     TProtocolMessage,  # type: ignore
 )
 from tests.test_protocols.test_generator.common import PATH_TO_T_PROTOCOL
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

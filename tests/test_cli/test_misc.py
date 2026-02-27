@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,9 +45,7 @@ def test_flag_help():
     """Test that the flag '--help' works correctly."""
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
-    assert (
-        result.stdout
-        == """Usage: aea [OPTIONS] COMMAND [ARGS]...
+    assert result.stdout == """Usage: aea [OPTIONS] COMMAND [ARGS]...
 
   Command-line tool for setting up an Autonomous Economic Agent (AEA).
 
@@ -105,4 +103,3 @@ Commands:
   transfer                Transfer wealth associated with a private key of...
   upgrade                 Upgrade the packages of the agent.
 """
-    )

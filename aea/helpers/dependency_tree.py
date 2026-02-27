@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ from aea.configurations.constants import (
 from aea.configurations.data_types import PackageId, PublicId
 from aea.exceptions import AEAPackageLoadingError
 from aea.helpers.yaml_utils import _AEAYamlDumper, _AEAYamlLoader
-
 
 COMPONENTS = [
     (AGENT, DEFAULT_AEA_CONFIG_FILE),

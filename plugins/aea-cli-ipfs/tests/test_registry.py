@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,6 @@ from aea_cli_ipfs.registry import (
 )
 
 from aea.configurations.data_types import PublicId
-
 
 DUMMY_REGISTRY_DATA = LOCAL_REGISTRY_DEFAULT.copy()
 DUMMY_REGISTRY_DATA["protocols"] = {

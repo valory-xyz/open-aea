@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea get_multiaddress' subcommand."""
+
 import re
 import typing
 from pathlib import Path
@@ -36,7 +37,6 @@ from aea.crypto.base import Crypto
 from aea.crypto.registries import crypto_registry
 from aea.exceptions import enforce
 from aea.helpers.multiaddr.base import MultiAddr
-
 
 URI_REGEX = re.compile(r"(?:https?://)?(?P<host>[^:/ ]+):(?P<port>[0-9]*)")
 

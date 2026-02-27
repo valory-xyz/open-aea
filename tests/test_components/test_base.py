@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains tests for aea/components/base.py"""
+
 import inspect
 import itertools
 import os
@@ -263,7 +264,7 @@ def test_load_all_aea_protocol_packages(
 ) -> None:
     """Load all AEA component packages."""
 
-    to_be_skipped = {os.path.join(CUR_PATH, "data", "gym-connection.yaml")}
+    to_be_skipped = {os.path.join(CUR_PATH, "data", "local-connection.yaml")}
 
     if config_file_path in to_be_skipped:
         pytest.skip(

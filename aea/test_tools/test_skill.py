@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains test case classes based on pytest for AEA skill testing."""
+
 import asyncio
 import os
 from abc import ABC, ABCMeta
@@ -38,7 +39,6 @@ from aea.protocols.base import Message
 from aea.protocols.dialogue.base import Dialogue, DialogueMessage, Dialogues
 from aea.skills.base import Skill
 from aea.skills.tasks import TaskManager
-
 
 COUNTERPARTY_AGENT_ADDRESS = "counterparty"
 COUNTERPARTY_SKILL_ADDRESS = "some_author/some_skill:0.1.0"
@@ -511,7 +511,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
         cls._outbox = OutBox(cast(Multiplexer, cls._multiplexer))
         cls._skill = cls._prepare_skill(**kwargs)
 
-    def setup(self, **kwargs: Any) -> None:
+    def setup_method(self, **kwargs: Any) -> None:
         """
         Set up the test method.
 
@@ -571,7 +571,7 @@ class BaseSkillTestCase(ABC, metaclass=_MetaBaseSkillTestCase):
 
         return Skill.from_config(skill_config, agent_context)
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """
         Teardown the test method.
 

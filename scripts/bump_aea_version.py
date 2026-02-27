@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,6 @@ from packaging.version import Version
 
 from aea.cli.ipfs_hash import update_hashes
 from aea.helpers.base import compute_specifier_from_version
-
 
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s][%(name)s][%(levelname)s] %(message)s"

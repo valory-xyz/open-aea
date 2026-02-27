@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the handler classes of the generic buyer skill."""
+
 # pylint: skip-file
 
 import logging
@@ -62,7 +63,6 @@ from packages.fetchai.skills.generic_buyer.handlers import (
 from packages.fetchai.skills.generic_buyer.strategy import GenericStrategy
 from packages.open_aea.protocols.signing.message import SigningMessage
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 
@@ -569,14 +569,14 @@ class TestGenericOefSearchHandler(BaseSkillTestCase):
             ),
         )
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
 
     def test_setup(self):

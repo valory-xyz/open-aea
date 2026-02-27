@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2025 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ from aea_ledger_ethereum_hwi.account import HWIAccount, HWIErrorCodes
 from aea_ledger_ethereum_hwi.exceptions import HWIError
 from hexbytes import HexBytes
 from ledgerwallet.client import CommException, LedgerClient
-
 
 DEFAULT_ACCOUNT_RESPONSE = b"A\x01\xfb\x02\xc3\x7f\xdc7B\xd8\x975b[*0\xc4\xb0c-\x1f:P|\xc2}+0\x08\x94\x9f\xf9\xc3?\x9bihO\x03~c\xaekn\xda\xdd\xfaQMo\xcd\xa8\xa0\xb16T\x9c*\x8f\x8e\xc9d\x90F\xf0\xcc(2a5f50C28F04A04B4b9671c02B2fBd757cb51d23\x97\x01nA<e\x08\xd9\x84\x1b\x9a\xbf<My\\E\xb2h\x93\x82$\xf4t\x83\xe2'\xa1a|R\x90"
 DEFAULT_TX_RESPONSE = b"\x00\x0e\x14a\n\xf5\x13\xdf\x91\xf0\xbaE\x80\xbb9\x87k:\xd2\x01\xbc\x87\x8a-4\xf9eDT\"$\x01\xda\x0b\xf6\x94\xeb\x1a->Z\xca\xa0\\e\x9e\xe9\xef\x82\xb9\xf8+\xac\xf5\xc6\x0b\x06P\xb2\xd9\xf03\xe7'\x13"

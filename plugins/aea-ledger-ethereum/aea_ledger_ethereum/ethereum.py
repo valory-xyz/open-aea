@@ -80,7 +80,6 @@ from aea.helpers import http_requests as requests
 from aea.helpers.base import try_decorator
 from aea.helpers.io import open_file
 
-
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum")
 
 _ETHEREUM = "ethereum"

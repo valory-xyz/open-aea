@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Classes to handle AEA configurations."""
+
 import pprint
 from abc import ABC, abstractmethod
 from collections import OrderedDict
@@ -87,7 +88,6 @@ from aea.helpers.base import (
     recursive_update,
 )
 from aea.helpers.ipfs.base import IPFSHashOnly
-
 
 # for tests
 _ = [PackageId, PackageVersion]

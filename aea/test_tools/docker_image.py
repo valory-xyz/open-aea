@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains testing utilities."""
+
 import logging
 import re
 import shutil
@@ -28,7 +29,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Generator, cast
 
 import pytest
-
 
 try:
     import docker

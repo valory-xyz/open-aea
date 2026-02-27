@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,14 +38,15 @@ from aea.protocols.base import Address, Message
 from aea.protocols.dialogue.base import Dialogue
 from aea.skills.base import Handler, Model, Skill, SkillContext
 
-from packages.open_aea.protocols.signing.dialogues import SigningDialogue
+from packages.open_aea.protocols.signing.dialogues import (
+    SigningDialogue,
+)
 from packages.open_aea.protocols.signing.dialogues import (
     SigningDialogues as BaseSigningDialogues,
 )
 from packages.open_aea.protocols.signing.message import SigningMessage
 
 from tests.conftest import get_wealth_if_needed
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

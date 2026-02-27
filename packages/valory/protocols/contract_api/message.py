@@ -36,7 +36,6 @@ from packages.valory.protocols.contract_api.custom_types import (
 )
 from packages.valory.protocols.contract_api.custom_types import State as CustomState
 
-
 _default_logger = logging.getLogger(
     "aea.packages.valory.protocols.contract_api.message"
 )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the protocol generator."""
+
 import itertools
 import os
 import re
@@ -65,7 +66,6 @@ from aea.protocols.generator.common import (
 )
 from aea.protocols.generator.extract_specification import extract
 from aea.protocols.generator.validate import validate
-
 
 PYLINT_DISABLE_SERIALIZATION_PY = [
     "too-many-statements",
@@ -2318,13 +2318,10 @@ class ProtocolGenerator:
         cls_str += self.indent + "return [\n"
 
         for performative, content in self.spec.speech_acts.items():
-            cls_str += (
-                self.indent
-                + f"""
+            cls_str += self.indent + f"""
             {msg_class}(
                 performative={msg_class}.Performative.{performative.upper()}\n,
             """
-            )
             for content_name, content_type in content.items():
                 if content_type in self.spec.all_custom_types:
                     cls_str += (
@@ -2360,13 +2357,10 @@ class ProtocolGenerator:
                 # no content to skip
                 continue
 
-            cls_str += (
-                self.indent
-                + f"""
+            cls_str += self.indent + f"""
             {msg_class}(
                 performative={msg_class}.Performative.{performative.upper()}\n,
             """
-            )
             idx = 0
             for content_name, content_type in content.items():
                 idx += 1

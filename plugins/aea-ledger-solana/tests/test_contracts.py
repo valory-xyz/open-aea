@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests to ensure the contracts work as expected."""
+
 import platform
 from pathlib import Path
 
@@ -25,7 +26,6 @@ import pytest
 from aea_ledger_solana import SolanaApi, SolanaCrypto, SolanaFaucetApi
 
 from tests.conftest import ROOT_DIR
-
 
 PAYER_KEYPAIR_PATH_0 = Path(ROOT_DIR, "tests", "data", "solana_private_key0.txt")
 PAYER_KEYPAIR_PATH_1 = Path(ROOT_DIR, "tests", "data", "solana_private_key1.txt")

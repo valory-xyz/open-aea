@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 # ------------------------------------------------------------------------------
 
 """Test package manager base."""
-
 
 import logging
 import re
@@ -43,7 +42,6 @@ from aea.package_manager.base import (
 from aea.test_tools.test_cases import BaseAEATestCase
 
 from tests.conftest import ROOT_DIR
-
 
 EXAMPLE_PACKAGE_ID = PackageId(
     package_type=PackageType.PROTOCOL,

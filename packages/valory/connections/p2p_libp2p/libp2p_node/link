@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 
-
 # renamed 'link' file
 original_link_file = 'link_orig'
 

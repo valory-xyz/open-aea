@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,9 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains helper methods and classes for the 'aea' package."""
+
 import codecs
 import hashlib
-import io
 import os
 import platform
 import re
@@ -28,11 +28,11 @@ from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
 
 import base58
+from google.protobuf.descriptor import FieldDescriptor
 
 from aea.helpers.cid import to_v1
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.utils import _protobuf_python_implementation
-
 
 # https://github.com/multiformats/multicodec/blob/master/table.csv
 SHA256_ID = "12"  # 0x12
@@ -281,13 +281,23 @@ class IPFSHashOnly:
     @classmethod
     def _serialize(cls, pb_node: PBNode) -> bytes:  # type: ignore
         """Serialize PBNode instance with fixed fields sequence."""
-        f = io.BytesIO()
-        # type: ignore
+        _chunks = []
         for field_descriptor, field_value in reversed(pb_node.ListFields()):
-            field_descriptor._encoder(  # pylint: disable=protected-access
-                f.write, field_value, True
-            )
-        return f.getvalue()
+            partial_node = type(pb_node)()
+            if field_descriptor.label == FieldDescriptor.LABEL_REPEATED:
+                repeated_field = getattr(partial_node, field_descriptor.name)
+                if field_descriptor.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE:
+                    for item in field_value:
+                        repeated_field.add().CopyFrom(item)
+                else:
+                    repeated_field.extend(field_value)
+            else:
+                if field_descriptor.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE:
+                    getattr(partial_node, field_descriptor.name).CopyFrom(field_value)
+                else:
+                    setattr(partial_node, field_descriptor.name, field_value)
+            _chunks.append(partial_node.SerializeToString(deterministic=True))
+        return b"".join(_chunks)
 
     @classmethod
     def _pb_serialize_bytes(cls, data: bytes) -> Tuple[bytes, int]:

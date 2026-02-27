@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,6 @@ from aea.configurations.constants import (
     SKILLS,
 )
 from aea.helpers.cid import to_v0, to_v1
-
 
 try:
     from aea_cli_ipfs.ipfs_utils import IPFSTool  # type: ignore

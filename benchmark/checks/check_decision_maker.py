@@ -19,6 +19,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage check."""
+
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -45,7 +46,9 @@ from benchmark.checks.utils import (
     print_results,
 )
 
-from packages.open_aea.protocols.signing.dialogues import SigningDialogue
+from packages.open_aea.protocols.signing.dialogues import (
+    SigningDialogue,
+)
 from packages.open_aea.protocols.signing.dialogues import (
     SigningDialogues as BaseSigningDialogues,
 )

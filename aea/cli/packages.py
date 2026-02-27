@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 """Package manager."""
 
-
 import sys
 from pathlib import Path
 from typing import List, cast
@@ -34,7 +33,6 @@ from aea.configurations.constants import PACKAGES
 from aea.package_manager.base import BasePackageManager, PackageFileNotValid
 from aea.package_manager.v0 import PackageManagerV0
 from aea.package_manager.v1 import PackageManagerV1
-
 
 try:
     from aea_cli_ipfs.registry import (  # type: ignore # noqa: F401 # pylint: disable=unused-import

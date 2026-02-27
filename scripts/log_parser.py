@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 # ------------------------------------------------------------------------------
 
 """Parser and plotter for profiling logs. Pyqt5 might be required in some systems in order for the script to work: pip install PyQt5"""
+
 import datetime
 import json
 import os
@@ -27,7 +28,6 @@ from enum import Enum
 from typing import Dict, List, Optional
 
 from matplotlib import pyplot as plt  # type: ignore
-
 
 LOG_FILE_DIR_BASE = "/tmp/oracle_logs"  # nosec
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of cli-commands.md file."""
+
 import pprint
 import re
 from pathlib import Path
@@ -27,7 +28,6 @@ from aea.cli import cli
 
 from tests.conftest import ROOT_DIR
 from tests.test_docs.helper import BaseTestMarkdownDocs
-
 
 IGNORE_MATCHES = ["`-v DEBUG run`", "`config set [path] [--type TYPE]`"]
 

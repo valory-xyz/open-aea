@@ -49,7 +49,6 @@ from packages.valory.protocols.ledger_api.custom_types import (
     TransactionReceipt as CustomTransactionReceipt,
 )
 
-
 _default_logger = logging.getLogger("aea.packages.valory.protocols.ledger_api.message")
 
 DEFAULT_BODY_SIZE = 4

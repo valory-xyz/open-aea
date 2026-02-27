@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check aea dependencies."""
+
 import copy
 import dis
 import importlib
@@ -43,7 +44,6 @@ from typing import (
 
 from pip._internal.commands.show import search_packages_info  # type: ignore
 
-
 AEA_ROOT_DIR = Path(__file__).parent.parent
 
 sys.path.append(str(AEA_ROOT_DIR))
@@ -51,7 +51,6 @@ sys.path.append(str(AEA_ROOT_DIR))
 from aea.crypto.registries import (  # noqa # pylint: disable=wrong-import-position
     crypto_registry,
 )
-
 
 IGNORE: Set[str] = {"pkg_resources", "pip._internal.commands.show"}
 DEP_NAME_RE = re.compile(r"(^[^=><\[]+)", re.I)  # type: ignore

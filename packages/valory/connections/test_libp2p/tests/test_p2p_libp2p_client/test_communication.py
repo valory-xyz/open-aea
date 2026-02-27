@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,6 @@ from packages.valory.connections.test_libp2p.tests.base import (
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p.test_communication import (
     TestP2PLibp2pConnectionRouting,
 )
-
 
 DEFAULT_CLIENTS_PER_NODE = 1
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,6 @@ from aea.configurations.loader import ConfigLoader
 from aea.test_tools.click_testing import CliRunner
 
 from tests.conftest import AUTHOR, CLI_LOG_OPTION, ROOT_DIR
-
 
 REGISTRY_PATH = Path(ROOT_DIR) / "tests" / "data" / "packages"
 
@@ -118,7 +117,7 @@ class TestCreate:
         assert "Contract stub_0 initialized." in outputs
         assert "Contract stub_1 initialized." in outputs
 
-    def teardown(
+    def teardown_method(
         self,
     ):
         """Test teardown."""

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,6 @@ from aea.crypto.ledger_apis import LedgerApis
 from aea.exceptions import AEAEnforceError
 
 from tests.conftest import COSMOS_ADDRESS_ONE
-
 
 logger = logging.getLogger(__name__)
 

@@ -23,7 +23,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="open-aea-ledger-cosmos",
     version="2.0.8",
@@ -43,7 +42,7 @@ setup(
         "ecdsa>=0.15,<0.17.0",
         "bech32>=1.2.0,<2",
         "pycryptodome>=3.10.1,<4.0.0",
-        "cosmpy==0.9.2",
+        "cosmpy<0.12,>=0.11.0",
     ],
     tests_require=["pytest"],
     entry_points={

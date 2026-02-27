@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea push' subcommand."""
+
 import os
 from pathlib import Path
 from shutil import copytree
@@ -47,7 +48,6 @@ from aea.cli.utils.package_utils import (
 )
 from aea.configurations.data_types import PublicId
 from aea.helpers.cid import to_v1
-
 
 try:
     from aea_cli_ipfs.core import IPFSTool  # type: ignore

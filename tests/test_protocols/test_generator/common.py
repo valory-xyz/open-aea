@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains utility code for the test_generator modules."""
+
 import os
 
 from tests.conftest import ROOT_DIR
-
 
 T_PROTOCOL_NAME = "t_protocol"
 PATH_TO_T_PROTOCOL_SPECIFICATION = os.path.join(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check amount of time and mem for agent setup."""
+
 import os
 import time
 from pathlib import Path
@@ -30,7 +31,6 @@ from click.testing import CliRunner
 
 from aea import AEA_DIR as _AEA_DIR
 from aea.aea_builder import AEABuilder
-
 
 AEA_DIR = Path(_AEA_DIR)
 PACKAGES_DIR = AEA_DIR.parent / "packages"

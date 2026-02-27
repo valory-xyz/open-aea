@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ from typing import Optional, Tuple, Union
 import pytest
 from solders.signature import Signature
 
-
 if platform.system() != "Linux":
     pytest.skip("Runs only on linux", allow_module_level=True)
 
@@ -38,7 +37,6 @@ from solders.system_program import ID as SYS_PROGRAM_ID
 from aea.common import JSONLike
 
 from tests.conftest import AIRDROP_AMOUNT, MAX_FLAKY_RERUNS, ROOT_DIR
-
 
 # testing keys #
 program_keypair_path = Path(ROOT_DIR, "tests", "data", "solana_private_key_program.txt")

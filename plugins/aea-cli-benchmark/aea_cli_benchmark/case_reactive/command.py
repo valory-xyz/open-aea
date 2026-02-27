@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Latency and throughput check."""
+
 from typing import Any, List, Tuple
 
 import click
@@ -29,7 +30,6 @@ from aea_cli_benchmark.utils import (
     runtime_mode_deco,
     with_packages,
 )
-
 
 PACKAGES = [("protocol", "open_aea/signing"), ("protocol", "fetchai/default")]
 

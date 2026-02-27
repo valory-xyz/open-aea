@@ -27,7 +27,6 @@ from aea.helpers.search.models import Description as BaseDescription
 from aea.helpers.search.models import Query as BaseQuery
 from aea.helpers.serializers import DictProtobufStructSerializer
 
-
 Description = BaseDescription
 
 

@@ -8,20 +8,20 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
-  base.py: bafybeicibxlywffu5f6lg2betosq2tamnrdubblvgqgvzhfjhpimngmqle
-  connection.py: bafybeicydkymhz2feqmihtkiwdfg7pp4pww2elqv4tijuhjcplyvawdk74
-  contract_dispatcher.py: bafybeiegp25e4fhgnyhx33s5lz3xxeftuszomtkewdr5frsyllmoef7w3u
-  ledger_dispatcher.py: bafybeidx6taabp6av6osal65uc7dwt7qgdv7xw6k277wlgtnsvyoksv6v4
+  base.py: bafybeifghgrbfxfiw5rykpm5lndpodwk6255zdjurh7if6ierhbhchtz74
+  connection.py: bafybeicz37uto2qojuxni3uph6dwbce5fwqjx6jfhtbqvmqynssuhkambe
+  contract_dispatcher.py: bafybeicnsfw2lvsx73f3bvc44sd7p3q2imhxt3yg5tvuw36ktjfgd7lxpm
+  ledger_dispatcher.py: bafybeiehqptlnjwzeuhhczcei4anbbl2ykpfik5wz2f3kjl2ondopexkkq
   tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
-  tests/conftest.py: bafybeid7vo7e2m76ey5beeadtbxywxx5ukefd5slwbc362rwmhht6i45ou
-  tests/test_contract_dispatcher.py: bafybeiag5lnpc7h25w23ash4hk4cowxsy5buxgpr474l3tfewnhf56eqyq
-  tests/test_ledger.py: bafybeigcedfr3yv3jse3xwrerrgwbelgb56uhgrvdus527d3daekh6dx4m
-  tests/test_ledger_api.py: bafybeiaicxq56bujtdqxy5czakzr5wpnf23q7ya4fc6oaimh5b5ydjhahi
+  tests/conftest.py: bafybeibvvorlz3xqgyq2htiazeygbcytvyn2cqkscg54lgylnqk2d5d4mm
+  tests/test_contract_dispatcher.py: bafybeih6qu32kqj2enq3poc4i2capp4lipxwgsiv7d5amdyyx6brggrtby
+  tests/test_ledger.py: bafybeihl33w4buy37kvph6axbln5uiy25avr3i5ifhspkopynx7lt4g3lq
+  tests/test_ledger_api.py: bafybeiah4oj5vas4oxj7d6kf577eldo5yf4bac75jm2ln2r2q3zstxxtfa
 fingerprint_ignore_patterns: []
 connections: []
 protocols:
-- valory/contract_api:1.0.0:bafybeigl7mxuyxngk4gztgygeccbgdfrllx73kwbvvkjvtkfw6ionyd56q
-- valory/ledger_api:1.0.0:bafybeig7yk77pmebqcb33jbavodcslmltitz2uolq6s5arklvsvu5bvp7y
+- valory/contract_api:1.0.0:bafybeibld2xb5m7kyluiptkamp4nrt6oeomkohz7a3yppbv2oo7qw2e4la
+- valory/ledger_api:1.0.0:bafybeiecq56phjfws36rgrefw6niyo4ezesloodsfis647mpm5ygqo4ysi
 class_name: LedgerConnection
 config:
   ledger_apis:

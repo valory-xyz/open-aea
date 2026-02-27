@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -82,7 +82,6 @@ from packages.valory.connections.test_libp2p.tests.conftest import (
     LIBP2P_LEDGER,
     NodeConfig,
 )
-
 
 DEFAULT_HOST = LOCALHOST.hostname
 
@@ -456,7 +455,7 @@ class BaseP2PLibp2pAEATestCaseMany(AEATestCaseMany):
     p2p_libp2p_client_path = f"vendor.{p2p_libp2p_client.__name__.split('.', 1)[-1]}"
     package_registry_src_rel: Path = Path(__file__).parent.parent.parent.parent.parent
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
 
         self.create_agents(self.agent_name)
@@ -497,7 +496,7 @@ class BaseP2PLibp2pAEATestCaseMany(AEATestCaseMany):
         """Make node cert request"""
         return make_cert_request(pub_key, self.agent_ledger_id, f"./{pub_key}")
 
-    def teardown(self):
+    def teardown_method(self):
         """Clean up after test case run."""
         self.unset_agent_context()
         self.run_cli_command("delete", self.agent_name)

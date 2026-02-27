@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,12 +40,12 @@ Hence, any usage of file system functionalities
 should either use 'open_file', or set 'newline="\n"' when
 calling the 'open' or the 'pathlib.Path.open' functions.
 """
+
 import collections
 import csv
 from functools import partial
 from pathlib import Path
 from typing import Callable, Dict, Optional, TextIO, Union
-
 
 UNIX_LINESEP = "\n"
 

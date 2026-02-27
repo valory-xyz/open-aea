@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Performance checks utils."""
+
 import asyncio
 import inspect
 import multiprocessing
@@ -50,7 +51,6 @@ from aea.skills.base import Behaviour, Handler, Skill, SkillContext
 from packages.fetchai.protocols.default.message import (  # noqa: F402  # pylint: disable=import-outside-toplevel,unused-import
     DefaultMessage,
 )
-
 
 ERROR_SKILL_NAME = "error"
 ROOT_DIR = os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())))  # type: ignore

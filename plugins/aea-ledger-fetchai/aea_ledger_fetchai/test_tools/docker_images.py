@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +19,12 @@
 # ------------------------------------------------------------------------------
 
 """This module contains testing utilities."""
+
 import logging
 import os
 import tempfile
 import time
 from typing import Any, Dict, Optional
-
 
 try:
     from docker import DockerClient
@@ -37,7 +37,6 @@ except ImportError:  # pragma: nocover
 from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
 from aea.test_tools.docker_image import DockerImage
-
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +119,6 @@ class FetchLedgerDockerImage(DockerImage):
             network="host",
             volumes=volumes,
             entrypoint=str(entrypoint),
-            ports=self.PORTS,
         )
         return container
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Python code execution time limit tools."""
+
 import asyncio
 import concurrent
 import ctypes
@@ -30,7 +31,6 @@ from asyncio.events import AbstractEventLoop
 from threading import Lock
 from types import TracebackType
 from typing import Any, Optional, Type
-
 
 _default_logger = logging.getLogger(__file__)
 

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ledger API connection for the contract APIs."""
+
 import asyncio
 import logging
 import os
@@ -46,14 +47,15 @@ from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as ERC1155_PUB
 from packages.valory.connections.ledger.contract_dispatcher import (
     ContractApiRequestDispatcher,
 )
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
 from packages.valory.protocols.contract_api.message import ContractApiMessage
 
 from tests.conftest import ROOT_DIR
-
 
 SOME_SKILL_ID = "some/skill:0.1.0"
 

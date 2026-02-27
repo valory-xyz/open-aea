@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module sets up test environment for erc1155_deploy skill."""
+
 # pylint: skip-file
 
 from pathlib import Path
@@ -68,7 +69,6 @@ from packages.open_aea.protocols.signing.message import SigningMessage
 from packages.valory.protocols.contract_api.custom_types import Kwargs
 from packages.valory.protocols.contract_api.message import ContractApiMessage
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 
@@ -351,14 +351,14 @@ class ERC1155DeployTestCase(BaseSkillTestCase):
             ),
         )
 
-    def setup(self):
+    def setup_method(self):
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._registration_kwargs = self.registration_behaviour.__dict__.copy()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.registration_behaviour.__dict__.update(self._registration_kwargs)
         self.strategy.__dict__.update(self._init_strategy_kwargs)

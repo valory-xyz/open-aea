@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains testing utilities."""
+
 import logging
 import os
 import re
@@ -34,7 +35,6 @@ from docker.models.containers import Container
 
 from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
-
 
 logger = logging.getLogger(__name__)
 

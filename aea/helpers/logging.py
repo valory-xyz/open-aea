@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,12 @@
 #
 # ------------------------------------------------------------------------------
 """Logging helpers."""
+
 import logging
 from logging import Logger, LoggerAdapter
 from typing import Any, MutableMapping, Optional, Tuple, cast
 
 from aea.helpers.base import _get_aea_logger_name_prefix
-
 
 DEFAULT_FORMAT = "[%(asctime)s][%(levelname)s] %(message)s"
 

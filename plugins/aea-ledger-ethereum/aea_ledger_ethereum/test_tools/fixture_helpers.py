@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ from aea_ledger_ethereum.test_tools.docker_images import GanacheDockerImage
 
 from aea.test_tools.docker_image import launch_image
 from aea.test_tools.network import LOCALHOST
-
 
 DEFAULT_GANACHE_ADDR = LOCALHOST.geturl()
 DEFAULT_GANACHE_PORT = 8545

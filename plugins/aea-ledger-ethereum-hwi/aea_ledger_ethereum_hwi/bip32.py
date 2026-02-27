@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ Original implementation: https://github.com/LedgerHQ/apduboy/blob/master/apduboy
 
 from dataclasses import dataclass, field
 from typing import List
-
 
 BIP32_HARDEN_BIT = 0x80000000
 

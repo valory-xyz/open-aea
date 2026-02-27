@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """The base connection package."""
+
 import asyncio
 import inspect
 import re
@@ -43,7 +44,6 @@ from aea.helpers.async_utils import AsyncState
 from aea.helpers.base import load_module
 from aea.helpers.logging import get_logger
 from aea.identity.base import Identity
-
 
 if TYPE_CHECKING:
     from aea.mail.base import Address, Envelope  # pragma: no cover

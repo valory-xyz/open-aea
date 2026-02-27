@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@
 """Entry-point for the AEA command-line tool."""
 
 from aea.cli.core import cli
-
 
 if __name__ == "__main__":
     cli(prog_name="aea")  # pragma: no cover

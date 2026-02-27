@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check amount of time and mem for agent setup."""
+
 import os
 import shutil
 import time
@@ -38,7 +39,6 @@ from benchmark.checks.utils import (
     output_format_deco,
     print_results,
 )
-
 
 PACKAGES = Path(__file__).parent / "../../packages"
 PROJECT_PATH = str(PACKAGES / "fetchai/agents/my_first_aea")

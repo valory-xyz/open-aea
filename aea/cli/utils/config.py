@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,7 @@
 #
 # ------------------------------------------------------------------------------
 """A module with config tools of the aea cli."""
+
 import json
 import os
 from pathlib import Path

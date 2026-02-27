@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """A module with context tools of the aea cli."""
+
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
@@ -253,7 +254,7 @@ class Context:
                                 extra dependencies and agent dependencies have conflicts
                                 the packages from extra dependencies list will be prefered
                                 over the agent dependencies
-        :return: a list of dependency version specification. e.g. ["gym >= 1.0.0"]
+        :return: a list of dependency version specification. e.g. ["web3 >= 1.0.0"]
         """
         dependencies: Dependencies = {}
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ from typing import Dict, List
 
 from aea.exceptions import enforce
 from aea.test_tools.docker_image import Container, DockerClient, DockerImage
-
 
 META_ADDRESS = "0.0.0.0"  # nosec
 

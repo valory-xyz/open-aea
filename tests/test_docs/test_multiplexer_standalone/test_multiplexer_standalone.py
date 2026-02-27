@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the code-blocks in the multiplexer-standalone.md file."""
+
 import os
 from pathlib import Path
 
@@ -27,7 +28,6 @@ from aea.test_tools.test_cases import BaseAEATestCase
 from tests.conftest import CUR_PATH, ROOT_DIR
 from tests.test_docs.helper import extract_code_blocks, extract_python_code
 from tests.test_docs.test_multiplexer_standalone.multiplexer_standalone import run
-
 
 MD_FILE = "docs/multiplexer-standalone.md"
 PY_FILE = "test_docs/test_multiplexer_standalone/multiplexer_standalone.py"

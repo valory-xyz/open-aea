@@ -22,9 +22,7 @@
 
 """Setup script for the plug-in."""
 
-
 from setuptools import setup  # type: ignore
-
 
 setup(
     name="open-aea-cli-ipfs",

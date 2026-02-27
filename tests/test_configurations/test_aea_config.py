@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the aea configurations."""
+
 import io
 from enum import Enum
 from pathlib import Path
@@ -50,8 +51,7 @@ class NotSet(type):
     """Definition to use when variable is not set."""
 
 
-base_config = dedent(
-    """
+base_config = dedent("""
 agent_name: my_seller_aea
 author: solarw
 version: 0.1.0
@@ -72,8 +72,7 @@ private_key_paths:
 connection_private_key_paths:
     cosmos: tests/data/cosmos_private_key.txt
 dependencies: {}
-"""
-)
+""")
 
 
 class BaseConfigTestVariable(TestCase):

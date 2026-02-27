@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +19,11 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the crypto and the ledger APIs registries."""
+
 from typing import Callable, Type
 
 from aea.crypto.base import Crypto, FaucetApi, LedgerApi
 from aea.crypto.registries.base import Registry
-
 
 crypto_registry: Registry[Crypto] = Registry[Crypto]()
 register_crypto = crypto_registry.register

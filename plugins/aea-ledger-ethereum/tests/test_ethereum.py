@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,6 @@ from aea.crypto.helpers import DecryptError, KeyIsIncorrect
 
 from tests.conftest import DEFAULT_GANACHE_CHAIN_ID, MAX_FLAKY_RERUNS, ROOT_DIR
 
-
 RPC_ENV_VAR_PREFIX = "RPC_"
 
 
@@ -90,7 +89,7 @@ class EIP1559Networks(Enum):
     OPTIMISM = "https://mainnet.optimism.io"
     BASE = "https://mainnet.base.org"
     MODE = "https://mainnet.mode.network"
-    POLYGON = "https://polygon-rpc.com"
+    POLYGON = "https://polygon.drpc.org"
     FRAXTAL = "https://rpc.frax.com"
 
 
@@ -1016,7 +1015,12 @@ def test_try_get_gas_pricing(
             },
             False,
         ),
-        ({"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137}, None, True),
+        pytest.param(
+            {"address": RPCS[EIP1559Networks.POLYGON], "chain_id": 137},
+            None,
+            True,
+            marks=pytest.mark.xfail(reason="Polygon RPC is flaky on CI"),
+        ),
         ({"address": RPCS[EIP1559Networks.FRAXTAL], "chain_id": 252}, None, False),
     ),
 )

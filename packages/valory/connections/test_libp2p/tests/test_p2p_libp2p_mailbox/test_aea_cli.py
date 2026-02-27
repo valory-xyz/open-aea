@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,6 @@ from packages.valory.connections.p2p_libp2p_mailbox.connection import PUBLIC_ID
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_aea_cli import (
     TestP2PLibp2pClientConnectionAEARunning as Base,
 )
-
 
 DEFAULT_HOST = LOCALHOST.hostname
 

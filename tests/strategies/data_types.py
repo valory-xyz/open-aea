@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ from aea.configurations.data_types import (
     PyPIPackageName,
 )
 from aea.helpers.base import IPFSHash, SimpleId
-
 
 positive_integer_strategy = st.integers(min_value=0)
 user_string_pattern = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]{0,127}")
