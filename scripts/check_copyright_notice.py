@@ -467,7 +467,6 @@ def main() -> None:
         Path("tests").glob("**/*.py"),
         Path("plugins").glob("**/*.py"),
         Path("scripts").glob("**/*.py"),
-        Path("examples", "gym_ex").glob("**/*.py"),
         Path("examples", "ml_ex").glob("**/*.py"),
         [Path("setup.py")],
     )

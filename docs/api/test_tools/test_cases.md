@@ -20,7 +20,8 @@ Base class for AEA test cases.
 
 ```python
 @pytest.fixture(autouse=True)
-def set_capfd_on_cli_runner(capfd: CaptureFixture) -> None
+def set_capfd_on_cli_runner(capfd: CaptureFixture,
+                            request: pytest.FixtureRequest) -> None
 ```
 
 Set pytest capfd on CLI runner

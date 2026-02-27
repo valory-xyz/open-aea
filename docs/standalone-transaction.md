@@ -16,7 +16,6 @@ from aea.crypto.helpers import create_private_key, try_generate_testnet_wealth
 from aea.crypto.ledger_apis import LedgerApis
 from aea.crypto.wallet import Wallet
 
-
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)
 
@@ -97,7 +96,6 @@ from aea_ledger_fetchai import FetchAICrypto
 from aea.crypto.helpers import create_private_key, try_generate_testnet_wealth
 from aea.crypto.ledger_apis import LedgerApis
 from aea.crypto.wallet import Wallet
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

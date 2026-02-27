@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,7 +104,7 @@ class TestSkillTestCase(BaseSkillTestCase):
     def test_setup_with_kwargs(self):
         """Test setup with kwargs"""
         setup_class_skill = self.skill
-        super().setup(shared_state=None)
+        super().setup_method(shared_state=None)
         assert self.skill is not setup_class_skill
 
     def test_properties(self):

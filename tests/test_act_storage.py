@@ -197,7 +197,7 @@ def _storage_all_dialogues_labels(storage: BasicDialoguesStorage) -> Set[Dialogu
 class TestDialogueModelSaveLoad(AEATestCaseEmpty):
     """Test dialogues sved and loaded on agent restart."""
 
-    def setup(self):
+    def setup_method(self):
         """Set up the test case."""
         self.add_item("skill", "fetchai/echo:latest", local=True)
         pkey_file = os.path.join(self._get_cwd(), "privkey")

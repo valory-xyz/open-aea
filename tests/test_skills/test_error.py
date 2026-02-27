@@ -70,7 +70,7 @@ class InboxWithHistory(InBox):
 class TestSkillError:
     """Test the skill: Error."""
 
-    def setup(self):
+    def setup_method(self):
         """Test the initialisation of the AEA."""
         private_key_path = os.path.join(CUR_PATH, "data", DEFAULT_PRIVATE_KEY_FILE)
         self.wallet = Wallet({DEFAULT_LEDGER: private_key_path})
@@ -212,7 +212,7 @@ class TestSkillError:
                     f"Cannot handle envelope: no active handler registered for the protocol_specification_id='{protocol_id}'."
                 )
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown method."""
         self.my_aea.stop()
         self.t.join()

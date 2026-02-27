@@ -455,7 +455,7 @@ class BaseP2PLibp2pAEATestCaseMany(AEATestCaseMany):
     p2p_libp2p_client_path = f"vendor.{p2p_libp2p_client.__name__.split('.', 1)[-1]}"
     package_registry_src_rel: Path = Path(__file__).parent.parent.parent.parent.parent
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
 
         self.create_agents(self.agent_name)
@@ -496,7 +496,7 @@ class BaseP2PLibp2pAEATestCaseMany(AEATestCaseMany):
         """Make node cert request"""
         return make_cert_request(pub_key, self.agent_ledger_id, f"./{pub_key}")
 
-    def teardown(self):
+    def teardown_method(self):
         """Clean up after test case run."""
         self.unset_agent_context()
         self.run_cli_command("delete", self.agent_name)

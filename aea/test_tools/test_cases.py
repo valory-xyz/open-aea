@@ -100,9 +100,19 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
     """Base class for AEA test cases."""
 
     @pytest.fixture(autouse=True)
-    def set_capfd_on_cli_runner(self, capfd: CaptureFixture) -> None:
+    def set_capfd_on_cli_runner(
+        self, capfd: CaptureFixture, request: pytest.FixtureRequest
+    ) -> None:
         """Set pytest capfd on CLI runner"""
+        if not hasattr(self, "runner"):
+            type(self).runner = CliRunner()
         self.runner.capfd = capfd
+
+        setup = getattr(self, "setup", None)
+        teardown = getattr(self, "teardown", None)
+        if callable(setup) and callable(teardown):
+            setup()  # pylint: disable=not-callable
+            request.addfinalizer(teardown)
 
     runner: CliRunner  # CLI runner
     last_cli_runner_result: Optional[Result] = None
@@ -972,7 +982,9 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
             and not func.startswith("__")
             and func.startswith("test_")
         ]
+        runner_capfd = getattr(getattr(cls, "runner", None), "capfd", None)
         cls.runner = CliRunner()
+        cls.runner.capfd = runner_capfd
         cls.old_cwd = Path(os.getcwd())
         cls.subprocesses = []
         cls.threads = []

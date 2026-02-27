@@ -65,7 +65,7 @@ class TestFileHashing:
 class TestDirectoryHashing:
     """Test recursive directory hashing."""
 
-    def setup(
+    def setup_method(
         self,
     ) -> None:
         """Setup test."""

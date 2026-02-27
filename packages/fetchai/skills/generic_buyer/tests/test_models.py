@@ -78,10 +78,10 @@ class TestGenericStrategy(BaseSkillTestCase):
         )
         cls._init_strategy_kwargs = cls.strategy.__dict__.copy()
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Teardown"""
 
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._init_strategy_kwargs)
 
     def test_properties(self):

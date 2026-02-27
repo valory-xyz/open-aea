@@ -144,7 +144,8 @@ def test_node_not_alive_can_not_be_started():
     ), patch("time.sleep"), patch("subprocess.Popen"), patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs"
     ), patch(
-        "aea_cli_ipfs.ipfs_utils.IPFSDaemon.start"
+        "aea_cli_ipfs.ipfs_utils.IPFSDaemon.start",
+        side_effect=ConnectionError(None, "oops"),
     ), patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
     ):
@@ -197,10 +198,10 @@ class TestIPFSToolDownload(CliTest):
 
     cli_options = ("ipfs", "download")
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup"""
 
-        super().setup()
+        super().setup_method()
         self.some_ipfs_hash = "not_a_real_ipfs_hash"
         self.target_dir = self.t / "target_dir"
         self.args = self.some_ipfs_hash, str(self.target_dir)

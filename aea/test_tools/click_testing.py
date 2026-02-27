@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -179,12 +179,12 @@ class CliTest(ABC):
 
         os.chdir(cls.__cwd)
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test."""
 
         self._t = Path(tempfile.mkdtemp()).resolve()
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Teardown test."""
 
         remove_test_directory(self._t)

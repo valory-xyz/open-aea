@@ -351,14 +351,14 @@ class ERC1155DeployTestCase(BaseSkillTestCase):
             ),
         )
 
-    def setup(self):
+    def setup_method(self):
         """Setup."""
-        super().setup()
+        super().setup_method()
         self._registration_kwargs = self.registration_behaviour.__dict__.copy()
         self._init_strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.registration_behaviour.__dict__.update(self._registration_kwargs)
         self.strategy.__dict__.update(self._init_strategy_kwargs)

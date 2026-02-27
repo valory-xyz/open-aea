@@ -83,7 +83,7 @@ def test_base_contract_test_case_definition_without_attributes_raises_error() ->
 class TestBaseContractTestCaseSetup:
     """Test BaseContractTestCase setup."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test"""
 
         # must `copy` the class to avoid test interference
@@ -94,7 +94,7 @@ class TestBaseContractTestCaseSetup:
 
         test_instance = self.test_cls()  # type: ignore
         test_instance.setup_class()
-        test_instance.setup()
+        test_instance.setup_method()
         return test_instance
 
     def test_contract_setup_contract_configuration_not_found(self):

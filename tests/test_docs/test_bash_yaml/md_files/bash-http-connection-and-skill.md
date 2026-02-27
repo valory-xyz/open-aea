@@ -3,7 +3,7 @@ aea create my_aea
 cd my_aea
 ```
 ``` bash
-aea add connection valory/http_server:0.22.0:bafybeiduvtgaxqw5yhiym7w6eqjw6j3qypfxcvdkjxoloe745z7hvfcefq --remote
+aea add connection valory/http_server:0.22.0:bafybeiddvj2y25mccqvm5w6bzrn7fnoox7raabhkvpzfldbznxrxkbutmi --remote
 ```
 ``` bash
 aea config set agent.default_connection valory/http_server:0.22.0
@@ -48,7 +48,7 @@ models:
 mkdir packages
 aea create my_aea
 cd my_aea
-aea add connection valory/http_server:0.22.0:bafybeiduvtgaxqw5yhiym7w6eqjw6j3qypfxcvdkjxoloe745z7hvfcefq --remote
+aea add connection valory/http_server:0.22.0:bafybeiddvj2y25mccqvm5w6bzrn7fnoox7raabhkvpzfldbznxrxkbutmi --remote
 aea push connection valory/http_server --local
 aea add protocol fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou --remote
 aea push protocol fetchai/default --local

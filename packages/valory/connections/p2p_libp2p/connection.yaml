@@ -10,7 +10,7 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeiabkdibf7iv3y33xkaemvuwiuhrjedrlvuklgjgty3gzggkgr5d5q
   __init__.py: bafybeibtknmpggpj77fflwndllcqvvbolpds7doymdp4fjd277metq6oxy
-  check_dependencies.py: bafybeicklq3ek2gn3xpncgclns23u7acsyieucys7aybba3pu4qebrhxeq
+  check_dependencies.py: bafybeidj4eoku3mxg3qxvnkfqsr7nmspcz7rh4wmmmipfeylivi2ljh6vy
   connection.py: bafybeib7ao3f2zhsx2bkx6du6l53lpdy2hgmjvdo5nwhgrnfglc7t475c4
   consts.py: bafybeihrr6ms7ctgqldwff4jrqph443vmlt4fblapkk6wlrh3mljerdlfm
   libp2p_node/Makefile: bafybeieuy4mut3oz2aqhtgt3dtky23do7g7tjg6fni4e256i3zg2onzmim
@@ -55,11 +55,11 @@ fingerprint:
   libp2p_node/utils/utils.go: bafybeihbd2br74nm3pupy4qkijm2tnuyl7pbq3uwasidmql5znhbr575k4
   libp2p_node/utils/utils_test.go: bafybeig2kkgqy7miml66w2byomeqjp4czzv45gb4jas76cxildo3lxi4xq
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e
-  tests/base.py: bafybeicj5obkjzmb6vfh55nsxee5knevracgae4by4a5wuhke73ic2z53m
+  tests/base.py: bafybeibjfrqmrj53jyczkiuvzqimjasdqibwthxwp4wy6hkiocdnvrep5y
   tests/test_aea_cli.py: bafybeihllxrp6bjvplvogrdsemel6rrqajl6qvei6ogagx55friwjajiti
   tests/test_build.py: bafybeigkz7isg4enmvfp7sfgx3mpinobi7apja63jfwxwpj2pcf4xepfjq
   tests/test_errors.py: bafybeiev36bsc4zxz2gverenqj4wuqw5btprm7ho5fj3juy3n5f4ppat4q
-  tests/test_go_code_matching_acn.py: bafybeiho5x45cwtnl5xdh7ygief7e27r7quplx7cpaqw7nvtzyt6c54h2e
+  tests/test_go_code_matching_acn.py: bafybeicsua43ax6xsps4a4w35migvrfqmuynfjkai3costywoycnp4uvr4
 fingerprint_ignore_patterns: []
 build_entrypoint: check_dependencies.py
 connections: []
