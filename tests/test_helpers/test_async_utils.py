@@ -224,10 +224,14 @@ class TestRunnable:
 
     def test_no_loop_and_threded(self):
         """Test runnable fails on threaded mode and loop provided.."""
-        with pytest.raises(
-            ValueError,
-        ):
-            RunAndExit(loop=asyncio.get_event_loop(), threaded=True)
+        loop = asyncio.new_event_loop()
+        try:
+            with pytest.raises(
+                ValueError,
+            ):
+                RunAndExit(loop=loop, threaded=True)
+        finally:
+            loop.close()
 
     def test_task_cancel_not_set(self):
         """Test task cancel."""
