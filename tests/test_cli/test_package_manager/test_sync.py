@@ -155,7 +155,7 @@ class TestSyncTypeDefaults(BaseAEATestCase):
 
     def _run_sync_and_capture(
         self, sync_mock: mock.MagicMock, *extra_args: str
-    ) -> mock.call:
+    ) -> mock._Call:
         """Run 'packages sync [extra_args]' and return the captured sync() call."""
         result = self.run_cli_command("packages", "sync", *extra_args)
         assert result.exit_code == 0, result.output
