@@ -52,7 +52,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/protocols/dialogue/base.py:207-220` — Uses `_` as separator in `__str__` and `split("_")` in `from_str`. Breaks if addresses or references contain underscores. Not fixable without changing `__str__`, which would break backward compatibility with persisted dialogue storage keys. `from_str` is not used in production code (only tests); production serialization uses `from_json`/`json`.
 
-### P13. MEDIUM — `sys.stderr` permanently replaced with `/dev/null`
+### P13. MEDIUM — `sys.stderr` permanently replaced with `/dev/null` ✅
 
 `aea/cli/run.py:218` — After profiling stops, stderr is redirected to devnull and never restored. All subsequent error output is silenced. The file handle also leaks.
 
@@ -68,11 +68,11 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/manager/manager.py` — `_agents`, `_agents_tasks`, `_projects` dicts are accessed from both main thread and background event loop thread with no mutex protection. Can cause `RuntimeError: dictionary changed size during iteration`.
 
-### P17. MEDIUM — `_wait_for_result` crashes on `queue.Empty`
+### P17. MEDIUM — `_wait_for_result` crashes on `queue.Empty` ✅
 
 `aea/manager/manager.py:242-254` — `get_nowait()` is called immediately after detecting process is dead, but the result may not yet be in the queue. Unhandled `queue.Empty` exception.
 
-### P18. MEDIUM — `PosixNamedPipeProtocol` leaks file descriptors on retry
+### P18. MEDIUM — `PosixNamedPipeProtocol` leaks file descriptors on retry ✅
 
 `aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input fd from line 157 is never closed before recursing to retry. Each retry leaks an fd.
 
@@ -80,19 +80,19 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/protocols/base.py:86-89` — Consistency check failures are caught and only logged. Invalid messages are created in an inconsistent state with no programmatic way to detect the error.
 
-### P20. MEDIUM — `re.match` for class name lookup allows partial/regex matches
+### P20. MEDIUM — `re.match` for class name lookup allows partial/regex matches ✅
 
 `aea/connections/base.py:294`, `aea/contracts/base.py:131` — Class names from config are used as regex patterns with `re.match`, which doesn't require a full match. `"MyConn"` would match `"MyConnection"`.
 
-### P21. MEDIUM — `MixedRegistry.check_item_present` missing early return
+### P21. MEDIUM — `MixedRegistry.check_item_present` missing early return ✅
 
 `aea/cli/publish.py:273-293` — After successful local check, no `return` statement. Falls through to remote check. If remote registry is down but package exists locally, publish fails with misleading error.
 
-### P22. MEDIUM — `ItemSpec.get_class` mutates class objects via `setattr`
+### P22. MEDIUM — `ItemSpec.get_class` mutates class objects via `setattr` ✅
 
 `aea/crypto/registries/base.py:149-158` — Every call to `get_class()` sets class-level attributes via `setattr`. Not thread-safe; concurrent calls with different kwargs corrupt each other.
 
-### P23. MEDIUM — No thread safety in component registries
+### P23. MEDIUM — No thread safety in component registries ✅
 
 `aea/registries/base.py:337-367` — Non-atomic read-unregister-modify-register pattern with no locking. Dynamic component registration can lose updates under concurrent access.
 
