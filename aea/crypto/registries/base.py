@@ -153,8 +153,8 @@ class ItemSpec(Generic[ItemType]):
         :return: an item class
         """
         cls = self.entry_point.load()
-        if self._class_kwargs:
-            cls = type(cls.__name__, (cls,), dict(self._class_kwargs))
+        for key, value in self._class_kwargs.items():
+            setattr(cls, key, value)
         return cls
 
 

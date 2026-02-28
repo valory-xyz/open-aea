@@ -88,9 +88,9 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/cli/publish.py:273-293` — After successful local check, no `return` statement. Falls through to remote check. If remote registry is down but package exists locally, publish fails with misleading error.
 
-### P22. MEDIUM — `ItemSpec.get_class` mutates class objects via `setattr` ✅
+### P22. INFO — `ItemSpec.get_class` mutates class objects via `setattr`
 
-`aea/crypto/registries/base.py:149-158` — Every call to `get_class()` sets class-level attributes via `setattr`. Not thread-safe; concurrent calls with different kwargs corrupt each other.
+`aea/crypto/registries/base.py:149-158` — Every call to `get_class()` sets class-level attributes via `setattr` on the original class. If two `ItemSpec` instances reference the same class with different `class_kwargs`, the last call wins. In practice this does not occur: crypto plugins register distinct classes, and contracts have a re-registration guard. Fixing this (e.g. via dynamic subclassing) would change `type(instance) is OriginalClass` identity checks, breaking downstream code that relies on exact type matching. Left as-is for consistency and backward compatibility.
 
 ### P23. MEDIUM — No thread safety in component registries ✅
 
