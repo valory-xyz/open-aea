@@ -488,8 +488,8 @@ class Libp2pNode:
 
         if (
             platform.system() != "Windows"
-            and sys.version_info.major == 3
-            and sys.version_info.minor >= 8
+            and sys.version_info >= (3, 8)
+            and sys.version_info < (3, 14)  # get_child_watcher removed in 3.14
         ):  # pragma: nocover
             with events.get_child_watcher() as watcher:
                 if watcher:
