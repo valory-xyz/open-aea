@@ -179,7 +179,7 @@ class ProtectedQueue(Queue):
         """
         if not (isinstance(internal_message, Message) or internal_message is None):
             raise ValueError("Only messages are allowed!")
-        super().put(internal_message, block=True, timeout=None)
+        super().put(internal_message, block=block, timeout=timeout)
 
     def put_nowait(  # pylint: disable=arguments-differ
         self, internal_message: Optional[Message]

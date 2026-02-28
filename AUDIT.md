@@ -96,17 +96,17 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/registries/base.py:337-367` — Non-atomic read-unregister-modify-register pattern with no locking. Dynamic component registration can lose updates under concurrent access.
 
-### P24. LOW — `ProtectedQueue.put` ignores caller-supplied `block` and `timeout`
+### P24. LOW — `ProtectedQueue.put` ignores caller-supplied `block` and `timeout` ✅
 
 `aea/decision_maker/base.py:182` — Hard-codes `block=True, timeout=None` regardless of caller arguments.
 
-### P25. LOW — `BaseException` catch converts Ctrl-C to ClickException
+### P25. LOW — `BaseException` catch converts Ctrl-C to ClickException (deferred)
 
-`aea/cli/remove.py:425` — Makes it impossible to interrupt a removal operation with Ctrl-C.
+`aea/cli/remove.py:425` — Makes it impossible to interrupt a removal operation with Ctrl-C. Deferred: changing exception handling flow in CLI commands could affect downstream error handling, exit codes, or cleanup logic.
 
-### P26. LOW — `Dependency.from_json` does not preserve `extras`
+### P26. LOW — `Dependency.from_json` does not preserve `extras` (deferred)
 
-`aea/configurations/data_types.py:937-953` — `extras` not in `allowed_keys`. Round-tripping through JSON loses extras information.
+`aea/configurations/data_types.py:937-953` — `extras` not in `allowed_keys`. Round-tripping through JSON loses extras information. Deferred: adding `extras` to serialization changes output that downstream tools may parse or compare, and could affect package hash generation.
 
 ## Developer Experience (DevX) Issues
 
