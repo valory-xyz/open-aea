@@ -61,12 +61,22 @@ class RequestDispatcher(ABC):
         :param api_configs: api configs.
         """
         self.connection_state = connection_state
-        self.loop = loop if loop is not None else asyncio.get_event_loop()
+        self._loop = loop
         self.executor = executor
         self._api_configs = api_configs
         self.logger = logger
         self.retry_attempts = retry_attempts
         self.retry_timeout = retry_timeout
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """Get the event loop.
+
+        :return: the event loop.
+        """
+        if self._loop is not None:
+            return self._loop
+        return asyncio.get_running_loop()
 
     def api_config(self, ledger_id: str) -> Dict[str, str]:
         """Get api config."""

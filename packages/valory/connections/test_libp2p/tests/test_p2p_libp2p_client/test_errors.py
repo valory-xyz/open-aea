@@ -46,6 +46,7 @@ from packages.valory.connections.test_libp2p.tests.base import (
     ports,
 )
 
+
 def _make_done_future() -> asyncio.Future:
     """Create a Future with result already set.
 
@@ -101,7 +102,9 @@ class TestLibp2pClientConnectionFailureNodeNotConnected(BaseP2PLibp2pTest):
         ]
 
         with patch.object(
-            self.connection, "_perform_connection_to_node", return_value=_make_done_future()
+            self.connection,
+            "_perform_connection_to_node",
+            return_value=_make_done_future(),
         ) as connect_mock:
             assert await self.connection._read_envelope_from_node() is None
             connect_mock.assert_called()
@@ -113,7 +116,9 @@ class TestLibp2pClientConnectionFailureNodeNotConnected(BaseP2PLibp2pTest):
         self.connection._node_client = Mock()
         self.connection._node_client.send_envelope.side_effect = Exception("oops")
         with patch.object(
-            self.connection, "_perform_connection_to_node", return_value=_make_done_future()
+            self.connection,
+            "_perform_connection_to_node",
+            return_value=_make_done_future(),
         ) as connect_mock, patch.object(
             self.connection, "_ensure_valid_envelope_for_external_comms"
         ):
