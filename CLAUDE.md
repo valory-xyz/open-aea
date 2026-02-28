@@ -1,6 +1,6 @@
-# CLAUDE.md
+# CLAUDE
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (`claude.ai/code`) when working with code in this repository.
 
 ## Project Overview
 
@@ -58,8 +58,8 @@ make protolint        # Lint .proto files
 
 ## Code Style
 
-- **Black** with line length 88, **isort** with black-compatible profile
-- **Docstrings**: Sphinx style (enforced by darglint)
+- **Black** with line length 88, **`isort`** with black-compatible profile
+- **Docstrings**: Sphinx style (enforced by `darglint`)
 - All files must include the Apache 2.0 license header (checked by `tox -e fix-copyright`)
 - Generated `*_pb2.py` files are excluded from all linting
 
@@ -67,26 +67,26 @@ make protolint        # Lint .proto files
 
 ### Core Framework (`aea/`)
 
-The AEA runtime is an asyncio-based agent loop. Key classes:
+The AEA runtime is an `asyncio`-based agent loop. Key classes:
 
-- **`AEA`** (`aea/aea.py`) — Main agent class inheriting from `Agent`. Manages lifecycle, communications, and resource coordination
+- **`AEA`** (`aea/aea.py`) — Main agent class inheriting from `Agent`. Manages life cycle, communications, and resource coordination
 - **`AEABuilder`** (`aea/aea_builder.py`) — Programmatic agent construction, configuration loading, dependency resolution
-- **`Multiplexer`** (`aea/multiplexer.py`) — Communication hub managing multiple connections, with InBox/OutBox message queues
+- **`Multiplexer`** (`aea/multiplexer.py`) — Communication hub managing multiple connections, with `InBox`/`OutBox` message queues
 
 ### Component Model
 
 Agents are composed of four component types, each loaded via configuration:
 
-- **Skills** (`aea/skills/`) — Agent behavior: **Handlers** (reactive, respond to messages), **Behaviours** (proactive, internally triggered), **Models** (state), **Tasks** (background work). Skills are horizontally arranged and can compete.
+- **Skills** (`aea/skills/`) — Agent behaviour: **Handlers** (reactive, respond to messages), **Behaviours** (proactive, internally triggered), **Models** (state), **Tasks** (background work). Skills are horizontally arranged and can compete.
 - **Protocols** (`aea/protocols/`) — Define message syntax and dialogues. Use Protocol Buffers for serialization. Each skill maps to at least one protocol.
 - **Connections** (`aea/connections/`) — Network/service interfaces wrapping SDKs/APIs. Translate between Envelopes/Messages and external protocols.
 - **Contracts** (`aea/contracts/`) — Blockchain smart contract wrappers.
 
-Communication uses **Envelopes** (to, sender, protocol_id, message, context) routed through the Multiplexer.
+Communication uses **Envelopes** (`to`, `sender`, `protocol_id`, `message`, `context`) routed through the `Multiplexer`.
 
 ### Plugin System (`plugins/`)
 
-Ledger integrations and CLI extensions are plugins, each with their own setup.py and tests:
+Ledger integrations and CLI extensions are plugins, each with their own `setup.py` and tests:
 - `aea-ledger-ethereum`, `aea-ledger-cosmos`, `aea-ledger-fetchai`, `aea-ledger-solana`
 - `aea-ledger-ethereum-flashbots`, `aea-ledger-ethereum-hwi`
 - `aea-cli-ipfs`, `aea-cli-benchmark`

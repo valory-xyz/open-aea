@@ -32,6 +32,7 @@ from aea.cli.registry.settings import (
     REGISTRY_LOCAL,
     REGISTRY_MIXED,
     REGISTRY_REMOTE,
+    REGISTRY_TYPES,
     REMOTE_HTTP,
     REMOTE_IPFS,
 )
@@ -299,14 +300,16 @@ def registry_flag(
         get_or_create_cli_config().get("registry_config", {}).get("default")
     )
     default_registry = default_registry or REGISTRY_LOCAL
+    if default_registry not in REGISTRY_TYPES:
+        default_registry = REGISTRY_LOCAL
 
     def wrapper(f: Callable) -> Callable:
         f = option(
-            "--local",
+            "--mixed",
             "registry",
-            flag_value=REGISTRY_LOCAL,
-            help="To use a local registry.",
-            default=(REGISTRY_LOCAL == default_registry) and mark_default,
+            flag_value=REGISTRY_MIXED,
+            help="To use a local and remote registries.",
+            default=(REGISTRY_MIXED == default_registry) and mark_default,
         )(f)
         f = option(
             "--remote",
@@ -316,11 +319,11 @@ def registry_flag(
             default=(REGISTRY_REMOTE == default_registry) and mark_default,
         )(f)
         f = option(
-            "--mixed",
+            "--local",
             "registry",
-            flag_value=REGISTRY_MIXED,
-            help="To use a local and remote registries.",
-            default=(REGISTRY_MIXED == default_registry) and mark_default,
+            flag_value=REGISTRY_LOCAL,
+            help="To use a local registry.",
+            default=(REGISTRY_LOCAL == default_registry) and mark_default,
         )(f)
         return f
 
@@ -342,21 +345,23 @@ def remote_registry_flag(
     )
 
     default_registry = default_registry or REMOTE_IPFS
+    if default_registry not in (REMOTE_HTTP, REMOTE_IPFS):
+        default_registry = REMOTE_IPFS
 
     def wrapper(f: Callable) -> Callable:
-        f = option(
-            "--ipfs",
-            "remote_registry",
-            flag_value=REMOTE_IPFS,
-            help="To use an IPFS registry.",
-            default=(REMOTE_IPFS == default_registry) and mark_default,
-        )(f)
         f = option(
             "--http",
             "remote_registry",
             flag_value=REMOTE_HTTP,
             help="To use an HTTP registry.",
             default=(REMOTE_HTTP == default_registry) and mark_default,
+        )(f)
+        f = option(
+            "--ipfs",
+            "remote_registry",
+            flag_value=REMOTE_IPFS,
+            help="To use an IPFS registry.",
+            default=(REMOTE_IPFS == default_registry) and mark_default,
         )(f)
         return f
 

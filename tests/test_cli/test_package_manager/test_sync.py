@@ -143,3 +143,51 @@ class TestSyncCommand(BaseAEATestCase):
                 "Updating (protocol, open_aea/signing:1.0.0:bafybeiambqptflge33eemdhis2whik67hjplfnqwieoa6wblzlaf7vuo41)"
                 in caplog.text
             )
+
+
+@mock.patch("aea.cli.packages.IS_IPFS_PLUGIN_INSTALLED", True)
+@mock.patch("aea.package_manager.base.load_fetch_ipfs")
+@mock.patch(
+    "aea.package_manager.base.BasePackageManager.calculate_hash_from_package_id"
+)
+class TestSyncTypeDefaults(BaseAEATestCase):
+    """Test that sync-type flags route to the correct sync path."""
+
+    def _run_sync_and_capture(
+        self, sync_mock: mock.MagicMock, *extra_args: str
+    ) -> mock._Call:
+        """Run 'packages sync [extra_args]' and return the captured sync() call."""
+        result = self.run_cli_command("packages", "sync", *extra_args)
+        assert result.exit_code == 0, result.output
+        assert sync_mock.call_count == 1
+        call = sync_mock.call_args
+        sync_mock.reset_mock()
+        return call
+
+    def test_no_flag_defaults_to_third_party(self, ipfs_mock, hash_mock) -> None:
+        """No sync-type flag => third_party=True, dev=False."""
+        with mock.patch.object(PackageManagerV1, "sync") as sync_mock:
+            call = self._run_sync_and_capture(sync_mock)
+        assert call.kwargs.get("dev") is False
+        assert call.kwargs.get("third_party") is True
+
+    def test_third_party_flag(self, ipfs_mock, hash_mock) -> None:
+        """--third-party => third_party=True, dev=False."""
+        with mock.patch.object(PackageManagerV1, "sync") as sync_mock:
+            call = self._run_sync_and_capture(sync_mock, "--third-party")
+        assert call.kwargs.get("third_party") is True
+        assert call.kwargs.get("dev") is False
+
+    def test_dev_flag(self, ipfs_mock, hash_mock) -> None:
+        """--dev => dev=True, third_party=False."""
+        with mock.patch.object(PackageManagerV1, "sync") as sync_mock:
+            call = self._run_sync_and_capture(sync_mock, "--dev")
+        assert call.kwargs.get("dev") is True
+        assert call.kwargs.get("third_party") is False
+
+    def test_all_flag(self, ipfs_mock, hash_mock) -> None:
+        """--all => dev=True, third_party=True."""
+        with mock.patch.object(PackageManagerV1, "sync") as sync_mock:
+            call = self._run_sync_and_capture(sync_mock, "--all")
+        assert call.kwargs.get("dev") is True
+        assert call.kwargs.get("third_party") is True

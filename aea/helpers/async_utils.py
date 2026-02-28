@@ -441,6 +441,12 @@ class Runnable(ABC):
             try:
                 self._loop = self._loop or asyncio.get_event_loop()
             except RuntimeError:
+                # Python 3.12/3.14 raise RuntimeError when no current event loop
+                self._loop = None
+            if self._loop is None or self._loop.is_closed():
+                # Python 3.10/3.11/3.13 may return a closed loop instead of
+                # raising RuntimeError; 3.14 may also return a closed loop if
+                # one was set. We must check is_closed() to handle all versions.
                 self._loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(self._loop)
 

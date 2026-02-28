@@ -87,8 +87,14 @@ class TestConnectionTestCase:
         obj = self.TConnection(
             ConnectionConfig("some_connection", "fetchai", "0.1.0"), MagicMock()
         )
-        with pytest.raises(AEAEnforceError):
-            obj.loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            with pytest.raises(AEAEnforceError):
+                obj.loop
+        finally:
+            asyncio.set_event_loop(None)
+            loop.close()
 
     def test_excluded_protocols_positive(self):
         """Test excluded_protocols property positive result."""
@@ -104,9 +110,15 @@ def test_loop_property():
     connection = TConnection(
         MagicMock(public_id=TConnection.connection_id), MagicMock()
     )
-    with unittest.mock.patch.object(aea.connections.base, "enforce"):
-        loop = connection.loop
-        assert isinstance(loop, asyncio.AbstractEventLoop)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        with unittest.mock.patch.object(aea.connections.base, "enforce"):
+            result = connection.loop
+            assert isinstance(result, asyncio.AbstractEventLoop)
+    finally:
+        asyncio.set_event_loop(None)
+        loop.close()
 
 
 def test_ensure_valid_envelope_for_external_comms_negative_cases():

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +40,7 @@ from aea.common import JSONLike
 from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_README_FILE,
     PROTOCOLS,
@@ -82,6 +83,7 @@ def publish_agent(ctx: Context) -> None:
         "version": ctx.agent_config.version,
         CONNECTIONS: ctx.agent_config.connections,
         CONTRACTS: ctx.agent_config.contracts,
+        CUSTOMS: ctx.agent_config.customs,
         PROTOCOLS: ctx.agent_config.protocols,
         SKILLS: ctx.agent_config.skills,
     }
