@@ -38,6 +38,7 @@ from pexpect.exceptions import EOF  # type: ignore
 
 import aea
 from aea.cli.core import cli
+from aea.configurations.base import PublicId
 from aea.configurations.constants import DEFAULT_LEDGER
 from aea.connections.base import ConnectionStates
 from aea.helpers.async_friendly_queue import AsyncFriendlyQueue
@@ -340,6 +341,37 @@ async def test_receiving_loop_raises_exception():
 
 
 @pytest.mark.asyncio
+async def test_receiving_loop_survives_single_connection_failure():
+    """Test that one connection's receive() error does not kill the whole loop."""
+    connection = _make_dummy_connection()
+
+    call_count = 0
+    original_receive = connection.receive
+
+    async def failing_receive(*args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            raise Exception("connection error")
+        return await original_receive(*args, **kwargs)
+
+    # Replace receive before connect so the receiving loop uses our version
+    connection.receive = failing_receive
+
+    multiplexer = Multiplexer([connection])
+    multiplexer.connect()
+    try:
+        # Give the receiving loop time to process the error and retry
+        await asyncio.sleep(0.5)
+        # The receiving loop should still be running (not killed by the error)
+        assert multiplexer.connection_status.is_connected
+        # The connection's receive was called again after the error
+        assert call_count >= 2, f"Expected receive to be retried, but was called {call_count} time(s)"
+    finally:
+        multiplexer.disconnect()
+
+
+@pytest.mark.asyncio
 async def test_send_envelope_with_non_registered_connection():
     """Test that sending an envelope with an unregistered connection raises an exception."""
     connection = _make_dummy_connection()
@@ -501,6 +533,14 @@ def test_autoset_default_connection():
     multiplexer._default_connection = None
     multiplexer._set_default_connection_if_none()
     assert multiplexer._default_connection == connections[0]
+
+
+def test_default_connection_validation_rejects_invalid():
+    """Test that an invalid default_connection is rejected even when connections list is non-empty."""
+    connection_1 = _make_dummy_connection()
+    invalid_default = PublicId("nonexistent", "connection", "0.1.0")
+    with pytest.raises(aea.exceptions.AEAEnforceError):
+        Multiplexer([connection_1], default_connection=invalid_default)
 
 
 def test__get_connection():

@@ -522,7 +522,7 @@ class Dialogue(
         """
         return (
             self.dialogue_label.dialogue_opponent_addr
-            is not self.dialogue_label.dialogue_starter_addr
+            != self.dialogue_label.dialogue_starter_addr
         )
 
     @property

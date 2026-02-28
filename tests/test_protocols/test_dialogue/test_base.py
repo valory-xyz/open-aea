@@ -234,7 +234,6 @@ class TestDialogueLabel:
         )
         assert complete_dialogue_label is None
 
-
 class TestDialogueBase:
     """Test for Dialogue."""
 
@@ -330,12 +329,36 @@ class TestDialogueBase:
         assert self.dialogue.message_class == DefaultMessage
 
         assert self.dialogue.is_self_initiated
+        assert not self.dialogue_opponent_started.is_self_initiated
 
         assert self.dialogue.last_incoming_message is None
         assert self.dialogue.last_outgoing_message is None
         assert self.dialogue.last_message is None
 
         assert self.dialogue.is_empty
+
+    def test_is_self_initiated_with_non_interned_strings(self):
+        """Test is_self_initiated uses equality, not identity, for address comparison."""
+        # Build addresses from parts to avoid Python string interning
+        addr = "".join(["agent", " ", "x"])
+        label = DialogueLabel(
+            dialogue_reference=(str(1), ""),
+            dialogue_opponent_addr="agent y",
+            dialogue_starter_addr=addr,
+        )
+        dialogue = Dialogue(dialogue_label=label)
+        assert dialogue.is_self_initiated
+
+        # When opponent == starter (both equal but distinct objects), not self-initiated
+        addr_copy = "".join(["agent", " ", "y"])
+        assert addr_copy == "agent y"
+        label_not_self = DialogueLabel(
+            dialogue_reference=(str(1), str(1)),
+            dialogue_opponent_addr=addr_copy,
+            dialogue_starter_addr="agent y",
+        )
+        dialogue_not_self = Dialogue(dialogue_label=label_not_self)
+        assert not dialogue_not_self.is_self_initiated
 
     def test_counterparty_from_message(self):
         """Test the 'counterparty_from_message' method."""

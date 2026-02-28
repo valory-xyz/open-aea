@@ -68,7 +68,7 @@ def install_dependencies(
     """
     try:
         pip_args = list(chain(*[d.get_pip_install_args() for d in dependencies]))
-        pip_args = [("--extra-index" if i == "-i" else i) for i in pip_args]
+        pip_args = [("--extra-index-url" if i == "-i" else i) for i in pip_args]
         logger.debug("Calling 'pip install {}'".format(" ".join(pip_args)))
         call_pip(["install", *pip_args], timeout=install_timeout, retry=True)
     except Exception as e:

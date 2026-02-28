@@ -136,11 +136,9 @@ class AsyncMultiplexer(Runnable, WithLogger):
 
         if default_connection:
             enforce(
-                bool(
-                    [
-                        i.connection_id.same_prefix(default_connection)
-                        for i in connections
-                    ]
+                any(
+                    i.connection_id.same_prefix(default_connection)
+                    for i in connections
                 ),
                 f"Default connection {default_connection} does not present in connections list!",
             )
@@ -529,7 +527,19 @@ class AsyncMultiplexer(Runnable, WithLogger):
                 # process completed receiving tasks.
                 for task in done:
                     connection = task_to_connection.pop(task)
-                    envelope = task.result()
+                    try:
+                        envelope = task.result()
+                    except Exception:  # pylint: disable=broad-except
+                        self.logger.exception(
+                            f"Error when receiving an envelope from connection {connection.connection_id}. "
+                        )
+                        # reinstantiate receiving task if the connection is still up
+                        if connection.is_connected:
+                            new_task = asyncio.ensure_future(
+                                connection.receive()
+                            )
+                            task_to_connection[new_task] = connection
+                        continue
                     if envelope is not None:
                         self._update_routing_helper(envelope, connection)
                         self.in_queue.put_nowait(envelope)
