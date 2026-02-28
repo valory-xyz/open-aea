@@ -763,7 +763,7 @@ def _parse_module(
     classes = inspect.getmembers(component_module, inspect.isclass)
     component_classes = list(
         filter(
-            lambda x: any(re.match(component, x[0]) for component in component_names)
+            lambda x: x[0] in component_names
             and issubclass(x[1], component_class)
             and not str.startswith(x[1].__module__, "aea.")
             and not str.startswith(

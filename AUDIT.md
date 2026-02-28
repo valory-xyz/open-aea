@@ -82,7 +82,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P20. MEDIUM — `re.match` for class name lookup allows partial/regex matches ✅
 
-`aea/connections/base.py:294`, `aea/contracts/base.py:131` — Class names from config are used as regex patterns with `re.match`, which doesn't require a full match. `"MyConn"` would match `"MyConnection"`.
+`aea/connections/base.py:294`, `aea/contracts/base.py:131`, `aea/protocols/base.py:393,404`, `aea/skills/base.py:766` — Class names from config are used as regex patterns with `re.match`, which doesn't require a full match. `"MyConn"` would match `"MyConnection"`. Fixed across all four component types (connections, contracts, protocols, skills). Customs are config-only and have no class loading.
 
 ### P21. MEDIUM — `MixedRegistry.check_item_present` missing early return ✅
 
