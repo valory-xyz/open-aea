@@ -432,3 +432,19 @@ def test_list_missing_packages():
         "aea.cli.registry.utils._perform_registry_request", return_value=resp_404
     ):
         assert list_missing_packages(packages) == packages
+
+
+def test_request_api_handles_500_with_non_json_body():
+    """Test that request_api handles HTTP 500 with non-JSON response body."""
+    resp_500 = MagicMock()
+    resp_500.status_code = 500
+    resp_500.json.side_effect = JSONDecodeError("msg", "doc", 0)
+    resp_500.text = "Internal Server Error"
+
+    with patch(
+        "aea.cli.registry.utils._perform_registry_request", return_value=resp_500
+    ):
+        with pytest.raises(ClickException) as exc_info:
+            request_api("GET", "/some/path")
+        # Should not crash with TypeError, should give a meaningful message
+        assert "500" in str(exc_info.value) or "server" in str(exc_info.value).lower()

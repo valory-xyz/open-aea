@@ -21,7 +21,7 @@
 
 import asyncio
 from asyncio.events import AbstractEventLoop
-from concurrent.futures._base import CancelledError
+from asyncio import CancelledError
 from contextlib import suppress
 from enum import Enum
 from typing import Dict, Optional, Type, cast

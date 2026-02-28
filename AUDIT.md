@@ -110,21 +110,21 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ## Developer Experience (DevX) Issues
 
-### D1. HIGH — `logging.getLogger(__file__)` instead of `__name__`
+### D1. HIGH — `logging.getLogger(__file__)` instead of `__name__` ✅
 
 `aea/helpers/async_utils.py:48`, `aea/helpers/profiling.py:45`, `aea/helpers/exec_timeout.py:35` — Creates logger names like `/Users/.../async_utils.py` instead of `aea.helpers.async_utils`. Breaks the standard Python logging hierarchy — configuring logging for `aea.helpers` won't affect these loggers.
 
-### D2. HIGH — Imports from private `concurrent.futures._base`
+### D2. HIGH — Imports from private `concurrent.futures._base` ✅
 
-`aea/runtime.py:24`, `aea/multiplexer.py:26-27` — Importing `CancelledError` from a private module risks breakage in future Python versions. Should use `asyncio.CancelledError` directly (same class since Python 3.9).
+`aea/runtime.py:24`, `aea/multiplexer.py:26-27` — Importing `CancelledError` and `TimeoutError` from a private module risks breakage in future Python versions. Replaced with `asyncio.CancelledError` and `asyncio.TimeoutError` (same classes since Python 3.9+).
 
-### D3. HIGH — `suppress(Exception, asyncio.CancelledError)` swallows all errors during shutdown
+### D3. HIGH — `suppress(Exception, asyncio.CancelledError)` swallows all errors during shutdown ✅
 
-`aea/multiplexer.py:365-366, 377-378` — All exceptions are silently swallowed with no logging. Makes debugging shutdown issues nearly impossible.
+`aea/multiplexer.py:365-366, 377-378` — All exceptions were silently swallowed with no logging. Replaced with explicit try/except that passes on `CancelledError` (expected during shutdown) but logs other exceptions via `logger.exception`.
 
-### D4. HIGH — `resp_json["detail"]` crashes on HTTP 500 with non-JSON body
+### D4. HIGH — `resp_json["detail"]` crashes on HTTP 500 with non-JSON body ✅
 
-`aea/cli/registry/utils.py:103-117` — If server returns 500 with non-JSON body, `resp_json` is `None` and `resp_json["detail"]` raises `TypeError` instead of a meaningful error.
+`aea/cli/registry/utils.py:103-117` — If server returns 500 with non-JSON body, `resp_json` is `None` and `resp_json["detail"]` raises `TypeError` instead of a meaningful error. Also fixed same pattern for 409 responses.
 
 ### D5. MEDIUM — 17+ uses of deprecated `asyncio.get_event_loop()`
 
