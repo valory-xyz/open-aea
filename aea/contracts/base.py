@@ -126,9 +126,7 @@ class Contract(Component):
         contract_module = load_module(CONTRACTS, directory / "contract.py")
         classes = inspect.getmembers(contract_module, inspect.isclass)
         contract_class_name = cast(str, configuration.class_name)
-        contract_classes = list(
-            filter(lambda x: x[0] == contract_class_name, classes)
-        )
+        contract_classes = list(filter(lambda x: x[0] == contract_class_name, classes))
         name_to_class = dict(contract_classes)
         _default_logger.debug(f"Processing contract {contract_class_name}")
         contract_class = name_to_class.get(contract_class_name, None)

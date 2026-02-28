@@ -112,17 +112,17 @@ def request_api(  # pylint: disable=too-many-positional-arguments
             'You are not authenticated. Please sign in with "aea login" command.'
         )
     elif resp.status_code == 500:
-        detail = resp_json["detail"] if resp_json and "detail" in resp_json else resp.text
-        raise click.ClickException(
-            "Registry internal server error: {}".format(detail)
+        detail = (
+            resp_json["detail"] if resp_json and "detail" in resp_json else resp.text
         )
+        raise click.ClickException("Registry internal server error: {}".format(detail))
     elif resp.status_code == 404:
         raise click.ClickException("Not found in Registry.")
     elif resp.status_code == 409:
-        detail = resp_json["detail"] if resp_json and "detail" in resp_json else resp.text
-        raise click.ClickException(
-            "Conflict in Registry. {}".format(detail)
+        detail = (
+            resp_json["detail"] if resp_json and "detail" in resp_json else resp.text
         )
+        raise click.ClickException("Conflict in Registry. {}".format(detail))
     elif resp.status_code == 400:
         if handle_400:
             raise click.ClickException(resp_json)

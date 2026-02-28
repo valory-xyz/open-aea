@@ -506,4 +506,3 @@ class BaseTestDecisionMaker:
 
 class TestDecisionMaker(BaseTestDecisionMaker):
     """Run test for default decision maker."""
-

@@ -235,8 +235,10 @@ def test_mixed_registry_returns_on_local_success():
     with mock.patch.object(
         LocalRegistry, "check_item_present", return_value=None
     ), mock.patch.object(
-        RemoteRegistry, "check_item_present", side_effect=click.ClickException("Remote down")
-    ) as mock_remote:
+        RemoteRegistry,
+        "check_item_present",
+        side_effect=click.ClickException("Remote down"),
+    ):
         # Should NOT raise, even though remote is down, because local check succeeded
         registry.check_item_present(
             "protocols", PublicId.from_str("author/package:0.1.0")

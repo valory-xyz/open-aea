@@ -656,12 +656,12 @@ class Skill(Component):
 
     @property
     def behaviours(self) -> Dict[str, Behaviour]:
-        """Get the handlers."""
+        """Get the behaviours."""
         return self._behaviours
 
     @property
     def models(self) -> Dict[str, Model]:
-        """Get the handlers."""
+        """Get the models."""
         return self._models
 
     @classmethod

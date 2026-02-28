@@ -285,9 +285,9 @@ def test_profiling_context_restores_stderr():
     with patch("aea.cli.run.Profiling"):
         with _profiling_context(period=1):
             pass
-    assert sys.stderr is original_stderr, (
-        "sys.stderr was not restored after _profiling_context"
-    )
+    assert (
+        sys.stderr is original_stderr
+    ), "sys.stderr was not restored after _profiling_context"
 
 
 # @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)

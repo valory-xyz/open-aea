@@ -366,7 +366,9 @@ async def test_receiving_loop_survives_single_connection_failure():
         # The receiving loop should still be running (not killed by the error)
         assert multiplexer.connection_status.is_connected
         # The connection's receive was called again after the error
-        assert call_count >= 2, f"Expected receive to be retried, but was called {call_count} time(s)"
+        assert (
+            call_count >= 2
+        ), f"Expected receive to be retried, but was called {call_count} time(s)"
     finally:
         multiplexer.disconnect()
 

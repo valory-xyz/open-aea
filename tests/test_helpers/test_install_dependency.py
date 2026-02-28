@@ -26,7 +26,10 @@ import pytest
 
 from aea.configurations.base import Dependency
 from aea.exceptions import AEAException
-from aea.helpers.install_dependency import call_pip, install_dependencies, install_dependency
+from aea.helpers.install_dependency import (
+    install_dependencies,
+    install_dependency,
+)
 
 
 class InstallDependencyTestCase(TestCase):
@@ -88,13 +91,11 @@ class InstallDependenciesTestCase(TestCase):
 def test_install_dependencies_uses_extra_index_url():
     """Test that install_dependencies rewrites -i to --extra-index-url (not --extra-index)."""
     dep = Dependency("mypkg", "==1.0.0", index="https://custom.pypi.org/simple")
-    with mock.patch(
-        "aea.helpers.install_dependency.call_pip"
-    ) as mock_call_pip:
+    with mock.patch("aea.helpers.install_dependency.call_pip") as mock_call_pip:
         mock_call_pip.return_value = None
         install_dependencies([dep], mock.Mock())
         args = mock_call_pip.call_args[0][0]
-        assert "--extra-index-url" in args, (
-            f"Expected --extra-index-url in pip args, got: {args}"
-        )
+        assert (
+            "--extra-index-url" in args
+        ), f"Expected --extra-index-url in pip args, got: {args}"
         assert "-i" not in args, f"Expected -i to be replaced, got: {args}"

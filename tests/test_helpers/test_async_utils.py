@@ -438,5 +438,7 @@ def test_default_logger_uses_module_name():
     from aea.helpers.async_utils import _default_logger
 
     # Logger name should be a dotted module path, not a file path
-    assert "/" not in _default_logger.name, f"Logger name is a file path: {_default_logger.name}"
+    assert (
+        "/" not in _default_logger.name
+    ), f"Logger name is a file path: {_default_logger.name}"
     assert _default_logger.name == "aea.helpers.async_utils"

@@ -1011,6 +1011,6 @@ async def test_wait_for_result_handles_empty_queue():
         await task._wait_for_result()
 
     # Should get a meaningful error, not queue.Empty
-    assert not isinstance(exc_info.value, queue.Empty), (
-        "_wait_for_result raised queue.Empty instead of a meaningful error"
-    )
+    assert not isinstance(
+        exc_info.value, queue.Empty
+    ), "_wait_for_result raised queue.Empty instead of a meaningful error"

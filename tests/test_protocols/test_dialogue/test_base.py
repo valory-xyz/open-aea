@@ -234,6 +234,7 @@ class TestDialogueLabel:
         )
         assert complete_dialogue_label is None
 
+
 class TestDialogueBase:
     """Test for Dialogue."""
 

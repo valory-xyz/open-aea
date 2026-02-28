@@ -150,33 +150,33 @@ Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running lo
 
 `aea/connections/base.py:380-388` — Parameter immediately overwritten by config value on the next line. Fixed to use `max_workers` as fallback when config does not specify `max_thread_workers`.
 
-### D11. LOW — Dead code: Python < 3.7 compatibility branches
+### D11. LOW — Dead code: Python < 3.7 compatibility branches ✅
 
-`aea/protocols/dialogue/base.py:55-70` — Unreachable since the project requires Python 3.10+.
+`aea/protocols/dialogue/base.py:55-70` — Unreachable since the project requires Python 3.10+. Removed branch, kept only the Python 3.7+ path. Also removed unused `sys` import.
 
-### D12. LOW — Typos in code
+### D12. LOW — Typos in code ✅ (partial)
 
-- `aea/multiplexer.py:133` — `"os out of"` should be `"is out of"`
-- `aea/multiplexer.py:235` — `"multipelxer"` should be `"multiplexer"`
-- `aea/cli/utils/exceptions.py:30` — Function named `aev_flag_depreaction` should be `deprecation`; message has `"envrionment varibales"` should be `"environment variables"`
-- `aea/configurations/manager.py:356` — `substitude_env_vars` should be `substitute_env_vars` (public API, breaking to rename)
+- `aea/multiplexer.py:133` — `"os out of"` → `"is out of"` ✅
+- `aea/multiplexer.py:235` — `"multipelxer"` → `"multiplexer"` ✅
+- `aea/cli/utils/exceptions.py:30` — Function `aev_flag_depreaction` → `aev_flag_deprecation`; message `"envrionment varibales"` → `"environment variables"` ✅
+- `aea/configurations/manager.py:356` — `substitude_env_vars` should be `substitute_env_vars`. Deferred: public API parameter used extensively across codebase, tests, and docs. Breaking to rename.
 
-### D13. LOW — Stale deprecation warning claims removal in v2.0.0
+### D13. LOW — Stale deprecation warning claims removal in v2.0.0 ✅
 
-`aea/cli/utils/exceptions.py:30-33` — The `--aev` flag deprecation message says "will be removed in v2.0.0" but the current version is 2.1.0rc2.
+`aea/cli/utils/exceptions.py:30-33` — Removed the stale "will be removed in v2.0.0" version reference from the deprecation message.
 
-### D14. LOW — `clean_tarfiles` removes ALL `.tar.gz` files in CWD
+### D14. LOW — `clean_tarfiles` removes ALL `.tar.gz` files in CWD (deferred)
 
-`aea/cli/registry/utils.py:238-259` — Not scoped to the file created by the decorated function.
+`aea/cli/registry/utils.py:238-259` — Not scoped to the file created by the decorated function. Deferred: scoping it could break if the decorated function creates multiple tarfiles or relies on cleanup of pre-existing files.
 
-### D15. LOW — Copy-paste docstring errors
+### D15. LOW — Copy-paste docstring errors ✅
 
-`aea/skills/base.py:658-665` — Both `behaviours` and `models` properties say "Get the handlers."
+`aea/skills/base.py:658-665` — Both `behaviours` and `models` properties said "Get the handlers." Fixed to "Get the behaviours." and "Get the models." respectively.
 
-### D16. LOW — `--aev` flag value hardcoded to `True`
+### D16. LOW — `--aev` flag value hardcoded to `True` (deferred)
 
-`aea/cli/run.py:156` — `--aev` flag exists on CLI but `apply_environment_variables` is always passed as `True`. Misleading interface.
+`aea/cli/run.py:156` — `--aev` flag exists on CLI but `apply_environment_variables` is always passed as `True`. Misleading interface. Deferred: removing the flag or making it functional changes CLI behavior that downstream tools may depend on.
 
-### D17. LOW — `AgentRunProcessTask._run_agent` — `aea` may be unbound in finally
+### D17. LOW — `AgentRunProcessTask._run_agent` — `aea` may be unbound in finally ✅
 
-`aea/manager/manager.py:269-303` — If `get_aea_instance()` raises, `aea.logger.debug(...)` in the finally block causes `NameError`.
+`aea/manager/manager.py:269-303` — If `get_aea_instance()` raises, `aea.logger.debug(...)` in the finally block causes `NameError`. Added guard to check `"aea" in locals()` before accessing.

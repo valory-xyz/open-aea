@@ -21,10 +21,9 @@
 
 import asyncio
 import errno
-import os
 from threading import Thread
 from unittest import mock
-from unittest.mock import patch, call
+from unittest.mock import patch
 
 import pytest
 
@@ -183,9 +182,9 @@ async def test_posix_pipe_closes_in_fd_on_enxio_retry():
     in_fd = 42
     enxio_error = OSError(errno.ENXIO, "No such device or address")
 
-    with patch("os.open", side_effect=[in_fd, enxio_error, in_fd, in_fd]) as mock_open, \
-         patch("os.close") as mock_close, \
-         patch("asyncio.sleep", return_value=None):
+    with patch("os.open", side_effect=[in_fd, enxio_error, in_fd, in_fd]), patch(
+        "os.close"
+    ) as mock_close, patch("asyncio.sleep", return_value=None):
         # Will fail on first attempt (ENXIO on output), then succeed or run out of attempts
         pipe._connection_attempts = 2  # force exit after retry
         await pipe.connect(timeout=1.0)

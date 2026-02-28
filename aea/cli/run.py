@@ -33,7 +33,7 @@ from aea.cli.utils.click_utils import ConnectionsOption, password_option
 from aea.cli.utils.constants import AEA_LOGO, REQUIREMENTS
 from aea.cli.utils.context import Context
 from aea.cli.utils.decorators import check_aea_project
-from aea.cli.utils.exceptions import aev_flag_depreaction
+from aea.cli.utils.exceptions import aev_flag_deprecation
 from aea.cli.utils.package_utils import list_available_packages
 from aea.configurations.base import ComponentType, PublicId
 from aea.configurations.manager import AgentConfigManager
@@ -120,7 +120,7 @@ def run(  # pylint: disable=too-many-positional-arguments
 ) -> None:
     """Run the agent."""
     if apply_environment_variables:
-        aev_flag_depreaction()
+        aev_flag_deprecation()
 
     if connection_ids and exclude_connection_ids:
         raise click.ClickException(

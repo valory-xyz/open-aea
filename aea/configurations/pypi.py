@@ -253,7 +253,7 @@ def merge_dependencies(dep1: Dependencies, dep2: Dependencies) -> Dependencies:
         old_dep = result.get(pkg_name)
         old_dep_exists = old_dep is not None
         new_dep_is_simple = is_simple_dep(info)
-        old_dep_is_simple = is_simple_dep(old_dep) if old_dep_exists else False
+        old_dep_is_simple = is_simple_dep(old_dep) if old_dep is not None else False
 
         # if the new dependency already exists in the list, ignore
         if old_dep == info:

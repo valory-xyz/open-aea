@@ -250,9 +250,7 @@ class AgentRunProcessTask(BaseAgentRunTask):
             result = self._result_queue.get_nowait()
         except queue.Empty:
             self.process.join(self.PROCESS_JOIN_TIMEOUT)
-            raise RuntimeError(
-                "Agent process terminated without returning a result."
-            )
+            raise RuntimeError("Agent process terminated without returning a result.")
         self.process.join(self.PROCESS_JOIN_TIMEOUT)
         if isinstance(result, Exception):
             raise result
@@ -305,7 +303,8 @@ class AgentRunProcessTask(BaseAgentRunTask):
             if t:
                 t.join(10)
             result_queue.put(r)
-            aea.logger.debug("process task stopped")
+            if "aea" in locals():
+                aea.logger.debug("process task stopped")
 
     def stop(self) -> None:
         """Stop the task."""
