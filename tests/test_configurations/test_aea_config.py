@@ -271,7 +271,7 @@ class TestStorageUriConfigVariable(BaseConfigTestVariable):
 
 
 class TestConnectionExceptionPolicyConfigVariable(BaseConfigTestVariable):
-    """Test `skill_exception_policy` aea config option."""
+    """Test `connection_exception_policy` aea config option."""
 
     OPTION_NAME = "connection_exception_policy"
     CONFIG_ATTR_NAME = "connection_exception_policy"
@@ -280,6 +280,17 @@ class TestConnectionExceptionPolicyConfigVariable(BaseConfigTestVariable):
     REQUIRED = False
     AEA_ATTR_NAME = "_connection_exception_policy"
     AEA_DEFAULT_VALUE = ExceptionPolicyEnum.propagate
+
+    def test_policy_reaches_multiplexer(self) -> None:
+        """Test that connection_exception_policy propagates to the multiplexer."""
+        for policy in ExceptionPolicyEnum:
+            configuration = self._make_configuration(policy)
+            builder = AEABuilder()
+            builder.set_from_configuration(
+                configuration, aea_project_path=Path(ROOT_DIR)
+            )
+            aea = builder.build()
+            assert aea.runtime.multiplexer._exception_policy == policy
 
 
 class TestRuntimeModeConfigVariable(BaseConfigTestVariable):

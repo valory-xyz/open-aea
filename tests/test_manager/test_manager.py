@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """This module contains tests for aea manager."""
 
+import asyncio
 import contextlib
 import logging
 import os
@@ -64,10 +65,6 @@ try:
 except AttributeError:
     pass
 
-
-pytestmark = pytest.mark.skip(
-    reason="Unknown issue: https://github.com/valory-xyz/open-aea/actions/runs/7162860465/job/19500538744?pr=698"
-)
 
 DEFAULT_TIMEOUT = 120
 NOT_BEFORE = "2022-01-01"
@@ -977,3 +974,19 @@ def test_handle_error_on_load_state():
             assert not manager.list_agents()
         finally:
             manager.stop_manager()
+
+
+def test_agent_run_process_task_start_uses_create_task():
+    """Test that AgentRunProcessTask.start() uses loop.create_task (not deprecated ensure_future with loop=)."""
+    loop = asyncio.new_event_loop()
+    agent_alias = Mock()
+    task = AgentRunProcessTask(agent_alias, loop)
+    try:
+        with patch.object(
+            loop, "create_task", wraps=loop.create_task
+        ) as mock_ct, patch("multiprocessing.Process.start"):
+            task.start()
+            mock_ct.assert_called_once()
+    finally:
+        task._manager.shutdown()
+        loop.close()

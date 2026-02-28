@@ -27,10 +27,6 @@ import pytest
 
 from aea.manager.utils import run_in_venv
 
-pytestmark = pytest.mark.skip(
-    reason="Unknown issue: https://github.com/valory-xyz/open-aea/actions/runs/7162860465/job/19500538744?pr=698"
-)
-
 RETURN_VALUE = randint(0, 2000)  # nosec
 
 DEFAULT_TIMEOUT = 20
