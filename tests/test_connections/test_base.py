@@ -229,3 +229,18 @@ def test_set_base_state():
     )
     with pytest.raises(ValueError, match="Incorrect state.*"):
         con.state = "some bad state"
+
+
+def test_set_executor_pool_respects_max_workers_param():
+    """Test that _set_executor_pool uses the max_workers parameter as fallback."""
+    from aea.connections.base import BaseSyncConnection
+
+    con = MagicMock(spec=BaseSyncConnection)
+    con.configuration = ConnectionConfig("some_connection", "fetchai", "0.1.0")
+    # Ensure config does NOT have max_thread_workers set
+    con.configuration.config.pop("max_thread_workers", None)
+    con.connection_id = PublicId.from_str("fetchai/some_connection:0.1.0")
+    con.MAX_WORKER_THREADS = 5
+    # Call the real method on the mock
+    BaseSyncConnection._set_executor_pool(con, max_workers=3)
+    assert con._executor_pool._max_workers == 3

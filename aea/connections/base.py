@@ -379,7 +379,7 @@ class BaseSyncConnection(Connection):
     def _set_executor_pool(self, max_workers: Optional[int] = None) -> None:
         """Set executors pool."""
         max_workers = self.configuration.config.get(
-            "max_thread_workers", self.MAX_WORKER_THREADS
+            "max_thread_workers", max_workers or self.MAX_WORKER_THREADS
         )
         thread_name_prefix = f"conn:{self.connection_id}:"
         self._executor_pool = ThreadPoolExecutor(

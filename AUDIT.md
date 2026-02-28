@@ -126,29 +126,29 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/cli/registry/utils.py:103-117` — If server returns 500 with non-JSON body, `resp_json` is `None` and `resp_json["detail"]` raises `TypeError` instead of a meaningful error. Also fixed same pattern for 409 responses.
 
-### D5. MEDIUM — 17+ uses of deprecated `asyncio.get_event_loop()`
+### D5. MEDIUM — 17+ uses of deprecated `asyncio.get_event_loop()` (deferred)
 
-Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running loop exists. Should use `asyncio.get_running_loop()` in async contexts or explicit `asyncio.new_event_loop()` elsewhere.
+Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running loop exists. Should use `asyncio.get_running_loop()` in async contexts or explicit `asyncio.new_event_loop()` elsewhere. Deferred: scattered across many files, each call site needs individual analysis (async vs sync context). High chance of subtle regressions.
 
-### D6. MEDIUM — `inspect.stack()` called on every `PersistDialoguesStorage` init
+### D6. MEDIUM — `inspect.stack()` called on every `PersistDialoguesStorage` init (deferred)
 
-`aea/protocols/dialogue/base.py:1057-1068` — Expensive operation that captures all frames and prevents garbage collection of local variables. Performance bottleneck with many dialogues.
+`aea/protocols/dialogue/base.py:1057-1068` — Expensive operation that captures all frames and prevents garbage collection of local variables. Performance bottleneck with many dialogues. Deferred: fixing requires passing the skill component explicitly rather than introspecting the stack, which changes the constructor's public API.
 
-### D7. MEDIUM — Class-level mutable defaults in `BaseAEATestCase`
+### D7. MEDIUM — Class-level mutable defaults in `BaseAEATestCase` (deferred)
 
-`aea/test_tools/test_cases.py:120-135` — `subprocesses`, `threads`, `agents` are shared mutable class defaults. Can leak between test classes if setup/teardown discipline isn't followed.
+`aea/test_tools/test_cases.py:120-135` — `subprocesses`, `threads`, `agents` are shared mutable class defaults. Can leak between test classes if setup/teardown discipline isn't followed. Deferred: changing to instance-level initialization could break subclasses in downstream projects that access these before setup runs or override them at class level.
 
-### D8. MEDIUM — `asyncio.Queue()` outside event loop in `BaseSkillTestCase`
+### D8. MEDIUM — `asyncio.Queue()` outside event loop in `BaseSkillTestCase` (deferred)
 
-`aea/test_tools/test_skill.py:507-509` — Deprecated in Python 3.10+. Emits warnings or fails in newer Python versions.
+`aea/test_tools/test_skill.py:507-509` — Deprecated in Python 3.10+. Emits warnings or fails in newer Python versions. Deferred: this is in test tooling used by downstream projects. Changing queue creation could break test setup patterns in dependent projects.
 
-### D9. MEDIUM — `_load_state` breaks on first project failure
+### D9. INFO — `_load_state` breaks on first project failure
 
-`aea/manager/manager.py:1072-1093` — Uses `break` instead of `continue` when a project fails to load, silently skipping all remaining projects.
+`aea/manager/manager.py:1072-1093` — Uses `break` instead of `continue` when a project fails to load, skipping remaining projects. Likely intentional fail-fast behavior: subsequent projects may depend on the failed one, and continuing could cause cascading errors or inconsistent state. The `failed_to_load` list is returned to the caller to handle.
 
-### D10. MEDIUM — `_set_executor_pool` ignores its `max_workers` parameter
+### D10. MEDIUM — `_set_executor_pool` ignores its `max_workers` parameter ✅
 
-`aea/connections/base.py:380-388` — Parameter immediately overwritten by config value on the next line.
+`aea/connections/base.py:380-388` — Parameter immediately overwritten by config value on the next line. Fixed to use `max_workers` as fallback when config does not specify `max_thread_workers`.
 
 ### D11. LOW — Dead code: Python < 3.7 compatibility branches
 
