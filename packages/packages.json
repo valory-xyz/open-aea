@@ -13,7 +13,7 @@
         "contract/fetchai/erc1155/0.22.0": "bafybeidejj3rt3agmwrcncff7jrbpv6obknhpwi24wr7qq2ufi2b2gswoy",
         "connection/fetchai/stub/0.21.0": "bafybeihjlr7xeurjm56ckji3gjjlao4pykkgk5xcdmfpjraxwyaljmlh4q",
         "connection/valory/ledger/0.19.0": "bafybeidxzeygks5zcky4u2ztcdufzptssgf6uqytxofnn6yta7qq6jsim4",
-        "connection/valory/http_server/0.22.0": "bafybeiddvj2y25mccqvm5w6bzrn7fnoox7raabhkvpzfldbznxrxkbutmi",
+        "connection/valory/http_server/0.22.0": "bafybeid4oqsfkqo36lryoecymjnq4whme3tgupqfq6m4l7lbr5r4yxtswu",
         "connection/valory/p2p_libp2p/0.1.0": "bafybeiegkj6v2sltf4mnahuhnevqond5kubnqt6pojgbdo7pgsjthci2rq",
         "connection/valory/p2p_libp2p_client/0.1.0": "bafybeielj3jso3wvrarp5n5rq7llpw4vgxybqiyensgjalb5ubfiawwhhu",
         "connection/valory/p2p_libp2p_mailbox/0.1.0": "bafybeifdbpetirc5id7v3y6wop5mylqh726mo7jgscl2jl3t4f7vusqcnq",
@@ -32,7 +32,7 @@
         "skill/fetchai/task_test_skill/0.1.0": "bafybeic73246oscw5glrvs66b5ptfdzhgnc27le4ivmlz77t7kfjdhyh2e",
         "agent/fetchai/error_test/0.1.0": "bafybeiespr3cxvz2mlmuqwdnhyaexhx2hdq3a75axxeqk5ug5to6yqpi3m",
         "agent/fetchai/my_first_aea/0.27.0": "bafybeigvzq5ygrsworlbz342hvmcrbauyj2444ugxfahzmfwgudvtwoaf4",
-        "agent/open_aea/http_echo/0.1.0": "bafybeifypuxx2lp6cyu2memot4ilyaxp5d2fpy3yv5xaa6ijyoftrd4moa",
+        "agent/open_aea/http_echo/0.1.0": "bafybeicwaj3kyeeomclwjxyaf36zhyxygjc5mrbkspzvrzgbhej3uzwqoy",
         "agent/open_aea/my_first_aea/0.1.0": "bafybeid76dcmtfg4wixmecwrzrrbkm5zovjqgxussqehrkufd3kklpvcby"
     },
     "third_party": {}
