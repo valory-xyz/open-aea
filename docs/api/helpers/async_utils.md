@@ -307,6 +307,31 @@ def stop() -> None
 
 Stop event loop in thread.
 
+<a id="aea.helpers.async_utils._ReadyAwaitable"></a>
+
+## `_`ReadyAwaitable Objects
+
+```python
+class _ReadyAwaitable()
+```
+
+An awaitable that completes immediately without RuntimeWarning.
+
+Unlike a coroutine, an unawaited instance does not trigger
+'RuntimeWarning: coroutine was never awaited'.
+Unlike asyncio.Future, instantiation does not require a running event loop
+(compatible with Python 3.14+).
+
+<a id="aea.helpers.async_utils._ReadyAwaitable.__await__"></a>
+
+#### `__`await`__`
+
+```python
+def __await__() -> Generator[Any, None, None]
+```
+
+Return an empty iterator to complete immediately.
+
 <a id="aea.helpers.async_utils.Runnable"></a>
 
 ## Runnable Objects
@@ -379,9 +404,10 @@ Implement run logic respectful to CancelError on termination.
 
 ```python
 def wait_completed(
-        sync: bool = False,
-        timeout: Optional[float] = None,
-        force_result: bool = False) -> Union[Coroutine, asyncio.Future]
+    sync: bool = False,
+    timeout: Optional[float] = None,
+    force_result: bool = False
+) -> Union[Coroutine, asyncio.Future, _ReadyAwaitable]
 ```
 
 Wait runnable execution completed.
@@ -411,8 +437,9 @@ Stop runnable.
 #### start`_`and`_`wait`_`completed
 
 ```python
-def start_and_wait_completed(*args: Any,
-                             **kwargs: Any) -> Union[Coroutine, Future]
+def start_and_wait_completed(
+        *args: Any,
+        **kwargs: Any) -> Union[Coroutine, Future, _ReadyAwaitable]
 ```
 
 Alias for start and wait methods.

@@ -158,7 +158,7 @@ class TestRequestDispatcher:
 
     def setup_method(self) -> None:
         """Setup test vars."""
-        self.logger = logging.getLogger(type(self).__class__.__name__)
+        self.logger = logging.getLogger(type(self).__name__)
         self.state = AsyncState(ConnectionStates.connected)
 
     def _setup_dispatcher_for_running_loop(self) -> None:
