@@ -74,7 +74,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P18. MEDIUM — `PosixNamedPipeProtocol` leaks file descriptors on retry ✅
 
-`aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input file descriptor from line 157 is never closed before recursing to retry. Each retry leaks a file descriptor.
+`aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input file descriptor from line 157 is never closed before recursing to retry. Each retry leaks a file descriptor. Fix: close the previous input fd when a new one is opened on retry (not immediately on ENXIO), because named pipes require the read end to stay open for the other side to connect its write end.
 
 ### P19. MEDIUM — `Message.__init__` silently swallows consistency errors (deferred)
 

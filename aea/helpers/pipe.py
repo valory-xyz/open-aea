@@ -154,13 +154,15 @@ class PosixNamedPipeProtocol:
             "Attempt opening pipes {}, {}...".format(self._in_path, self._out_path)
         )
 
+        prev_in = self._in
         self._in = os.open(self._in_path, os.O_RDONLY | os.O_NONBLOCK | os.O_SYNC)
+        if prev_in != -1:
+            os.close(prev_in)
 
         try:
             self._out = os.open(self._out_path, os.O_WRONLY | os.O_NONBLOCK)
         except OSError as e:  # pragma: no cover
             if e.errno == errno.ENXIO:
-                os.close(self._in)
                 self.logger.debug("Sleeping for {}...".format(self._connection_timeout))
                 await asyncio.sleep(self._connection_timeout)
                 return await self.connect(timeout)
