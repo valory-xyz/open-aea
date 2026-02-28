@@ -170,10 +170,8 @@ class PosixNamedPipeProtocol:
             self._in != -1 and self._out != -1 and self._loop is not None,
             "Incomplete initialization.",
         )
-        self._stream_reader = asyncio.StreamReader(loop=self._loop)
-        self._reader_protocol = asyncio.StreamReaderProtocol(
-            self._stream_reader, loop=self._loop
-        )
+        self._stream_reader = asyncio.StreamReader()
+        self._reader_protocol = asyncio.StreamReaderProtocol(self._stream_reader)
         self._fileobj = os.fdopen(self._in, "r")
         await self._loop.connect_read_pipe(
             lambda: self.__reader_protocol, self._fileobj

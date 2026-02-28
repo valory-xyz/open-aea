@@ -230,9 +230,7 @@ class AgentRunProcessTask(BaseAgentRunTask):
 
     def start(self) -> None:
         """Run task in a dedicated process."""
-        self._wait_task = asyncio.ensure_future(
-            self._wait_for_result(), loop=self.caller_loop
-        )
+        self._wait_task = self.caller_loop.create_task(self._wait_for_result())
         self.process = multiprocessing.Process(
             target=self._run_agent,
             args=(self.agent_alias, self._stop_event, self._result_queue),
