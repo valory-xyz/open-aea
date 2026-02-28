@@ -22,6 +22,7 @@
 import asyncio
 import logging
 import multiprocessing
+import sys
 from asyncio.events import AbstractEventLoop
 from concurrent.futures.process import BrokenProcessPool
 from multiprocessing.synchronize import Event
@@ -203,7 +204,13 @@ class AEADirMultiprocessTask(AbstractMultiprocessExecutorTask):
         :param password: the password to encrypt/decrypt the private key.
         """
         self._agent_dir = agent_dir
-        self._manager = multiprocessing.Manager()
+        if sys.version_info >= (3, 14):
+            # Python 3.14 changed the default start method to forkserver,
+            # which causes KeyError: 'multiprocessing.popen_forkserver'
+            ctx = multiprocessing.get_context("spawn")
+            self._manager = ctx.Manager()
+        else:
+            self._manager = multiprocessing.Manager()
         self._stop_event = self._manager.Event()
         self._log_level = log_level
         self._password = password
