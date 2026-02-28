@@ -41,6 +41,7 @@ from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
     CUSTOM,
+    CUSTOMS,
     DEFAULT_README_FILE,
     ITEM_TYPE_PLURAL_TO_TYPE,
     PROTOCOLS,
@@ -149,7 +150,7 @@ def push_item(ctx: Context, item_type: str, item_id: PublicId) -> None:
 
     # dependencies
     dependencies: List[Tuple[str, PublicId]] = []
-    for key in [CONNECTIONS, CONTRACTS, PROTOCOLS, SKILLS]:
+    for key in [CONNECTIONS, CONTRACTS, PROTOCOLS, SKILLS, CUSTOMS]:
         deps_list = item_config.get(key, [])
         if deps_list:
             data.update({key: deps_list})

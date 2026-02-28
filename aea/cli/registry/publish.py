@@ -40,6 +40,7 @@ from aea.common import JSONLike
 from aea.configurations.constants import (
     CONNECTIONS,
     CONTRACTS,
+    CUSTOMS,
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_README_FILE,
     PROTOCOLS,
@@ -82,6 +83,7 @@ def publish_agent(ctx: Context) -> None:
         "version": ctx.agent_config.version,
         CONNECTIONS: ctx.agent_config.connections,
         CONTRACTS: ctx.agent_config.contracts,
+        CUSTOMS: ctx.agent_config.customs,
         PROTOCOLS: ctx.agent_config.protocols,
         SKILLS: ctx.agent_config.skills,
     }
