@@ -10,7 +10,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P2. CRITICAL — `FSMBehaviour` final state detection broken ✅
 
-`aea/skills/behaviours.py:360` — `current_state in self._final_states` compares a `State` object to a `Set[str]`. This never matches, so FSMs can never detect reaching a final state.
+`aea/skills/behaviours.py:360` — `current_state in self._final_states` compares a `State` object to a `Set[str]`. This never matches, so the FSM can never detect reaching a final state.
 
 ### P3. CRITICAL — `TickerBehaviour.last_act_time` returns wrong value ✅
 
@@ -34,7 +34,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P8. HIGH — `merge_dependencies` checks wrong variable ✅
 
-`aea/configurations/pypi.py:256` — `old_dep_is_simple = is_simple_dep(info)` checks the **new** dep instead of the old one. This inverts the merge logic, potentially allowing invalid merges or rejecting valid ones.
+`aea/configurations/pypi.py:256` — `old_dep_is_simple = is_simple_dep(info)` checks the **new** dependency instead of the old one. This inverts the merge logic, potentially allowing invalid merges or rejecting valid ones.
 
 ### P9. HIGH — Single connection failure kills entire receiving loop ✅
 
@@ -54,19 +54,19 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P13. MEDIUM — `sys.stderr` permanently replaced with `/dev/null` ✅
 
-`aea/cli/run.py:218` — After profiling stops, stderr is redirected to devnull and never restored. All subsequent error output is silenced. The file handle also leaks.
+`aea/cli/run.py:218` — After profiling stops, `stderr` is redirected to `/dev/null` and never restored. All subsequent error output is silenced. The file handle also leaks.
 
 ### P14. MEDIUM — Private keys written with default (world-readable) permissions (deferred)
 
-`aea/crypto/base.py:174` — `open(private_key_file, "wb")` uses default permissions (typically `0o644`). Should use `0o600` for private key files. Deferred: changing file permissions is observable behavior that could break downstream tooling, CI/CD pipelines, or scripts that read key files as a different user.
+`aea/crypto/base.py:174` — `open(private_key_file, "wb")` uses default permissions (typically `0o644`). Should use `0o600` for private key files. Deferred: changing file permissions is observable behaviour that could break downstream tooling, CI/CD pipelines, or scripts that read key files as a different user.
 
 ### P15. MEDIUM — `AsyncState` not thread-safe (deferred)
 
-`aea/helpers/async_utils.py:65-160` — Used across threads (runtime state changes from async thread, read from main thread) but has no synchronization primitives protecting `_state`, `_watchers`, or `_callbacks`. Deferred: adding locks to this core runtime primitive changes timing behavior and risks deadlocks or performance regressions. The race condition is real but rarely triggered in practice.
+`aea/helpers/async_utils.py:65-160` — Used across threads (runtime state changes from async thread, read from main thread) but has no synchronization primitives protecting `_state`, `_watchers`, or `_callbacks`. Deferred: adding locks to this core runtime primitive changes timing behaviour and risks deadlocks or performance regressions. The race condition is real but rarely triggered in practice.
 
 ### P16. MEDIUM — Manager shared state modified from multiple threads without locks (deferred)
 
-`aea/manager/manager.py` — `_agents`, `_agents_tasks`, `_projects` dicts are accessed from both main thread and background event loop thread with no mutex protection. Can cause `RuntimeError: dictionary changed size during iteration`. Deferred: adding mutexes could cause deadlocks if existing code holds other locks or does blocking calls while iterating these dicts. The race condition is real but rarely triggered in practice.
+`aea/manager/manager.py` — `_agents`, `_agents_tasks`, `_projects` are accessed from both main thread and background event loop thread with no lock protection. Can cause `RuntimeError: dictionary changed size during iteration`. Deferred: adding mutexes could cause deadlocks if existing code holds other locks or does blocking calls while iterating. The race condition is real but rarely triggered in practice.
 
 ### P17. MEDIUM — `_wait_for_result` crashes on `queue.Empty` ✅
 
@@ -74,11 +74,11 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P18. MEDIUM — `PosixNamedPipeProtocol` leaks file descriptors on retry ✅
 
-`aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input fd from line 157 is never closed before recursing to retry. Each retry leaks an fd.
+`aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input file descriptor from line 157 is never closed before recursing to retry. Each retry leaks a file descriptor.
 
 ### P19. MEDIUM — `Message.__init__` silently swallows consistency errors (deferred)
 
-`aea/protocols/base.py:86-89` — Consistency check failures are caught and only logged. Invalid messages are created in an inconsistent state with no programmatic way to detect the error. Deferred: raising exceptions instead of logging would break any downstream code that constructs messages with temporarily inconsistent fields. The current log-and-continue behavior is almost certainly relied upon.
+`aea/protocols/base.py:86-89` — Consistency check failures are caught and only logged. Invalid messages are created in an inconsistent state with no programmatic way to detect the error. Deferred: raising exceptions instead of logging would break any downstream code that constructs messages with temporarily inconsistent fields. The current log-and-continue behaviour is almost certainly relied upon.
 
 ### P20. MEDIUM — `re.match` for class name lookup allows partial/regex matches ✅
 
@@ -98,7 +98,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 ### P24. INFO — `ProtectedQueue.put` ignores caller-supplied `block` and `timeout`
 
-`aea/decision_maker/base.py:182` — Hard-codes `block=True, timeout=None` regardless of caller arguments. Likely intentional: the `ProtectedQueue` ensures messages between skills and the decision maker are never silently dropped. The method signature is misleading (accepts `block`/`timeout` but ignores them), but changing the behavior risks dropping messages in production. `put_nowait` exists as a separate path for non-blocking puts.
+`aea/decision_maker/base.py:182` — Hard-codes `block=True, timeout=None` regardless of caller arguments. Likely intentional: the `ProtectedQueue` ensures messages between skills and the decision maker are never silently dropped. The method signature is misleading (accepts `block`/`timeout` but ignores them), but changing the behaviour risks dropping messages in production. `put_nowait` exists as a separate path for non-blocking puts.
 
 ### P25. LOW — `BaseException` catch converts Ctrl-C to ClickException (deferred)
 
@@ -108,7 +108,7 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/configurations/data_types.py:937-953` — `extras` not in `allowed_keys`. Round-tripping through JSON loses extras information. Deferred: adding `extras` to serialization changes output that downstream tools may parse or compare, and could affect package hash generation.
 
-## Developer Experience (DevX) Issues
+## Developer Experience Issues
 
 ### D1. HIGH — `logging.getLogger(__file__)` instead of `__name__` ✅
 
@@ -130,9 +130,9 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running loop exists. Should use `asyncio.get_running_loop()` in async contexts or explicit `asyncio.new_event_loop()` elsewhere. Deferred: scattered across many files, each call site needs individual analysis (async vs sync context). High chance of subtle regressions.
 
-### D6. MEDIUM — `inspect.stack()` called on every `PersistDialoguesStorage` init (deferred)
+### D6. MEDIUM — `inspect.stack()` called on every `PersistDialoguesStorage.__init__` (deferred)
 
-`aea/protocols/dialogue/base.py:1057-1068` — Expensive operation that captures all frames and prevents garbage collection of local variables. Performance bottleneck with many dialogues. Deferred: fixing requires passing the skill component explicitly rather than introspecting the stack, which changes the constructor's public API.
+`aea/protocols/dialogue/base.py:1057-1068` — Expensive operation that captures all frames and prevents garbage collection of local variables. Performance bottleneck with many dialogues. Deferred: fixing requires passing the skill component explicitly rather than inspecting the stack, which changes the constructor's public API.
 
 ### D7. MEDIUM — Class-level mutable defaults in `BaseAEATestCase` (deferred)
 
@@ -144,7 +144,7 @@ Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running lo
 
 ### D9. INFO — `_load_state` breaks on first project failure
 
-`aea/manager/manager.py:1072-1093` — Uses `break` instead of `continue` when a project fails to load, skipping remaining projects. Likely intentional fail-fast behavior: subsequent projects may depend on the failed one, and continuing could cause cascading errors or inconsistent state. The `failed_to_load` list is returned to the caller to handle.
+`aea/manager/manager.py:1072-1093` — Uses `break` instead of `continue` when a project fails to load, skipping remaining projects. Likely intentional fail-fast behaviour: subsequent projects may depend on the failed one, and continuing could cause cascading errors or inconsistent state. The `failed_to_load` list is returned to the caller to handle.
 
 ### D10. MEDIUM — `_set_executor_pool` ignores its `max_workers` parameter ✅
 
@@ -167,15 +167,15 @@ Multiple files — Emits `DeprecationWarning` on Python 3.10+ when no running lo
 
 ### D14. LOW — `clean_tarfiles` removes ALL `.tar.gz` files in CWD (deferred)
 
-`aea/cli/registry/utils.py:238-259` — Not scoped to the file created by the decorated function. Deferred: scoping it could break if the decorated function creates multiple tarfiles or relies on cleanup of pre-existing files.
+`aea/cli/registry/utils.py:238-259` — Not scoped to the file created by the decorated function. Deferred: scoping it could break if the decorated function creates multiple tar files or relies on cleanup of pre-existing files.
 
 ### D15. LOW — Copy-paste docstring errors ✅
 
 `aea/skills/base.py:658-665` — Both `behaviours` and `models` properties said "Get the handlers." Fixed to "Get the behaviours." and "Get the models." respectively.
 
-### D16. LOW — `--aev` flag value hardcoded to `True` (deferred)
+### D16. LOW — `--aev` flag value hard-coded to `True` (deferred)
 
-`aea/cli/run.py:156` — `--aev` flag exists on CLI but `apply_environment_variables` is always passed as `True`. Misleading interface. Deferred: removing the flag or making it functional changes CLI behavior that downstream tools may depend on.
+`aea/cli/run.py:156` — `--aev` flag exists on CLI but `apply_environment_variables` is always passed as `True`. Misleading interface. Deferred: removing the flag or making it functional changes CLI behaviour that downstream tools may depend on.
 
 ### D17. LOW — `AgentRunProcessTask._run_agent` — `aea` may be unbound in finally ✅
 
