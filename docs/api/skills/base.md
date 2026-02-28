@@ -868,7 +868,7 @@ Get the handlers.
 def behaviours() -> Dict[str, Behaviour]
 ```
 
-Get the handlers.
+Get the behaviours.
 
 <a id="aea.skills.base.Skill.models"></a>
 
@@ -879,7 +879,7 @@ Get the handlers.
 def models() -> Dict[str, Model]
 ```
 
-Get the handlers.
+Get the models.
 
 <a id="aea.skills.base.Skill.from_dir"></a>
 

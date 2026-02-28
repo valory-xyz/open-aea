@@ -175,7 +175,7 @@ def make_future(result) -> asyncio.Future:
 @pytest.mark.asyncio
 async def test_posix_pipe_closes_in_fd_on_enxio_retry():
     """Test that the input fd is closed when output open fails with ENXIO."""
-    pipe = PosixNamedPipeProtocol(in_path="/tmp/test_in", out_path="/tmp/test_out")
+    pipe = PosixNamedPipeProtocol(in_path="/tmp/test_in", out_path="/tmp/test_out")  # nosec
     pipe._loop = asyncio.get_event_loop()
     pipe._connection_attempts = 3
 
