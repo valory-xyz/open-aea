@@ -95,10 +95,10 @@ def test_type_comparison(self, other):
 
     assert not isinstance(self, type(other))
     assert not isinstance(other, type(self))
-    assert self.__eq__(self)
-    assert other.__eq__(other)
-    assert self.__ne__(other)
-    assert other.__ne__(self)
+    assert self == self  # noqa: PLR0124
+    assert other == other  # noqa: PLR0124
+    assert self != other
+    assert other != self
 
     for f in funcs:
         with pytest.raises((TypeError, ValueError)):
