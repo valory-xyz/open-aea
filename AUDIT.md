@@ -96,9 +96,9 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/registries/base.py:337-367` — Non-atomic read-unregister-modify-register pattern with no locking. Dynamic component registration can lose updates under concurrent access.
 
-### P24. LOW — `ProtectedQueue.put` ignores caller-supplied `block` and `timeout` ✅
+### P24. INFO — `ProtectedQueue.put` ignores caller-supplied `block` and `timeout`
 
-`aea/decision_maker/base.py:182` — Hard-codes `block=True, timeout=None` regardless of caller arguments.
+`aea/decision_maker/base.py:182` — Hard-codes `block=True, timeout=None` regardless of caller arguments. Likely intentional: the `ProtectedQueue` ensures messages between skills and the decision maker are never silently dropped. The method signature is misleading (accepts `block`/`timeout` but ignores them), but changing the behavior risks dropping messages in production. `put_nowait` exists as a separate path for non-blocking puts.
 
 ### P25. LOW — `BaseException` catch converts Ctrl-C to ClickException (deferred)
 

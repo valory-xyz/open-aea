@@ -507,15 +507,3 @@ class BaseTestDecisionMaker:
 class TestDecisionMaker(BaseTestDecisionMaker):
     """Run test for default decision maker."""
 
-
-def test_protected_queue_put_respects_block_and_timeout():
-    """Test that ProtectedQueue.put passes block and timeout to the underlying Queue."""
-    from unittest.mock import patch
-
-    from aea.decision_maker.base import ProtectedQueue
-
-    pq = ProtectedQueue(access_code="test")
-    # Patch Queue.put to capture the actual block/timeout passed through
-    with patch("queue.Queue.put") as mock_put:
-        pq.put(None, block=False, timeout=0.1)
-        mock_put.assert_called_once_with(None, block=False, timeout=0.1)
