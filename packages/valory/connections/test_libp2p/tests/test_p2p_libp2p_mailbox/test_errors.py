@@ -32,7 +32,7 @@ from packages.valory.connections.test_libp2p.tests.base import (
     _make_libp2p_mailbox_connection,
 )
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_errors import (
-    DONE_FUTURE,
+    _make_done_future,
 )
 from packages.valory.connections.test_libp2p.tests.test_p2p_libp2p_client.test_errors import (
     TestLibp2pClientConnectionFailureConnectionSetup as BaseFailureConnectionSetup,
@@ -60,7 +60,7 @@ class TestLibp2pMailboxConnectionFailureNodeNotConnected(BaseFailureNodeNotConne
         self.connection._node_client = Mock()
         self.connection._node_client.send_envelope.side_effect = Exception("oops")
         with patch.object(
-            self.connection, "_perform_connection_to_node", return_value=DONE_FUTURE
+            self.connection, "_perform_connection_to_node", return_value=_make_done_future()
         ) as connect_mock, patch.object(
             self.connection, "_ensure_valid_envelope_for_external_comms"
         ):
