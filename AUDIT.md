@@ -56,17 +56,17 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/cli/run.py:218` — After profiling stops, stderr is redirected to devnull and never restored. All subsequent error output is silenced. The file handle also leaks.
 
-### P14. MEDIUM — Private keys written with default (world-readable) permissions
+### P14. MEDIUM — Private keys written with default (world-readable) permissions (deferred)
 
-`aea/crypto/base.py:174` — `open(private_key_file, "wb")` uses default permissions (typically `0o644`). Should use `0o600` for private key files.
+`aea/crypto/base.py:174` — `open(private_key_file, "wb")` uses default permissions (typically `0o644`). Should use `0o600` for private key files. Deferred: changing file permissions is observable behavior that could break downstream tooling, CI/CD pipelines, or scripts that read key files as a different user.
 
-### P15. MEDIUM — `AsyncState` not thread-safe
+### P15. MEDIUM — `AsyncState` not thread-safe (deferred)
 
-`aea/helpers/async_utils.py:65-160` — Used across threads (runtime state changes from async thread, read from main thread) but has no synchronization primitives protecting `_state`, `_watchers`, or `_callbacks`.
+`aea/helpers/async_utils.py:65-160` — Used across threads (runtime state changes from async thread, read from main thread) but has no synchronization primitives protecting `_state`, `_watchers`, or `_callbacks`. Deferred: adding locks to this core runtime primitive changes timing behavior and risks deadlocks or performance regressions. The race condition is real but rarely triggered in practice.
 
-### P16. MEDIUM — Manager shared state modified from multiple threads without locks
+### P16. MEDIUM — Manager shared state modified from multiple threads without locks (deferred)
 
-`aea/manager/manager.py` — `_agents`, `_agents_tasks`, `_projects` dicts are accessed from both main thread and background event loop thread with no mutex protection. Can cause `RuntimeError: dictionary changed size during iteration`.
+`aea/manager/manager.py` — `_agents`, `_agents_tasks`, `_projects` dicts are accessed from both main thread and background event loop thread with no mutex protection. Can cause `RuntimeError: dictionary changed size during iteration`. Deferred: adding mutexes could cause deadlocks if existing code holds other locks or does blocking calls while iterating these dicts. The race condition is real but rarely triggered in practice.
 
 ### P17. MEDIUM — `_wait_for_result` crashes on `queue.Empty` ✅
 
@@ -76,9 +76,9 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/helpers/pipe.py:157-166` — When output pipe open fails with `ENXIO`, the input fd from line 157 is never closed before recursing to retry. Each retry leaks an fd.
 
-### P19. MEDIUM — `Message.__init__` silently swallows consistency errors
+### P19. MEDIUM — `Message.__init__` silently swallows consistency errors (deferred)
 
-`aea/protocols/base.py:86-89` — Consistency check failures are caught and only logged. Invalid messages are created in an inconsistent state with no programmatic way to detect the error.
+`aea/protocols/base.py:86-89` — Consistency check failures are caught and only logged. Invalid messages are created in an inconsistent state with no programmatic way to detect the error. Deferred: raising exceptions instead of logging would break any downstream code that constructs messages with temporarily inconsistent fields. The current log-and-continue behavior is almost certainly relied upon.
 
 ### P20. MEDIUM — `re.match` for class name lookup allows partial/regex matches ✅
 
