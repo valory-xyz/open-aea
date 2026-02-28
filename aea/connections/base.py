@@ -21,7 +21,6 @@
 
 import asyncio
 import inspect
-import re
 from abc import ABC, abstractmethod
 from concurrent.futures.thread import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -291,7 +290,7 @@ class Connection(Component, ABC):
         classes = inspect.getmembers(connection_module, inspect.isclass)
         connection_class_name = cast(str, configuration.class_name)
         connection_classes = list(
-            filter(lambda x: re.match(connection_class_name, x[0]), classes)
+            filter(lambda x: x[0] == connection_class_name, classes)
         )
         name_to_class = dict(connection_classes)
         logger = get_logger(__name__, identity.name)

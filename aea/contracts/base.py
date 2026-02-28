@@ -22,7 +22,6 @@
 
 import inspect
 import logging
-import re
 from pathlib import Path
 from typing import Any, Dict, Optional, cast
 
@@ -128,7 +127,7 @@ class Contract(Component):
         classes = inspect.getmembers(contract_module, inspect.isclass)
         contract_class_name = cast(str, configuration.class_name)
         contract_classes = list(
-            filter(lambda x: re.match(contract_class_name, x[0]), classes)
+            filter(lambda x: x[0] == contract_class_name, classes)
         )
         name_to_class = dict(contract_classes)
         _default_logger.debug(f"Processing contract {contract_class_name}")

@@ -215,7 +215,11 @@ def _profiling_context(period: int) -> Generator:
         import os  # pylint: disable=import-outside-toplevel
         import sys  # pylint: disable=import-outside-toplevel
 
-        sys.stderr = open(os.devnull, "w")
+        _original_stderr = sys.stderr
+        _devnull = open(os.devnull, "w")
+        sys.stderr = _devnull
+        sys.stderr = _original_stderr
+        _devnull.close()
 
 
 def print_table(rows: Sequence) -> None:

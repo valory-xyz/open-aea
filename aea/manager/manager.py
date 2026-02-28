@@ -24,6 +24,7 @@ import datetime
 import json
 import multiprocessing
 import os
+import queue
 import threading
 from abc import ABC, abstractmethod
 from asyncio.tasks import FIRST_COMPLETED
@@ -245,7 +246,13 @@ class AgentRunProcessTask(BaseAgentRunTask):
         while self.process.is_alive():
             await asyncio.sleep(self.PROCESS_ALIVE_SLEEP_TIME)
 
-        result = self._result_queue.get_nowait()
+        try:
+            result = self._result_queue.get_nowait()
+        except queue.Empty:
+            self.process.join(self.PROCESS_JOIN_TIMEOUT)
+            raise RuntimeError(
+                "Agent process terminated without returning a result."
+            )
         self.process.join(self.PROCESS_JOIN_TIMEOUT)
         if isinstance(result, Exception):
             raise result

@@ -280,6 +280,7 @@ class MixedRegistry(LocalRegistry):
         item_type = ITEM_TYPE_PLURAL_TO_TYPE[item_type_plural]
         try:
             LocalRegistry.check_item_present(self, item_type_plural, public_id)
+            return
         except click.ClickException:
             click.echo(
                 f"Can not find dependency locally: {item_type} {public_id}. Trying remote registry..."

@@ -68,15 +68,42 @@ def test_register_make_with_class_kwargs():
     assert Something.class_key is None
     item = reg.make(id_)
     assert item is not None
-    assert type(item) is Something
+    assert isinstance(item, Something)
     assert item.kwargs == kwargs
     assert item.class_key == "class_value"
+    # Original class should not be mutated
+    assert Something.class_key is None
 
 
 def test_itemid():
     """Test the idemid object."""
     item_id = ItemId(COSMOS)
     assert item_id.name == COSMOS
+
+
+def test_get_class_does_not_mutate_across_specs():
+    """Test that get_class from one spec does not corrupt another spec's class."""
+    reg = Registry()
+    reg.register(
+        id_="a",
+        entry_point="tests.test_crypto.test_registries:Something",
+        class_kwargs={"class_key": "a_value"},
+    )
+    reg.register(
+        id_="b",
+        entry_point="tests.test_crypto.test_registries:Something",
+        class_kwargs={"class_key": "b_value"},
+    )
+
+    cls_a = reg.specs["a"].get_class()
+    assert cls_a.class_key == "a_value"
+
+    # Getting class for 'b' should not corrupt 'a'
+    cls_b = reg.specs["b"].get_class()
+    assert cls_b.class_key == "b_value"
+    assert cls_a.class_key == "a_value", (
+        f"get_class for 'b' corrupted class from 'a': class_key={cls_a.class_key}"
+    )
 
 
 def test_registry():

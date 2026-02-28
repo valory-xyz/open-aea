@@ -226,6 +226,23 @@ def test_negative_check_is_item_in_registry_mixed():
         )
 
 
+def test_mixed_registry_returns_on_local_success():
+    """Test that MixedRegistry.check_item_present returns immediately when item is found locally."""
+    ctx = mock.Mock()
+    ctx.registry_path = "some-registry-path"
+    registry = MixedRegistry(ctx)
+
+    with mock.patch.object(
+        LocalRegistry, "check_item_present", return_value=None
+    ), mock.patch.object(
+        RemoteRegistry, "check_item_present", side_effect=click.ClickException("Remote down")
+    ) as mock_remote:
+        # Should NOT raise, even though remote is down, because local check succeeded
+        registry.check_item_present(
+            "protocols", PublicId.from_str("author/package:0.1.0")
+        )
+
+
 @pytest.mark.skip(reason="https://agents-registry.prod.fetch-ai.com/ is down")
 @mock.patch(
     "aea.cli.registry.utils.get_or_create_cli_config",

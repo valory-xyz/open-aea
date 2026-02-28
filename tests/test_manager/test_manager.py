@@ -990,3 +990,27 @@ def test_agent_run_process_task_start_uses_create_task():
     finally:
         task._manager.shutdown()
         loop.close()
+
+
+@pytest.mark.asyncio
+async def test_wait_for_result_handles_empty_queue():
+    """Test that _wait_for_result does not crash when result queue is empty."""
+    import queue
+
+    loop = asyncio.new_event_loop()
+    agent_alias = Mock()
+    task = AgentRunProcessTask(agent_alias, loop)
+
+    # Simulate a dead process with an empty result queue
+    mock_process = Mock()
+    mock_process.is_alive.return_value = False
+    task.process = mock_process
+    task._result_queue = queue.Queue()  # empty queue
+
+    with pytest.raises(Exception) as exc_info:
+        await task._wait_for_result()
+
+    # Should get a meaningful error, not queue.Empty
+    assert not isinstance(exc_info.value, queue.Empty), (
+        "_wait_for_result raised queue.Empty instead of a meaningful error"
+    )

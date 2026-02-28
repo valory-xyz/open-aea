@@ -20,8 +20,11 @@
 """Tests for the pipe module."""
 
 import asyncio
+import errno
+import os
 from threading import Thread
 from unittest import mock
+from unittest.mock import patch, call
 
 import pytest
 
@@ -29,6 +32,7 @@ from aea.helpers.pipe import (
     IPCChannelClient,
     PosixNamedPipeChannel,
     PosixNamedPipeChannelClient,
+    PosixNamedPipeProtocol,
     TCPSocketChannel,
     TCPSocketChannelClient,
     TCPSocketProtocol,
@@ -166,6 +170,28 @@ def make_future(result) -> asyncio.Future:
     f = asyncio.Future()  # type: ignore
     f.set_result(result)
     return f
+
+
+@skip_test_windows
+@pytest.mark.asyncio
+async def test_posix_pipe_closes_in_fd_on_enxio_retry():
+    """Test that the input fd is closed when output open fails with ENXIO."""
+    pipe = PosixNamedPipeProtocol(in_path="/tmp/test_in", out_path="/tmp/test_out")
+    pipe._loop = asyncio.get_event_loop()
+    pipe._connection_attempts = 3
+
+    in_fd = 42
+    enxio_error = OSError(errno.ENXIO, "No such device or address")
+
+    with patch("os.open", side_effect=[in_fd, enxio_error, in_fd, in_fd]) as mock_open, \
+         patch("os.close") as mock_close, \
+         patch("asyncio.sleep", return_value=None):
+        # Will fail on first attempt (ENXIO on output), then succeed or run out of attempts
+        pipe._connection_attempts = 2  # force exit after retry
+        await pipe.connect(timeout=1.0)
+
+    # The input fd should have been closed before the retry
+    mock_close.assert_any_call(in_fd)
 
 
 @skip_test_windows
