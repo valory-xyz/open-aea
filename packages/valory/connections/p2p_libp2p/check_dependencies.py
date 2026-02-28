@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #
 # ------------------------------------------------------------------------------
 """Check that the dependencies 'gcc' and 'go' are installed in the system."""
+
 import asyncio
 import os
 import platform
@@ -27,14 +28,12 @@ import shutil
 import subprocess  # nosec
 import sys
 import tempfile
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from itertools import islice
 from subprocess import Popen, TimeoutExpired  # nosec
 from typing import Iterable, List, Optional, Pattern, Tuple
 
 from aea.exceptions import AEAException
 from aea.helpers.base import ensure_dir
-
 
 try:
     # flake8: noqa
@@ -221,7 +220,7 @@ def _golang_module_build(
 def build_node(build_dir: str) -> None:
     """Build node placed inside build_dir."""
     with tempfile.TemporaryDirectory() as dirname:
-        copy_tree(LIBP2P_NODE_MODULE, dirname)
+        shutil.copytree(LIBP2P_NODE_MODULE, dirname, dirs_exist_ok=True)
         err_str = _golang_module_build(dirname)
         if err_str:  # pragma: nocover
             raise RuntimeError(f"Node build failed: {err_str}")

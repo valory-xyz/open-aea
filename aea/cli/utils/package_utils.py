@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module with package utils of the aea cli."""
+
 import os
 import re
 import shutil
@@ -47,7 +48,10 @@ from aea.configurations.base import (
     _compute_fingerprint,
     _get_default_configuration_file_name_from_type,
 )
-from aea.configurations.constants import AGENT, DEFAULT_AEA_CONFIG_FILE
+from aea.configurations.constants import (
+    AGENT,
+    DEFAULT_AEA_CONFIG_FILE,
+)
 from aea.configurations.constants import (
     DISTRIBUTED_PACKAGES as DISTRIBUTED_PACKAGES_STR,
 )
@@ -72,7 +76,6 @@ from aea.helpers.dependency_tree import COMPONENTS
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
 from aea.helpers.sym_link import create_symlink
-
 
 DISTRIBUTED_PACKAGES = [PublicId.from_str(dp) for dp in DISTRIBUTED_PACKAGES_STR]
 ROOT = Path(".")

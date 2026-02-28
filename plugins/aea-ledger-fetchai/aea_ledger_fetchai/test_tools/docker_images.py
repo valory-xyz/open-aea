@@ -19,12 +19,12 @@
 # ------------------------------------------------------------------------------
 
 """This module contains testing utilities."""
+
 import logging
 import os
 import tempfile
 import time
 from typing import Any, Dict, Optional
-
 
 try:
     from docker import DockerClient
@@ -37,7 +37,6 @@ except ImportError:  # pragma: nocover
 from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
 from aea.test_tools.docker_image import DockerImage
-
 
 logger = logging.getLogger(__name__)
 

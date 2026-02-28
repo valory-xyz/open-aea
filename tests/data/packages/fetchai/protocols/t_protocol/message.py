@@ -43,7 +43,6 @@ from tests.data.packages.fetchai.protocols.t_protocol.custom_types import (
     DataModel4 as CustomDataModel4,
 )
 
-
 _default_logger = logging.getLogger("aea.packages.fetchai.protocols.t_protocol.message")
 
 DEFAULT_BODY_SIZE = 4

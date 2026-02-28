@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for the `aea add protocol` sub-command."""
+
 import os
 import re
 import shutil
@@ -37,8 +38,8 @@ from aea.configurations.base import DEFAULT_PROTOCOL_CONFIG_FILE, PublicId
 from aea.configurations.data_types import PackageId, PackageType
 from aea.test_tools.test_cases import AEATestCaseEmpty, AEATestCaseEmptyFlaky
 
+from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.fipa.message import FipaMessage
-from packages.fetchai.protocols.gym.message import GymMessage
 
 from tests.conftest import (
     AUTHOR,
@@ -63,7 +64,7 @@ class TestAddProtocolFailsWhenProtocolAlreadyExists:
         cls.agent_name = "myagent"
         cls.cwd = os.getcwd()
         cls.t = tempfile.mkdtemp()
-        cls.protocol_id = GymMessage.protocol_id
+        cls.protocol_id = DefaultMessage.protocol_id
         cls.protocol_name = cls.protocol_id.name
         cls.protocol_author = cls.protocol_id.author
         cls.protocol_version = cls.protocol_id.version
@@ -130,7 +131,7 @@ class TestAddProtocolFailsWhenProtocolWithSameAuthorAndNameButDifferentVersion:
         cls.agent_name = "myagent"
         cls.cwd = os.getcwd()
         cls.t = tempfile.mkdtemp()
-        cls.protocol_id = GymMessage.protocol_id
+        cls.protocol_id = DefaultMessage.protocol_id
         cls.protocol_name = cls.protocol_id.name
         cls.protocol_author = cls.protocol_id.author
         cls.protocol_version = cls.protocol_id.version
@@ -346,7 +347,7 @@ class TestAddProtocolFailsWhenConfigFileIsNotCompliant:
         cls.agent_name = "myagent"
         cls.cwd = os.getcwd()
         cls.t = tempfile.mkdtemp()
-        cls.protocol_id = str(GymMessage.protocol_id)
+        cls.protocol_id = str(DefaultMessage.protocol_id)
 
         # copy the 'packages' directory in the parent of the agent folder.
         shutil.copytree(Path(CUR_PATH, "..", "packages"), Path(cls.t, "packages"))
@@ -415,8 +416,8 @@ class TestAddProtocolFailsWhenDirectoryAlreadyExists:
         cls.agent_name = "myagent"
         cls.cwd = os.getcwd()
         cls.t = tempfile.mkdtemp()
-        cls.protocol_id = str(GymMessage.protocol_id)
-        cls.protocol_name = "gym"
+        cls.protocol_id = str(DefaultMessage.protocol_id)
+        cls.protocol_name = "default"
 
         # copy the 'packages' directory in the parent of the agent folder.
         shutil.copytree(Path(CUR_PATH, "..", "packages"), Path(cls.t, "packages"))

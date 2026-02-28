@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This test module contains the tests for the `aea add connection` sub-command."""
+
 # import filecmp
 # import os
 # import shutil
@@ -106,7 +107,7 @@
 #             agent_loader.dump(agent_config, fp)
 
 #     @classmethod
-#     def setup(cls):
+#     def setup_method(cls):
 #         """Set the test up."""
 #         cls.runner = CliRunner()
 #         cls.agent_name = "myagent"
@@ -175,7 +176,7 @@
 #             self.dump_config(original_config)
 
 #     @classmethod
-#     def teardown(cls):
+#     def teardown_method(cls):
 #         """Tear the test down."""
 #         os.chdir(cls.cwd)
 #         try:
@@ -194,7 +195,7 @@
 #     DEPENDENCY_PUBLIC_ID = OefSearchMessage.protocol_id
 
 #     @classmethod
-#     def setup(cls):
+#     def setup_method(cls):
 #         """Set the test up."""
 #         super(TestRemoveAndDependencies, cls).setup()
 #         cls.DEPENDENCY_PACKAGE_ID = PackageId(
@@ -346,7 +347,7 @@
 #     capture_log = True
 
 #     @classmethod
-#     def setup(cls):
+#     def setup_method(cls):
 #         """Set up test case."""
 #         super(TestUpgradeProject, cls).setup()
 #         cls.change_directory(Path(".."))
@@ -431,7 +432,7 @@
 #     capture_log = True
 
 #     @classmethod
-#     def setup(cls):
+#     def setup_method(cls):
 #         """Set up test case."""
 #         super(TestNonVendorProject, cls).setup()
 #         cls.change_directory(Path(".."))
@@ -481,7 +482,7 @@
 #     LOCAL: List[str] = ["--local"]
 
 #     @classmethod
-#     def setup(cls):
+#     def setup_method(cls):
 #         """Set the test up."""
 #         super(TestUpgradeConnectionLocally, cls).setup()
 
@@ -649,7 +650,7 @@
 #                 )
 
 #     @classmethod
-#     def teardown(cls):
+#     def teardown_method(cls):
 #         """Tear the test down."""
 #         super(TestUpgradeConnectionLocally, cls).teardown()
 
@@ -1161,12 +1162,12 @@
 #             cls.EXPECTED,
 #         )
 
-#     def setup(self):
+#     def setup_method(self):
 #         """Set up the class."""
 #         self.run_cli_command("fetch", str(self.OLD_AGENT_PUBLIC_ID))
 #         self.set_agent_context(self.OLD_AGENT_PUBLIC_ID.name)
 
-#     def teardown(self):
+#     def teardown_method(self):
 #         """Tear down class."""
 #         shutil.rmtree(self.current_agent_context)
 

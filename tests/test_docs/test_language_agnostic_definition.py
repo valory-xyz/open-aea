@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of language-agnostic-definition.md file."""
+
 from pathlib import Path
 from typing import Dict
 
@@ -27,7 +28,6 @@ from aea.configurations.data_types import PublicId
 
 from tests.conftest import ROOT_DIR
 from tests.test_docs.helper import BaseTestMarkdownDocs
-
 
 MAIL_BASE_PROTO = Path(AEA_DIR) / "mail" / "base.proto"
 DEFAULT_MESSAGE_PROTO = (

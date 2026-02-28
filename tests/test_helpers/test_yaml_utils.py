@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the yaml utils module."""
+
 import io
 import random
 import string

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Helper for benchmark run control."""
+
 from multiprocessing import Queue
 
 

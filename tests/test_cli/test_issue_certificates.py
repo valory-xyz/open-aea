@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains tests for 'issue-certificates' command."""
+
 import json
 import os
 import shutil
@@ -38,7 +39,6 @@ from aea.test_tools.test_cases import AEATestCaseEmpty, _get_password_option_arg
 
 from tests.conftest import CUR_PATH
 from tests.data.dummy_connection.connection import DummyConnection
-
 
 NOT_BEFORE = "2022-01-01"
 NOT_AFTER = "2023-01-01"

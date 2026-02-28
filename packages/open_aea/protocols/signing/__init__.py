@@ -26,5 +26,4 @@ It was created with protocol buffer compiler version `libprotoc 24.3` and aea pr
 from packages.open_aea.protocols.signing.message import SigningMessage
 from packages.open_aea.protocols.signing.serialization import SigningSerializer
 
-
 SigningMessage.serializer = SigningSerializer

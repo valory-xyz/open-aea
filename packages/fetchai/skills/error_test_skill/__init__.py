@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +21,5 @@
 """This module contains an example of skill raises exception for an AEA."""
 
 from aea.configurations.base import PublicId
-
 
 PUBLIC_ID = PublicId.from_str("fetchai/error_test_skill:0.1.0")

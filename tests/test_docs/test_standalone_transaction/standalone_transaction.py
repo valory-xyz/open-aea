@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,6 @@ from aea_ledger_fetchai import FetchAICrypto
 from aea.crypto.helpers import create_private_key, try_generate_testnet_wealth
 from aea.crypto.ledger_apis import LedgerApis
 from aea.crypto.wallet import Wallet
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

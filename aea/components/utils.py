@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
+#   Copyright 2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,6 @@
 # ------------------------------------------------------------------------------
 """This module contains the component loading utils."""
 
-
 import re
 import sys
 from pathlib import Path
@@ -26,7 +26,6 @@ from typing import Dict, List
 
 from aea.components.base import perform_load_aea_package
 from aea.configurations.constants import CONNECTIONS, CONTRACTS, PROTOCOLS, SKILLS
-
 
 PACKAGES_RE = re.compile(r"^packages\.(\w+)\.(\w+)\.(\w+)$", re.I)
 

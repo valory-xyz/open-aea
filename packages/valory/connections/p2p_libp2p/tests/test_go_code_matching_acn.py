@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import pytest
 from aea.test_tools.utils import remove_test_directory
 
 from packages.valory.connections.p2p_libp2p.tests.base import libp2p_log_on_failure_all
-
 
 PACKAGE = "packages.valory.connections.p2p_libp2p.libp2p_node"
 LIBP2P_NODE_DIRECTORY = str(Path(__file__).parent.parent.absolute() / "libp2p_node")
@@ -104,7 +103,7 @@ class TestP2PLibp2pGoCodeMatchingOpenACN:
     3. use filecmp and difflib to check for differences
     """
 
-    def setup(self) -> Any:  # I don't take extra args :)
+    def setup_method(self) -> Any:  # I don't take extra args :)
         """Set the test up"""
 
     def test_repo_not_bare(self, acn_repo_dir: Any) -> Any:

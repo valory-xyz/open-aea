@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,7 +80,6 @@ from tests.test_cli.tools_for_testing import (
     StopTest,
     raise_stoptest,
 )
-
 
 AUTHOR = "author"
 

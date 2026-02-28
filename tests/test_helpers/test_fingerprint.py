@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ from aea.helpers.fingerprint import (
 )
 
 from tests.conftest import PACKAGES_DIR
-
 
 CONFIG_CLASSES = {k.value: v for k, v in PACKAGE_TYPE_TO_CONFIG_CLASS.items()}
 CONFIG_FILES = {k: Path(PACKAGES_DIR).rglob(f_name) for k, f_name in COMPONENTS}

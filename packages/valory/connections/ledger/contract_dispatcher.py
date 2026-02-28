@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the implementation of the contract API request dispatcher."""
+
 import inspect
 import logging
 from collections.abc import Mapping
@@ -37,11 +38,12 @@ from aea.protocols.dialogue.base import Dialogues as BaseDialogues
 
 from packages.valory.connections.ledger.base import RequestDispatcher
 from packages.valory.protocols.contract_api import ContractApiMessage
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
-
 
 _default_logger = logging.getLogger(
     "aea.packages.valory.connections.ledger.contract_dispatcher"

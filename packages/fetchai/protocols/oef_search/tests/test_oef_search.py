@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests of the oef_search protocol package."""
+
 # pylint: skip-file
 
 from typing import Type
@@ -39,7 +40,9 @@ from packages.fetchai.protocols.oef_search.dialogues import (
     OefSearchDialogue,
     OefSearchDialogues,
 )
-from packages.fetchai.protocols.oef_search.message import OefSearchMessage
+from packages.fetchai.protocols.oef_search.message import (
+    OefSearchMessage,
+)
 from packages.fetchai.protocols.oef_search.message import (
     _default_logger as oef_search_message_logger,
 )

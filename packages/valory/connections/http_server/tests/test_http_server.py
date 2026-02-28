@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the HTTP Server connection module."""
+
 # pylint: skip-file
 
 import asyncio
@@ -31,6 +32,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import aiohttp
 import pytest
+import pytest_asyncio
 from aiohttp.client_reqrep import ClientResponse
 
 from aea.common import Address
@@ -49,7 +51,6 @@ from packages.valory.connections.http_server.connection import (
 from packages.valory.protocols.http.dialogues import HttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +109,7 @@ class TestHTTPServer:
             print_exc()
             raise
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the test case."""
         self.identity = Identity("name", address="my_key", public_key="my_public_key")
         self.agent_address = self.identity.address
@@ -132,11 +133,17 @@ class TestHTTPServer:
             data_dir=MagicMock(),
             identity=self.identity,
         )
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.http_connection.connect())
         self.connection_address = str(HTTPServerConnection.connection_id)
         self._dialogues = HttpDialogues(self.target_skill_id)
+
+    @pytest_asyncio.fixture(autouse=True)
+    async def _connection_lifecycle(self):
+        """Run the connection lifecycle on the active pytest-asyncio loop."""
+        await self.http_connection.connect()
         self.original_timeout = self.http_connection.channel.timeout_window
+        yield
+        self.http_connection.channel.timeout_window = self.original_timeout
+        await self.http_connection.disconnect()
 
     @pytest.mark.asyncio
     async def test_http_connection_disconnect_channel(self):
@@ -155,7 +162,7 @@ class TestHTTPServer:
     @pytest.mark.asyncio
     async def test_get_200(self):
         """Test send get request w/ 200 response."""
-        request_task = self.loop.create_task(self.request("get", "/pets"))
+        request_task = asyncio.create_task(self.request("get", "/pets"))
         envelope = await asyncio.wait_for(self.http_connection.receive(), timeout=20)
         assert envelope
         incoming_message, dialogue = self._get_message_and_dialogue(envelope)
@@ -191,7 +198,7 @@ class TestHTTPServer:
     async def test_header_content_type(self):
         """Test send get request w/ 200 response."""
         content_type = "something/unique"
-        request_task = self.loop.create_task(self.request("get", "/pets"))
+        request_task = asyncio.create_task(self.request("get", "/pets"))
         envelope = await asyncio.wait_for(self.http_connection.receive(), timeout=20)
         assert envelope
         incoming_message, dialogue = self._get_message_and_dialogue(envelope)
@@ -227,7 +234,7 @@ class TestHTTPServer:
     async def test_bad_performative_get_timeout_error(self):
         """Test send get request w/ 200 response."""
         self.http_connection.channel.timeout_window = 3
-        request_task = self.loop.create_task(self.request("get", "/pets"))
+        request_task = asyncio.create_task(self.request("get", "/pets"))
         envelope = await asyncio.wait_for(self.http_connection.receive(), timeout=10)
         assert envelope
         incoming_message, dialogue = self._get_message_and_dialogue(envelope)
@@ -270,7 +277,7 @@ class TestHTTPServer:
     async def test_late_message_get_timeout_error(self):
         """Test send get request w/ 200 response."""
         self.http_connection.channel.timeout_window = 0.2
-        request_task = self.loop.create_task(self.request("get", "/pets"))
+        request_task = asyncio.create_task(self.request("get", "/pets"))
         envelope = await asyncio.wait_for(self.http_connection.receive(), timeout=10)
         assert envelope
         incoming_message, dialogue = self._get_message_and_dialogue(envelope)
@@ -309,7 +316,7 @@ class TestHTTPServer:
     @pytest.mark.asyncio
     async def test_post_201(self):
         """Test send get request w/ 200 response."""
-        request_task = self.loop.create_task(
+        request_task = asyncio.create_task(
             self.request(
                 "post",
                 "/pets",
@@ -444,7 +451,7 @@ class TestHTTPServer:
     @pytest.mark.asyncio
     async def test_server_error_on_send_response(self):
         """Test exception raised on response sending to the client."""
-        request_task = self.loop.create_task(
+        request_task = asyncio.create_task(
             self.request(
                 "post",
                 "/pets",
@@ -477,11 +484,6 @@ class TestHTTPServer:
             )
 
         assert response and response.status == 500 and response.reason == "Server Error"
-
-    def teardown(self):
-        """Teardown the test case."""
-        self.loop.run_until_complete(self.http_connection.disconnect())
-        self.http_connection.channel.timeout_window = self.original_timeout
 
 
 def test_bad_api_spec():
@@ -521,7 +523,7 @@ class TestHTTPSServer:
             print_exc()
             raise
 
-    def setup(self):
+    def setup_method(self):
         """Initialise the test case."""
         self.identity = Identity("name", address="my_key", public_key="my_public_key")
         self.agent_address = self.identity.address
@@ -548,16 +550,22 @@ class TestHTTPSServer:
             data_dir=MagicMock(),
             identity=self.identity,
         )
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.http_connection.connect())
         self.connection_address = str(HTTPServerConnection.connection_id)
         self._dialogues = HttpDialogues(self.target_skill_id)
+
+    @pytest_asyncio.fixture(autouse=True)
+    async def _connection_lifecycle(self):
+        """Run the connection lifecycle on the active pytest-asyncio loop."""
+        await self.http_connection.connect()
         self.original_timeout = self.http_connection.channel.timeout_window
+        yield
+        self.http_connection.channel.timeout_window = self.original_timeout
+        await self.http_connection.disconnect()
 
     @pytest.mark.asyncio
     async def test_get_200(self):
         """Test send get request w/ 200 response."""
-        request_task = self.loop.create_task(self.request("get", "/pets"))
+        request_task = asyncio.create_task(self.request("get", "/pets"))
         envelope = await asyncio.wait_for(self.http_connection.receive(), timeout=20)
         assert envelope
         incoming_message, dialogue = self._get_message_and_dialogue(envelope)

@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Memory usage of dialogues across the time."""
+
 import os
 import sys
 import time
@@ -39,7 +40,6 @@ from benchmark.checks.utils import (
 
 from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 ROOT_PATH = os.path.join(os.path.abspath(__file__), "..", "..")
 sys.path.append(ROOT_PATH)

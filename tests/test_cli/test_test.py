@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This test module contains the tests for CLI test command."""
+
 import shutil
 import subprocess  # nosec
 import sys
@@ -45,7 +46,6 @@ from aea.helpers.base import cd
 from aea.package_manager.v1 import PackageManagerV1
 from aea.test_tools.test_cases import AEATestCaseEmpty, CLI_LOG_OPTION
 
-
 OK_PYTEST_EXIT_CODE = ExitCode.OK
 NO_TESTS_COLLECTED_PYTEST_EXIT_CODE = ExitCode.NO_TESTS_COLLECTED
 PACKAGE_TYPES = [t for t in ComponentType if t != ComponentType.CUSTOM]
@@ -62,18 +62,18 @@ def _parametrize_class(test_cls: Type) -> Type:
     def teardown_class(cls) -> None:
         """Don't call super teardown method."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup after every test execution."""
         old_setup_class()  # type: ignore
 
-    def teardown(self) -> None:
+    def teardown_method(self) -> None:
         """Tear down after every test execution."""
         old_teardown_class()  # type: ignore
 
     test_cls.setup_class = setup_class
     test_cls.teardown_class = teardown_class
-    test_cls.setup = setup
-    test_cls.teardown = teardown
+    test_cls.setup = setup_method
+    test_cls.teardown = teardown_method
 
     return test_cls
 
@@ -156,14 +156,10 @@ class BaseAEATestCommand(AEATestCaseEmpty):
     @classmethod
     def write_dummy_test_module(cls, path_to_module: Path) -> None:
         """Write dummy test module."""
-        path_to_module.write_text(
-            dedent(
-                """\
+        path_to_module.write_text(dedent("""\
         def test_dummy_function():
             assert True
-        """
-            )
-        )
+        """))
 
     @classmethod
     def _get_dummy_package_name(cls, package_type: ComponentType) -> str:

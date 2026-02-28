@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Ledger TX generation and processing benchmark."""
+
 import threading
 import time
 from pathlib import Path
@@ -68,12 +69,13 @@ from aea.skills.base import Handler
 
 from packages.open_aea.protocols.signing.dialogues import SigningDialogue
 from packages.open_aea.protocols.signing.message import SigningMessage
-from packages.valory.connections.ledger.connection import LedgerConnection
+from packages.valory.connections.ledger.connection import (
+    LedgerConnection,
+)
 from packages.valory.connections.ledger.connection import (
     PUBLIC_ID as LEDGER_CONNECTION_PUBLIC_ID,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 LEDGER_API_ADDRESS = str(LEDGER_CONNECTION_PUBLIC_ID)
 AEA_DIR = Path(_AEA_DIR)

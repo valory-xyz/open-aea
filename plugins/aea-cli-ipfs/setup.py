@@ -22,13 +22,11 @@
 
 """Setup script for the plug-in."""
 
-
 from setuptools import setup  # type: ignore
-
 
 setup(
     name="open-aea-cli-ipfs",
-    version="2.0.8",
+    version="2.1.0rc2",
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for open AEA framework wrapping IPFS functionality.",
@@ -54,6 +52,9 @@ setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

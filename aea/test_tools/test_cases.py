@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains test case classes based on pytest for AEA end-to-end testing."""
+
 import contextlib
 import copy
 import logging
@@ -86,7 +87,6 @@ from aea.test_tools.generic import (
 )
 from aea.test_tools.utils import consume, wait_for_condition
 
-
 _default_logger = logging.getLogger(__name__)
 
 CLI_LOG_OPTION = ["-v", "OFF"]
@@ -100,9 +100,19 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
     """Base class for AEA test cases."""
 
     @pytest.fixture(autouse=True)
-    def set_capfd_on_cli_runner(self, capfd: CaptureFixture) -> None:
+    def set_capfd_on_cli_runner(
+        self, capfd: CaptureFixture, request: pytest.FixtureRequest
+    ) -> None:
         """Set pytest capfd on CLI runner"""
+        if not hasattr(self, "runner"):
+            type(self).runner = CliRunner()
         self.runner.capfd = capfd
+
+        setup = getattr(self, "setup", None)
+        teardown = getattr(self, "teardown", None)
+        if callable(setup) and callable(teardown):
+            setup()  # pylint: disable=not-callable
+            request.addfinalizer(teardown)
 
     runner: CliRunner  # CLI runner
     last_cli_runner_result: Optional[Result] = None
@@ -972,7 +982,9 @@ class BaseAEATestCase(ABC):  # pylint: disable=too-many-public-methods
             and not func.startswith("__")
             and func.startswith("test_")
         ]
+        runner_capfd = getattr(getattr(cls, "runner", None), "capfd", None)
         cls.runner = CliRunner()
+        cls.runner.capfd = runner_capfd
         cls.old_cwd = Path(os.getcwd())
         cls.subprocesses = []
         cls.threads = []

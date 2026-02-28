@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the p2p libp2p connection."""
+
 import asyncio
 import logging
 import os
@@ -44,7 +45,6 @@ from aea.mail.base import Envelope
 from packages.valory.connections.p2p_libp2p.consts import LIBP2P_NODE_MODULE_NAME
 from packages.valory.protocols.acn import acn_pb2
 from packages.valory.protocols.acn.message import AcnMessage
-
 
 _default_logger = logging.getLogger("aea.packages.valory.connections.p2p_libp2p")
 

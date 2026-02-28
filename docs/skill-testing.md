@@ -36,13 +36,13 @@ You must then specify the path to your skill directory via `path_to_skill` to al
 
 ### Setting up Each Test
 
-You can add a `setup()` class method to set the environment up for each of your tests. This code will be executed before every test method. If you do include this method, you must call the `setup()` method of the `BaseSkillTestCase` class via `super().setup()`.
+You can add a `setup_method()` class method to set the environment up for each of your tests. This code will be executed before every test method. If you do include this method, you must call the `setup_method()` method of the `BaseSkillTestCase` class via `super().setup_method()`.
 
 ``` python
 @classmethod
-def setup(cls):
+def setup_method(cls):
     """Setup the test class."""
-    super().setup()
+    super().setup_method()
     cls.my_behaviour = cast(
         MyBehaviour, cls._skill.skill_context.behaviours.my_behaviour
     )

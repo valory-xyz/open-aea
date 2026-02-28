@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from aea.helpers.io import from_csv, open_file, to_csv
-
 
 DUMMY_CSV_DATA = {
     "key_0": "value_0",

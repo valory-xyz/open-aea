@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Executor to run and measure resources consumed by python code."""
+
 import datetime
 import inspect
 import multiprocessing
@@ -115,8 +116,7 @@ class ExecReport:
 
         :return: string representation of report.
         """
-        return inspect.cleandoc(
-            f"""
+        return inspect.cleandoc(f"""
         == Report created {self.report_created} ==
         Arguments are `{self.args}`
         Time passed {self.time_passed}
@@ -127,8 +127,7 @@ class ExecReport:
         Mem(kb) mean: {mean(self.mem)}
         Mem(kb) min: {min(self.mem)}
         Mem(kb) max: {max(self.mem)}
-        """
-        )
+        """)
 
 
 class Executor:

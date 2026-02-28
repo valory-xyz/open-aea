@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,7 +67,7 @@ class TestRemoveAndDependencies:  # pylint: disable=attribute-defined-outside-in
             agent_config = agent_loader.load(fp)
         return agent_config
 
-    def setup(self):
+    def setup_method(self):
         """Set the test up."""
         self.runner = CliRunner()
         self.agent_name = "myagent"
@@ -102,7 +102,7 @@ class TestRemoveAndDependencies:  # pylint: disable=attribute-defined-outside-in
             catch_exceptions=False,
         )
 
-    def teardown(self):
+    def teardown_method(self):
         """Tear the test down."""
         os.chdir(self.cwd)
         try:

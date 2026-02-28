@@ -22,10 +22,9 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="open-aea-ledger-ethereum-flashbots",
-    version="2.0.8",
+    version="2.1.0rc2",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package extending the default open-aea ethereum ledger plugin to add support for flashbots.",
@@ -65,6 +64,9 @@ setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Communications",
         "Topic :: Internet",
         "Topic :: Software Development",

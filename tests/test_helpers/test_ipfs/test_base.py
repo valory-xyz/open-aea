@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the ipfs helper module."""
+
 import tempfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -64,7 +65,7 @@ class TestFileHashing:
 class TestDirectoryHashing:
     """Test recursive directory hashing."""
 
-    def setup(
+    def setup_method(
         self,
     ) -> None:
         """Setup test."""

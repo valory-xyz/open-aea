@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for generator/validate.py module."""
+
 import logging
 from unittest import TestCase, mock
 
@@ -53,7 +54,6 @@ from aea.protocols.generator.validate import (
     _validate_termination,
     validate,
 )
-
 
 logger = logging.getLogger("aea")
 logging.basicConfig(level=logging.INFO)

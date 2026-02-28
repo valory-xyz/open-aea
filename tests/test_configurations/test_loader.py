@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 
 
 """This module contains the tests for the aea.configurations.loader module."""
+
 import os
 from collections import OrderedDict
 from io import StringIO
@@ -32,6 +33,7 @@ import pytest
 import yaml
 
 import aea
+import aea.configurations
 from aea.configurations.base import (
     AgentConfig,
     PackageConfiguration,

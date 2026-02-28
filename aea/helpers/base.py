@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Miscellaneous helpers."""
+
 import builtins
 import contextlib
 import datetime
@@ -59,7 +60,6 @@ from packaging.version import Version
 
 from aea.common import PathLike
 from aea.exceptions import enforce
-
 
 STRING_LENGTH_LIMIT = 128
 SIMPLE_ID_REGEX = rf"[a-z_][a-z0-9_]{{0,{STRING_LENGTH_LIMIT - 1}}}"

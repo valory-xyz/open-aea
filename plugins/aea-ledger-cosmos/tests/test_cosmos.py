@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ethereum module."""
+
 import os
 import shutil
 import tempfile
@@ -25,7 +26,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
-import pytest  # type:ignore
+import pytest  # type: ignore
 from aea_ledger_cosmos import CosmosApi, CosmosCrypto, CosmosHelper
 from aea_ledger_cosmos.cosmos import _default_logger as cosmos_logger
 

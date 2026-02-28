@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests of the ledger API connection module."""
+
 # pylint: skip-file
 
 import asyncio
@@ -65,12 +66,13 @@ from packages.valory.protocols.ledger_api.custom_types import (
     SignedTransactions,
     TransactionDigests,
 )
-from packages.valory.protocols.ledger_api.dialogues import LedgerApiDialogue
+from packages.valory.protocols.ledger_api.dialogues import (
+    LedgerApiDialogue,
+)
 from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 SOME_SKILL_ID = "some/skill:0.1.0"
 PACKAGE_DIR = Path(__file__).parent.parent

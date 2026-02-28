@@ -29,7 +29,6 @@ from aea.test_tools.test_protocol import BaseProtocolMessagesTestCase
 from tests.data.packages.fetchai.protocols.t_protocol.custom_types import DataModel
 from tests.data.packages.fetchai.protocols.t_protocol.message import TProtocolMessage
 
-
 data_model = DataModel(
     int_field=12,
     bool_field=True,

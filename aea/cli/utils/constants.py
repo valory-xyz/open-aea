@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Module with constants of the aea cli."""
+
 import os
 from pathlib import Path
 
@@ -42,7 +43,6 @@ from aea.configurations.constants import (
 from aea.configurations.data_types import PublicId
 from aea.helpers.constants import FROM_STRING_TO_TYPE
 
-
 AEA_DIR = str(Path("."))
 ITEM_TYPES = (CONNECTION, CONTRACT, PROTOCOL, SKILL)
 AEA_LOGO = "    _     _____     _    \r\n   / \\   | ____|   / \\   \r\n  / _ \\  |  _|    / _ \\  \r\n / ___ \\ | |___  / ___ \\ \r\n/_/   \\_\\|_____|/_/   \\_\\\r\n                         \r\n"
@@ -64,7 +64,7 @@ DEFAULT_CLI_CONFIG = {
         "settings": {
             REGISTRY_REMOTE: {
                 REMOTE_HTTP: {
-                    "auth_token": None,  # auth token for registry
+                    "auth_token": None,  # auth token for registry  # nosec
                     "registry_api_url": None,  # registry url
                 },
                 REMOTE_IPFS: {"ipfs_node": None},  # IPFS url (in multiaddr format)

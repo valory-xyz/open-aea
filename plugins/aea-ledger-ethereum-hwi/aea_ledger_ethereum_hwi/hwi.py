@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2025 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,18 +25,23 @@ from typing import Any, Optional, Union, cast
 from aea_ledger_ethereum.ethereum import (
     AttributeDictTranslator as BaseAttributeDictTranslator,
 )
-from aea_ledger_ethereum.ethereum import EthereumApi, EthereumFaucetApi, EthereumHelper
+from aea_ledger_ethereum.ethereum import (
+    EthereumApi,
+    EthereumFaucetApi,
+    EthereumHelper,
+)
 from aea_ledger_ethereum.ethereum import (
     SignedTransactionTranslator as BaseSignedTransactionTranslator,
 )
-from aea_ledger_ethereum.ethereum import TESTNET_NAME
+from aea_ledger_ethereum.ethereum import (
+    TESTNET_NAME,
+)
 from aea_ledger_ethereum_hwi.account import HWIAccount
 from eth_account.messages import encode_defunct
 from eth_account.signers.local import LocalAccount
 
 from aea.common import JSONLike
 from aea.crypto.base import Crypto
-
 
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum_hwi")
 

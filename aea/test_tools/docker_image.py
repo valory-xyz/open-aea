@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains testing utilities."""
+
 import logging
 import re
 import shutil
@@ -28,7 +29,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Generator, cast
 
 import pytest
-
 
 try:
     import docker
@@ -99,7 +99,7 @@ class DockerImage(ABC):
     def stop_if_already_running(self) -> None:
         """Stop the running images with the same tag, if any."""
 
-        client = docker.from_env()
+        client = docker.from_env(version="auto")
         for container in client.containers.list():
             if self.tag in container.image.tags:
                 logger.info(f"Stopping image {self.tag}...")

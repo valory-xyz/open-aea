@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2024 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,10 @@
 #
 # ------------------------------------------------------------------------------
 """Implementation of the 'aea fetch' subcommand."""
+
 import os
 import shutil
 import tempfile
-from distutils.dir_util import copy_tree  # pylint: disable=deprecated-module
 from pathlib import Path
 from typing import Optional, Union, cast
 
@@ -52,7 +52,6 @@ from aea.configurations.constants import (
 )
 from aea.exceptions import enforce
 from aea.helpers.io import open_file
-
 
 try:
     from aea_cli_ipfs.ipfs_utils import DownloadError, IPFSTool  # type: ignore
@@ -245,7 +244,7 @@ def fetch_agent_locally(
         os.makedirs(target_path)  # pragma: nocover
 
     ctx.clean_paths.append(target_path)
-    copy_tree(source_path, target_path)
+    shutil.copytree(source_path, target_path)
 
     ctx.cwd = target_path
     try_to_load_agent_config(ctx)

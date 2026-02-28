@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,7 @@ import aea.configurations.base
 from aea.cli import cli
 from aea.configurations.base import AgentConfig, DEFAULT_AEA_CONFIG_FILE
 
-from packages.fetchai.skills.gym import PUBLIC_ID as GYM_SKILL_PUBLIC_ID
+from packages.fetchai.skills.echo import PUBLIC_ID as ECHO_SKILL_PUBLIC_ID
 
 from tests.conftest import AUTHOR, CLI_LOG_OPTION, CliRunner, ROOT_DIR
 
@@ -52,8 +52,8 @@ class TestRemoveSkillWithPublicId:
         tmp_dir = cls.t / dir_path
         src_dir = cls.cwd / Path(ROOT_DIR, dir_path)
         shutil.copytree(str(src_dir), str(tmp_dir))
-        cls.skill_id = str(GYM_SKILL_PUBLIC_ID)
-        cls.skill_name = "gym"
+        cls.skill_id = str(ECHO_SKILL_PUBLIC_ID)
+        cls.skill_name = "echo"
 
         os.chdir(cls.t)
         result = cls.runner.invoke(
@@ -88,7 +88,7 @@ class TestRemoveSkillWithPublicId:
         )
 
     def test_exit_code_equal_to_zero(self):
-        """Test that the exit code is equal to 1 (i.e. catchall for general errors)."""
+        """Test that the exit code is equal to 0 (i.e. successful execution)."""
         assert self.result.exit_code == 0
 
     def test_directory_does_not_exist(self):
@@ -126,7 +126,7 @@ class TestRemoveSkillFailsWhenSkillIsNotSupported:
         tmp_dir = cls.t / dir_path
         src_dir = cls.cwd / Path(ROOT_DIR, dir_path)
         shutil.copytree(str(src_dir), str(tmp_dir))
-        cls.skill_id = str(GYM_SKILL_PUBLIC_ID)
+        cls.skill_id = str(ECHO_SKILL_PUBLIC_ID)
 
         os.chdir(cls.t)
         result = cls.runner.invoke(
@@ -185,8 +185,8 @@ class TestRemoveSkillFailsWhenExceptionOccurs:
         tmp_dir = cls.t / dir_path
         src_dir = cls.cwd / Path(ROOT_DIR, dir_path)
         shutil.copytree(str(src_dir), str(tmp_dir))
-        cls.skill_id = str(GYM_SKILL_PUBLIC_ID)
-        cls.skill_name = "gym"
+        cls.skill_id = str(ECHO_SKILL_PUBLIC_ID)
+        cls.skill_name = "echo"
 
         os.chdir(cls.t)
         result = cls.runner.invoke(

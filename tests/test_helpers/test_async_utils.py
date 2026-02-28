@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for AsyncFriendlyQueue."""
+
 import asyncio
 import time
 from concurrent.futures._base import CancelledError
@@ -223,10 +224,14 @@ class TestRunnable:
 
     def test_no_loop_and_threded(self):
         """Test runnable fails on threaded mode and loop provided.."""
-        with pytest.raises(
-            ValueError,
-        ):
-            RunAndExit(loop=asyncio.get_event_loop(), threaded=True)
+        loop = asyncio.new_event_loop()
+        try:
+            with pytest.raises(
+                ValueError,
+            ):
+                RunAndExit(loop=loop, threaded=True)
+        finally:
+            loop.close()
 
     def test_task_cancel_not_set(self):
         """Test task cancel."""

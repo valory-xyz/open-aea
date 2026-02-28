@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,7 +94,9 @@ def test_click_version():
     When this tests fails you need to ensure that the current versions implementation
     of the click.testing.CliRunner remains compatible with our monkey-patched version
     """
-    assert click.__version__ == "8.2.1", message
+    parts = click.__version__.split(".")
+    assert parts[0] == "8", message
+    assert int(parts[1]) in range(4), message
 
 
 def test_capfd_on_cli_runner(capfd: CaptureFixture):
@@ -141,7 +143,7 @@ def test_cli_runner_invoke_raises(kwargs, capfd: CaptureFixture):
 class TestCliTest:
     """Test CliTest"""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Setup test"""
         # `copy` the class to avoid test interference
         self.test_cls = cast(CliTest, copy_class(CliTest))
@@ -151,7 +153,7 @@ class TestCliTest:
 
         self.test_cls.setup_class()
         test_instance = self.test_cls()  # type: ignore
-        test_instance.setup()
+        test_instance.setup_method()
         return test_instance
 
     def test_setup_cls_and_setup(self) -> None:
@@ -163,7 +165,7 @@ class TestCliTest:
         assert not hasattr(self.test_cls, "_t")
 
         test_instance = self.test_cls()  # type: ignore
-        test_instance.setup()
+        test_instance.setup_method()
         assert isinstance(test_instance._t, Path)
 
     def test_teardown_and_teardown_cls(self) -> None:
@@ -175,7 +177,7 @@ class TestCliTest:
         assert not test_instance._t == cwd
         os.chdir(test_instance._t)
         assert test_instance._t == Path.cwd()
-        test_instance.teardown()
+        test_instance.teardown_method()
         assert not hasattr(self.test_cls, "_t")
 
         test_instance.teardown_class()

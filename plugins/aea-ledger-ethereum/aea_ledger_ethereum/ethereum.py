@@ -34,6 +34,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 import ipfshttpclient  # noqa: F401 # pylint: disable=unused-import
+from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware, parse_rpc_urls
 from eth_account import Account
 from eth_account._utils.legacy_transactions import (
     encode_transaction,
@@ -78,7 +79,6 @@ from aea.exceptions import enforce
 from aea.helpers import http_requests as requests
 from aea.helpers.base import try_decorator
 from aea.helpers.io import open_file
-
 
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum")
 
@@ -975,17 +975,26 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
         :param kwargs: keyword arguments
         """
+        address = kwargs.pop("address", DEFAULT_ADDRESS)
+        rpc_urls = parse_rpc_urls(address)
+        self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
+        request_kwargs = {
+            REQUESTS_TIMEOUT_KEY: kwargs.pop(REQUESTS_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT)
+        }
         self._api = Web3(
             HTTPProvider(
-                endpoint_uri=kwargs.pop("address", DEFAULT_ADDRESS),
-                request_kwargs={
-                    REQUESTS_TIMEOUT_KEY: kwargs.pop(
-                        REQUESTS_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT
-                    )
-                },
+                endpoint_uri=rpc_urls[0],
+                request_kwargs=request_kwargs,
             )
         )
-        self._chain_id = kwargs.pop("chain_id", DEFAULT_CHAIN_ID)
+        # RPC rotation middleware — handles failover and retry across endpoints
+        self._rpc_rotation: RPCRotationMiddleware = RPCRotationMiddleware.build(
+            self._api,
+            rpc_urls=rpc_urls,
+            request_kwargs=request_kwargs,
+            chain_id=self._chain_id,
+        )
+        self._api.middleware_onion.add(self._rpc_rotation)
         # cache the chain id and use it for all the `eth_chainId` calls to avoid excess RPC usage
         cached_chain_id = (
             CachedChainIdMiddleware.build(  # pylint: disable=no-value-for-parameter
@@ -1056,8 +1065,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
             kwargs.pop("raise_on_try")
 
-        function = getattr(self._api.eth, callable_name)
-        response = function(*args, **kwargs)
+        response = getattr(self._api.eth, callable_name)(*args, **kwargs)
 
         if isinstance(response, AttributeDict):
             result = AttributeDictTranslator.to_dict(response)
@@ -1258,10 +1266,10 @@ class EthereumApi(LedgerApi, EthereumHelper):
         self, address: Address, **_kwargs: Any
     ) -> Optional[int]:
         """Try get the transaction count."""
-        nonce = self._api.eth.get_transaction_count(  # pylint: disable=no-member
-            self._api.to_checksum_address(address)
-        )
-        return nonce
+        check_address = self._api.to_checksum_address(address)
+        return self._api.eth.get_transaction_count(
+            check_address
+        )  # pylint: disable=no-member
 
     def update_with_gas_estimate(  # pylint: disable=arguments-differ
         self, transaction: JSONLike, raise_on_try: bool = False
@@ -1286,11 +1294,11 @@ class EthereumApi(LedgerApi, EthereumHelper):
         self, transaction: JSONLike, **_kwargs: Any
     ) -> Optional[int]:
         """Try get the gas estimate."""
-        gas_estimate: Optional[int] = None
         transaction = deepcopy(transaction)
         del transaction["gas"]
+
         try:
-            gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
+            return self._api.eth.estimate_gas(  # pylint: disable=no-member
                 transaction=cast(TxParams, transaction)
             )
         except (ContractLogicError, ValueError) as e:
@@ -1302,12 +1310,10 @@ class EthereumApi(LedgerApi, EthereumHelper):
             # to avoid effects of pending txs when estimating gas
             # we can set the block identifier to "latest" block
             # this might fail if the node doesn't support the `block_identifier` param
-            gas_estimate = self._api.eth.estimate_gas(  # pylint: disable=no-member
+            return self._api.eth.estimate_gas(  # pylint: disable=no-member
                 transaction=cast(TxParams, transaction),
                 block_identifier="latest",
             )
-
-        return gas_estimate
 
     def get_l1_data_fee(self, transaction: JSONLike) -> int:
         """

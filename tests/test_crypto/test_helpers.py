@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests for the crypto/helpers module."""
+
 import logging
 import os
 from pathlib import Path
@@ -46,7 +47,6 @@ from aea.crypto.wallet import Wallet
 
 from tests.conftest import COSMOS_PRIVATE_KEY_FILE, CUR_PATH
 from tests.test_cli.tools_for_testing import AgentConfigMock
-
 
 logger = logging.getLogger(__name__)
 

@@ -17,6 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 """Cli implementation for performance tests suits."""
+
 import ast
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
@@ -147,15 +148,13 @@ class TestCli:
 
         :return: str.
         """
-        doc_str = inspect.cleandoc(
-            f"""
+        doc_str = inspect.cleandoc(f"""
         {self.func_details.doc}
 
         ARGS is function arguments in format: `{','.join(self.func_details.argument_names)}`
 
         default ARGS is `{self.func_details.default_argument_values_as_string}`
-        """
-        )
+        """)
         return doc_str
 
     @staticmethod

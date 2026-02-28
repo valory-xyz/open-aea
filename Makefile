@@ -109,25 +109,29 @@ v := $(shell pip -V | grep virtualenvs)
 .PHONY: all-checks
 all-checks: clean formatters code-checks generators common-checks-1 common-checks-2 security
 
+PYTHON_VERSION ?= 3.10
+PLUGINS := \
+	aea-ledger-ethereum \
+	aea-ledger-ethereum-flashbots \
+	aea-ledger-cosmos \
+	aea-ledger-fetchai \
+	aea-ledger-solana \
+	aea-cli-ipfs
+
 .PHONY: new_env
 new_env: clean
-	if [ -z "$v" ];\
-	then\
-		pipenv --rm;\
-		pipenv --clear;\
-		pipenv --python 3.10;\
-		pipenv install --dev --skip-lock;\
-		pipenv run pip install -e .[all];\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-ethereum;\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-ethereum-flashbots;\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-cosmos;\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-fetchai;\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-solana;\
-		pipenv run pip install --no-deps file:plugins/aea-cli-ipfs;\
-		echo "Enter virtual environment with all development dependencies now: 'pipenv shell'.";\
-		pipenv run pip install --no-deps file:plugins/aea-ledger-solana;\
-	else\
-		echo "In a virtual environment! Exit first: 'exit'.";\
+	@if [ -z "$$VIRTUAL_ENV" ]; then \
+		pipenv --rm || true; \
+		pipenv --clear; \
+		pipenv --python $(PYTHON_VERSION); \
+		pipenv install --dev --skip-lock; \
+		pipenv run pip install -e .[all]; \
+		for plugin in $(PLUGINS); do \
+			pipenv run pip install --no-deps file:plugins/$$plugin; \
+		done; \
+		echo "Enter virtual environment with all development dependencies now: 'pipenv shell'."; \
+	else \
+		echo "In a virtual environment! Exit first: 'exit'."; \
 	fi
 protolint_install:
 	GO111MODULE=on GOPATH=~/go go install -v github.com/yoheimuta/protolint/cmd/protolint@v0.27.0

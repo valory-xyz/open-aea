@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2025 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 # flake8: noqa: B009
 
 """Tests for the aea_ledger_ethereum_flashbots package."""
+
 from typing import Tuple
 from unittest.mock import ANY, MagicMock, patch
 
@@ -30,7 +31,6 @@ from flashbots.types import FlashbotsBundleRawTx
 from hexbytes import HexBytes
 from web3.exceptions import TransactionNotFound
 from web3.types import TxReceipt
-
 
 _DUMMY_FLASHBOTS_BUILDERS = [
     ["dummy", "dummy_uri1"],

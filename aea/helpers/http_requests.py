@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,13 @@
 #
 # ------------------------------------------------------------------------------
 """Wrapper over requests library."""
+
 from functools import wraps
 from typing import Any, Callable
 
 import requests
 
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
-
 
 DEFAULT_TIMEOUT = NETWORK_REQUEST_DEFAULT_TIMEOUT
 

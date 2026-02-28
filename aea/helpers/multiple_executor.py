@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the helpers to run multiple stoppable tasks in different modes: async, threaded, multiprocess ."""
+
 import asyncio
 import logging
 from abc import ABC, abstractmethod
@@ -40,7 +41,6 @@ from typing import (
     Union,
     cast,
 )
-
 
 _default_logger = logging.getLogger(__name__)
 

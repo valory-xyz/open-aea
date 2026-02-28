@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the storage implementation."""
+
 import asyncio
 from typing import Any, Coroutine, List, Optional
 from urllib.parse import urlparse
@@ -30,7 +31,6 @@ from aea.helpers.storage.backends.base import (
     OBJECT_ID_AND_BODY,
 )
 from aea.helpers.storage.backends.sqlite import SqliteStorageBackend
-
 
 BACKENDS = {"sqlite": SqliteStorageBackend}
 

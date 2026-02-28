@@ -1,3 +1,5 @@
+b8fada4e7dc757c3d6df9688965f87d4ec3cd9fb:node_modules/@types/node/https.d.ts:generic-api-key:349
+b8fada4e7dc757c3d6df9688965f87d4ec3cd9fb:node_modules/readable-stream/README.md:generic-api-key:114
 77d07108ea198b6b96eaeb71e296ffd0c3e6e3fa:tests/test_packages/test_connections/test_p2p_libp2p_client/test_errors.py:generic-api-key:233
 758fd1a355b994dfc79ff2de00af301a6dcdfc6f:tests/test_packages/test_skills_integration/test_simple_oracle.py:generic-api-key:69
 758fd1a355b994dfc79ff2de00af301a6dcdfc6f:tests/test_packages/test_skills_integration/test_simple_oracle.py:generic-api-key:70

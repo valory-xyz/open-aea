@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the ledger API connection for the contract APIs."""
+
 import asyncio
 import logging
 import os
@@ -46,14 +47,15 @@ from packages.fetchai.contracts.erc1155.contract import PUBLIC_ID as ERC1155_PUB
 from packages.valory.connections.ledger.contract_dispatcher import (
     ContractApiRequestDispatcher,
 )
-from packages.valory.protocols.contract_api.dialogues import ContractApiDialogue
+from packages.valory.protocols.contract_api.dialogues import (
+    ContractApiDialogue,
+)
 from packages.valory.protocols.contract_api.dialogues import (
     ContractApiDialogues as BaseContractApiDialogues,
 )
 from packages.valory.protocols.contract_api.message import ContractApiMessage
 
 from tests.conftest import ROOT_DIR
-
 
 SOME_SKILL_ID = "some/skill:0.1.0"
 
@@ -194,7 +196,7 @@ async def test_erc1155_get_raw_message(erc1155_contract, ledger_apis_connection)
             {
                 "from_address": ETHEREUM_ADDRESS_ONE,
                 "to_address": ETHEREUM_ADDRESS_ONE,
-                "token_id": 1,
+                "token_id": 1,  # nosec
                 "from_supply": 10,
                 "to_supply": 0,
                 "value": 0,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023-2025 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ from web3.exceptions import TransactionNotFound
 
 from aea.common import JSONLike
 from aea.helpers.base import try_decorator
-
 
 _default_logger = logging.getLogger("aea.ledger_apis.ethereum_flashbots")
 

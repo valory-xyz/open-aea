@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,6 @@ from aea.protocols.generator.common import (
     _has_matched_brackets,
     _is_compositional_type,
 )
-
 
 # The following names are reserved for standard message fields and cannot be
 # used as user defined names for performative or contents

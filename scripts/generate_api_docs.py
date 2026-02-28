@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 """This tool generates the API docs."""
+
 import argparse
 import re
 import shutil
@@ -30,7 +31,6 @@ from pathlib import Path
 from aea.configurations.base import ComponentType, PublicId
 from aea.configurations.constants import PACKAGES, SIGNING_PROTOCOL, _FETCHAI_IDENTIFIER
 from aea.helpers.git import check_working_tree_is_dirty
-
 
 DOCS_DIR = Path("docs/")
 API_DIR = DOCS_DIR / "api/"

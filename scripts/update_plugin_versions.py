@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,6 @@ from packaging.version import Version
 
 from aea.cli.ipfs_hash import update_hashes
 from aea.helpers.base import compute_specifier_from_version
-
 
 ROOT_DIR = Path(__file__).parent.parent
 PLUGINS_DIR = Path("plugins")

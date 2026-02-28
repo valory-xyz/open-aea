@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +30,9 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import jsonschema
 from jsonschema import Draft4Validator
+from jsonschema._keywords import additionalProperties
 from jsonschema._types import TypeChecker
 from jsonschema._utils import find_additional_properties
-from jsonschema._validators import additionalProperties
 from jsonschema.validators import extend
 
 from aea.configurations.constants import AGENT
@@ -41,7 +41,6 @@ from aea.exceptions import AEAValidationError
 from aea.helpers.base import dict_to_path_value, update_nested_dict
 from aea.helpers.env_vars import is_env_variable
 from aea.helpers.io import open_file
-
 
 _CUR_DIR = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 _SCHEMAS_DIR = os.path.join(_CUR_DIR, "schemas")

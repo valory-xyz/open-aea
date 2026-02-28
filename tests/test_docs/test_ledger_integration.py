@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2025 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """This module contains the tests for the content of ledger-integration.md file."""
+
 from importlib import import_module
 from pathlib import Path
 from unittest import mock
@@ -48,7 +49,7 @@ def _import_module_mock(arg):
 
 # we mock only if the import is from dummy import path like "some.dotted.path".
 @mock.patch("importlib.import_module", side_effect=_import_module_mock)
-@mock.patch("setuptools.setup")
+@mock.patch.dict("sys.modules", {"setuptools": MagicMock(setup=MagicMock())})
 class TestLedgerIntegration(BasePythonMarkdownDocs):
     """Test the ledger integration code snippets."""
 
@@ -76,6 +77,6 @@ class TestLedgerIntegration(BasePythonMarkdownDocs):
     @classmethod
     def teardown_class(cls):
         """Tear down the test."""
-        crypto_registry.specs.pop("my_ledger_id")
-        ledger_apis_registry.specs.pop("my_ledger_id")
-        faucet_apis_registry.specs.pop("my_ledger_id")
+        crypto_registry.specs.pop("my_ledger_id", None)
+        ledger_apis_registry.specs.pop("my_ledger_id", None)
+        faucet_apis_registry.specs.pop("my_ledger_id", None)

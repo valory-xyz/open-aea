@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,6 @@ from aea.configurations.loader import ConfigLoaders
 from aea.exceptions import AEAException, AEAValidationError, enforce
 from aea.helpers.base import decorator_with_optional_params
 from aea.helpers.io import open_file
-
 
 pass_ctx = click.make_pass_decorator(Context)
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2025 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,6 @@ from aea.helpers.protocols import (
     get_protocol_specification_from_readme,
     get_protocol_specification_id_from_specification,
 )
-
 
 ROOT_DIR = Path(__file__).parent.parent
 PACKAGES_DIR = ROOT_DIR / "packages"
@@ -128,7 +127,7 @@ def check_if_running_allowed() -> None:
     Script should only be run on a clean branch.
     """
     git_call = subprocess.Popen(["git", "diff"], stdout=subprocess.PIPE)  # nosec
-    (stdout, _) = git_call.communicate()
+    stdout, _ = git_call.communicate()
     git_call.wait()
     if len(stdout) > 0:
         print("Cannot run script in unclean git state.")
@@ -629,7 +628,7 @@ class Updater:
         Script should only be run on a clean branch.
         """
         git_call = subprocess.Popen(["git", "diff"], stdout=subprocess.PIPE)  # nosec
-        (stdout, _) = git_call.communicate()
+        stdout, _ = git_call.communicate()
         git_call.wait()
         if len(stdout) > 0:
             raise RuntimeError("Cannot run script in unclean git state.")

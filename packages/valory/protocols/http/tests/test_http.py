@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 
 """Tests package for the 'valory/http' protocol."""
+
 from abc import abstractmethod
 from typing import Callable, Type
 from unittest import mock
@@ -37,7 +38,6 @@ from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import (
     _default_logger as http_message_logger,
 )
-
 
 LEDGER_ID = "ethereum"
 

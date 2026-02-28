@@ -18,9 +18,9 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains some constants for the p2p libp2p connection."""
+
 import os
 import platform
-
 
 LIBP2P_CERT_NOT_BEFORE = "2026-01-01"
 LIBP2P_CERT_NOT_AFTER = "2027-01-01"

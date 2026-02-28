@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """This module contains the tests of the behaviour classes of the generic seller skill."""
+
 # pylint: skip-file
 
 import logging
@@ -35,7 +36,6 @@ from packages.fetchai.skills.generic_seller.behaviours import (
 )
 from packages.fetchai.skills.generic_seller.strategy import GenericStrategy
 from packages.valory.protocols.ledger_api.message import LedgerApiMessage
-
 
 PACKAGE_ROOT = Path(__file__).parent.parent
 
@@ -67,15 +67,15 @@ class TestSkillBehaviour(BaseSkillTestCase):
 
         cls.mocked_description = Description({"foo1": 1, "bar1": 2})
 
-    def setup(self):
+    def setup_method(self):
         """Setup"""
-        super().teardown()
+        super().teardown_method()
         self._init_service_registration = self.service_registration.__dict__.copy()
         self._strategy_kwargs = self.strategy.__dict__.copy()
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown"""
-        super().teardown()
+        super().teardown_method()
         self.strategy.__dict__.update(self._strategy_kwargs)
         self.service_registration.__dict__.update(self._init_service_registration)
 

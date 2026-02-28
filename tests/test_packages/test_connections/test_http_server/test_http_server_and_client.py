@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for the HTTP Client and Server connections together."""
+
 import asyncio
 import email
 import logging
@@ -26,6 +27,7 @@ from typing import Dict, Optional, cast
 from unittest.mock import MagicMock
 
 import pytest
+import pytest_asyncio
 
 from aea.common import Address
 from aea.configurations.base import ConnectionConfig
@@ -42,7 +44,6 @@ from packages.valory.protocols.http.dialogues import HttpDialogue, HttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
 
 from tests.conftest import get_host, get_unused_tcp_port
-
 
 logger = logging.getLogger(__name__)
 
@@ -79,8 +80,6 @@ class TestClientServer:
             data_dir=MagicMock(),
             identity=self.server_agent_identity,
         )
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.server.connect())
 
         # skill side dialogues
         def role_from_first_message(  # pylint: disable=unused-argument
@@ -118,7 +117,6 @@ class TestClientServer:
             data_dir=MagicMock(),
             identity=self.client_agent_identity,
         )
-        self.loop.run_until_complete(self.client.connect())
 
         # skill side dialogues
         def role_from_first_message(  # pylint: disable=unused-argument
@@ -136,10 +134,16 @@ class TestClientServer:
             self.client_agent_skill_id, role_from_first_message=role_from_first_message
         )
 
-    def setup(self):
-        """Set up test case."""
+    @pytest_asyncio.fixture(autouse=True)
+    async def setup_connections(self):
+        """Set up and tear down client/server connections on active test loop."""
         self.setup_server()
         self.setup_client()
+        await self.server.connect()
+        await self.client.connect()
+        yield
+        await self.client.disconnect()
+        await self.server.disconnect()
 
     def _make_request(
         self,
@@ -156,7 +160,7 @@ class TestClientServer:
             url=f"http://{self.host}:{self.port}{path}",
             headers=headers_to_string(headers) if headers else "",
             version="",
-            body=b"",
+            body=body,
         )
         request_envelope = Envelope(
             to=request_http_message.to,
@@ -263,8 +267,3 @@ class TestClientServer:
             initial_request.message.dialogue_reference[0]
             == response.message.dialogue_reference[0]
         )
-
-    def teardown(self):
-        """Tear down testcase."""
-        self.loop.run_until_complete(self.client.disconnect())
-        self.loop.run_until_complete(self.server.disconnect())

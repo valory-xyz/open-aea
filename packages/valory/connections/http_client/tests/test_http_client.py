@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 """Tests for valory/http_client connection. Adapted from original AEA code."""
+
 # pylint: skip-file
 
 import asyncio
@@ -42,7 +43,6 @@ from packages.valory.connections.http_client.connection import HTTPClientConnect
 from packages.valory.protocols.http.dialogues import HttpDialogue
 from packages.valory.protocols.http.dialogues import HttpDialogues as BaseHttpDialogues
 from packages.valory.protocols.http.message import HttpMessage
-
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +96,7 @@ class HttpDialogues(BaseHttpDialogues):
 class TestHTTPClientConnect:
     """Tests the http client connection's 'connect' functionality."""
 
-    def setup(self) -> None:
+    def setup_method(self) -> None:
         """Initialise the class."""
         self.address = get_host()
         self.port = get_unused_tcp_port()
