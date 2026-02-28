@@ -204,6 +204,63 @@ class CompressDirTestCase(TestCase):
         open_mock.assert_called_once_with("output_filename", "w:gz")
 
 
+@mock.patch("builtins.open", mock_open(read_data="opened_file"))
+@mock.patch("aea.cli.registry.push.check_is_author_logged_in")
+@mock.patch("aea.cli.registry.push.list_missing_packages", return_value=[])
+@mock.patch("aea.cli.registry.utils._rm_tarfiles")
+@mock.patch("aea.cli.registry.push.os.getcwd", return_value="cwd")
+@mock.patch("aea.cli.registry.push._compress_dir")
+@mock.patch(
+    "aea.cli.registry.push.load_yaml",
+    return_value={
+        "description": "some-description",
+        "version": PublicIdMock.DEFAULT_VERSION,
+        "author": "some_author",
+        "name": "some_name",
+        "customs": ["some/custom_component:0.1.0"],
+    },
+)
+@mock.patch(
+    "aea.cli.registry.push.request_api", return_value={"public_id": "public-id"}
+)
+class PushItemWithCustomsTestCase(TestCase):
+    """Test case for push_item method with customs dependencies."""
+
+    @mock.patch("aea.cli.registry.push.os.path.exists", return_value=True)
+    @mock.patch("aea.cli.registry.push.is_readme_present", return_value=False)
+    def test_push_item_includes_customs_deps(
+        self,
+        is_readme_present_mock,
+        path_exists_mock,
+        request_api_mock,
+        load_yaml_mock,
+        compress_mock,
+        getcwd_mock,
+        rm_tarfiles_mock,
+        check_is_author_logged_in_mock,
+        *_
+    ):
+        """Test that push_item includes customs in the data payload."""
+        public_id = PublicIdMock(
+            name="some_name",
+            author="some_author",
+            version="{}".format(PublicIdMock.DEFAULT_VERSION),
+        )
+        push_item(ContextMock(), "some-type", public_id)
+        request_api_mock.assert_called_once_with(
+            "POST",
+            "/some-types/create",
+            data={
+                "name": "some_name",
+                "description": "some-description",
+                "version": PublicIdMock.DEFAULT_VERSION,
+                "customs": ["some/custom_component:0.1.0"],
+            },
+            is_auth=True,
+            files={"file": mock.ANY},
+        )
+
+
 def test_check_package_public_id():
     """Test check_package_public_id."""
     public_id = PublicId("test", "test", "10.0.1")

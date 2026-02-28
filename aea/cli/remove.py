@@ -48,6 +48,7 @@ from aea.configurations.base import (
 from aea.configurations.constants import (
     CONNECTION,
     CONTRACT,
+    CUSTOM,
     DEFAULT_AEA_CONFIG_FILE,
     PROTOCOL,
     SKILL,
@@ -104,6 +105,14 @@ def protocol(ctx: Context, protocol_id: PublicId) -> None:
 def skill(ctx: Context, skill_id: PublicId) -> None:
     """Remove a skill from the agent."""
     remove_item(ctx, SKILL, skill_id)
+
+
+@remove.command()
+@click.argument("custom_id", type=PublicIdParameter(), required=True)
+@pass_ctx
+def custom(ctx: Context, custom_id: PublicId) -> None:
+    """Remove a custom component from the agent."""
+    remove_item(ctx, CUSTOM, custom_id)
 
 
 class ItemRemoveHelper:
