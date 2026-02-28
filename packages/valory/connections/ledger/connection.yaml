@@ -8,7 +8,7 @@ aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeihkgodu7o7v6pfazm7u6orlspsfrae3cyz36yc46x67phfmw3l57e
   __init__.py: bafybeia3purd7y4b7tkdt2fcaxkdazos32criq5hx6fhufaislrdefe674
-  base.py: bafybeifghgrbfxfiw5rykpm5lndpodwk6255zdjurh7if6ierhbhchtz74
+  base.py: bafybeidenzu6nltrvltcsvhorbyrk3ki5xsyby3f24qye37qjinwzfkfwm
   connection.py: bafybeicz37uto2qojuxni3uph6dwbce5fwqjx6jfhtbqvmqynssuhkambe
   contract_dispatcher.py: bafybeicnsfw2lvsx73f3bvc44sd7p3q2imhxt3yg5tvuw36ktjfgd7lxpm
   ledger_dispatcher.py: bafybeiehqptlnjwzeuhhczcei4anbbl2ykpfik5wz2f3kjl2ondopexkkq

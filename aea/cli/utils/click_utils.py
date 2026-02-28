@@ -32,6 +32,7 @@ from aea.cli.registry.settings import (
     REGISTRY_LOCAL,
     REGISTRY_MIXED,
     REGISTRY_REMOTE,
+    REGISTRY_TYPES,
     REMOTE_HTTP,
     REMOTE_IPFS,
 )
@@ -299,6 +300,8 @@ def registry_flag(
         get_or_create_cli_config().get("registry_config", {}).get("default")
     )
     default_registry = default_registry or REGISTRY_LOCAL
+    if default_registry not in REGISTRY_TYPES:
+        default_registry = REGISTRY_LOCAL
 
     def wrapper(f: Callable) -> Callable:
         f = option(
@@ -342,6 +345,8 @@ def remote_registry_flag(
     )
 
     default_registry = default_registry or REMOTE_IPFS
+    if default_registry not in (REMOTE_HTTP, REMOTE_IPFS):
+        default_registry = REMOTE_IPFS
 
     def wrapper(f: Callable) -> Callable:
         f = option(
