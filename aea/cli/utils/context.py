@@ -79,6 +79,10 @@ class Context:
     @registry_type.setter
     def registry_type(self, value: str) -> None:
         """Set registry value."""
+        if value in (False, "False", "", None):
+            self._registry_type = REGISTRY_LOCAL
+            return
+
         if value is not None:
             if value not in REGISTRY_TYPES:
                 raise ValueError(

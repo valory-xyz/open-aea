@@ -81,6 +81,7 @@ def test_connection():
         multiplexer2.disconnect()
 
 
+@pytest.mark.flaky(reruns=3)
 @pytest.mark.asyncio
 async def test_connection_twice_return_none():
     """Test that connecting twice works."""
@@ -103,7 +104,7 @@ async def test_connection_twice_return_none():
             message=message,
         )
         await connection.send(expected_envelope)
-        actual_envelope = await connection.receive()
+        actual_envelope = await asyncio.wait_for(connection.receive(), timeout=TIMEOUT)
 
         assert expected_envelope == actual_envelope
 

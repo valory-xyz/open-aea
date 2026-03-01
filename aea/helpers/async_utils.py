@@ -352,9 +352,21 @@ class ThreadedAsyncRunner(Thread):
         _default_logger.debug("Stopped.")
 
 
-def _ready_awaitable() -> Coroutine[Any, Any, None]:
-    """Return an already-completed awaitable without requiring a pre-existing loop."""
-    return asyncio.sleep(0)
+class _ReadyAwaitable:
+    """An awaitable that completes immediately without RuntimeWarning.
+
+    Unlike a coroutine, an unawaited instance does not trigger
+    'RuntimeWarning: coroutine was never awaited'.
+    Unlike asyncio.Future, instantiation does not require a running event loop
+    (compatible with Python 3.14+).
+    """
+
+    def __await__(self) -> Generator[Any, None, None]:
+        """Return an empty iterator to complete immediately."""
+        yield from ()
+
+
+_READY_AWAITABLE = _ReadyAwaitable()
 
 
 class Runnable(ABC):
@@ -485,7 +497,7 @@ class Runnable(ABC):
         sync: bool = False,
         timeout: Optional[float] = None,
         force_result: bool = False,
-    ) -> Union[Coroutine, asyncio.Future]:
+    ) -> Union[Coroutine, asyncio.Future, _ReadyAwaitable]:
         """
         Wait runnable execution completed.
 
@@ -497,14 +509,14 @@ class Runnable(ABC):
         """
         if not self._task:
             _default_logger.warning("Runnable is not started")
-            return _ready_awaitable()
+            return _READY_AWAITABLE
 
         if self._got_result and not force_result:
-            return _ready_awaitable()
+            return _READY_AWAITABLE
 
         if sync:
             self._wait_sync(timeout)
-            return _ready_awaitable()
+            return _READY_AWAITABLE
 
         return asyncio.wait_for(self._wait_async(timeout), timeout=timeout)
 
@@ -601,7 +613,7 @@ class Runnable(ABC):
 
     def start_and_wait_completed(
         self, *args: Any, **kwargs: Any
-    ) -> Union[Coroutine, Future]:
+    ) -> Union[Coroutine, Future, _ReadyAwaitable]:
         """Alias for start and wait methods."""
         self.start()
         return self.wait_completed(*args, **kwargs)

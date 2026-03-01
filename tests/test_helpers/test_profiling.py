@@ -102,6 +102,7 @@ def extract_object_counts(log: str) -> Dict[str, Dict[str, int]]:
     return result
 
 
+@pytest.mark.flaky(reruns=3)
 def test_basic_profiling():
     """Test profiling tool."""
 

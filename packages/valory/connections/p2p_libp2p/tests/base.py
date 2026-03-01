@@ -69,7 +69,7 @@ def libp2p_log_on_failure(fn: Callable) -> Callable:
 
 
 def libp2p_log_on_failure_all(cls: Type) -> Type:
-    """Wrap test methods to print libp2p logs on failure."""
+    """Decorate every method of a class with `libp2p_log_on_failure`."""
 
     def _wrap(func: Callable) -> Callable:
         if inspect.iscoroutinefunction(func):

@@ -32,6 +32,7 @@ from aea.cli.registry.settings import (
     REGISTRY_LOCAL,
     REGISTRY_MIXED,
     REGISTRY_REMOTE,
+    REGISTRY_TYPES,
     REMOTE_HTTP,
     REMOTE_IPFS,
 )
@@ -299,6 +300,8 @@ def registry_flag(
         get_or_create_cli_config().get("registry_config", {}).get("default")
     )
     default_registry = default_registry or REGISTRY_LOCAL
+    if default_registry not in REGISTRY_TYPES:
+        default_registry = REGISTRY_LOCAL
 
     def wrapper(f: Callable) -> Callable:
         f = option(
@@ -342,6 +345,8 @@ def remote_registry_flag(
     )
 
     default_registry = default_registry or REMOTE_IPFS
+    if default_registry not in (REMOTE_HTTP, REMOTE_IPFS):
+        default_registry = REMOTE_IPFS
 
     def wrapper(f: Callable) -> Callable:
         f = option(
@@ -398,7 +403,8 @@ def password_option(confirmation_prompt: bool = False, **kwargs) -> Callable:  #
 
     def callback(ctx, _, value: bool) -> bool:  # type: ignore
         if value is True:
-            ctx.params["password"] = ctx.params.get("password") or click.prompt(
+            # Always prompt for password when -p flag is used, overriding any existing value
+            ctx.params["password"] = click.prompt(
                 "Enter password",
                 hide_input=True,
                 confirmation_prompt=confirmation_prompt,
@@ -420,6 +426,7 @@ def password_option(confirmation_prompt: bool = False, **kwargs) -> Callable:  #
                 is_eager=True,
                 metavar="PASSWORD",
                 help="Set password for key encryption/decryption",
+                envvar="AEA_PASSWORD",
                 **kwargs,
             )(fn)
         )  # type: ignore
