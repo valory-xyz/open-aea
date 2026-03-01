@@ -31,6 +31,7 @@ import aea
 from aea.cli.add import add_item
 from aea.cli.eject import _eject_item
 from aea.cli.registry.fetch import fetch_agent
+from aea.cli.registry.settings import REGISTRY_LOCAL, REGISTRY_MIXED
 from aea.cli.registry.utils import get_latest_version_available_in_registry
 from aea.cli.remove import (
     ItemRemoveHelper,
@@ -73,12 +74,12 @@ from aea.helpers.base import delete_directory_contents, find_topological_order
     check_aea_version=False
 )
 def upgrade(
-    click_context: click.Context, local: bool, remote: bool, yes: bool
+    click_context: click.Context, registry: str, yes: bool
 ) -> None:  # pylint: disable=unused-argument
     """Upgrade the packages of the agent."""
     ctx = cast(Context, click_context.obj)
-    ctx.set_config("is_local", local and not remote)
-    ctx.set_config("is_mixed", not (local or remote))
+    ctx.set_config("is_local", registry == REGISTRY_LOCAL)
+    ctx.set_config("is_mixed", registry == REGISTRY_MIXED)
     ctx.set_config("yes_by_default", yes)
     set_cli_author(click_context)
 
