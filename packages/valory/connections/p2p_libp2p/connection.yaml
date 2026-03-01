@@ -55,7 +55,7 @@ fingerprint:
   libp2p_node/utils/utils.go: bafybeihbd2br74nm3pupy4qkijm2tnuyl7pbq3uwasidmql5znhbr575k4
   libp2p_node/utils/utils_test.go: bafybeig2kkgqy7miml66w2byomeqjp4czzv45gb4jas76cxildo3lxi4xq
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e
-  tests/base.py: bafybeibjfrqmrj53jyczkiuvzqimjasdqibwthxwp4wy6hkiocdnvrep5y
+  tests/base.py: bafybeiduqhd4t62fj7tsj6se3pokgtrizrna37b6vw5nj7ul4xdawc7vii
   tests/test_aea_cli.py: bafybeihllxrp6bjvplvogrdsemel6rrqajl6qvei6ogagx55friwjajiti
   tests/test_build.py: bafybeigkz7isg4enmvfp7sfgx3mpinobi7apja63jfwxwpj2pcf4xepfjq
   tests/test_errors.py: bafybeiev36bsc4zxz2gverenqj4wuqw5btprm7ho5fj3juy3n5f4ppat4q

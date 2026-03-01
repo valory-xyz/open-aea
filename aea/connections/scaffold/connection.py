@@ -31,13 +31,13 @@ Choose one of the possible implementations:
 Sync (inherited from BaseSyncConnection) or Async (inherited from Connection) connection and remove unused one.
 """
 
-CONNECTION_ID = PublicId.from_str("open_aea/scaffold:0.1.0")
+PUBLIC_ID = PublicId.from_str("open_aea/scaffold:0.1.0")
 
 
 class MyScaffoldAsyncConnection(Connection):
     """Proxy to the functionality of the SDK or API."""
 
-    connection_id = CONNECTION_ID
+    connection_id = PUBLIC_ID
 
     def __init__(self, **kwargs: Any) -> None:
         """
@@ -98,7 +98,7 @@ class MyScaffoldSyncConnection(BaseSyncConnection):
 
     MAX_WORKER_THREADS = 5
 
-    connection_id = CONNECTION_ID
+    connection_id = PUBLIC_ID
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # pragma: no cover
         """

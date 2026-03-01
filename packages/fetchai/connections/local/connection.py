@@ -108,6 +108,7 @@ class LocalNode:
 
         self._in_queue: Optional[asyncio.Queue] = None
         self._out_queues: Dict[str, asyncio.Queue] = {}
+        self._out_queue_loops: Dict[str, asyncio.AbstractEventLoop] = {}
 
         self._receiving_loop_task: Optional[Future] = None
         self.address: Optional[Address] = None
@@ -152,6 +153,7 @@ class LocalNode:
             raise ValueError("In queue not set.")
         q = self._in_queue  # type: asyncio.Queue
         self._out_queues[address] = writer
+        self._out_queue_loops[address] = asyncio.get_event_loop()
 
         self.address = address
         self._dialogues = OefSearchDialogues()
@@ -365,7 +367,8 @@ class LocalNode:
         """Send a message."""
         destination = envelope.to
         destination_queue = self._out_queues[destination]
-        destination_queue._loop.call_soon_threadsafe(destination_queue.put_nowait, envelope)  # type: ignore  # pylint: disable=protected-access
+        dest_loop = self._out_queue_loops[destination]
+        dest_loop.call_soon_threadsafe(destination_queue.put_nowait, envelope)
         self.logger.debug("Send envelope {}".format(envelope))
 
     async def disconnect(self, address: Address) -> None:
@@ -376,6 +379,7 @@ class LocalNode:
         """
         with self._lock:
             self._out_queues.pop(address, None)
+            self._out_queue_loops.pop(address, None)
             self.services.pop(address, None)
 
 
@@ -436,7 +440,7 @@ class OEFLocalConnection(Connection):
         :param envelope: the envelope.
         """
         self._ensure_connected()
-        self._writer._loop.call_soon_threadsafe(self._writer.put_nowait, envelope)  # type: ignore  # pylint: disable=protected-access
+        self._local_node._loop.call_soon_threadsafe(self._writer.put_nowait, envelope)  # type: ignore  # pylint: disable=protected-access
 
     async def receive(self, *args: Any, **kwargs: Any) -> Optional["Envelope"]:
         """
