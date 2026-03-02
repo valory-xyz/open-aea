@@ -52,9 +52,9 @@ Comprehensive audit of the open-aea codebase. Date: 2026-02-28.
 
 `aea/protocols/dialogue/base.py:207-220` — Uses `_` as separator in `__str__` and `split("_")` in `from_str`. Breaks if addresses or references contain underscores. Not fixable without changing `__str__`, which would break backward compatibility with persisted dialogue storage keys. `from_str` is not used in production code (only tests); production serialization uses `from_json`/`json`.
 
-### P13. MEDIUM — `sys.stderr` permanently replaced with `/dev/null` ✅
+### P13. MEDIUM — `sys.stderr` permanently replaced with `/dev/null` (reverted, intentional)
 
-`aea/cli/run.py:218` — After profiling stops, `stderr` is redirected to `/dev/null` and never restored. All subsequent error output is silenced. The file handle also leaks.
+`aea/cli/run.py:218` — After profiling stops, `stderr` is redirected to `/dev/null` and never restored. This is an intentional hack to suppress faulty garbage collection output printed to stderr during interpreter shutdown. The redirect only takes effect at the very end of the profiling context, so it does not silence meaningful error output during normal execution. The original save-and-restore fix was reverted as it defeated the purpose of the hack.
 
 ### P14. MEDIUM — Private keys written with default (world-readable) permissions (deferred)
 

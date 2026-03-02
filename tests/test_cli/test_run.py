@@ -38,7 +38,7 @@ from click import ClickException
 from pexpect.exceptions import EOF  # type: ignore
 
 from aea.cli import cli
-from aea.cli.run import _build_aea, _profiling_context, run_aea
+from aea.cli.run import _build_aea, run_aea
 from aea.configurations.base import (
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_CONNECTION_CONFIG_FILE,
@@ -277,17 +277,6 @@ def test_run_with_profiling():
             shutil.rmtree(t)
         except (OSError, IOError):
             pass
-
-
-def test_profiling_context_restores_stderr():
-    """Test that _profiling_context restores sys.stderr after exiting."""
-    original_stderr = sys.stderr
-    with patch("aea.cli.run.Profiling"):
-        with _profiling_context(period=1):
-            pass
-    assert (
-        sys.stderr is original_stderr
-    ), "sys.stderr was not restored after _profiling_context"
 
 
 # @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
