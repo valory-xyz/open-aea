@@ -45,7 +45,7 @@ from typing import (
     cast,
 )
 
-_default_logger = logging.getLogger(__file__)
+_default_logger = logging.getLogger(__name__)
 
 
 def ensure_list(value: Any) -> List:

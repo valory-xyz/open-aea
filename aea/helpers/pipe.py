@@ -154,7 +154,10 @@ class PosixNamedPipeProtocol:
             "Attempt opening pipes {}, {}...".format(self._in_path, self._out_path)
         )
 
+        prev_in = self._in
         self._in = os.open(self._in_path, os.O_RDONLY | os.O_NONBLOCK | os.O_SYNC)
+        if prev_in != -1:
+            os.close(prev_in)
 
         try:
             self._out = os.open(self._out_path, os.O_WRONLY | os.O_NONBLOCK)
@@ -170,10 +173,8 @@ class PosixNamedPipeProtocol:
             self._in != -1 and self._out != -1 and self._loop is not None,
             "Incomplete initialization.",
         )
-        self._stream_reader = asyncio.StreamReader(loop=self._loop)
-        self._reader_protocol = asyncio.StreamReaderProtocol(
-            self._stream_reader, loop=self._loop
-        )
+        self._stream_reader = asyncio.StreamReader()
+        self._reader_protocol = asyncio.StreamReaderProtocol(self._stream_reader)
         self._fileobj = os.fdopen(self._in, "r")
         await self._loop.connect_read_pipe(
             lambda: self.__reader_protocol, self._fileobj

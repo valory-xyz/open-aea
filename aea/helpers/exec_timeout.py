@@ -32,7 +32,7 @@ from threading import Lock
 from types import TracebackType
 from typing import Any, Optional, Type
 
-_default_logger = logging.getLogger(__file__)
+_default_logger = logging.getLogger(__name__)
 
 
 class TimeoutResult:

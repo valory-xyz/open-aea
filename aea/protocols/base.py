@@ -22,7 +22,6 @@
 import importlib
 import inspect
 import logging
-import re
 from abc import ABC, abstractmethod
 from base64 import b64decode, b64encode
 from copy import copy
@@ -390,7 +389,7 @@ class Protocol(Component):
             word.capitalize() for word in configuration.name.split("_")
         )
         message_classes = list(
-            filter(lambda x: re.match(f"{name_camel_case}Message", x[0]), classes)
+            filter(lambda x: x[0] == f"{name_camel_case}Message", classes)
         )
         if len(message_classes) != 1:  # pragma: nocover
             raise AEAComponentLoadException("Not exactly one message class detected.")
@@ -401,7 +400,7 @@ class Protocol(Component):
         classes = inspect.getmembers(class_module, inspect.isclass)
         serializer_classes = list(
             filter(
-                lambda x: re.match(f"{name_camel_case}Serializer", x[0]),
+                lambda x: x[0] == f"{name_camel_case}Serializer",
                 classes,
             )
         )

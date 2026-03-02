@@ -29,7 +29,7 @@ from click.exceptions import ClickException
 from aea.cli.utils.constants import CONFIG_SUPPORTED_KEY_TYPES
 from aea.cli.utils.context import Context
 from aea.cli.utils.decorators import check_aea_project, pass_ctx
-from aea.cli.utils.exceptions import aev_flag_depreaction
+from aea.cli.utils.exceptions import aev_flag_deprecation
 from aea.configurations.manager import AgentConfigManager, VariableDoesNotExist
 from aea.configurations.validation import ExtraPropertiesError
 from aea.exceptions import AEAException
@@ -57,7 +57,7 @@ def config(click_context: click.Context) -> None:  # pylint: disable=unused-argu
 def get(ctx: Context, apply_environment_variables: bool, json_path: str) -> None:
     """Get a field."""
     if apply_environment_variables:
-        aev_flag_depreaction()
+        aev_flag_deprecation()
 
     try:
         agent_config_manager = AgentConfigManager.load(
@@ -102,7 +102,7 @@ def set_command(
 ) -> None:
     """Set a field."""
     if apply_environment_variables:
-        aev_flag_depreaction()
+        aev_flag_deprecation()
 
     try:
         agent_config_manager = AgentConfigManager.load(

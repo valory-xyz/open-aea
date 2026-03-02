@@ -24,6 +24,7 @@ import datetime
 import json
 import multiprocessing
 import os
+import queue
 import threading
 from abc import ABC, abstractmethod
 from asyncio.tasks import FIRST_COMPLETED
@@ -230,9 +231,7 @@ class AgentRunProcessTask(BaseAgentRunTask):
 
     def start(self) -> None:
         """Run task in a dedicated process."""
-        self._wait_task = asyncio.ensure_future(
-            self._wait_for_result(), loop=self.caller_loop
-        )
+        self._wait_task = self.caller_loop.create_task(self._wait_for_result())
         self.process = multiprocessing.Process(
             target=self._run_agent,
             args=(self.agent_alias, self._stop_event, self._result_queue),
@@ -247,7 +246,11 @@ class AgentRunProcessTask(BaseAgentRunTask):
         while self.process.is_alive():
             await asyncio.sleep(self.PROCESS_ALIVE_SLEEP_TIME)
 
-        result = self._result_queue.get_nowait()
+        try:
+            result = self._result_queue.get_nowait()
+        except queue.Empty:
+            self.process.join(self.PROCESS_JOIN_TIMEOUT)
+            raise RuntimeError("Agent process terminated without returning a result.")
         self.process.join(self.PROCESS_JOIN_TIMEOUT)
         if isinstance(result, Exception):
             raise result
@@ -300,7 +303,8 @@ class AgentRunProcessTask(BaseAgentRunTask):
             if t:
                 t.join(10)
             result_queue.put(r)
-            aea.logger.debug("process task stopped")
+            if "aea" in locals():
+                aea.logger.debug("process task stopped")
 
     def stop(self) -> None:
         """Stop the task."""

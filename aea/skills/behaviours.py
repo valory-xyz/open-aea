@@ -145,7 +145,7 @@ class TickerBehaviour(SimpleBehaviour, ABC):
     @property
     def last_act_time(self) -> datetime.datetime:
         """Get the last time the act method has been called."""
-        return self._start_at
+        return self._last_act_time
 
     def act_wrapper(self) -> None:
         """Wrap the call of the action. This method must be called only by the framework."""
@@ -357,7 +357,7 @@ class FSMBehaviour(CompositeBehaviour, ABC):
         current_state.act_wrapper()
 
         if current_state.is_done():
-            if current_state in self._final_states:
+            if self.current in self._final_states:
                 # we reached a final state - return.
                 self.current = None
                 return

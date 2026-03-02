@@ -27,7 +27,6 @@ This module contains the classes required for dialogue management.
 
 import inspect
 import secrets
-import sys
 from collections import defaultdict, namedtuple
 from enum import Enum
 from functools import cached_property
@@ -52,22 +51,13 @@ from aea.helpers.storage.generic_storage import SyncCollection
 from aea.protocols.base import Message
 from aea.skills.base import SkillComponent
 
-if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 7):
-    DialogueMessage = namedtuple(  # pragma: no cover
-        "DialogueMessage",
-        ["performative", "contents", "is_incoming", "target"],
-        rename=False,
-        module="aea.protocols.dialogues.base",
-    )
-    DialogueMessage.__new__.__defaults__ = (dict(), None, None)  # pragma: no cover
-else:
-    DialogueMessage = namedtuple(  # pylint: disable=unexpected-keyword-arg
-        "DialogueMessage",
-        ["performative", "contents", "is_incoming", "target"],
-        rename=False,
-        defaults=[dict(), None, None],
-        module="aea.protocols.dialogues.base",
-    )
+DialogueMessage = namedtuple(
+    "DialogueMessage",
+    ["performative", "contents", "is_incoming", "target"],
+    rename=False,
+    defaults=[dict(), None, None],
+    module="aea.protocols.dialogues.base",
+)
 
 
 class InvalidDialogueMessage(Exception):
@@ -522,7 +512,7 @@ class Dialogue(
         """
         return (
             self.dialogue_label.dialogue_opponent_addr
-            is not self.dialogue_label.dialogue_starter_addr
+            != self.dialogue_label.dialogue_starter_addr
         )
 
     @property

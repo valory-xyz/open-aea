@@ -121,6 +121,20 @@ def test_merge_dependencies_succeeds_not_simple_but_the_same():
     assert dependencies_a == dependencies_b == expected_merged_dependencies
 
 
+def test_merge_dependencies_old_nonsimple_new_simple_raises():
+    """Test that merging a non-simple old dep with a simple new dep raises ValueError."""
+    dependencies_a = {
+        "package_1": Dependency("package_1", "==0.1.0", index="https://pypi.org"),
+    }
+    dependencies_b = {
+        "package_1": Dependency("package_1", "==0.2.0"),
+    }
+    with pytest.raises(
+        ValueError, match="cannot trivially merge these two PyPI dependencies:.*"
+    ):
+        merge_dependencies(dependencies_a, dependencies_b)
+
+
 def test_is_simple_dep():
     """Test the `is_simple_dep` function."""
     dependency_a = Dependency("name", "==0.1.0")

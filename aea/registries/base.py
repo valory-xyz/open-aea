@@ -21,6 +21,7 @@
 """This module contains registries."""
 
 import copy
+import threading
 from abc import ABC, abstractmethod
 from operator import itemgetter
 from typing import Any, Dict, Generic, List, Optional, Set, Tuple, TypeVar, cast
@@ -320,7 +321,7 @@ class ComponentRegistry(
 ):
     """This class implements a generic registry for skill components."""
 
-    __slots__ = ("_items", "_dynamically_added")
+    __slots__ = ("_items", "_dynamically_added", "_lock")
 
     def __init__(self, **kwargs: Any) -> None:
         """
@@ -333,6 +334,7 @@ class ComponentRegistry(
             PublicIdRegistry()
         )
         self._dynamically_added: Dict[PublicId, Set[str]] = {}
+        self._lock = threading.Lock()
 
     def register(
         self,
@@ -348,23 +350,24 @@ class ComponentRegistry(
         :param is_dynamically_added: whether or not the item is dynamically added.
         :raises ValueError: if an item is already registered with that item id.
         """
-        skill_id = item_id[0]
-        item_name = item_id[1]
-        skill_items = self._items.fetch(skill_id)
-        if skill_items is not None and item_name in skill_items.keys():
-            raise ValueError(
-                f"Item already registered with skill id '{skill_id}' and name '{item_name}'"
-            )
+        with self._lock:
+            skill_id = item_id[0]
+            item_name = item_id[1]
+            skill_items = self._items.fetch(skill_id)
+            if skill_items is not None and item_name in skill_items.keys():
+                raise ValueError(
+                    f"Item already registered with skill id '{skill_id}' and name '{item_name}'"
+                )
 
-        if skill_items is not None:
-            self._items.unregister(skill_id)
-        else:
-            skill_items = {}
-        skill_items[item_name] = item
-        self._items.register(skill_id, skill_items)
+            if skill_items is not None:
+                self._items.unregister(skill_id)
+            else:
+                skill_items = {}
+            skill_items[item_name] = item
+            self._items.register(skill_id, skill_items)
 
-        if is_dynamically_added:
-            self._dynamically_added.setdefault(skill_id, set()).add(item_name)
+            if is_dynamically_added:
+                self._dynamically_added.setdefault(skill_id, set()).add(item_name)
 
     def unregister(self, item_id: Tuple[PublicId, str]) -> Optional[SkillComponentType]:
         """
@@ -385,27 +388,28 @@ class ComponentRegistry(
         :return: None
         :raises ValueError: if no item registered with that item id.
         """
-        skill_id = item_id[0]
-        item_name = item_id[1]
-        name_to_item = self._items.fetch(skill_id)
-        if name_to_item is None or item_name not in name_to_item:
-            raise ValueError(
-                "No item registered with component id '{}'".format(item_id)
-            )
-        self.logger.debug("Unregistering item with id {}".format(item_id))
-        item = name_to_item.pop(item_name)
-        if len(name_to_item) == 0:
-            self._items.unregister(skill_id)
-        else:
-            self._items.unregister(skill_id)
-            self._items.register(skill_id, name_to_item)
+        with self._lock:
+            skill_id = item_id[0]
+            item_name = item_id[1]
+            name_to_item = self._items.fetch(skill_id)
+            if name_to_item is None or item_name not in name_to_item:
+                raise ValueError(
+                    "No item registered with component id '{}'".format(item_id)
+                )
+            self.logger.debug("Unregistering item with id {}".format(item_id))
+            item = name_to_item.pop(item_name)
+            if len(name_to_item) == 0:
+                self._items.unregister(skill_id)
+            else:
+                self._items.unregister(skill_id)
+                self._items.register(skill_id, name_to_item)
 
-        items = self._dynamically_added.get(skill_id, None)
-        if items is not None:
-            items.remove(item_name)
-            if len(items) == 0:
-                self._dynamically_added.pop(skill_id, None)
-        return item
+            items = self._dynamically_added.get(skill_id, None)
+            if items is not None:
+                items.remove(item_name)
+                if len(items) == 0:
+                    self._dynamically_added.pop(skill_id, None)
+            return item
 
     def fetch(self, item_id: Tuple[PublicId, str]) -> Optional[SkillComponentType]:
         """

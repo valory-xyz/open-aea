@@ -22,10 +22,8 @@
 import asyncio
 import queue
 import threading
+from asyncio import CancelledError
 from asyncio.events import AbstractEventLoop
-from concurrent.futures._base import CancelledError
-from concurrent.futures._base import TimeoutError as FuturesTimeoutError
-from contextlib import suppress
 from typing import (
     Any,
     Callable,
@@ -130,17 +128,14 @@ class AsyncMultiplexer(Runnable, WithLogger):
         if not default_connection and connections:
             enforce(
                 len(connections) - 1 >= default_connection_index,
-                "default_connection_index os out of connections range!",
+                "default_connection_index is out of connections range!",
             )
             default_connection = connections[default_connection_index].connection_id
 
         if default_connection:
             enforce(
-                bool(
-                    [
-                        i.connection_id.same_prefix(default_connection)
-                        for i in connections
-                    ]
+                any(
+                    i.connection_id.same_prefix(default_connection) for i in connections
                 ),
                 f"Default connection {default_connection} does not present in connections list!",
             )
@@ -232,7 +227,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
 
         if not protocol_id:
             raise ValueError(
-                f"Can not resolve protocol id for {envelope}, pass protocols supported to multipelxer instance {self._specification_id_to_protocol_id}"
+                f"Can not resolve protocol id for {envelope}, pass protocols supported to multiplexer instance {self._specification_id_to_protocol_id}"
             )
 
         return protocol_id
@@ -362,8 +357,12 @@ class AsyncMultiplexer(Runnable, WithLogger):
 
         if self._recv_loop_task:
             self._recv_loop_task.cancel()
-            with suppress(Exception, asyncio.CancelledError):
+            try:
                 await self._recv_loop_task
+            except asyncio.CancelledError:
+                pass
+            except Exception:  # pylint: disable=broad-except
+                self.logger.exception("Error stopping receive loop.")
 
         self._recv_loop_task = None
         self.logger.debug("Receive loop stopped.")
@@ -374,8 +373,12 @@ class AsyncMultiplexer(Runnable, WithLogger):
             # send a 'stop' token (a None value) to wake up the coroutine waiting for outgoing envelopes.
             await self.out_queue.put(None)
             self._send_loop_task.cancel()
-            with suppress(Exception, asyncio.CancelledError):
+            try:
                 await self._send_loop_task
+            except asyncio.CancelledError:
+                pass
+            except Exception:  # pylint: disable=broad-except
+                self.logger.exception("Error stopping send loop.")
 
         self._send_loop_task = None
         self.logger.debug("Send loop stopped.")
@@ -455,7 +458,7 @@ class AsyncMultiplexer(Runnable, WithLogger):
                 await asyncio.wait_for(
                     self._disconnect_one(connection_id), timeout=self.DISCONNECT_TIMEOUT
                 )
-            except FuturesTimeoutError:
+            except asyncio.TimeoutError:
                 self.logger.debug(  # pragma: nocover
                     f"Disconnection of `{connection_id}` timed out."
                 )
@@ -529,7 +532,17 @@ class AsyncMultiplexer(Runnable, WithLogger):
                 # process completed receiving tasks.
                 for task in done:
                     connection = task_to_connection.pop(task)
-                    envelope = task.result()
+                    try:
+                        envelope = task.result()
+                    except Exception:  # pylint: disable=broad-except
+                        self.logger.exception(
+                            f"Error when receiving an envelope from connection {connection.connection_id}. "
+                        )
+                        # reinstantiate receiving task if the connection is still up
+                        if connection.is_connected:
+                            new_task = asyncio.ensure_future(connection.receive())
+                            task_to_connection[new_task] = connection
+                        continue
                     if envelope is not None:
                         self._update_routing_helper(envelope, connection)
                         self.in_queue.put_nowait(envelope)

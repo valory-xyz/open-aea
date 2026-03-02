@@ -20,8 +20,10 @@
 """Tests for the pipe module."""
 
 import asyncio
+import errno
 from threading import Thread
 from unittest import mock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -29,6 +31,7 @@ from aea.helpers.pipe import (
     IPCChannelClient,
     PosixNamedPipeChannel,
     PosixNamedPipeChannelClient,
+    PosixNamedPipeProtocol,
     TCPSocketChannel,
     TCPSocketChannelClient,
     TCPSocketProtocol,
@@ -166,6 +169,39 @@ def make_future(result) -> asyncio.Future:
     f = asyncio.Future()  # type: ignore
     f.set_result(result)
     return f
+
+
+@skip_test_windows
+@pytest.mark.asyncio
+async def test_posix_pipe_closes_prev_in_fd_on_retry():
+    """Test that the previous input fd is closed when a new one is opened on retry."""
+    pipe = PosixNamedPipeProtocol(
+        in_path="/tmp/test_in", out_path="/tmp/test_out"  # nosec
+    )
+    pipe._loop = asyncio.get_event_loop()
+    pipe._connection_attempts = 3
+
+    first_in_fd = 42
+    second_in_fd = 43
+    out_fd = 44
+    enxio_error = OSError(errno.ENXIO, "No such device or address")
+
+    # First attempt: open in (42), open out fails ENXIO, sleep, retry
+    # Second attempt: open in (43) — should close prev (42), open out (44) — success
+    with patch(
+        "os.open", side_effect=[first_in_fd, enxio_error, second_in_fd, out_fd]
+    ), patch("os.close") as mock_close, patch(
+        "asyncio.sleep", return_value=None
+    ), patch(
+        "os.fdopen"
+    ), patch.object(
+        pipe._loop, "connect_read_pipe", return_value=(Mock(), Mock())
+    ):
+        pipe._connection_attempts = 3
+        await pipe.connect(timeout=1.0)
+
+    # The first input fd should have been closed when the second was opened
+    mock_close.assert_any_call(first_in_fd)
 
 
 @skip_test_windows

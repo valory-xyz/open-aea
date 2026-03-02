@@ -166,6 +166,9 @@ def test_fms_behaviour():
         i += 1
 
     assert outputs == ["a", "b", "c"]
+    assert fsm.is_done(), "FSM should be done after reaching final state"
+    assert fsm.current is None, "FSM current should be None after reaching final state"
+    assert i < max_iterations, "FSM should have terminated via final state detection"
 
 
 class TestFSMBehaviourCreation:
@@ -363,7 +366,19 @@ class TickerBehaviourTestCase(TestCase):
     def test_last_act_time_positive(self):
         """Test for last_act_time property positive result."""
         obj = self.TestTickerBehaviour(skill_context="skill_context", name="name")
-        obj.last_act_time
+        assert obj.last_act_time == obj._last_act_time
+
+    def test_last_act_time_updates_on_act(self):
+        """Test that last_act_time updates after act_wrapper and differs from start_at."""
+        obj = self.TestTickerBehaviour(skill_context="skill_context", name="name")
+        obj.is_done = mock.Mock(return_value=False)
+        obj.is_time_to_act = mock.Mock(return_value=True)
+        obj.act = mock.Mock()
+        initial_time = obj.last_act_time
+        obj.act_wrapper()
+        assert obj.last_act_time >= initial_time
+        assert obj.last_act_time == obj._last_act_time
+        assert obj.last_act_time != obj._start_at or obj._start_at == obj._last_act_time
 
     def test_act_wrapper_positive(self):
         """Test for act_wrapper positive result."""
@@ -452,7 +467,7 @@ class FSMBehaviourTestCase(TestCase):
         current_state.act_wrapper = mock.Mock()
         current_state.is_done = mock.Mock(return_value=True)
 
-        obj.final_states.add(current_state)
+        obj._final_states.add("current")
         obj.get_state = mock.Mock(return_value=current_state)
         obj.current = "current"
         obj.act()
@@ -460,6 +475,7 @@ class FSMBehaviourTestCase(TestCase):
         obj.get_state.assert_called_once()
         current_state.act_wrapper.assert_called_once()
         current_state.is_done.assert_called_once()
+        assert obj.current is None, "FSM should set current to None on final state"
 
     def test_unregister_transition_value_error(self):
         """Test for unregister_transition method ValueError raises."""

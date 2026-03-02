@@ -42,7 +42,7 @@ BYTES_TO_MBYTES = 1024**-2
 
 lock = threading.Lock()
 
-_default_logger = logging.getLogger(__file__)
+_default_logger = logging.getLogger(__name__)
 
 if platform.system() == "Windows":  # pragma: nocover
     import win32process  # type: ignore  # pylint: disable=import-error,import-outside-toplevel

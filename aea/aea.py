@@ -176,6 +176,7 @@ class AEA(Agent):
                 default_routing=default_routing,
                 default_connection=default_connection,
                 protocols=self.resources.get_all_protocols(),
+                connection_exception_policy=self._connection_exception_policy,
             ),
         )
 

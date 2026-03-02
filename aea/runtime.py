@@ -20,8 +20,8 @@
 """This module contains the implementation of runtime for economic agent (AEA)."""
 
 import asyncio
+from asyncio import CancelledError
 from asyncio.events import AbstractEventLoop
-from concurrent.futures._base import CancelledError
 from contextlib import suppress
 from enum import Enum
 from typing import Dict, Optional, Type, cast

@@ -854,13 +854,14 @@ class Updater:
     "--update-minor",
     "update_version",
     flag_value="minor",
-    default=True,
+    default="minor",
     help="Increase minor version",
 )
 @click.option(
     "--update-patch",
     "update_version",
     flag_value="patch",
+    default="minor",
     help="Increase patch version",
 )
 @click.option(

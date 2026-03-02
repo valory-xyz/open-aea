@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,11 @@ import click
 from aea.exceptions import AEAException
 
 
-def aev_flag_depreaction() -> None:
+def aev_flag_deprecation() -> None:
     """Deprecation warning for `--aev` flag."""
-    message = "`--aev` flag is deprecated and will be removed in v2.0.0, usage of envrionment varibales is default now."
+    message = (
+        "`--aev` flag is deprecated, usage of environment variables is default now."
+    )
     click.echo(message)
     warn(message, DeprecationWarning, stacklevel=2)
 
