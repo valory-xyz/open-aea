@@ -40,7 +40,7 @@ If your downstream CLI uses Click options with `flag_value`, audit these exact p
 - `aea/cli/upgrade.py::upgrade`
 - `scripts/update_package_versions.py` options `--update-minor` / `--update-patch`
 
-Required behavior:
+Required behaviour:
 
 - Do **not** rely on decorator order to select defaults when multiple flags write to the same parameter.
 - Use explicit normalization in code for unset values (e.g. `if sync_type is None: sync_type = SyncTypes.THIRD_PARTY`).
@@ -65,7 +65,7 @@ Audit downstream code for these exact anti-patterns and replacements:
 
 If you install both plugins, verify dependency constraints in your lock/constraints files:
 
-- `open-aea-ledger-ethereum-flashbots` must be compatible with the same 2.1.x line of `open-aea-ledger-ethereum`.
+- The Flashbots plugin package must be compatible with the same 2.1.x line of the Ethereum plugin package.
 - Reject locks where Flashbots still constrains Ethereum to `<2.1.0`.
 
 Concrete verification commands to run after upgrade:
@@ -75,7 +75,7 @@ Concrete verification commands to run after upgrade:
     - or for pre-release validation: `pip install --upgrade "open-aea==2.1.0rc6"`
 2. Re-lock dependencies:
     - `pipenv lock` (or your equivalent lock workflow)
-3. Verify CLI default routing behavior:
+3. Verify CLI default routing behaviour:
     - `aea packages sync` (must default to third-party sync mode)
     - `aea packages sync --third-party`
     - `aea packages sync --dev`
@@ -83,11 +83,11 @@ Concrete verification commands to run after upgrade:
 4. Verify interpreter matrix:
     - run your tests on Python `3.10` and `3.14`
 5. Verify plugin resolution when Flashbots is used:
-    - install both `open-aea-ledger-ethereum` and `open-aea-ledger-ethereum-flashbots` in a clean env and ensure resolver succeeds.
+    - install both `open-aea-ledger-ethereum` and `open-aea-ledger-ethereum-flashbots` in a clean environment and ensure dependency resolution succeeds.
 
 Known caveat:
 
-- Historical installer scripts may still contain hardcoded checks/messages for Python `3.10/3.11`. Treat package metadata and release notes as the source of truth for supported runtime versions.
+- Historical installer scripts may still contain hard-coded checks/messages for Python `3.10/3.11`. Treat package metadata and release notes as the source of truth for supported runtime versions.
 
 ## `v2.0.7` to `v2.0.8`
 
