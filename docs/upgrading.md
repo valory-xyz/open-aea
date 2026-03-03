@@ -89,6 +89,14 @@ Known caveat:
 
 - Historical installer scripts may still contain hard-coded checks/messages for Python `3.10/3.11`. Treat package metadata and release notes as the source of truth for supported runtime versions.
 
+### API compatibility notes
+
+- CLI/API-surface changes:
+  - `aea/cli/utils/click_utils.py::password_option` now always prompts on `-p` and supports `AEA_PASSWORD` for `--password`.
+
+- Side-effect risk to audit in downstream code:
+  - `aea/helpers/async_utils.py::Runnable.wait_completed` internals changed to use a lightweight ready-awaitable for loop safety on Python 3.14; callers that relied on strict `Future` type checks should switch to awaitability checks instead.
+
 ## `v2.0.7` to `v2.0.8`
 
 - No backwards incompatible changes
