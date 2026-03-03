@@ -40,8 +40,8 @@ setup(
     },
     python_requires=">=3.10,<4.0",
     install_requires=[
-        "open-aea-ledger-ethereum~=2.0.0",
-        "open-aea-flashbots==2.0.0",
+        "open-aea-ledger-ethereum>=2.0.0, <3.0.0",
+        "open-aea-flashbots>=2.0.0, <3.0.0",
     ],
     tests_require=["pytest"],
     entry_points={
