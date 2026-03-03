@@ -1,5 +1,31 @@
 # Release History - open AEA
 
+## 2.1.0 (upcoming)
+
+AEA:
+- Extends Python support from `3.10-3.11` to `3.10-3.14`. #831
+- Adds support for pytest v8 and updates related test and utility modules. #835
+- Makes CLI `flag_value` defaults robust across Click processing-order changes (including `packages sync` defaults and registry flag defaults). #839 #848
+- Adds `AEA_PASSWORD` environment variable support for CLI password handling. #825
+- Fixes multiple high-impact audit findings across behaviours, multiplexer, manager, dependency installation, and registry handling. #846
+
+Plugins:
+- Adds multiple RPC rotation with automatic failover in the Ethereum ledger plugin stack. #829
+- Fixes `open-aea-ledger-ethereum-flashbots` dependency constraints to be compatible with `open-aea-ledger-ethereum` in the `2.1.0rc6` line. #850
+
+Tooling and dependencies:
+- Bumps `tomte` from `0.4.0` to `0.6.1`. #831
+- Updates Click range to `<8.4.0` and applies compatibility fixes for 8.3.x behaviour rules. #838 #839 #848
+- Updates several pinned dependencies for Python 3.12-3.14 compatibility, including `packaging==26`, `pytest>=8.2,<10`, `protobuf>=5,<6`, `requests>=2.32.5,<3`, `openapi-core==0.22.0`, `openapi-spec-validator>=0.7.0,<0.8.0`, `docker==7.1.0`, `hypothesis==6.151.9`, and `cosmpy>=0.11.0,<0.12`. #831
+- Removes obsolete/deprecated compatibility dependencies and paths (including `gym` and `distutils` usage). #831 #836
+
+Compatibility and regression fixes:
+- Fixes Python 3.13/3.14 regressions in async/multiprocessing paths (including `multiprocessing.Manager` context handling and asyncio event-loop compatibility changes). #843
+- Reworks ready-awaitable internals to avoid Python 3.14 warnings/regressions and follow-up flaky behaviour. #831 #847
+- Fixes local connection cross-thread queue loop handling to avoid race conditions caused by private asyncio queue internals. #847
+- Adds follow-up fixes for CLI and framework regressions found after the initial interpreter/dependency bump, including critical audit issues and command behaviour corrections. #846 #847 #848
+
+
 ## 2.0.8 (2026-01-20)
 
 Packages:

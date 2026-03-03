@@ -9,6 +9,94 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.0.8` to `v2.1.0`
+
+- Python support is now `3.10-3.14` (previously `3.10-3.11`).
+- Regenerate your environment and lock files when upgrading, as several toolchain and runtime dependencies were bumped to support newer Python versions.
+
+Main dependency updates to account for:
+
+- `tomte: 0.4.0 -> 0.6.1`
+- `click: >=8.1.0,<8.3.0 -> >=8.1.0,<8.4.0`
+- `pytest: >=7.0.0,<8.0.0 -> >=8.2,<10`
+- `packaging: >=23.1,<24.0 -> ==26`
+- `protobuf: >=4.21.6,<4.25.0 -> >=5,<6`
+- `requests: ==2.28.1 -> ==2.32.5`
+- `openapi-core: 0.15.0 -> 0.22.0`
+- `openapi-spec-validator: >=0.4.0,<0.5.0 -> >=0.7.0,<0.8.0`
+- `docker: 4.2.0 -> 7.1.0`
+- `hypothesis: 6.21.6 -> 6.151.9`
+- `cosmpy: ==0.9.2 -> >=0.11.0,<0.12`
+
+Exact APIs/functions to check:
+
+### 1) Click `flag_value` default handling
+
+If your downstream CLI uses Click options with `flag_value`, audit these exact patterns against Open AEA fixes:
+
+- `aea/cli/utils/click_utils.py::registry_flag`
+- `aea/cli/utils/click_utils.py::remote_registry_flag`
+- `aea/cli/packages.py::sync`
+- `aea/cli/upgrade.py::upgrade`
+- `scripts/update_package_versions.py` options `--update-minor` / `--update-patch`
+
+Required behaviour:
+
+- Do **not** rely on decorator order to select defaults when multiple flags write to the same parameter.
+- Use explicit normalization in code for unset values (e.g. `if sync_type is None: sync_type = SyncTypes.THIRD_PARTY`).
+- Ensure upgrade command handlers consume a single `registry: str` mode rather than split boolean flags (`local` / `remote`).
+
+### 2) Python 3.13/3.14 asyncio/multiprocessing compatibility
+
+Audit downstream code for these exact anti-patterns and replacements:
+
+- `multiprocessing.Manager()` without explicit context on Python 3.14+.
+  - Required fix pattern: use `multiprocessing.get_context("spawn").Manager()` where process-manager context must be controlled.
+- Accessing private queue loop internals (e.g. `queue._loop`).
+  - Required fix pattern: store/use explicit event loop references instead of private attributes.
+- Removed/unsupported asyncio APIs in modern Python:
+  - `asyncio.StreamReader(loop=...)`
+  - `asyncio.ensure_future(..., loop=...)`
+  - unconditional `asyncio.get_child_watcher()` / child-watcher usage on Python 3.14+
+- Ready-awaitable internals relying on module-level coroutine/future objects.
+  - Required fix pattern: use a lightweight awaitable object/factory that is loop-safe across Python 3.10-3.14.
+
+### 3) Plugin dependency compatibility (Ethereum + Flashbots)
+
+If you install both plugins, verify dependency constraints in your lock/constraints files:
+
+- The Flashbots plugin package must be compatible with the same 2.1.x line of the Ethereum plugin package.
+- Reject locks where Flashbots still constrains Ethereum to `<2.1.0`.
+
+Concrete verification commands to run after upgrade:
+
+1. Upgrade and reinstall:
+    - `pip install --upgrade "open-aea==2.1.0"`
+    - or for pre-release validation: `pip install --upgrade "open-aea==2.1.0rc6"`
+2. Re-lock dependencies:
+    - `pipenv lock` (or your equivalent lock workflow)
+3. Verify CLI default routing behaviour:
+    - `aea packages sync` (must default to third-party sync mode)
+    - `aea packages sync --third-party`
+    - `aea packages sync --dev`
+    - `aea packages sync --all`
+4. Verify interpreter matrix:
+    - run your tests on Python `3.10` and `3.14`
+5. Verify plugin resolution when Flashbots is used:
+    - install both `open-aea-ledger-ethereum` and `open-aea-ledger-ethereum-flashbots` in a clean environment and ensure dependency resolution succeeds.
+
+Known caveat:
+
+- Historical installer scripts may still contain hard-coded checks/messages for Python `3.10/3.11`. Treat package metadata and release notes as the source of truth for supported runtime versions.
+
+### API compatibility notes
+
+- CLI/API-surface changes:
+  - `aea/cli/utils/click_utils.py::password_option` now always prompts on `-p` and supports `AEA_PASSWORD` for `--password`.
+
+- Side-effect risk to audit in downstream code:
+  - `aea/helpers/async_utils.py::Runnable.wait_completed` internals changed to use a lightweight ready-awaitable for loop safety on Python 3.14; callers that relied on strict `Future` type checks should switch to awaitability checks instead.
+
 ## `v2.0.7` to `v2.0.8`
 
 - No backwards incompatible changes
