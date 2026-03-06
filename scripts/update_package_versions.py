@@ -854,14 +854,14 @@ class Updater:
     "--update-minor",
     "update_version",
     flag_value="minor",
-    default="minor",
+    default=None,
     help="Increase minor version",
 )
 @click.option(
     "--update-patch",
     "update_version",
     flag_value="patch",
-    default="minor",
+    default=None,
     help="Increase patch version",
 )
 @click.option(
@@ -885,6 +885,8 @@ class Updater:
 )
 def command(ask_version, update_version, replace_by_default, no_interactive, context):
     """Run cli command."""
+    if update_version is None:
+        update_version = "minor"
     Updater(
         ask_version, update_version, replace_by_default, no_interactive, context
     ).run()
