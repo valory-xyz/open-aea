@@ -1,6 +1,6 @@
 # Release History - open AEA
 
-## 2.1.0 (upcoming)
+## 2.1.0 (2026-03-06)
 
 AEA:
 - Extends Python support from `3.10-3.11` to `3.10-3.14`. #831
