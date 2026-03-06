@@ -169,8 +169,8 @@ jobs:
           sudo apt-get autoremove
           sudo apt-get autoclean
           python -m pip install --upgrade pip
-          pip install open-aea[all] --no-cache
-          pip install open-aea-cli-ipfs --no-cache
+          pip install ".[all]" --no-cache
+          pip install plugins/aea-cli-ipfs --no-cache
 
       - name: Push Packages
         run: |
