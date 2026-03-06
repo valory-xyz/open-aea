@@ -305,22 +305,18 @@ def registry_flag(
 
     def wrapper(f: Callable) -> Callable:
         _default = default_registry if mark_default else None
-        options = [
-            ("--mixed", REGISTRY_MIXED, "To use a local and remote registries."),
-            ("--remote", REGISTRY_REMOTE, "To use a remote registry."),
-            ("--local", REGISTRY_LOCAL, "To use a local registry."),
-        ]
-        # The last-applied option's flag_value becomes Click's effective default,
-        # so apply the option matching default_registry last (outermost decorator).
-        options.sort(key=lambda o: o[1] == default_registry)
-        for flag, flag_value, help_text in options:
-            f = option(
-                flag,
-                "registry",
-                flag_value=flag_value,
-                help=help_text,
-                default=_default,
-            )(f)
+        f = option(
+            "--mixed", "registry", flag_value=REGISTRY_MIXED,
+            help="To use a local and remote registries.", default=_default,
+        )(f)
+        f = option(
+            "--remote", "registry", flag_value=REGISTRY_REMOTE,
+            help="To use a remote registry.", default=_default,
+        )(f)
+        f = option(
+            "--local", "registry", flag_value=REGISTRY_LOCAL,
+            help="To use a local registry.", default=_default,
+        )(f)
         return f
 
     return wrapper
@@ -346,21 +342,14 @@ def remote_registry_flag(
 
     def wrapper(f: Callable) -> Callable:
         _default = default_registry if mark_default else None
-        options = [
-            ("--http", REMOTE_HTTP, "To use an HTTP registry."),
-            ("--ipfs", REMOTE_IPFS, "To use an IPFS registry."),
-        ]
-        # The last-applied option's flag_value becomes Click's effective default,
-        # so apply the option matching default_registry last (outermost decorator).
-        options.sort(key=lambda o: o[1] == default_registry)
-        for flag, flag_value, help_text in options:
-            f = option(
-                flag,
-                "remote_registry",
-                flag_value=flag_value,
-                help=help_text,
-                default=_default,
-            )(f)
+        f = option(
+            "--http", "remote_registry", flag_value=REMOTE_HTTP,
+            help="To use an HTTP registry.", default=_default,
+        )(f)
+        f = option(
+            "--ipfs", "remote_registry", flag_value=REMOTE_IPFS,
+            help="To use an IPFS registry.", default=_default,
+        )(f)
         return f
 
     return wrapper

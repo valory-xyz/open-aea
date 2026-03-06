@@ -31,7 +31,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 def get_all_extras() -> Dict:
     cli_deps = [
-        "click>=8.1.0,<8.4.0",
+        "click>=8.3.0,<8.4.0",
         "pyyaml>=6.0.1,<9",
         "packaging==26",
         "pytest>=8.2,<10",
