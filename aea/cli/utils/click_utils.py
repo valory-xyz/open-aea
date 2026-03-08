@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """Module with click utils of the aea cli."""
 
+import functools
 import os
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -304,29 +305,42 @@ def registry_flag(
         default_registry = REGISTRY_LOCAL
 
     def wrapper(f: Callable) -> Callable:
-        _default = default_registry if mark_default else None
-        f = option(
+        # Workaround: Click <8.3 ignores default= on flag_value options and
+        # uses the last-applied decorator's flag_value instead. Click >=8.3
+        # honours default= but treats booleans literally. Using default=None
+        # with a normalizing wrapper works across all supported versions.
+        # If the Click lower bound is raised to >=8.3, this wrapper can be
+        # removed and default=_resolve can be passed directly to the options.
+        _resolve = default_registry if mark_default else None
+
+        @functools.wraps(f)
+        def new_f(*args: Any, registry: Optional[str] = None, **kwargs: Any) -> Any:
+            if registry is None:
+                registry = _resolve
+            return f(*args, registry=registry, **kwargs)
+
+        new_f = option(
             "--mixed",
             "registry",
             flag_value=REGISTRY_MIXED,
             help="To use a local and remote registries.",
-            default=_default,
-        )(f)
-        f = option(
+            default=None,
+        )(new_f)
+        new_f = option(
             "--remote",
             "registry",
             flag_value=REGISTRY_REMOTE,
             help="To use a remote registry.",
-            default=_default,
-        )(f)
-        f = option(
+            default=None,
+        )(new_f)
+        new_f = option(
             "--local",
             "registry",
             flag_value=REGISTRY_LOCAL,
             help="To use a local registry.",
-            default=_default,
-        )(f)
-        return f
+            default=None,
+        )(new_f)
+        return new_f
 
     return wrapper
 
@@ -350,22 +364,33 @@ def remote_registry_flag(
         default_registry = REMOTE_IPFS
 
     def wrapper(f: Callable) -> Callable:
-        _default = default_registry if mark_default else None
-        f = option(
+        # See registry_flag for explanation of this workaround.
+        # Can be removed when Click lower bound is raised to >=8.3.
+        _resolve = default_registry if mark_default else None
+
+        @functools.wraps(f)
+        def new_f(
+            *args: Any, remote_registry: Optional[str] = None, **kwargs: Any
+        ) -> Any:
+            if remote_registry is None:
+                remote_registry = _resolve
+            return f(*args, remote_registry=remote_registry, **kwargs)
+
+        new_f = option(
             "--http",
             "remote_registry",
             flag_value=REMOTE_HTTP,
             help="To use an HTTP registry.",
-            default=_default,
-        )(f)
-        f = option(
+            default=None,
+        )(new_f)
+        new_f = option(
             "--ipfs",
             "remote_registry",
             flag_value=REMOTE_IPFS,
             help="To use an IPFS registry.",
-            default=_default,
-        )(f)
-        return f
+            default=None,
+        )(new_f)
+        return new_f
 
     return wrapper
 
