@@ -85,6 +85,8 @@ def package_manager(
     is_flag=True,
     help="Recalculate hashes in packages.json so that they match the local packages.",
 )
+# default=None workaround for Click <8.3 flag_value handling; see
+# aea/cli/utils/click_utils.py:registry_flag for details.
 @click.option(
     "--third-party",
     "sync_type",
