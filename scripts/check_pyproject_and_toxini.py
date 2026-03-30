@@ -54,21 +54,12 @@ class Requirement(BaseRequirement):
         return hash(self.__str__())
 
 
-def load_pyproject(filename: str = PYPROJECT_TOML) -> Set[Requirement]:
-    """Load pyproject.toml dev dependencies."""
-    with open(filename, "rb") as f:
-        pyproject_data = tomli.load(f)
-
+def _parse_poetry_deps(deps: dict) -> list:
+    """Parse a Poetry dependency dict into a list of Requirement objects."""
     packages = []
-    dev_deps = (
-        pyproject_data.get("tool", {})
-        .get("poetry", {})
-        .get("group", {})
-        .get("dev", {})
-        .get("dependencies", {})
-    )
-
-    for name, version in dev_deps.items():
+    for name, version in deps.items():
+        if name == "python":
+            continue
         if isinstance(version, str):
             package_spec = f"{name}{version if version != '*' else ''}"
         else:
@@ -81,6 +72,25 @@ def load_pyproject(filename: str = PYPROJECT_TOML) -> Set[Requirement]:
             package_spec = f"{name}{extras}{version_spec}"
 
         packages.append(Requirement(package_spec))
+    return packages
+
+
+def load_pyproject(filename: str = PYPROJECT_TOML) -> Set[Requirement]:
+    """Load pyproject.toml dependencies (both core and dev)."""
+    with open(filename, "rb") as f:
+        pyproject_data = tomli.load(f)
+
+    poetry = pyproject_data.get("tool", {}).get("poetry", {})
+
+    packages = []
+
+    # Core dependencies
+    core_deps = poetry.get("dependencies", {})
+    packages.extend(_parse_poetry_deps(core_deps))
+
+    # Dev dependencies
+    dev_deps = poetry.get("group", {}).get("dev", {}).get("dependencies", {})
+    packages.extend(_parse_poetry_deps(dev_deps))
 
     return set(packages)
 

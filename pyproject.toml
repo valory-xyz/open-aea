@@ -22,6 +22,7 @@ ecdsa = ">=0.15,<0.17.0"
 morphys = ">=1.0"
 py-multibase = ">=1.0.0"
 py-multicodec = ">=0.2.0"
+pywin32 = {version = ">=304", markers = "sys_platform == 'win32'"}
 # Optional deps for extras
 click = {version = ">=8.1.0,<8.4.0", optional = true}
 pytest = {version = ">=8.2,<10", optional = true}
