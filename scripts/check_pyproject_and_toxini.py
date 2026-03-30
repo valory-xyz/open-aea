@@ -31,7 +31,7 @@ from packaging.requirements import Requirement as BaseRequirement
 TOX_INI = "tox.ini"
 PYPROJECT_TOML = "pyproject.toml"
 
-# specified in setup.py
+# Packages to skip: specified in setup.py as core deps, or not relevant to tox
 WHITELIST = {
     "base58",
     "tomte",
@@ -39,6 +39,11 @@ WHITELIST = {
     "apduboy",
     "matplotlib",
     "open-aea-flashbots",
+    # Core deps declared in [tool.poetry.dependencies] — version ranges differ
+    # from tox.ini exact pins, so string comparison would always mismatch
+    "semver",
+    "requests",
+    "packaging",
 }
 
 
@@ -76,23 +81,18 @@ def _parse_poetry_deps(deps: dict) -> list:
 
 
 def load_pyproject(filename: str = PYPROJECT_TOML) -> Set[Requirement]:
-    """Load pyproject.toml dependencies (both core and dev)."""
+    """Load pyproject.toml dev dependencies."""
     with open(filename, "rb") as f:
         pyproject_data = tomli.load(f)
 
     poetry = pyproject_data.get("tool", {}).get("poetry", {})
 
-    packages = []
-
-    # Core dependencies
-    core_deps = poetry.get("dependencies", {})
-    packages.extend(_parse_poetry_deps(core_deps))
-
-    # Dev dependencies
+    # Only compare dev dependencies (mirrors old Pipfile [dev-packages] behavior).
+    # Core deps in [tool.poetry.dependencies] use ranges for library consumers
+    # while tox.ini uses exact pins — they intentionally differ.
     dev_deps = poetry.get("group", {}).get("dev", {}).get("dependencies", {})
-    packages.extend(_parse_poetry_deps(dev_deps))
 
-    return set(packages)
+    return set(_parse_poetry_deps(dev_deps))
 
 
 def load_tox_ini(file_name: str = TOX_INI) -> Set[Requirement]:
