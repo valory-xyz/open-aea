@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Tuple, Union, cast
 
 import click
-from jsonschema import ValidationError
+from aea.helpers.json_schema import ValidationError
 
 from aea.cli.utils.click_utils import PytestArgs
 from aea.cli.utils.config import (

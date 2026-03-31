@@ -43,7 +43,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set
 
 import click
-import jsonschema
 import yaml
 
 from aea.cli.registry.settings import (
@@ -65,6 +64,7 @@ from aea.configurations.base import (
 from aea.configurations.constants import DEFAULT_AEA_CONFIG_FILE
 from aea.configurations.loader import ConfigLoader, ConfigLoaders
 from aea.configurations.validation import ExtraPropertiesError, _SCHEMAS_DIR
+from aea.helpers.json_schema import Draft4Validator, ValidationError
 from aea.exceptions import AEAEnforceError, AEAValidationError
 from aea.helpers.io import open_file
 
@@ -95,7 +95,7 @@ def try_to_load_agent_config(
                 )
             )
     except (
-        jsonschema.exceptions.ValidationError,
+        ValidationError,
         ExtraPropertiesError,
         AEAValidationError,
     ) as e:
@@ -114,7 +114,7 @@ def validate_cli_config(config: Dict) -> None:
     with open_file(Path(_SCHEMAS_DIR, "cli_config.json")) as fp:
         schema = json.load(fp)
 
-    validator = jsonschema.Draft4Validator(schema=schema)
+    validator = Draft4Validator(schema)
     validator.validate(config)
 
 

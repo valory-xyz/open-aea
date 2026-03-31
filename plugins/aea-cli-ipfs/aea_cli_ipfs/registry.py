@@ -26,13 +26,13 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-import jsonschema
 from aea_cli_ipfs.exceptions import HashNotProvided
 from aea_cli_ipfs.ipfs_utils import DownloadError, IPFSTool, NodeError
 
 from aea.cli.registry.settings import DEFAULT_IPFS_URL_LOCAL
 from aea.cli.utils.config import get_ipfs_node_multiaddr
 from aea.configurations.base import PublicId
+from aea.helpers.json_schema import Draft4Validator, ValidationError
 
 _default_logger = logging.getLogger(__name__)
 
@@ -72,8 +72,8 @@ def validate_registry(registry_data: LocalRegistry) -> None:
     :param registry_data: json like object containing registry data.
     """
     try:
-        jsonschema.validate(registry_data, schema=LOCAL_REGISTRY_SCHEMA)
-    except jsonschema.ValidationError as e:
+        Draft4Validator(LOCAL_REGISTRY_SCHEMA).validate(registry_data)
+    except ValidationError as e:
         _default_logger.debug("Registry Not Valid")
         raise ValueError(str(e))
 

@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Optional, cast
 
 import click
-from jsonschema import ValidationError
+from aea.helpers.json_schema import ValidationError
 
 from aea import AEA_DIR
 from aea.cli.fingerprint import fingerprint_item

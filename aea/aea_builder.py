@@ -32,7 +32,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any, Collection, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-import jsonschema
 from packaging.specifiers import SpecifierSet
 
 from aea.aea import AEA
@@ -82,6 +81,7 @@ from aea.configurations.pypi import (
     merge_dependencies_list,
 )
 from aea.configurations.validation import ExtraPropertiesError
+from aea.helpers.json_schema import ValidationError
 from aea.crypto.helpers import private_key_verify
 from aea.crypto.ledger_apis import DEFAULT_CURRENCY_DENOMINATIONS
 from aea.crypto.wallet import Wallet
@@ -1701,7 +1701,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             )
         except (
             AEAValidationError,
-            jsonschema.exceptions.ValidationError,
+            ValidationError,
             ExtraPropertiesError,
         ) as e:  # pragma: nocover
             raise AEAValidationError(

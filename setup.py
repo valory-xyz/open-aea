@@ -36,7 +36,6 @@ def get_all_extras() -> Dict:
         "packaging==26",
         "pytest>=8.2,<10",
         "coverage>=6.4.4,<8.0.0",
-        "jsonschema<4.24.0,>=4.20.0",
     ]
 
     extras = {
@@ -52,7 +51,6 @@ def get_all_extras() -> Dict:
 all_extras = get_all_extras()
 
 base_deps = [
-    "jsonschema<4.24.0,>=4.20.0",
     "packaging==26",
     "protobuf<6,>=5",
     "pyyaml>=6.0.1,<7",

@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import click
-from jsonschema import ValidationError
+from aea.helpers.json_schema import ValidationError
 
 from aea import AEA_DIR, get_current_aea_version
 from aea.cli.fingerprint import fingerprint_item

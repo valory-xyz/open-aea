@@ -28,19 +28,20 @@ from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
-import jsonschema
-from jsonschema import Draft4Validator
-from jsonschema._keywords import additionalProperties
-from jsonschema._types import TypeChecker
-from jsonschema._utils import find_additional_properties
-from jsonschema.validators import extend
-
 from aea.configurations.constants import AGENT
 from aea.configurations.data_types import ComponentId, ComponentType, PublicId
 from aea.exceptions import AEAValidationError
 from aea.helpers.base import dict_to_path_value, update_nested_dict
 from aea.helpers.env_vars import is_env_variable
 from aea.helpers.io import open_file
+from aea.helpers.json_schema import (
+    Draft4Validator,
+    RefResolver,
+    TypeChecker,
+    ValidationError,
+    extend,
+    find_additional_properties,
+)
 
 _CUR_DIR = os.path.dirname(inspect.getfile(inspect.currentframe()))  # type: ignore
 _SCHEMAS_DIR = os.path.join(_CUR_DIR, "schemas")
@@ -106,8 +107,10 @@ class CustomTypeChecker(TypeChecker):
 
 def own_additional_properties(validator, aP, instance, schema) -> Iterator:  # type: ignore
     """Additional properties validator."""
-    for _ in additionalProperties(validator, aP, instance, schema):
-        raise ExtraPropertiesError(list(find_additional_properties(instance, schema)))
+    if aP is False and isinstance(instance, dict):
+        extras = list(find_additional_properties(instance, schema))
+        if extras:
+            raise ExtraPropertiesError(extras)
     return iter(())
 
 
@@ -119,9 +122,7 @@ OwnDraft4Validator = extend(
 
 EnvVarsFriendlyDraft4Validator = extend(
     validator=Draft4Validator,
-    type_checker=CustomTypeChecker(
-        Draft4Validator.TYPE_CHECKER._type_checkers  # pylint: disable=protected-access
-    ),
+    type_checker=CustomTypeChecker(),
 )
 
 
@@ -143,7 +144,7 @@ class ConfigValidator:
         with open_file(schema_file) as fp:
             self._schema = json.load(fp)
         root_path = make_jsonschema_base_uri(base_uri)
-        self._resolver = jsonschema.RefResolver(root_path, self._schema)
+        self._resolver = RefResolver(root_path, self._schema)
         self.env_vars_friendly = env_vars_friendly
 
         if env_vars_friendly:
@@ -234,7 +235,7 @@ class ConfigValidator:
 
     def _validate(self, instance: Dict) -> None:
         """Validate an instance using the current validator."""
-        errors: List[jsonschema.ValidationError] = list(
+        errors: List[ValidationError] = list(
             self._validator.iter_errors(instance=instance)
         )
         if len(errors) > 0:
@@ -242,10 +243,10 @@ class ConfigValidator:
             raise AEAValidationError(f"{error_msg}")
 
     @staticmethod
-    def _build_message_from_errors(errors: List[jsonschema.ValidationError]) -> str:
+    def _build_message_from_errors(errors: List[ValidationError]) -> str:
         """Build an error message from validation errors."""
 
-        def get_path(error: jsonschema.ValidationError) -> str:
+        def get_path(error: ValidationError) -> str:
             return "::".join(map(str, error.path))
 
         result = [f"{get_path(error)}: {error.message}" for error in errors]
