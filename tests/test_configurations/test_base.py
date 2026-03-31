@@ -31,7 +31,6 @@ from unittest import TestCase, mock
 from unittest.mock import Mock
 
 import pytest
-import semver
 import yaml
 from packaging.specifiers import SpecifierSet
 
@@ -609,8 +608,10 @@ def test_configuration_ordered_json():
 
 def test_public_id_versions():
     """Test that a public id version can be initialized with different objects."""
+    from packaging.version import Version
+
     PublicId("author", "name", "0.1.0")
-    PublicId("author", "name", semver.VersionInfo(major=0, minor=1, patch=0))
+    PublicId("author", "name", Version("0.1.0"))
 
 
 def test_public_id_invalid_version():
@@ -1008,6 +1009,44 @@ def test_package_version_lt():
     v2 = PackageVersion("0.2.0")
     v3 = PackageVersion("0.12.0")
     assert v1 < v2 < v3
+
+
+def test_package_version_from_version_object():
+    """Test PackageVersion accepts packaging.version.Version objects."""
+    from packaging.version import Version
+
+    v = Version("1.2.3")
+    pv = PackageVersion(v)
+    assert str(pv) == "1.2.3"
+
+    # Comparison with string-constructed version
+    pv_str = PackageVersion("1.2.3")
+    assert pv == pv_str
+
+    # Ordering
+    pv_lower = PackageVersion(Version("1.1.0"))
+    pv_higher = PackageVersion(Version("2.0.0"))
+    assert pv_lower < pv < pv_higher
+
+    # str round-trip
+    assert PackageVersion(str(pv)) == pv
+
+
+def test_package_version_str_format():
+    """Test PackageVersion string representation matches semver format."""
+    cases = ["0.1.0", "1.0.0", "1.2.3", "10.20.30"]
+    for version_str in cases:
+        pv = PackageVersion(version_str)
+        assert str(pv) == version_str
+
+
+def test_public_id_with_version_object():
+    """Test PublicId can be initialized with a packaging.version.Version."""
+    from packaging.version import Version
+
+    pid = PublicId("author", "name", Version("0.1.0"))
+    assert str(pid.package_version) == "0.1.0"
+    assert pid == PublicId("author", "name", "0.1.0")
 
 
 class TestDependencyGetPipInstallArgs:

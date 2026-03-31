@@ -38,9 +38,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Pattern, Set
 
 import click
-import semver
 import yaml
 from click.testing import CliRunner
+from packaging.version import Version
 
 from aea.cli import cli
 from aea.cli.ipfs_hash import update_hashes
@@ -397,7 +397,7 @@ def _sort_in_update_order(package_ids: Set[PackageId]) -> List[PackageId]:
     return sorted(
         package_ids,
         key=lambda x: (
-            semver.VersionInfo.parse(x.public_id.version),
+            Version(x.public_id.version),
             x.public_id.author,
             x.public_id.name,
             x.package_type.value,
@@ -410,8 +410,9 @@ def minor_version_difference(
     current_public_id: PublicId, deployed_public_id: PublicId
 ) -> int:
     """Check the minor version difference."""
-    diff = semver.compare(current_public_id.version, deployed_public_id.version)
-    return diff
+    current = Version(current_public_id.version)
+    deployed = Version(deployed_public_id.version)
+    return (current > deployed) - (current < deployed)
 
 
 def _can_disambiguate_from_context(
@@ -705,7 +706,7 @@ class Updater:
     def get_new_package_version(self, current_public_id: PublicId) -> str:
         """Get new package version according to command line options provided."""
 
-        ver = semver.VersionInfo.parse(current_public_id.version)
+        ver = Version(current_public_id.version)
 
         if self.option_ask_version:
             while True:
@@ -714,7 +715,7 @@ class Updater:
                 )
 
                 try:
-                    new_ver = semver.VersionInfo.parse(new_version)
+                    new_ver = Version(new_version)
                     if new_ver <= ver:
                         print("Version is lower or the same. Enter a new one.")
                         continue
@@ -723,9 +724,9 @@ class Updater:
                     print(f"Version parse error: {e}. Enter a new one")
                     continue
         elif self.option_update_version == "minor":
-            new_version = ver.bump_minor()
+            new_version = f"{ver.major}.{ver.minor + 1}.0"
         elif self.option_update_version == "patch":
-            new_version = ver.bump_patch()
+            new_version = f"{ver.major}.{ver.minor}.{ver.micro + 1}"
         else:
             raise RuntimeError("unknown version update mode")
 

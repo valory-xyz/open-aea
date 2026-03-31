@@ -37,7 +37,6 @@ def get_all_extras() -> Dict:
         "pytest>=8.2,<10",
         "coverage>=6.4.4,<8.0.0",
         "jsonschema<4.24.0,>=4.20.0",
-        "semver>=2.9.1,<3.0.0",
     ]
 
     extras = {
@@ -53,7 +52,6 @@ def get_all_extras() -> Dict:
 all_extras = get_all_extras()
 
 base_deps = [
-    "semver>=2.9.1,<3.0.0",
     "base58>=1.0.3,<3.0.0",
     "jsonschema<4.24.0,>=4.20.0",
     "packaging==26",
