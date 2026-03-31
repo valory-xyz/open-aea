@@ -63,7 +63,6 @@ base_deps = [
     "requests>=2.32.5,<3",
     "python-dotenv>=0.14.0,<1.0.1",
     "ecdsa>=0.15,<0.17.0",
-    "morphys>=1.0",
     "py-multibase>=1.0.0",
     "py-multicodec>=0.2.0",
 ]
