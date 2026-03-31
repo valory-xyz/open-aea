@@ -55,7 +55,6 @@ from typing import (
     cast,
 )
 
-from dotenv import load_dotenv
 from packaging.version import Version
 
 from aea.common import PathLike
@@ -140,7 +139,21 @@ def load_env_file(env_file: str) -> None:
 
     :param env_file: save_path to the env file.
     """
-    load_dotenv(dotenv_path=Path(env_file), override=False)
+    path = Path(env_file)
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            continue
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
 
 
 def sigint_crossplatform(process: subprocess.Popen) -> None:  # pragma: nocover

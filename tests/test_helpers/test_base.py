@@ -149,6 +149,38 @@ def test_load_env_file():
     assert os.getenv("TEST") == "yes"
 
 
+def test_load_env_file_no_override():
+    """Test load env file does not override existing environment variables."""
+    os.environ["TEST_NO_OVERRIDE"] = "original"
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+            f.write("TEST_NO_OVERRIDE=overridden\n")
+            f.write("TEST_NEW_VAR=new_value\n")
+            tmp_path = f.name
+        load_env_file(tmp_path)
+        assert os.getenv("TEST_NO_OVERRIDE") == "original"
+        assert os.getenv("TEST_NEW_VAR") == "new_value"
+    finally:
+        os.environ.pop("TEST_NO_OVERRIDE", None)
+        os.environ.pop("TEST_NEW_VAR", None)
+        os.unlink(tmp_path)
+
+
+def test_load_env_file_comments_and_blanks():
+    """Test load env file ignores comments and blank lines."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write("# this is a comment\n")
+        f.write("\n")
+        f.write("TEST_ENV_PARSED=works\n")
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("TEST_ENV_PARSED") == "works"
+    finally:
+        os.environ.pop("TEST_ENV_PARSED", None)
+        os.unlink(tmp_path)
+
+
 def test_reg_exp_not_match():
     """Test regexp checks."""
 
