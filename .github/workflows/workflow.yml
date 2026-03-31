@@ -25,10 +25,10 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install poetry==1.8.0
+          pip install poetry==2.3.2
       - name: Poetry install requirements and check lock
         run: |
-          poetry lock --check
+          poetry check --lock
           time poetry install --all-extras --no-interaction -vvv
           time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum
           time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum-flashbots
