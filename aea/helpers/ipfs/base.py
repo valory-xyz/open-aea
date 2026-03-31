@@ -27,8 +27,9 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
 
-import base58
 from google.protobuf.descriptor import FieldDescriptor
+
+from aea.helpers.multiformat import b58encode
 
 from aea.helpers.cid import to_v1
 from aea.helpers.io import open_file
@@ -205,7 +206,7 @@ class IPFSHashOnly:
             wrapper_node_serialization
         )
 
-        return base58.b58encode(wrapper_node_hash_bytes).decode()
+        return b58encode(wrapper_node_hash_bytes).decode()
 
     @classmethod
     def _hash_directory_recursively(cls, root: Path) -> Dict:
@@ -251,7 +252,7 @@ class IPFSHashOnly:
 
         root_node_serialization = cls._serialize(root_node)
         root_node_hash_bytes = cls._generate_multihash_bytes(root_node_serialization)
-        root_node_hash = base58.b58encode(root_node_hash_bytes).decode()
+        root_node_hash = b58encode(root_node_hash_bytes).decode()
 
         return {
             "serialization": root_node_serialization,
@@ -350,7 +351,7 @@ class IPFSHashOnly:
         :return: string representing the hash
         """
         multihash_bytes = cls._generate_multihash_bytes(pb_data)
-        ipfs_hash = base58.b58encode(multihash_bytes)
+        ipfs_hash = b58encode(multihash_bytes)
         return ipfs_hash.decode()
 
     @classmethod

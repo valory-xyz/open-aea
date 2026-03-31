@@ -24,7 +24,6 @@ import json
 from pathlib import Path
 from typing import Optional, Union
 
-import base58
 from aea_ledger_solana.constants import _SOLANA
 from cryptography.fernet import Fernet  # type: ignore
 from solana.transaction import Transaction as SolanaTransaction
@@ -80,7 +79,9 @@ class SolanaCrypto(Crypto[Keypair]):
         """
         seed = bytes(self.entity.secret())
         private_key = seed + bytes.fromhex(self.public_key)
-        return base58.b58encode(private_key).decode()
+        from aea.helpers.multiformat import b58encode
+
+        return b58encode(private_key).decode()
 
     @property
     def public_key(self) -> str:
