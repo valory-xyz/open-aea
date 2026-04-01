@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """Utils used for operating Registry with CLI."""
 
+import json
 import os
 import tarfile
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -39,7 +40,7 @@ from aea.cli.utils.package_utils import find_item_locally
 from aea.common import JSONLike
 from aea.configurations.base import PublicId
 from aea.configurations.constants import ITEM_TYPE_TO_PLURAL
-from aea.helpers import http_requests as requests
+from aea.helpers import http_requests
 
 FILE_DOWNLOAD_TIMEOUT = (
     180  # quite big number case possible slow channels and package can be quite big
@@ -98,9 +99,9 @@ def request_api(  # pylint: disable=too-many-positional-arguments
     try:
         resp = _perform_registry_request(method, path, params, data, files, headers)
         resp_json = resp.json()
-    except requests.exceptions.ConnectionError:
+    except http_requests.ConnectionError:
         raise click.ClickException("Registry server is not responding.")
-    except requests.JSONDecodeError:
+    except (json.JSONDecodeError, ValueError):
         resp_json = None
 
     if resp.status_code == 200:
@@ -151,7 +152,7 @@ def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
     data: Optional[Dict] = None,
     files: Optional[Dict] = None,
     headers: Optional[Dict] = None,
-) -> requests.Response:
+) -> http_requests.HTTPResponse:
     """Perform HTTP request and resturn response object."""
     config = get_or_create_cli_config()
     registry_api_url = (
@@ -173,7 +174,7 @@ def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
         data=data,
         headers=headers,
     )
-    resp = requests.request(**request_kwargs)
+    resp = http_requests.request(**request_kwargs)
     return resp
 
 
@@ -190,10 +191,10 @@ def download_file(url: str, cwd: str, timeout: float = FILE_DOWNLOAD_TIMEOUT) ->
     local_filename = url.split("/")[-1]
     filepath = os.path.join(cwd, local_filename)
     # NOTE the stream=True parameter below
-    response = requests.get(url, stream=True, timeout=timeout)
+    response = http_requests.get(url, timeout=timeout)
     if response.status_code == 200:
         with open(filepath, "wb") as f:
-            f.write(response.raw.read())
+            f.write(response.content)
     else:
         raise click.ClickException(
             "Wrong response from server when downloading package."

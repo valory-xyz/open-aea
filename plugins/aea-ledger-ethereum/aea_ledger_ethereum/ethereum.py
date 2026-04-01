@@ -75,7 +75,9 @@ from aea.common import Address, JSONLike
 from aea.crypto.base import Crypto, FaucetApi, Helper, LedgerApi
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect, hex_to_bytes_for_key
 from aea.exceptions import enforce
-from aea.helpers import http_requests as requests
+import requests
+
+from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 from aea.helpers.base import try_decorator
 from aea.helpers.io import open_file
 
@@ -354,7 +356,7 @@ def get_gas_price_strategy_eip1559_polygon(
         transaction_params: TxParams,  # pylint: disable=unused-argument
     ) -> Dict[str, Wei]:
         try:
-            response = requests.get(gas_endpoint)
+            response = requests.get(gas_endpoint, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
             if response.status_code == 200:
                 data = response.json()[speed]
                 return {
@@ -414,7 +416,7 @@ def get_gas_price_strategy(
         _default_logger.info(  # pragma: nocover
             "`ethgasstation.info` has been deprecated and will be replaced with an alternative on the next release."
         )
-        response = requests.get(f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}")
+        response = requests.get(f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}", timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
         if response.status_code != 200:  # pragma: nocover
             # TODO : Use some other gas station API # pylint: disable=fixme
             _default_logger.error(
@@ -1878,7 +1880,7 @@ class EthereumFaucetApi(FaucetApi):
             raise ValueError(  # pragma: nocover
                 "Url is none, no default url provided. Please provide a faucet url."
             )
-        response = requests.get(url + address)
+        response = requests.get(url + address, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
         if response.status_code // 100 == 5:  # pragma: no cover
             _default_logger.error("Response: {}".format(response.status_code))
         elif response.status_code // 100 in [3, 4]:  # pragma: nocover

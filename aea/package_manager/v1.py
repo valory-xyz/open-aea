@@ -31,7 +31,7 @@ from typing import Callable, Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Union, cast
 
-from requests import get as r_get
+from aea.helpers.http_requests import get as r_get
 
 from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageId, PackageType

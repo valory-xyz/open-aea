@@ -29,12 +29,12 @@ import json
 import mimetypes
 import os
 import tarfile
+import urllib.error
 import urllib.parse
+import urllib.request
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
-
-import requests
 
 
 # ---------------------------------------------------------------------------
@@ -308,6 +308,38 @@ class IPFSHTTPClient:
         self.name = _NameSection(self)
         self.repo = _RepoSection(self)
 
+    def _post(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, str]] = None,
+        data: Optional[bytes] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Tuple[int, bytes]:
+        """
+        POST to the IPFS API and return (status_code, body_bytes).
+
+        :raises CommunicationError: on connection failure.
+        :raises TimeoutError: on timeout.
+        """
+        url = self._base_url + endpoint
+        if params:
+            url = url + "?" + urllib.parse.urlencode(params)
+
+        req = urllib.request.Request(
+            url, data=data or b"", headers=headers or {}, method="POST"
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
+                return resp.status, resp.read()
+        except urllib.error.HTTPError as e:
+            return e.code, e.read()
+        except urllib.error.URLError as e:
+            if "timed out" in str(e):
+                raise TimeoutError(str(e)) from e
+            raise CommunicationError(str(e)) from e
+        except OSError as e:
+            raise CommunicationError(str(e)) from e
+
     def _api_post(
         self,
         endpoint: str,
@@ -316,44 +348,28 @@ class IPFSHTTPClient:
         headers: Optional[Dict[str, str]] = None,
         stream: bool = False,
     ) -> Any:
-        """Make a POST request to the IPFS API."""
-        url = self._base_url + endpoint
-        try:
-            resp = requests.post(
-                url,
-                params=params,
-                data=data,
-                headers=headers,
-                timeout=self._timeout,
-                stream=stream,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(str(e)) from e
+        """Make a POST request to the IPFS API, parse JSON response."""
+        status, body = self._post(endpoint, params=params, data=data, headers=headers)
+        text = body.decode("utf-8", errors="replace")
 
-        if resp.status_code != 200:
-            # Try to extract error message from JSON response
+        if status != 200:
             try:
-                body = resp.json()
-                if isinstance(body, dict) and "Message" in body:
-                    raise ErrorResponse(body["Message"])
+                parsed = json.loads(body)
+                if isinstance(parsed, dict) and "Message" in parsed:
+                    raise ErrorResponse(parsed["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
+            raise StatusError(f"IPFS API returned status {status}: {text}")
 
         if stream:
-            # Newline-delimited JSON
             results = []
-            for line in resp.text.strip().split("\n"):
+            for line in text.strip().split("\n"):
                 line = line.strip()
                 if line:
                     results.append(json.loads(line))
             return results
 
-        return resp.json()
+        return json.loads(body)
 
     def id(self, peer: Optional[str] = None) -> Dict:
         """Get node identity info."""
@@ -386,32 +402,23 @@ class IPFSHTTPClient:
             "recursive": str(recursive).lower(),
             "wrap-with-directory": str(wrap_with_directory).lower(),
         }
-        url = self._base_url + "/add"
-        try:
-            resp = requests.post(
-                url,
-                params=params,
-                data=body,
-                headers={"Content-Type": content_type},
-                timeout=self._timeout,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
+        status, resp_body = self._post(
+            "/add", params=params, data=body, headers={"Content-Type": content_type}
+        )
+        text = resp_body.decode("utf-8", errors="replace")
 
-        if resp.status_code != 200:
+        if status != 200:
             try:
-                err = resp.json()
+                err = json.loads(resp_body)
                 if isinstance(err, dict) and "Message" in err:
                     raise ErrorResponse(err["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
+            raise StatusError(f"IPFS API returned status {status}: {text}")
 
         # /add returns newline-delimited JSON
         results = []
-        for line in resp.text.strip().split("\n"):
+        for line in text.strip().split("\n"):
             line = line.strip()
             if line:
                 results.append(json.loads(line))
@@ -430,22 +437,14 @@ class IPFSHTTPClient:
         """
         boundary = _multipart_boundary()
         body, content_type = _encode_bytes(data, boundary)
-        url = self._base_url + "/add"
-        try:
-            resp = requests.post(
-                url,
-                data=body,
-                headers={"Content-Type": content_type},
-                timeout=self._timeout,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
+        status, resp_body = self._post(
+            "/add", data=body, headers={"Content-Type": content_type}
+        )
 
-        if resp.status_code != 200:
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
-        return resp.json()["Hash"]
+        if status != 200:
+            text = resp_body.decode("utf-8", errors="replace")
+            raise StatusError(f"IPFS API returned status {status}: {text}")
+        return json.loads(resp_body)["Hash"]
 
     def get(self, cid: str, target: str = ".") -> None:
         """
@@ -456,27 +455,20 @@ class IPFSHTTPClient:
         :param cid: IPFS CID to download.
         :param target: local directory to extract into.
         """
-        url = self._base_url + "/get"
-        try:
-            resp = requests.post(
-                url,
-                params={"arg": cid, "archive": "true", "compress": "false"},
-                timeout=self._timeout,
-                stream=True,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
+        status, resp_body = self._post(
+            "/get", params={"arg": cid, "archive": "true", "compress": "false"}
+        )
 
-        if resp.status_code != 200:
+        if status != 200:
             try:
-                err = resp.json()
+                err = json.loads(resp_body)
                 if isinstance(err, dict) and "Message" in err:
                     raise ErrorResponse(err["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(f"IPFS API returned status {resp.status_code}")
+            raise StatusError(f"IPFS API returned status {status}")
 
         # Extract tar archive to target directory
-        buf = io.BytesIO(resp.content)
+        buf = io.BytesIO(resp_body)
         with tarfile.open(fileobj=buf, mode="r") as tar:
             tar.extractall(path=target)  # nosec

@@ -1287,19 +1287,19 @@ def test_get_gas_price_strategy() -> None:
 
     resp_mock = Mock()
     resp_mock.status_code = 300
-    with patch("aea.helpers.http_requests.get", return_value=resp_mock):
+    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
 
     resp_mock.status_code = 200
     resp_mock.json = Mock(return_value={"fast": {"maxFee": 2, "maxPriorityFee": 2}})
-    with patch("aea.helpers.http_requests.get", return_value=resp_mock):
+    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
         assert strategy(Mock(), Mock()) == {
             "maxFeePerGas": 2000000000,
             "maxPriorityFeePerGas": 2000000000,
         }
 
     with patch(
-        "aea.helpers.http_requests.get",
+        "aea_ledger_ethereum.ethereum.requests.get",
         side_effect=requests.exceptions.RequestException(Mock()),
     ):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}

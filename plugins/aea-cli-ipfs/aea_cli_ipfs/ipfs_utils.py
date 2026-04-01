@@ -29,7 +29,9 @@ import time
 from pathlib import Path
 from typing import Dict, IO, List, Optional, Set, Tuple, Union, cast
 
-import requests
+import urllib.error
+import urllib.request
+
 from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.exceptions import (
     DownloadError,
@@ -146,9 +148,10 @@ class IPFSDaemon:
     def is_started_externally(self) -> bool:
         """Check daemon was started externally."""
         try:
-            x = requests.post(self.api_url, timeout=30)
-            return x.status_code == 200
-        except requests.exceptions.ConnectionError:
+            req = urllib.request.Request(self.api_url, data=b"", method="POST")
+            with urllib.request.urlopen(req, timeout=30) as resp:  # nosec
+                return resp.status == 200
+        except (urllib.error.URLError, OSError):
             return False
 
     def is_started_internally(self) -> bool:
