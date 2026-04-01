@@ -1,0 +1,482 @@
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
+#
+#   Copyright 2026 Valory AG
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+# ------------------------------------------------------------------------------
+
+"""
+Lightweight IPFS HTTP API client.
+
+Replaces the ``ipfshttpclient`` package. Talks directly to the IPFS
+daemon's HTTP API (``/api/v0/*``) using ``requests``.
+"""
+
+import io
+import json
+import mimetypes
+import os
+import tarfile
+import urllib.parse
+import uuid
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
+import requests
+
+
+# ---------------------------------------------------------------------------
+# Exceptions (mirrors ipfshttpclient.exceptions hierarchy)
+# ---------------------------------------------------------------------------
+
+
+class IPFSError(Exception):
+    """Base IPFS client error."""
+
+
+class CommunicationError(IPFSError):
+    """Could not communicate with the IPFS daemon."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize, accepting optional ``original`` for compat."""
+        kwargs.pop("original", None)
+        super().__init__(*args, **kwargs)
+
+
+class TimeoutError(CommunicationError):  # noqa: A001
+    """Request to the IPFS daemon timed out."""
+
+
+class StatusError(CommunicationError):
+    """IPFS daemon returned an unexpected HTTP status."""
+
+
+class ErrorResponse(StatusError):
+    """IPFS daemon returned a JSON error message."""
+
+
+# ---------------------------------------------------------------------------
+# Multipart encoding for the IPFS /api/v0/add endpoint
+# ---------------------------------------------------------------------------
+
+
+def _multipart_boundary() -> str:
+    """Generate a random multipart boundary."""
+    return uuid.uuid4().hex
+
+
+def _quote_filename(filename: str) -> str:
+    """URL-encode a filename for use in Content-Disposition headers."""
+    return urllib.parse.quote(filename, safe="")
+
+
+def _guess_content_type(filename: str) -> str:
+    """Guess MIME type for a filename, defaulting to application/octet-stream."""
+    ctype, _ = mimetypes.guess_type(filename)
+    return ctype or "application/octet-stream"
+
+
+def _multipart_file_part(
+    boundary: str,
+    field_name: str,
+    filename: str,
+    data: bytes,
+    content_type: str = "application/octet-stream",
+    abspath: Optional[str] = None,
+) -> bytes:
+    """Encode a single file part in multipart form-data."""
+    quoted = _quote_filename(filename)
+    # Headers sorted alphabetically to match ipfshttpclient behavior
+    header = f"--{boundary}\r\n"
+    if abspath:
+        header += f"Abspath: {abspath}\r\n"
+    header += (
+        f'Content-Disposition: form-data; name="{field_name}"; filename="{quoted}"\r\n'
+        f"Content-Type: {content_type}\r\n"
+        f"\r\n"
+    )
+    return header.encode() + data + b"\r\n"
+
+
+def _multipart_dir_part(boundary: str, dirname: str) -> bytes:
+    """Encode a directory marker in multipart form-data."""
+    quoted = _quote_filename(dirname)
+    header = (
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="file"; filename="{quoted}"\r\n'
+        f"Content-Type: application/x-directory\r\n"
+        f"\r\n"
+    )
+    return header.encode() + b"\r\n"
+
+
+def _multipart_end(boundary: str) -> bytes:
+    """Encode the multipart terminator."""
+    return f"--{boundary}--\r\n".encode()
+
+
+def _encode_directory(
+    dir_path: str,
+    boundary: str,
+    recursive: bool = True,
+    wrap_with_directory: bool = True,
+) -> Tuple[bytes, str]:
+    """
+    Encode a directory as multipart form-data for IPFS /api/v0/add.
+
+    :param dir_path: path to directory.
+    :param boundary: multipart boundary string.
+    :param recursive: include subdirectories.
+    :param wrap_with_directory: wrap in parent directory.
+    :return: (body_bytes, content_type).
+    """
+    parts: List[bytes] = []
+    root = Path(dir_path)
+    base_name = root.name
+
+    # Use os.path.abspath (not Path.resolve) to avoid macOS /private prefix
+    abs_root = os.path.abspath(root)
+
+    if root.is_file():
+        data = root.read_bytes()
+        filename = base_name
+        ctype = _guess_content_type(filename)
+        parts.append(
+            _multipart_file_part(
+                boundary,
+                "file",
+                filename,
+                data,
+                content_type=ctype,
+                abspath=abs_root,
+            )
+        )
+    else:
+        # Walk directory, emitting subdirs before files at each level
+        # to match ipfshttpclient's filescanner ordering
+        for dirpath_str, dirnames, filenames in os.walk(root):
+            dirpath = Path(dirpath_str)
+            rel = dirpath.relative_to(root)
+            dir_label = str(Path(base_name) / rel).replace(os.sep, "/")
+
+            # Emit directory entry
+            parts.append(_multipart_dir_part(boundary, dir_label))
+
+            if not recursive:
+                dirnames.clear()
+            else:
+                dirnames.sort()
+
+            # Emit subdirectory entries before files
+            # (os.walk will recurse into them on next iteration)
+
+            # Emit files
+            for fname in sorted(filenames):
+                fpath = dirpath / fname
+                file_label = str(Path(base_name) / rel / fname).replace(os.sep, "/")
+                abs_file = os.path.normpath(os.path.join(abs_root, str(rel), fname))
+                ctype = _guess_content_type(fname)
+                data = fpath.read_bytes()
+                parts.append(
+                    _multipart_file_part(
+                        boundary,
+                        "file",
+                        file_label,
+                        data,
+                        content_type=ctype,
+                        abspath=abs_file,
+                    )
+                )
+
+    parts.append(_multipart_end(boundary))
+    body = b"".join(parts)
+    content_type = f'multipart/form-data; boundary="{boundary}"'
+    return body, content_type
+
+
+def _encode_bytes(data: bytes, boundary: str) -> Tuple[bytes, str]:
+    """Encode bytes as multipart form-data for IPFS /api/v0/add."""
+    parts = [
+        _multipart_file_part(boundary, "file", "bytes", data),
+        _multipart_end(boundary),
+    ]
+    body = b"".join(parts)
+    content_type = f'multipart/form-data; boundary="{boundary}"'
+    return body, content_type
+
+
+# ---------------------------------------------------------------------------
+# Subsections (pin, name, repo)
+# ---------------------------------------------------------------------------
+
+
+class _PinSection:
+    """Pin management commands."""
+
+    def __init__(self, client: "IPFSHTTPClient") -> None:
+        self._client = client
+
+    def ls(self, type: str = "all") -> Dict:  # noqa: A002
+        """List pinned objects."""
+        return self._client._api_post("/pin/ls", params={"type": type})
+
+    def add(self, cid: str, recursive: bool = True) -> Dict:
+        """Pin an object."""
+        return self._client._api_post(
+            "/pin/add", params={"arg": cid, "recursive": str(recursive).lower()}
+        )
+
+    def rm(self, cid: str, recursive: bool = True) -> Dict:
+        """Unpin an object."""
+        return self._client._api_post(
+            "/pin/rm", params={"arg": cid, "recursive": str(recursive).lower()}
+        )
+
+
+class _NameSection:
+    """IPNS name commands."""
+
+    def __init__(self, client: "IPFSHTTPClient") -> None:
+        self._client = client
+
+    def publish(self, ipfs_path: str, **kwargs: Any) -> Dict:
+        """Publish an IPNS name."""
+        params: Dict[str, str] = {"arg": ipfs_path}
+        params["resolve"] = str(kwargs.get("resolve", True)).lower()
+        params["lifetime"] = str(kwargs.get("lifetime", "24h"))
+        if kwargs.get("allow_offline"):
+            params["allow-offline"] = "true"
+        return self._client._api_post("/name/publish", params=params)
+
+
+class _RepoSection:
+    """Repository commands."""
+
+    def __init__(self, client: "IPFSHTTPClient") -> None:
+        self._client = client
+
+    def gc(self, quiet: bool = False) -> List[Dict]:
+        """Run garbage collection."""
+        resp = self._client._api_post(
+            "/repo/gc", params={"quiet": str(quiet).lower()}, stream=True
+        )
+        # /repo/gc returns newline-delimited JSON
+        if isinstance(resp, list):
+            return resp
+        return [resp]
+
+
+# ---------------------------------------------------------------------------
+# Main client
+# ---------------------------------------------------------------------------
+
+
+class IPFSHTTPClient:
+    """
+    Lightweight IPFS HTTP API client.
+
+    Replaces ``ipfshttpclient.Client``. Communicates with the IPFS daemon
+    via its HTTP API at ``/api/v0/*``.
+    """
+
+    def __init__(self, addr: str, base: str = "api/v0") -> None:
+        """
+        Initialize client.
+
+        :param addr: multiaddr string (e.g. ``/dns/host/tcp/443/https``).
+        :param base: API base path.
+        """
+        from aea_cli_ipfs.ipfs_utils import addr_to_url
+
+        self._base_url = addr_to_url(addr).rstrip("/") + "/" + base.strip("/")
+        self._timeout = 120
+
+        # Subsections
+        self.pin = _PinSection(self)
+        self.name = _NameSection(self)
+        self.repo = _RepoSection(self)
+
+    def _api_post(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, str]] = None,
+        data: Optional[bytes] = None,
+        headers: Optional[Dict[str, str]] = None,
+        stream: bool = False,
+    ) -> Any:
+        """Make a POST request to the IPFS API."""
+        url = self._base_url + endpoint
+        try:
+            resp = requests.post(
+                url,
+                params=params,
+                data=data,
+                headers=headers,
+                timeout=self._timeout,
+                stream=stream,
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise CommunicationError(str(e)) from e
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError(str(e)) from e
+
+        if resp.status_code != 200:
+            # Try to extract error message from JSON response
+            try:
+                body = resp.json()
+                if isinstance(body, dict) and "Message" in body:
+                    raise ErrorResponse(body["Message"])
+            except (ValueError, KeyError):
+                pass
+            raise StatusError(
+                f"IPFS API returned status {resp.status_code}: {resp.text}"
+            )
+
+        if stream:
+            # Newline-delimited JSON
+            results = []
+            for line in resp.text.strip().split("\n"):
+                line = line.strip()
+                if line:
+                    results.append(json.loads(line))
+            return results
+
+        return resp.json()
+
+    def id(self, peer: Optional[str] = None) -> Dict:
+        """Get node identity info."""
+        params: Dict[str, str] = {}
+        if peer is not None:
+            params["arg"] = peer
+        return self._api_post("/id", params=params or None)
+
+    def add(
+        self,
+        file_or_dir: str,
+        pin: bool = True,
+        recursive: bool = True,
+        wrap_with_directory: bool = True,
+    ) -> Union[Dict, List[Dict]]:
+        """
+        Add file or directory to IPFS.
+
+        :return: list of dicts with 'Name' and 'Hash' keys.
+        """
+        boundary = _multipart_boundary()
+        body, content_type = _encode_directory(
+            file_or_dir,
+            boundary,
+            recursive=recursive,
+            wrap_with_directory=wrap_with_directory,
+        )
+        params = {
+            "pin": str(pin).lower(),
+            "recursive": str(recursive).lower(),
+            "wrap-with-directory": str(wrap_with_directory).lower(),
+        }
+        url = self._base_url + "/add"
+        try:
+            resp = requests.post(
+                url,
+                params=params,
+                data=body,
+                headers={"Content-Type": content_type},
+                timeout=self._timeout,
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise CommunicationError(str(e)) from e
+
+        if resp.status_code != 200:
+            try:
+                err = resp.json()
+                if isinstance(err, dict) and "Message" in err:
+                    raise ErrorResponse(err["Message"])
+            except (ValueError, KeyError):
+                pass
+            raise StatusError(
+                f"IPFS API returned status {resp.status_code}: {resp.text}"
+            )
+
+        # /add returns newline-delimited JSON
+        results = []
+        for line in resp.text.strip().split("\n"):
+            line = line.strip()
+            if line:
+                results.append(json.loads(line))
+
+        # Match ipfshttpclient behavior: single-item result returns a dict,
+        # multi-item result returns a list
+        if len(results) == 1:
+            return results[0]
+        return results
+
+    def add_bytes(self, data: bytes, **kwargs: Any) -> str:
+        """
+        Add bytes to IPFS.
+
+        :return: hash string.
+        """
+        boundary = _multipart_boundary()
+        body, content_type = _encode_bytes(data, boundary)
+        url = self._base_url + "/add"
+        try:
+            resp = requests.post(
+                url,
+                data=body,
+                headers={"Content-Type": content_type},
+                timeout=self._timeout,
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise CommunicationError(str(e)) from e
+
+        if resp.status_code != 200:
+            raise StatusError(
+                f"IPFS API returned status {resp.status_code}: {resp.text}"
+            )
+        return resp.json()["Hash"]
+
+    def get(self, cid: str, target: str = ".") -> None:
+        """
+        Download a file or directory from IPFS.
+
+        The IPFS ``/api/v0/get`` endpoint returns a tar archive.
+
+        :param cid: IPFS CID to download.
+        :param target: local directory to extract into.
+        """
+        url = self._base_url + "/get"
+        try:
+            resp = requests.post(
+                url,
+                params={"arg": cid, "archive": "true", "compress": "false"},
+                timeout=self._timeout,
+                stream=True,
+            )
+        except requests.exceptions.ConnectionError as e:
+            raise CommunicationError(str(e)) from e
+
+        if resp.status_code != 200:
+            try:
+                err = resp.json()
+                if isinstance(err, dict) and "Message" in err:
+                    raise ErrorResponse(err["Message"])
+            except (ValueError, KeyError):
+                pass
+            raise StatusError(f"IPFS API returned status {resp.status_code}")
+
+        # Extract tar archive to target directory
+        buf = io.BytesIO(resp.content)
+        with tarfile.open(fileobj=buf, mode="r") as tar:
+            tar.extractall(path=target)  # nosec

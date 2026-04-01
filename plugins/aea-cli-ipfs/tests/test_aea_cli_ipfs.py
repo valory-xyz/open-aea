@@ -27,8 +27,8 @@ from unittest import mock
 from unittest.mock import patch
 
 import click
-import ipfshttpclient  # type: ignore
 import pytest
+from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.ipfs_utils import addr_to_url, resolve_addr
 from urllib3.exceptions import NewConnectionError as ConnectionError
 
@@ -93,7 +93,7 @@ def test_addr_helpers():
 def test_ipfs():
     """Test aea ipfs command itself."""
     runner = CliRunner()
-    with patch("ipfshttpclient.Client.id"):
+    with patch("aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id"):
         r = runner.invoke(cli, ["ipfs"], standalone_mode=False)
     assert r.exit_code == 1
     assert "Usage: aea ipfs [OPTIONS] COMMAND [ARGS]..." in r.exception.message
@@ -102,10 +102,10 @@ def test_ipfs():
 def test_ipfs_add():
     """Test aea ipfs add."""
     runner = CliRunner()
-    with patch("ipfshttpclient.Client.name.publish") as ipfs_publish, patch(
-        "ipfshttpclient.Client.id"
+    with patch("aea_cli_ipfs.ipfs_client._NameSection.publish") as ipfs_publish, patch(
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id"
     ) as ipfs_id, patch(
-        "ipfshttpclient.Client.add",
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.add",
         return_value=[{"Name": "name", "Hash": DUMMY_HASH}] * 2,
     ) as ipfs_add, patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
@@ -117,9 +117,12 @@ def test_ipfs_add():
     ipfs_publish.assert_called()
 
     with patch(
-        "ipfshttpclient.Client.name.publish", side_effect=PublishError("oops")
-    ) as ipfs_publish, patch("ipfshttpclient.Client.id") as ipfs_id, patch(
-        "ipfshttpclient.Client.add",
+        "aea_cli_ipfs.ipfs_client._NameSection.publish",
+        side_effect=PublishError("oops"),
+    ) as ipfs_publish, patch(
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id"
+    ) as ipfs_id, patch(
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.add",
         return_value=[{"Name": "name", "Hash": DUMMY_HASH}] * 2,
     ) as ipfs_add, patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
@@ -137,10 +140,8 @@ def test_node_not_alive_can_not_be_started():
     """Test error on node connection failed"""
     runner = CliRunner()
     with patch(
-        "ipfshttpclient.Client.id",
-        side_effect=ipfshttpclient.exceptions.CommunicationError(
-            original=Exception("oops")
-        ),
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id",
+        side_effect=ipfs_exc.CommunicationError(original=Exception("oops")),
     ), patch("time.sleep"), patch("subprocess.Popen"), patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs"
     ), patch(
@@ -166,10 +167,8 @@ def test_version_did_not_match():
     """Test error on node connection failed"""
     runner = CliRunner()
     with patch(
-        "ipfshttpclient.Client.id",
-        side_effect=ipfshttpclient.exceptions.CommunicationError(
-            original=Exception("oops")
-        ),
+        "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id",
+        side_effect=ipfs_exc.CommunicationError(original=Exception("oops")),
     ), patch("time.sleep"), patch(
         "subprocess.Popen.communicate", new_callable=lambda: lambda _: (b"", None)
     ), patch(
@@ -223,7 +222,10 @@ class TestIPFSToolDownload(CliTest):
                 (Path(tmp_dir) / hash_id).touch()
 
         # we need a nested lambda to mock a method on the class instead of instance
-        return patch("ipfshttpclient.Client.get", new_callable=lambda: new_callable)
+        return patch(
+            "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.get",
+            new_callable=lambda: new_callable,
+        )
 
     @property
     def mock_client_get_failure(self) -> mock._patch:
@@ -231,9 +233,12 @@ class TestIPFSToolDownload(CliTest):
 
         def new_callable(*_, **__) -> None:
             exception = Exception("DummyError for testing")
-            raise ipfshttpclient.exceptions.StatusError(exception)
+            raise ipfs_exc.StatusError(exception)
 
-        return patch("ipfshttpclient.Client.get", new_callable=lambda: new_callable)
+        return patch(
+            "aea_cli_ipfs.ipfs_client.IPFSHTTPClient.get",
+            new_callable=lambda: new_callable,
+        )
 
     @pytest.mark.parametrize("is_dir", [False, True])
     def test_ipfs_download_success(self, is_dir: bool) -> None:
@@ -271,11 +276,11 @@ class TestIPFSToolDownload(CliTest):
         assert not any(self.target_dir.rglob("*"))
 
 
-@patch("ipfshttpclient.Client.id")
+@patch("aea_cli_ipfs.ipfs_client.IPFSHTTPClient.id")
 def test_ipfs_remove(*_):
     """Test aea ipfs remove."""
     runner = CliRunner()
-    with patch("ipfshttpclient.Client.pin.rm") as ipfs_rm, patch(
+    with patch("aea_cli_ipfs.ipfs_client._PinSection.rm") as ipfs_rm, patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
     ):
         r = runner.invoke(cli, ["ipfs", "remove", "some_hash"], catch_exceptions=False)
@@ -283,10 +288,8 @@ def test_ipfs_remove(*_):
     ipfs_rm.assert_called()
 
     with patch(
-        "ipfshttpclient.Client.pin.rm",
-        side_effect=ipfshttpclient.exceptions.ErrorResponse(
-            "oops", original=Exception()
-        ),
+        "aea_cli_ipfs.ipfs_client._PinSection.rm",
+        side_effect=ipfs_exc.ErrorResponse("oops", original=Exception()),
     ) as ipfs_rm, patch(
         "aea_cli_ipfs.ipfs_utils.IPFSDaemon._check_ipfs", new=lambda *_: None
     ):

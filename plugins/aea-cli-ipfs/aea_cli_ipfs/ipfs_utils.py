@@ -29,8 +29,8 @@ import time
 from pathlib import Path
 from typing import Dict, IO, List, Optional, Set, Tuple, Union, cast
 
-import ipfshttpclient  # type: ignore
 import requests
+from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.exceptions import (
     DownloadError,
     NodeError,
@@ -225,11 +225,13 @@ class IPFSTool:
         if addr is None:
             addr = os.environ.get("OPEN_AEA_IPFS_ADDR", DEFAULT_IPFS_URL)
 
+        from aea_cli_ipfs.ipfs_client import IPFSHTTPClient
+
         _, host, *_ = resolve_addr(cast(str, addr))  # verify addr
 
         self._addr = addr
         self.is_remote = is_remote_addr(host)
-        self.client = ipfshttpclient.Client(addr=self.addr, base=base)
+        self.client = IPFSHTTPClient(addr=self.addr, base=base)
         self.daemon = IPFSDaemon(
             node_url=addr_to_url(self.addr), is_remote=self.is_remote
         )
@@ -302,7 +304,7 @@ class IPFSTool:
 
         try:
             return self.client.pin.add(hash_id, recursive=True)
-        except ipfshttpclient.exceptions.ErrorResponse as e:
+        except ipfs_exc.ErrorResponse as e:
             raise PinError(f"Error on while pinning {hash_id}: {str(e)}") from e
 
     def remove(self, hash_id: str) -> Dict:
@@ -315,14 +317,14 @@ class IPFSTool:
         """
         try:
             return self.client.pin.rm(hash_id, recursive=True)
-        except ipfshttpclient.exceptions.ErrorResponse as e:
+        except ipfs_exc.ErrorResponse as e:
             raise RemoveError(f"Error on {hash_id} remove: {str(e)}") from e
 
     def remove_unpinned_files(self) -> None:
         """Remove dir added by it's hash."""
         try:
             return self.client.repo.gc()
-        except ipfshttpclient.exceptions.ErrorResponse as e:
+        except ipfs_exc.ErrorResponse as e:
             raise RemoveError(
                 f"Error while performing garbage collection: {str(e)}"
             ) from e
@@ -376,7 +378,7 @@ class IPFSTool:
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     self.client.get(hash_id, tmp_dir)
                     return move_to_target_dir(Path(tmp_dir) / hash_id)
-            except ipfshttpclient.exceptions.StatusError as e:
+            except ipfs_exc.StatusError as e:
                 logging.error(f"error on download of {hash_id}: {e}")
                 time.sleep(1)
 
@@ -392,7 +394,7 @@ class IPFSTool:
         """
         try:
             return self.client.name.publish(hash_id)
-        except ipfshttpclient.exceptions.TimeoutError as e:  # pragma: nocover
+        except ipfs_exc.TimeoutError as e:  # pragma: nocover
             raise PublishError(
                 "can not publish within timeout, check internet connection!"
             ) from e
@@ -401,5 +403,5 @@ class IPFSTool:
         """Check ipfs node running."""
         try:
             self.client.id()
-        except ipfshttpclient.exceptions.CommunicationError as e:
+        except ipfs_exc.CommunicationError as e:
             raise NodeError(f"Can not connect to node. Is node running?:\n{e}") from e

@@ -37,7 +37,7 @@ setup(
     entry_points={"aea.cli": ["ipfs_cli_command = aea_cli_ipfs.core:ipfs"]},
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
-        "ipfshttpclient>=0.8.0a2",
+        "requests>=2.20.0,<3",
     ],
     tests_require=["pytest"],
     classifiers=[
