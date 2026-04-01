@@ -31,11 +31,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 def get_all_extras() -> Dict:
     cli_deps = [
-        "click>=8.1.0,<8.4.0",
-        "pyyaml>=6.0.1,<9",
-        "packaging==26",
-        "pytest>=8.2,<10",
-        "coverage>=6.4.4,<8.0.0",
+        "click>=8.1.0,<9",
+        "pyyaml>=6.0.1",
+        "packaging>=22.0",
+        "pytest>=7.0,<10",
+        "coverage>=6.4.4,<9",
     ]
 
     extras = {
@@ -51,10 +51,10 @@ def get_all_extras() -> Dict:
 all_extras = get_all_extras()
 
 base_deps = [
-    "packaging==26",
-    "protobuf<6,>=5",
-    "pyyaml>=6.0.1,<7",
-    "requests>=2.32.5,<3",
+    "packaging>=22.0",
+    "protobuf>=5,<8",
+    "pyyaml>=6.0.1",
+    "requests>=2.20.0,<3",
 ]
 
 if os.name == "nt" or os.getenv("WIN_BUILD_WHEEL", None) == "1":
