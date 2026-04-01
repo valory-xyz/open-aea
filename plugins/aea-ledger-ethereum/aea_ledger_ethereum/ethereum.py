@@ -33,7 +33,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from uuid import uuid4
 
-import ipfshttpclient  # noqa: F401 # pylint: disable=unused-import
 from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware, parse_rpc_urls
 from eth_account import Account
 from eth_account._utils.legacy_transactions import (
