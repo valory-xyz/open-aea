@@ -105,7 +105,7 @@ class CustomTypeChecker(TypeChecker):
         return super().is_type(instance, type)
 
 
-def own_additional_properties(validator, aP, instance, schema) -> Iterator:  # type: ignore
+def own_additional_properties(validator, aP, instance, schema) -> Iterator:  # type: ignore  # pylint: disable=unused-argument
     """Additional properties validator."""
     if aP is False and isinstance(instance, dict):
         extras = list(find_additional_properties(instance, schema))
@@ -236,7 +236,7 @@ class ConfigValidator:
     def _validate(self, instance: Dict) -> None:
         """Validate an instance using the current validator."""
         errors: List[ValidationError] = list(
-            self._validator.iter_errors(instance=instance)
+            self._validator.iter_errors(instance=instance)  # pylint: disable=no-member
         )
         if len(errors) > 0:
             error_msg = self._build_message_from_errors(errors)

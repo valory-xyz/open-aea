@@ -10,7 +10,7 @@ clean-build:
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -fr {} +
 	find . -type d -name __pycache__ -exec rm -rv {} +
-	rm -fr Pipfile.lock
+	rm -fr poetry.lock
 	rm -rf plugins/*/build
 	rm -rf plugins/*/dist
 
@@ -121,15 +121,12 @@ PLUGINS := \
 .PHONY: new_env
 new_env: clean
 	@if [ -z "$$VIRTUAL_ENV" ]; then \
-		pipenv --rm || true; \
-		pipenv --clear; \
-		pipenv --python $(PYTHON_VERSION); \
-		pipenv install --dev --skip-lock; \
-		pipenv run pip install -e .[all]; \
+		poetry env remove --all || true; \
+		poetry install --with dev --all-extras --no-interaction; \
 		for plugin in $(PLUGINS); do \
-			pipenv run pip install --no-deps file:plugins/$$plugin; \
+			poetry run pip install --no-deps file:plugins/$$plugin; \
 		done; \
-		echo "Enter virtual environment with all development dependencies now: 'pipenv shell'."; \
+		echo "Enter virtual environment with all development dependencies now: 'poetry shell'."; \
 	else \
 		echo "In a virtual environment! Exit first: 'exit'."; \
 	fi

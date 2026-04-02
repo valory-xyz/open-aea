@@ -24,9 +24,8 @@ from unittest import mock
 import pytest
 from aea_ledger_fetchai import FetchAICrypto
 
-from aea.helpers.multiformat import b58decode
-
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
+from aea.helpers.multiformat import b58decode
 from aea.test_tools.test_cases import AEATestCaseEmpty, _get_password_option_args
 
 from packages.fetchai.connections.stub.connection import (

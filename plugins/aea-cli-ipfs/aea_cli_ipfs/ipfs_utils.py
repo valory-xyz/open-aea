@@ -228,7 +228,9 @@ class IPFSTool:
         if addr is None:
             addr = os.environ.get("OPEN_AEA_IPFS_ADDR", DEFAULT_IPFS_URL)
 
-        from aea_cli_ipfs.ipfs_client import IPFSHTTPClient
+        from aea_cli_ipfs.ipfs_client import (  # pylint: disable=import-outside-toplevel
+            IPFSHTTPClient,
+        )
 
         _, host, *_ = resolve_addr(cast(str, addr))  # verify addr
 
@@ -300,7 +302,7 @@ class IPFSTool:
         if Path(dir_path).is_dir():
             return response[-1]["Name"], response[-1]["Hash"], response[:-1]
 
-        return response["Name"], response["Hash"], []
+        return response["Name"], response["Hash"], []  # type: ignore[call-overload]
 
     def pin(self, hash_id: str) -> Dict:
         """Pin content with hash_id"""
@@ -326,7 +328,7 @@ class IPFSTool:
     def remove_unpinned_files(self) -> None:
         """Remove dir added by it's hash."""
         try:
-            return self.client.repo.gc()
+            self.client.repo.gc()
         except ipfs_exc.ErrorResponse as e:
             raise RemoveError(
                 f"Error while performing garbage collection: {str(e)}"
