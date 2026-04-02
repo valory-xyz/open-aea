@@ -39,7 +39,7 @@ from typing import (
 )
 
 from packaging.specifiers import SpecifierSet
-from packaging.version import Version
+from packaging.version import InvalidVersion, Version
 
 from aea.configurations.constants import (
     AGENT,
@@ -122,7 +122,13 @@ class PackageVersion:
         if isinstance(version_like, str) and version_like in ("any", "latest"):
             self._version = version_like
         elif isinstance(version_like, str):
-            self._version = Version(version_like)
+            try:
+                self._version = Version(version_like)
+            except InvalidVersion:
+                # Semver prerelease forms (e.g. 1.0.0-0.3.7) are not PEP 440
+                # but are allowed by the schema regex. Store as raw string so
+                # config loading does not crash.
+                self._version = version_like
         elif isinstance(version_like, Version):
             self._version = version_like
         else:
