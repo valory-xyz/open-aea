@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import Optional, cast
 
 import click
-from aea.helpers.json_schema import ValidationError
 
 from aea import AEA_DIR
 from aea.cli.fingerprint import fingerprint_item
@@ -60,6 +59,7 @@ from aea.configurations.constants import (
 from aea.configurations.loader import ConfigLoader
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
+from aea.helpers.json_schema import ValidationError
 
 COPYRIGHT_HEADER = """\
 # -*- coding: utf-8 -*-

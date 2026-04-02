@@ -81,7 +81,6 @@ from aea.configurations.pypi import (
     merge_dependencies_list,
 )
 from aea.configurations.validation import ExtraPropertiesError
-from aea.helpers.json_schema import ValidationError
 from aea.crypto.helpers import private_key_verify
 from aea.crypto.ledger_apis import DEFAULT_CURRENCY_DENOMINATIONS
 from aea.crypto.wallet import Wallet
@@ -104,6 +103,7 @@ from aea.helpers.env_vars import apply_env_variables
 from aea.helpers.exception_policy import ExceptionPolicyEnum
 from aea.helpers.install_dependency import install_dependency
 from aea.helpers.io import open_file
+from aea.helpers.json_schema import ValidationError
 from aea.helpers.logging import AgentLoggerAdapter, WithLogger, get_logger
 from aea.identity.base import Identity
 from aea.registries.resources import Resources
