@@ -36,6 +36,7 @@ from aea.helpers.multiformat import (
 from aea.helpers.multiaddr.crypto_pb2 import KeyType, PublicKey  # type: ignore
 from aea.helpers.secp256k1 import validate_secp256k1_compressed_pubkey
 
+
 # NOTE:
 # - Reference: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys
 # - Implementation inspired from https://github.com/libp2p/py-libp2p

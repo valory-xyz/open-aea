@@ -17,6 +17,8 @@
 #
 # ------------------------------------------------------------------------------
 
+# pylint: disable=protected-access,unused-argument
+
 """
 Inlined JSON Schema Draft-04 validator.
 
@@ -34,7 +36,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Type
 from urllib.parse import urljoin, urlsplit
 from urllib.request import urlopen
-
 
 # ---------------------------------------------------------------------------
 # ValidationError
@@ -122,7 +123,7 @@ class RefResolver:
         if parsed.scheme == "file":
             path = Path(parsed.path)
             return json.loads(path.read_text(encoding="utf-8"))
-        with urlopen(uri) as resp:  # pragma: nocover
+        with urlopen(uri) as resp:  # pragma: nocover  # nosec B310
             return json.loads(resp.read().decode("utf-8"))
 
 
@@ -172,6 +173,7 @@ def find_additional_properties(instance: Dict, schema: Dict) -> Iterator[str]:
 
     :param instance: the object instance.
     :param schema: the schema with ``properties`` and/or ``patternProperties``.
+    :yield: property names not covered by the schema.
     """
     properties = schema.get("properties", {})
     patterns = "|".join(schema.get("patternProperties", {}))
@@ -192,7 +194,10 @@ ValidatorFn = Callable[..., Iterator[ValidationError]]
 
 
 def _validate_type(
-    validator: "Draft4Validator", type_value: Any, instance: Any, schema: Dict
+    validator: "Draft4Validator",
+    type_value: Any,
+    instance: Any,
+    schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``type`` keyword."""
     if isinstance(type_value, list):
@@ -208,7 +213,10 @@ def _validate_type(
 
 
 def _validate_properties(
-    validator: "Draft4Validator", properties: Dict, instance: Any, schema: Dict
+    validator: "Draft4Validator",
+    properties: Dict,
+    instance: Any,
+    schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``properties`` keyword."""
     if not isinstance(instance, dict):
@@ -220,7 +228,10 @@ def _validate_properties(
 
 
 def _validate_pattern_properties(
-    validator: "Draft4Validator", pattern_props: Dict, instance: Any, schema: Dict
+    validator: "Draft4Validator",
+    pattern_props: Dict,
+    instance: Any,
+    schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``patternProperties`` keyword."""
     if not isinstance(instance, dict):
@@ -233,7 +244,10 @@ def _validate_pattern_properties(
 
 
 def _validate_required(
-    validator: "Draft4Validator", required: List[str], instance: Any, schema: Dict
+    validator: "Draft4Validator",
+    required: List[str],
+    instance: Any,
+    schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``required`` keyword."""
     if not isinstance(instance, dict):
@@ -264,7 +278,10 @@ def _validate_additional_properties(
 
 
 def _validate_items(
-    validator: "Draft4Validator", items: Dict, instance: Any, schema: Dict
+    validator: "Draft4Validator",
+    items: Dict,
+    instance: Any,
+    schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``items`` keyword."""
     if not isinstance(instance, list):
@@ -388,13 +405,14 @@ class Draft4Validator:
         """
         errors = list(self.iter_errors(instance))
         if errors:
-            raise errors[0]
+            raise ValidationError(str(errors[0]))
 
     def iter_errors(self, instance: Any) -> Iterator[ValidationError]:
         """
         Yield all validation errors for the given instance.
 
         :param instance: the data to validate.
+        :yield: validation errors.
         """
         self._current_root = self.schema
         yield from self._validate_schema(instance, self.schema)
@@ -407,9 +425,13 @@ class Draft4Validator:
         if "$ref" in schema:
             ref = schema["$ref"]
             if ref.startswith("#"):
+                if self._current_root is None:  # pragma: nocover
+                    raise ValueError("No root schema set")
                 resolved = RefResolver._resolve_pointer(ref[1:], self._current_root)
                 yield from self._validate_schema(instance, resolved)
             elif self.resolver is not None:
+                if self._current_root is None:  # pragma: nocover
+                    raise ValueError("No root schema set")
                 resolved = self.resolver.resolve(ref, self._current_root)
                 # Switch root context to the external document for nested refs
                 file_part = ref.split("#", 1)[0]
@@ -428,7 +450,7 @@ class Draft4Validator:
 
 
 # ---------------------------------------------------------------------------
-# extend()
+# Validator extension helper
 # ---------------------------------------------------------------------------
 
 

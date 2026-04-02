@@ -29,11 +29,10 @@ from typing import Any, Dict, Generator, Optional, Sized, Tuple, cast
 
 from google.protobuf.descriptor import FieldDescriptor
 
-from aea.helpers.multiformat import b58encode
-
 from aea.helpers.cid import to_v1
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.utils import _protobuf_python_implementation
+from aea.helpers.multiformat import b58encode
 
 # https://github.com/multiformats/multicodec/blob/master/table.csv
 SHA256_ID = "12"  # 0x12
