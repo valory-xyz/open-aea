@@ -20,8 +20,6 @@
 """Tests for the inlined JSON schema validator."""
 
 import json
-import os
-import re
 from pathlib import Path
 from typing import List
 
@@ -34,7 +32,6 @@ from aea.helpers.json_schema import (
     extend,
     find_additional_properties,
 )
-
 
 # --- ValidationError ---
 
