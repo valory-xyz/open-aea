@@ -44,6 +44,9 @@ WHITELIST = {
     "semver",
     "requests",
     "packaging",
+    # Inlined into aea.helpers.multiformat
+    "py-multicodec",
+    "py-multibase",
 }
 
 

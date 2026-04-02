@@ -64,9 +64,9 @@ from aea.configurations.base import (
 from aea.configurations.constants import DEFAULT_AEA_CONFIG_FILE
 from aea.configurations.loader import ConfigLoader, ConfigLoaders
 from aea.configurations.validation import ExtraPropertiesError, _SCHEMAS_DIR
-from aea.helpers.json_schema import Draft4Validator, ValidationError
 from aea.exceptions import AEAEnforceError, AEAValidationError
 from aea.helpers.io import open_file
+from aea.helpers.json_schema import Draft4Validator, ValidationError
 
 
 def try_to_load_agent_config(
