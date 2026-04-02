@@ -100,7 +100,7 @@ class TestCrossValidation:
 
     def test_all_generated_keys_match(self) -> None:
         """Test that our validator agrees with ecdsa on 50 random keys."""
-        from ecdsa import VerifyingKey, curves, keys
+        from ecdsa import VerifyingKey, curves
 
         for _ in range(50):
             sk = SigningKey.generate(curve=SECP256k1)
