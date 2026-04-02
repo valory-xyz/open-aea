@@ -146,6 +146,55 @@ def test_cid_from_bytes(multihash):
     assert CID.from_bytes(multihash_bytes)
 
 
+def test_ensure_bytes_and_unicode_usage() -> None:
+    """Test that str/bytes coercion in CID works correctly.
+
+    This covers the ensure_bytes/ensure_unicode call sites:
+    - BaseCID.__init__ accepts bytes multihash
+    - BaseCID.__str__ returns a str
+    - CIDv0.encode returns bytes
+    - CID.from_string accepts str and internally converts to bytes
+    - CID.from_bytes accepts bytes
+    """
+
+    # from_string takes str, internally coerces to bytes
+    cid_v0_from_str = CID.from_string(HASH_V0)
+    assert isinstance(cid_v0_from_str, CIDv0)
+    assert cid_v0_from_str.version == 0
+
+    # from_bytes takes bytes directly
+    cid_v0_from_bytes = CID.from_bytes(HASH_V0.encode("utf-8"))
+    assert cid_v0_from_bytes == cid_v0_from_str
+
+    # __str__ must return str (ensure_unicode)
+    result_str = str(cid_v0_from_str)
+    assert isinstance(result_str, str)
+    assert result_str == HASH_V0
+
+    # encode must return bytes (ensure_bytes)
+    encoded = cid_v0_from_str.encode()
+    assert isinstance(encoded, bytes)
+
+    # multihash property must be bytes (ensure_bytes in __init__)
+    assert isinstance(cid_v0_from_str.multihash, bytes)
+
+    # Same checks for v1
+    cid_v1_from_str = CID.from_string(HASH_V1)
+    cid_v1_from_bytes = CID.from_bytes(HASH_V1.encode("utf-8"))
+    assert cid_v1_from_str == cid_v1_from_bytes
+    assert isinstance(str(cid_v1_from_str), str)
+    assert str(cid_v1_from_str) == HASH_V1
+    assert isinstance(cid_v1_from_str.encode(), bytes)
+    assert isinstance(cid_v1_from_str.multihash, bytes)
+
+    # Round-trip: v0 -> v1 -> v0
+    v1_hash = to_v1(HASH_V0)
+    assert isinstance(v1_hash, str)
+    v0_hash = to_v0(v1_hash)
+    assert isinstance(v0_hash, str)
+    assert v0_hash == HASH_V0
+
+
 @pytest.mark.parametrize(
     "cid_bytes, error_message",
     [

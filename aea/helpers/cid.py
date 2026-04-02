@@ -30,7 +30,6 @@ import base58
 import multibase
 import multicodec
 import multihash as mh
-from morphys import ensure_bytes, ensure_unicode
 
 DEFAULT_ENCODING = "base32"
 BTC_ENCODING = "base58btc"
@@ -48,7 +47,9 @@ class BaseCID:
 
         self._version = version
         self._codec = codec
-        self._multihash = ensure_bytes(multihash)
+        self._multihash = (
+            multihash if isinstance(multihash, bytes) else multihash.encode("utf-8")
+        )
 
     @property
     def version(self) -> int:
@@ -88,7 +89,8 @@ class BaseCID:
     def __str__(self) -> str:
         """String representation."""
 
-        return ensure_unicode(self.encode())
+        encoded = self.encode()
+        return encoded if isinstance(encoded, str) else encoded.decode("utf-8")
 
     def __eq__(self, other: object) -> bool:
         """Dunder to check object equivalence."""
@@ -118,7 +120,8 @@ class CIDv0(BaseCID):
     def encode(self, encoding: str = DEFAULT_ENCODING) -> bytes:
         """base58-encoded buffer"""
 
-        return ensure_bytes(base58.b58encode(self.buffer))
+        result = base58.b58encode(self.buffer)
+        return result if isinstance(result, bytes) else result.encode("utf-8")
 
     def to_v1(self) -> "CIDv1":
         """Get an equivalent `CIDv1` object."""
@@ -208,7 +211,7 @@ class CID:
     def from_string(cls, cid: str) -> CIDObject:
         """Creates a CID object from a encoded form"""
 
-        cid_bytes = ensure_bytes(cid, "utf-8")
+        cid_bytes = cid if isinstance(cid, bytes) else cid.encode("utf-8")
         return cls.from_bytes(cid_bytes)
 
     @classmethod
