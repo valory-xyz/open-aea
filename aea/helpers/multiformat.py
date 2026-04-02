@@ -172,7 +172,7 @@ def multibase_decode(data: bytes) -> bytes:
         padding = (8 - len(upper_payload) % 8) % 8
         try:
             return base64.b32decode(upper_payload + b"=" * padding, casefold=True)
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             # Invalid base32 (e.g. wrong padding length) — return empty
             return b""
     if encoding == "base58btc":
@@ -219,13 +219,14 @@ def _varint_decode(data: bytes) -> Tuple[int, int]:
     """
     Decode an unsigned varint from the start of data.
 
+    :param data: bytes to decode.
     :return: (value, number_of_bytes_consumed).
     """
     result = 0
     shift = 0
     for i, byte in enumerate(data):
         result |= (byte & 0x7F) << shift
-        if not (byte & 0x80):
+        if not byte & 0x80:
             return result, i + 1
         shift += 7
     raise ValueError("varint is truncated")
