@@ -36,7 +36,8 @@ from docker.models.containers import Container
 
 from aea.exceptions import enforce
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
-from aea.helpers.http_requests import get as http_get, post as http_post
+from aea.helpers.http_requests import get as http_get
+from aea.helpers.http_requests import post as http_post
 
 logger = logging.getLogger(__name__)
 

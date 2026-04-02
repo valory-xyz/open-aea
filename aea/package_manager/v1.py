@@ -31,11 +31,10 @@ from typing import Callable, Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Union, cast
 
-from aea.helpers.http_requests import get as r_get
-
 from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageId, PackageType
 from aea.helpers.fingerprint import check_fingerprint
+from aea.helpers.http_requests import get as r_get
 from aea.helpers.ipfs.base import IPFSHashOnly
 from aea.package_manager.base import (
     BasePackageManager,

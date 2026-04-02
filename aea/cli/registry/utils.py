@@ -174,7 +174,7 @@ def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
         data=data,
         headers=headers,
     )
-    resp = http_requests.request(**request_kwargs)
+    resp = http_requests.request(**request_kwargs)  # type: ignore[arg-type]
     return resp
 
 

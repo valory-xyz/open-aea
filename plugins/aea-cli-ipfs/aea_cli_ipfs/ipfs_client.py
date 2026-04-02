@@ -38,7 +38,6 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-
 # ---------------------------------------------------------------------------
 # Exceptions (mirrors ipfshttpclient.exceptions hierarchy)
 # ---------------------------------------------------------------------------
@@ -320,6 +319,11 @@ class IPFSHTTPClient:
         """
         POST to the IPFS API and return (status_code, body_bytes).
 
+        :param endpoint: API endpoint path.
+        :param params: optional query parameters.
+        :param data: optional request body.
+        :param headers: optional headers.
+        :return: tuple of (status_code, body_bytes).
         :raises CommunicationError: on connection failure.
         :raises TimeoutError: on timeout.
         """

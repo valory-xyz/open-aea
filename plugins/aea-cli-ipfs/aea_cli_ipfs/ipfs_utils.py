@@ -26,11 +26,10 @@ import signal
 import subprocess  # nosec
 import tempfile
 import time
-from pathlib import Path
-from typing import Dict, IO, List, Optional, Set, Tuple, Union, cast
-
 import urllib.error
 import urllib.request
+from pathlib import Path
+from typing import Dict, IO, List, Optional, Set, Tuple, Union, cast
 
 from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.exceptions import (

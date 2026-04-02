@@ -33,6 +33,7 @@ from json.decoder import JSONDecodeError
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
+import requests
 from Crypto.Cipher import AES  # nosec
 from Crypto.Protocol.KDF import scrypt  # nosec
 from Crypto.Random import get_random_bytes  # nosec
@@ -56,8 +57,6 @@ from aea.common import Address, JSONLike
 from aea.crypto.base import Crypto, FaucetApi, Helper, LedgerApi
 from aea.crypto.helpers import KeyIsIncorrect, hex_to_bytes_for_key
 from aea.exceptions import AEAEnforceError
-import requests
-
 from aea.helpers.base import try_decorator
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 
@@ -1685,7 +1684,9 @@ class CosmosFaucetApi(FaucetApi):
         :return: None on failure, otherwise the request uid
         """
         uri = cls._faucet_request_uri(url)
-        response = requests.post(url=uri, json={"address": address}, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
+        response = requests.post(
+            url=uri, json={"address": address}, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT
+        )
 
         uid = None
         if response.status_code == 200:
@@ -1718,7 +1719,9 @@ class CosmosFaucetApi(FaucetApi):
         :param url: the url
         :return: None on failure otherwise a CosmosFaucetStatus for the specified uid
         """
-        response = requests.get(cls._faucet_status_uri(uid, url), timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
+        response = requests.get(
+            cls._faucet_status_uri(uid, url), timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT
+        )
         if response.status_code != 200:  # pragma: nocover
             _default_logger.warning(
                 "Response: {}, Text: {}".format(response.status_code, response.text)

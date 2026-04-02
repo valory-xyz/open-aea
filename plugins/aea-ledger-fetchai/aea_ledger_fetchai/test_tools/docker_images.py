@@ -34,9 +34,9 @@ except ImportError:  # pragma: nocover
     Container = Any
 
 
-from aea.exceptions import enforce
 import requests
 
+from aea.exceptions import enforce
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 from aea.test_tools.docker_image import DockerImage
 

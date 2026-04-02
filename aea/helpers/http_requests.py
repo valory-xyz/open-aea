@@ -18,6 +18,8 @@
 #
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-positional-arguments,unused-argument,import-outside-toplevel
+
 """
 Minimal HTTP helpers backed by :mod:`urllib` from the standard library.
 
@@ -40,6 +42,12 @@ class HTTPResponse:
     """Lightweight response wrapper matching the subset of requests.Response used in aea."""
 
     def __init__(self, status_code: int, data: bytes, url: str = "") -> None:
+        """Initialize HTTPResponse.
+
+        :param status_code: HTTP status code.
+        :param data: response body bytes.
+        :param url: request URL.
+        """
         self.status_code = status_code
         self._data = data
         self.url = url
@@ -91,6 +99,7 @@ def request(
     :param headers: optional headers dict.
     :param files: optional dict of {field: file_obj} for multipart upload.
     :param timeout: request timeout in seconds.
+    :param kwargs: additional keyword arguments (ignored, for compatibility).
     :return: HTTPResponse.
     """
     if params:
@@ -100,7 +109,7 @@ def request(
     body: Optional[bytes] = None
 
     if files:
-        body, content_type = _encode_multipart(data or {}, files)
+        body, content_type = _encode_multipart(data or {}, files)  # type: ignore[arg-type]
         headers["Content-Type"] = content_type
     elif isinstance(data, dict):
         body = urllib.parse.urlencode(data).encode("utf-8")
