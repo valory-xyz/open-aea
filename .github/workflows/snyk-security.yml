@@ -46,11 +46,10 @@ jobs:
         with:
           python-version: "3.10.9"
 
-      - name: Pipenv install requirements
+      - name: Install dependencies
         run: |
-          pip install pipenv==2023.7.23
-          pipenv --clear
-          time pipenv install --dev --deploy
+          pip install poetry==2.3.2
+          poetry install --with dev --no-interaction
 
       - name: Set up Snyk CLI to check for security issues
         # Snyk can be used to break the build when it detects security issues.

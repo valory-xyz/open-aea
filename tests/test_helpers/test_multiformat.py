@@ -24,6 +24,8 @@ import hashlib
 import pytest
 
 from aea.helpers.multiformat import (
+    IDENTITY_HASH_CODE,
+    SHA2_256_CODE,
     b58decode,
     b58encode,
     multibase_decode,
@@ -36,10 +38,7 @@ from aea.helpers.multiformat import (
     multihash_decode,
     multihash_digest,
     multihash_encode,
-    IDENTITY_HASH_CODE,
-    SHA2_256_CODE,
 )
-
 
 # --- base58 ---
 
