@@ -25,18 +25,16 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install pipenv
-      - name: Pipenv install requirements and check it can be locked
+          pip install poetry==2.3.2
+      - name: Poetry install requirements and check lock
         run: |
-          pipenv --clear
-          time pipenv install --verbose --dev --skip-lock
-          time pipenv run pip install -e .[all]
-          time pipenv run pip install --no-deps file:plugins/aea-ledger-ethereum
-          time pipenv run pip install --no-deps file:plugins/aea-ledger-ethereum-flashbots
-          time pipenv run pip install --no-deps file:plugins/aea-ledger-cosmos
-          time pipenv run pip install --no-deps file:plugins/aea-ledger-fetchai
-          time pipenv run pip install --no-deps file:plugins/aea-ledger-solana
-          time pipenv lock
+          poetry check --lock
+          time poetry install --all-extras --no-interaction -vvv
+          time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum
+          time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum-flashbots
+          time poetry run pip install --no-deps file:plugins/aea-ledger-cosmos
+          time poetry run pip install --no-deps file:plugins/aea-ledger-fetchai
+          time poetry run pip install --no-deps file:plugins/aea-ledger-solana
       - name: Check plugin consistency
         run: |
           # check diff between plugins' LICENSE and main LICENSE
@@ -252,9 +250,9 @@ jobs:
       - name: Install tox
         run: |
           pip install tomte[tox]==0.6.1
-      - name: Check Pipfile and tox.ini consistency
+      - name: Check pyproject.toml and tox.ini consistency
         run: |
-          python ./scripts/check_pipfile_and_toxini.py
+          python ./scripts/check_pyproject_and_toxini.py
       - name: Install current aea
         run: |
           pip install -e .[all]
@@ -539,7 +537,7 @@ jobs:
           RPC_ETHEREUM: ${{ secrets.RPC_ETHEREUM || 'https://eth.drpc.org' }}
           RPC_ARBITRUM: ${{ secrets.RPC_ARBITRUM || 'https://arbitrum.drpc.org' }}
           RPC_ZKSYNC: ${{ secrets.RPC_ZKSYNC || 'https://mainnet.era.zksync.io' }}
-          RPC_BINANCE: ${{ secrets.RPC_BINANCE || 'https://binance.llamarpc.com' }}
+          RPC_BINANCE: ${{ secrets.RPC_BINANCE || 'https://bsc-dataseed1.binance.org' }}
           RPC_GNOSIS: ${{ secrets.RPC_GNOSIS || 'https://gnosis.drpc.org' }}
           RPC_CELO: ${{ secrets.RPC_CELO || 'https://rpc.ankr.com/celo' }}
           RPC_OPTIMISM: ${{ secrets.RPC_OPTIMISM || 'https://optimism.drpc.org' }}
