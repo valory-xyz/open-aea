@@ -47,6 +47,8 @@ WHITELIST = {
     # Inlined into aea.helpers.multiformat
     "py-multicodec",
     "py-multibase",
+    # Replaced by inlined IPFS client
+    "ipfshttpclient",
 }
 
 

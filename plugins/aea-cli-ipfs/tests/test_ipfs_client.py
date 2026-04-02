@@ -20,26 +20,22 @@
 """Tests for the inlined IPFS HTTP client."""
 
 import json
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
-
 from aea_cli_ipfs.ipfs_client import (
     CommunicationError,
     ErrorResponse,
     IPFSHTTPClient,
     StatusError,
-    TimeoutError,
     _encode_bytes,
     _encode_directory,
     _multipart_boundary,
     _quote_filename,
 )
-
 
 # ---------------------------------------------------------------------------
 # Multipart encoding tests

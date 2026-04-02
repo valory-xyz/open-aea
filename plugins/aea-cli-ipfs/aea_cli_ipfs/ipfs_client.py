@@ -17,6 +17,8 @@
 #
 # ------------------------------------------------------------------------------
 
+# pylint: disable=protected-access,unused-argument,redefined-builtin,too-many-positional-arguments,import-outside-toplevel,cyclic-import
+
 """
 Lightweight IPFS HTTP API client.
 
@@ -32,10 +34,9 @@ import tarfile
 import urllib.parse
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
-
 
 # ---------------------------------------------------------------------------
 # Exceptions (mirrors ipfshttpclient.exceptions hierarchy)
@@ -218,7 +219,7 @@ def _encode_bytes(data: bytes, boundary: str) -> Tuple[bytes, str]:
 
 
 # ---------------------------------------------------------------------------
-# Subsections (pin, name, repo)
+# Subsections: pin, name, repo
 # ---------------------------------------------------------------------------
 
 
@@ -372,6 +373,10 @@ class IPFSHTTPClient:
         """
         Add file or directory to IPFS.
 
+        :param file_or_dir: path to file or directory.
+        :param pin: whether to pin the content.
+        :param recursive: whether to add recursively.
+        :param wrap_with_directory: whether to wrap with directory.
         :return: list of dicts with 'Name' and 'Hash' keys.
         """
         boundary = _multipart_boundary()
@@ -426,6 +431,8 @@ class IPFSHTTPClient:
         """
         Add bytes to IPFS.
 
+        :param data: bytes to add.
+        :param kwargs: additional keyword arguments.
         :return: hash string.
         """
         boundary = _multipart_boundary()

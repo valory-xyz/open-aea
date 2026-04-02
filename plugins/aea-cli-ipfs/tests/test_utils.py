@@ -26,8 +26,8 @@ from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
 import pytest
-from aea_cli_ipfs import ipfs_client as ipfs_exc
 import requests
+from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.ipfs_utils import (
     DownloadError,
     IPFSDaemon,
