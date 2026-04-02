@@ -47,7 +47,9 @@ class BaseCID:
 
         self._version = version
         self._codec = codec
-        self._multihash = multihash if isinstance(multihash, bytes) else multihash.encode("utf-8")
+        self._multihash = (
+            multihash if isinstance(multihash, bytes) else multihash.encode("utf-8")
+        )
 
     @property
     def version(self) -> int:
