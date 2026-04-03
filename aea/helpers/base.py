@@ -158,7 +158,13 @@ def load_env_file(env_file: str) -> None:
         if not key:
             continue
         if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+            # Quoted values: strip quotes but preserve content (including #)
             value = value[1:-1]
+        else:
+            # Unquoted values: strip inline comments (space + #)
+            comment_idx = value.find(" #")
+            if comment_idx != -1:
+                value = value[:comment_idx].rstrip()
         # Interpolate ${VAR} references (matching python-dotenv behavior)
         value = re.sub(
             r"\$\{([^}]+)\}",

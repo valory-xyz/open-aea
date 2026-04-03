@@ -225,6 +225,28 @@ def test_load_env_file_variable_interpolation():
         os.unlink(tmp_path)
 
 
+def test_load_env_file_inline_comments():
+    """Test load env file strips inline comments (matching python-dotenv)."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write("TEST_IC_STRIPPED=value # this is a comment\n")
+        f.write("TEST_IC_NOSPACE=value#notacomment\n")
+        f.write('TEST_IC_QUOTED="value # preserved"\n')
+        f.write("TEST_IC_SINGLE='value # preserved'\n")
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("TEST_IC_STRIPPED") == "value"
+        assert os.getenv("TEST_IC_NOSPACE") == "value#notacomment"
+        assert os.getenv("TEST_IC_QUOTED") == "value # preserved"
+        assert os.getenv("TEST_IC_SINGLE") == "value # preserved"
+    finally:
+        os.environ.pop("TEST_IC_STRIPPED", None)
+        os.environ.pop("TEST_IC_NOSPACE", None)
+        os.environ.pop("TEST_IC_QUOTED", None)
+        os.environ.pop("TEST_IC_SINGLE", None)
+        os.unlink(tmp_path)
+
+
 def test_reg_exp_not_match():
     """Test regexp checks."""
 
