@@ -1040,13 +1040,14 @@ def test_package_version_str_format():
         assert str(pv) == version_str
 
 
-def test_package_version_semver_prerelease_fallback():
-    """Test that semver prerelease forms that aren't PEP 440 don't crash."""
+def test_package_version_rejects_non_pep440():
+    """Test that non-PEP 440 semver prerelease forms are rejected explicitly."""
+    from packaging.version import InvalidVersion
+
     exotic = ["1.0.0-0.3.7", "1.0.0-x.7.z.92"]
     for version_str in exotic:
-        pv = PackageVersion(version_str)
-        assert str(pv) == version_str
-        assert pv == PackageVersion(version_str)
+        with pytest.raises(InvalidVersion):
+            PackageVersion(version_str)
 
 
 def test_public_id_with_version_object():
