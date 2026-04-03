@@ -137,6 +137,9 @@ def load_env_file(env_file: str) -> None:
     """
     Load the content of the environment file into the process environment.
 
+    Supports ``export`` prefixes and ``${VAR}`` interpolation, matching
+    the behaviour of ``python-dotenv``.
+
     :param env_file: save_path to the env file.
     """
     path = Path(env_file)
@@ -146,6 +149,9 @@ def load_env_file(env_file: str) -> None:
         line = line.strip()
         if not line or line.startswith("#"):
             continue
+        # Strip optional 'export ' prefix
+        if line.startswith("export "):
+            line = line[7:]
         key, _, value = line.partition("=")
         key = key.strip()
         value = value.strip()
@@ -153,6 +159,12 @@ def load_env_file(env_file: str) -> None:
             continue
         if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
             value = value[1:-1]
+        # Interpolate ${VAR} references (matching python-dotenv behavior)
+        value = re.sub(
+            r"\$\{([^}]+)\}",
+            lambda m: os.environ.get(m.group(1), ""),
+            value,
+        )
         os.environ.setdefault(key, value)
 
 
