@@ -226,24 +226,28 @@ def test_load_env_file_variable_interpolation():
 
 
 def test_load_env_file_inline_comments():
-    """Test load env file strips inline comments (matching python-dotenv)."""
+    """Test load env file handles inline comments and quotes (matching python-dotenv)."""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
-        f.write("TEST_IC_STRIPPED=value # this is a comment\n")
-        f.write("TEST_IC_NOSPACE=value#notacomment\n")
-        f.write('TEST_IC_QUOTED="value # preserved"\n')
-        f.write("TEST_IC_SINGLE='value # preserved'\n")
+        f.write("IC_A=value # c\n")
+        f.write("IC_B=value#no_comment\n")
+        f.write('IC_C="value"\n')
+        f.write('IC_D="value" # c\n')
+        f.write("IC_E='value' # c\n")
+        f.write('IC_F="value # inside"\n')
+        f.write("IC_G='value # inside'\n")
         tmp_path = f.name
     try:
         load_env_file(tmp_path)
-        assert os.getenv("TEST_IC_STRIPPED") == "value"
-        assert os.getenv("TEST_IC_NOSPACE") == "value#notacomment"
-        assert os.getenv("TEST_IC_QUOTED") == "value # preserved"
-        assert os.getenv("TEST_IC_SINGLE") == "value # preserved"
+        assert os.getenv("IC_A") == "value"
+        assert os.getenv("IC_B") == "value#no_comment"
+        assert os.getenv("IC_C") == "value"
+        assert os.getenv("IC_D") == "value"
+        assert os.getenv("IC_E") == "value"
+        assert os.getenv("IC_F") == "value # inside"
+        assert os.getenv("IC_G") == "value # inside"
     finally:
-        os.environ.pop("TEST_IC_STRIPPED", None)
-        os.environ.pop("TEST_IC_NOSPACE", None)
-        os.environ.pop("TEST_IC_QUOTED", None)
-        os.environ.pop("TEST_IC_SINGLE", None)
+        for key in ["IC_A", "IC_B", "IC_C", "IC_D", "IC_E", "IC_F", "IC_G"]:
+            os.environ.pop(key, None)
         os.unlink(tmp_path)
 
 

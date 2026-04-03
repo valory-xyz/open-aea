@@ -157,9 +157,15 @@ def load_env_file(env_file: str) -> None:
         value = value.strip()
         if not key:
             continue
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
-            # Quoted values: strip quotes but preserve content (including #)
-            value = value[1:-1]
+        if value and value[0] in ("'", '"'):
+            # Quoted value: find matching closing quote
+            quote_char = value[0]
+            end_idx = value.find(quote_char, 1)
+            if end_idx != -1:
+                value = value[1:end_idx]
+            else:
+                # No closing quote — treat as unquoted
+                value = value[1:]
         else:
             # Unquoted values: strip inline comments (space + #)
             comment_idx = value.find(" #")
