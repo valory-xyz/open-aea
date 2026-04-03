@@ -22,9 +22,9 @@
 import collections
 import re
 
-import semver
 from hypothesis import strategies as st
 from packaging.specifiers import Specifier, SpecifierSet
+from packaging.version import Version
 
 from aea.configurations.data_types import (
     ComponentId,
@@ -58,7 +58,7 @@ st.register_type_strategy(Specifier, specifier_strategy)
 
 
 version_info_strategy = st.builds(
-    lambda kwargs: semver.VersionInfo(**kwargs),
+    lambda kwargs: Version(f"{kwargs['major']}.{kwargs['minor']}.{kwargs['patch']}"),
     st.fixed_dictionaries(
         dict(
             major=positive_integer_strategy,
@@ -67,7 +67,7 @@ version_info_strategy = st.builds(
         ),
     ),
 )
-st.register_type_strategy(semver.VersionInfo, version_info_strategy)
+st.register_type_strategy(Version, version_info_strategy)
 
 
 package_version_strategy = st.builds(
@@ -81,7 +81,7 @@ s = st.fixed_dictionaries(
     dict(
         author=st.from_type(SimpleId),
         name=st.from_type(SimpleId),
-        version=st.from_type(semver.VersionInfo),
+        version=st.from_type(Version),
         package_hash=st.from_type(IPFSHash),
     )
 )

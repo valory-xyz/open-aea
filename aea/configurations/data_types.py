@@ -38,8 +38,8 @@ from typing import (
     cast,
 )
 
-import semver
 from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 from aea.configurations.constants import (
     AGENT,
@@ -62,7 +62,7 @@ from aea.helpers.base import (
 )
 
 T = TypeVar("T")
-PackageVersionLike = Union[str, semver.VersionInfo]
+PackageVersionLike = Union[str, Version]
 
 PACKAGE_NAME_RE = r"[a-zA-Z0-9_-]+"
 VERSION_SPECIFIER_RE = r"(>|<|=|~|\*)+.*"
@@ -117,13 +117,13 @@ class PackageVersion:
         """
         Initialize a package version.
 
-        :param version_like: a string, os a semver.VersionInfo object.
+        :param version_like: a string, or a packaging.version.Version object.
         """
         if isinstance(version_like, str) and version_like in ("any", "latest"):
             self._version = version_like
         elif isinstance(version_like, str):
-            self._version = semver.VersionInfo.parse(version_like)
-        elif isinstance(version_like, semver.VersionInfo):
+            self._version = Version(version_like)
+        elif isinstance(version_like, Version):
             self._version = version_like
         else:
             raise ValueError("Version type not valid.")

@@ -43,7 +43,7 @@ from pathlib import Path
 from typing import Any, List, Tuple, cast
 
 import click
-import semver
+from packaging.version import Version
 
 from aea.cli.registry.utils import download_file, extract, request_api
 from aea.common import JSONLike
@@ -276,8 +276,8 @@ def _bump_protocol_specification_id(
 ) -> None:
     """Bump spec id version."""
     spec_id: PublicId = configuration.protocol_specification_id  # type: ignore
-    old_version = semver.VersionInfo.parse(spec_id.version)
-    new_version = str(old_version.bump_minor())
+    old_version = Version(spec_id.version)
+    new_version = f"{old_version.major}.{old_version.minor + 1}.0"
     new_spec_id = PublicId(spec_id.author, spec_id.name, new_version)
     configuration.protocol_specification_id = new_spec_id
     with (package_path / DEFAULT_PROTOCOL_CONFIG_FILE).open("w") as file_output:
