@@ -456,9 +456,9 @@ jobs:
           unzip protoc-24.3-linux-x86_64.zip -d protoc
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           make protolint_install
-          # install ipfs
-          wget https://dist.ipfs.tech/go-ipfs/v0.6.0/go-ipfs_v0.6.0_linux-amd64.tar.gz
-          tar -xvzf go-ipfs_v0.6.0_linux-amd64.tar.gz
+          # install ipfs (mirrored to avoid dist.ipfs.tech outages)
+          wget https://github.com/valory-xyz/open-aea/releases/download/ipfs-v0.6.0-binaries/go-ipfs-linux.tar.gz
+          tar -xvzf go-ipfs-linux.tar.gz
           cd go-ipfs
           sudo ./install.sh
           cd ..
@@ -481,9 +481,9 @@ jobs:
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           brew tap yoheimuta/protolint
           brew install protolint
-          # install ipfs
-          curl -O https://dist.ipfs.tech/go-ipfs/v0.6.0/go-ipfs_v0.6.0_darwin-amd64.tar.gz
-          tar -xvzf go-ipfs_v0.6.0_darwin-amd64.tar.gz
+          # install ipfs (mirrored to avoid dist.ipfs.tech outages)
+          curl -L -O https://github.com/valory-xyz/open-aea/releases/download/ipfs-v0.6.0-binaries/go-ipfs-darwin.tar.gz
+          tar -xvzf go-ipfs-darwin.tar.gz
           cd go-ipfs
           sudo ./install.sh
           cd ..
@@ -511,7 +511,8 @@ jobs:
           make protolint_install_win
           # just check protolint runs
           protolint version
-          curl https://dist.ipfs.tech/go-ipfs/v0.6.0/go-ipfs_v0.6.0_windows-amd64.zip -o go-ipfs_v0.6.0.zip
+          # install ipfs (mirrored to avoid dist.ipfs.tech outages)
+          curl -L https://github.com/valory-xyz/open-aea/releases/download/ipfs-v0.6.0-binaries/go-ipfs-windows.zip -o go-ipfs_v0.6.0.zip
           Expand-Archive -Path go-ipfs_v0.6.0.zip -DestinationPath ~\Apps\
           cp ~\Apps\go-ipfs\ipfs.exe C:\Users\runneradmin\go\bin\
           ipfs init
