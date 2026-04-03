@@ -61,7 +61,7 @@ Initialize a package version.
 
 **Arguments**:
 
-- `version_like`: a string, os a semver.VersionInfo object.
+- `version_like`: a string, or a packaging.version.Version object.
 
 <a id="aea.configurations.data_types.PackageVersion.is_any"></a>
 
