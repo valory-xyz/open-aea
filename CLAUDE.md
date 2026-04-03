@@ -10,8 +10,8 @@ Open AEA (Autonomous Economic Agent) Framework — a Python framework for buildi
 
 ### Environment Setup
 ```bash
-make new_env          # Create pipenv environment with all dev dependencies
-pipenv shell          # Enter virtual environment
+make new_env          # Create poetry environment with all dev dependencies
+poetry shell          # Enter virtual environment
 ```
 
 ### Formatting and Linting
