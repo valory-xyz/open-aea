@@ -1819,9 +1819,14 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
                 skip_consistency_check,
             )
 
-        self._custom_component_configurations = (
-            agent_configuration.component_configurations
-        )
+        self._custom_component_configurations = {
+            component_id: apply_env_variables(
+                config,
+                os.environ,
+                path=[str(component_id.component_type.value), component_id.name],
+            )
+            for component_id, config in agent_configuration.component_configurations.items()
+        }
 
         self.set_default_connection(agent_configuration.default_connection)
         self.set_default_routing(agent_configuration.default_routing)
