@@ -1820,10 +1820,12 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             )
 
         self._custom_component_configurations = {
-            component_id: apply_env_variables(
-                config,
-                os.environ,
-                path=[str(component_id.component_type.value), component_id.name],
+            component_id: dict(
+                apply_env_variables(
+                    config,
+                    os.environ,
+                    path=[str(component_id.component_type.value), component_id.name],
+                )
             )
             for component_id, config in agent_configuration.component_configurations.items()
         }
