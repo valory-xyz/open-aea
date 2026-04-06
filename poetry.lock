@@ -252,7 +252,7 @@ version = "2.1.1"
 description = "Base58 and Base58Check implementation."
 optional = false
 python-versions = ">=3.5"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
     {file = "base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c"},
@@ -2910,7 +2910,7 @@ version = "1.0"
 description = "Smart conversions between unicode and bytes types for common cases"
 optional = false
 python-versions = "*"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "morphys-1.0-py2.py3-none-any.whl", hash = "sha256:76d6dbaa4d65f597e59d332c81da786d83e4669387b9b2a750cfec74e7beec20"},
 ]
@@ -3845,7 +3845,7 @@ version = "2.0.0"
 description = "Multibase implementation for Python"
 optional = false
 python-versions = "<4.0,>=3.10"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "py_multibase-2.0.0-py3-none-any.whl", hash = "sha256:b29ce489b556134e73998a11712c406b70950812955df64084754e0774e40900"},
     {file = "py_multibase-2.0.0.tar.gz", hash = "sha256:58c1a264195fa1ae29ea707c6fc8196446f4bdb92e0f9a0f131e0f280b238839"},
@@ -3865,7 +3865,7 @@ version = "1.0.0"
 description = "Multicodec implementation in Python"
 optional = false
 python-versions = "<4.0,>=3.10"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "py_multicodec-1.0.0-py3-none-any.whl", hash = "sha256:ae2e687bac8fdf54e3f5b3feded36b61a304d5e3c3af9438f7481f543ec15b8d"},
     {file = "py_multicodec-1.0.0.tar.gz", hash = "sha256:78e4e3e47b6288cf635c3ca987152e6cb5510bdcdab307e7690c76ec3d5bbfeb"},
@@ -4164,22 +4164,6 @@ markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
-name = "pymultihash"
-version = "0.8.2"
-description = "Python implementation of the multihash specification"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "pymultihash-0.8.2-py3-none-any.whl", hash = "sha256:f7fa840b24bd6acbd6b073fcd330f10e15619387297babf1dd13ca4dae6e8209"},
-    {file = "pymultihash-0.8.2.tar.gz", hash = "sha256:49c75a1ae9ecc6d22d259064d4597b3685da3f0258f4ded632e03a3a79af215b"},
-]
-
-[package.extras]
-blake2 = ["pyblake2"]
-sha3 = ["pysha3"]
-
-[[package]]
 name = "pynacl"
 version = "1.6.0"
 description = "Python binding to the Networking and Cryptography (NaCl) library"
@@ -4379,7 +4363,7 @@ version = "1.2.2"
 description = "Convert numbers from base 10 integers to base X strings and back again."
 optional = false
 python-versions = "*"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "python-baseconv-1.2.2.tar.gz", hash = "sha256:0539f8bd0464013b05ad62e0a1673f0ac9086c76b43ebf9f833053527cd9931b"},
 ]
@@ -5300,7 +5284,7 @@ version = "1.0.2"
 description = "Simple python varint implementation"
 optional = false
 python-versions = "*"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "varint-1.0.2.tar.gz", hash = "sha256:a6ecc02377ac5ee9d65a6a8ad45c9ff1dac8ccee19400a5950fb51d594214ca5"},
 ]
@@ -5729,4 +5713,4 @@ test-tools = ["click", "coverage", "jsonschema", "packaging", "pytest", "pyyaml"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.16"
-content-hash = "25180fceeeaaafc15efc2747ff8fcac92963e4178b19676c970c5724197c0213"
+content-hash = "01417207c3049c4782251cc479a9b3a103cf9ebf06116e8283da21df9ee4ddd7"
