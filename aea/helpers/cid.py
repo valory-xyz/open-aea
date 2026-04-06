@@ -236,8 +236,8 @@ class CID:
             # if the bytestream is multibase encoded
             try:
                 cid = multibase_decode(cid)
-            except ValueError:
-                raise ValueError("cid length is invalid")
+            except ValueError as e:
+                raise ValueError(f"invalid multibase encoding: {e}") from e
             if len(cid) < 2:
                 raise ValueError("cid length is invalid")
 
