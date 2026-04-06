@@ -128,6 +128,11 @@ class TestMultibase:
         with pytest.raises(ValueError, match="Unsupported multibase encoding"):
             multibase_encode("base2", b"data")
 
+    def test_invalid_base32_raises(self) -> None:
+        """Test that invalid base32 payload raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid base32"):
+            multibase_decode(b"bb")  # 'b' prefix + invalid single-char payload
+
 
 # --- multicodec ---
 
@@ -238,6 +243,18 @@ class TestMultihash:
         """Test decoding empty bytes raises."""
         with pytest.raises(ValueError, match="multihash is too short"):
             multihash_decode(b"")
+
+    def test_encode_decode_varint_roundtrip(self) -> None:
+        """Test that encode/decode uses varints correctly for multi-byte codes."""
+        # Use a func_code > 127 that requires multi-byte varint
+        func_code = 0x1012  # arbitrary large code
+        digest = b"\xab" * 32
+        encoded = multihash_encode(func_code, digest)
+        # First bytes should NOT be a single byte for func_code
+        assert encoded[0] != 0x12  # varint for 0x1012 is multi-byte
+        decoded_code, decoded_digest = multihash_decode(encoded)
+        assert decoded_code == func_code
+        assert decoded_digest == digest
 
 
 # --- Integration: CID-like operations ---
