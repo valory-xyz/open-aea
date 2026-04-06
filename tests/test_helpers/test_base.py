@@ -181,6 +181,92 @@ def test_load_env_file_comments_and_blanks():
         os.unlink(tmp_path)
 
 
+def test_load_env_file_export_prefix():
+    """Test load env file strips 'export ' prefix."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write('export TEST_EXPORT_VAR="exported_value"\n')
+        f.write("export TEST_EXPORT_UNQUOTED=plain\n")
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("TEST_EXPORT_VAR") == "exported_value"
+        assert os.getenv("TEST_EXPORT_UNQUOTED") == "plain"
+    finally:
+        os.environ.pop("TEST_EXPORT_VAR", None)
+        os.environ.pop("TEST_EXPORT_UNQUOTED", None)
+        os.unlink(tmp_path)
+
+
+def test_load_env_file_variable_interpolation():
+    """Test load env file interpolates ${VAR} references."""
+    os.environ["TEST_INTERP_BASE"] = "/usr/local"
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write("TEST_INTERP_PATH=${TEST_INTERP_BASE}/bin\n")
+        f.write("TEST_INTERP_DOUBLE=${TEST_INTERP_BASE}${TEST_INTERP_BASE}\n")
+        f.write("TEST_INTERP_MISSING=${UNDEFINED_VAR_XYZ}/fallback\n")
+        f.write("TEST_INTERP_NONE=no_interpolation\n")
+        f.write("TEST_INTERP_DOLLAR=$TEST_INTERP_BASE/bin\n")
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("TEST_INTERP_PATH") == "/usr/local/bin"
+        assert os.getenv("TEST_INTERP_DOUBLE") == "/usr/local/usr/local"
+        assert os.getenv("TEST_INTERP_MISSING") == "/fallback"
+        assert os.getenv("TEST_INTERP_NONE") == "no_interpolation"
+        # $VAR without braces is NOT interpolated (matches python-dotenv)
+        assert os.getenv("TEST_INTERP_DOLLAR") == "$TEST_INTERP_BASE/bin"
+    finally:
+        os.environ.pop("TEST_INTERP_BASE", None)
+        os.environ.pop("TEST_INTERP_PATH", None)
+        os.environ.pop("TEST_INTERP_DOUBLE", None)
+        os.environ.pop("TEST_INTERP_MISSING", None)
+        os.environ.pop("TEST_INTERP_NONE", None)
+        os.environ.pop("TEST_INTERP_DOLLAR", None)
+        os.unlink(tmp_path)
+
+
+def test_load_env_file_inline_comments():
+    """Test load env file handles inline comments and quotes (matching python-dotenv)."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write("IC_A=value # c\n")
+        f.write("IC_B=value#no_comment\n")
+        f.write('IC_C="value"\n')
+        f.write('IC_D="value" # c\n')
+        f.write("IC_E='value' # c\n")
+        f.write('IC_F="value # inside"\n')
+        f.write("IC_G='value # inside'\n")
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("IC_A") == "value"
+        assert os.getenv("IC_B") == "value#no_comment"
+        assert os.getenv("IC_C") == "value"
+        assert os.getenv("IC_D") == "value"
+        assert os.getenv("IC_E") == "value"
+        assert os.getenv("IC_F") == "value # inside"
+        assert os.getenv("IC_G") == "value # inside"
+    finally:
+        for key in ["IC_A", "IC_B", "IC_C", "IC_D", "IC_E", "IC_F", "IC_G"]:
+            os.environ.pop(key, None)
+        os.unlink(tmp_path)
+
+
+def test_load_env_file_escaped_quotes():
+    """Test load env file handles escaped quotes (matching python-dotenv)."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write('EQ_A="value with \\"escaped\\" quotes"\n')
+        f.write('EQ_B="value with \\"escaped\\" quotes" # comment\n')
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("EQ_A") == 'value with "escaped" quotes'
+        assert os.getenv("EQ_B") == 'value with "escaped" quotes'
+    finally:
+        os.environ.pop("EQ_A", None)
+        os.environ.pop("EQ_B", None)
+        os.unlink(tmp_path)
+
+
 def test_reg_exp_not_match():
     """Test regexp checks."""
 
