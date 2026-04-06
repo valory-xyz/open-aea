@@ -251,6 +251,22 @@ def test_load_env_file_inline_comments():
         os.unlink(tmp_path)
 
 
+def test_load_env_file_escaped_quotes():
+    """Test load env file handles escaped quotes (matching python-dotenv)."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
+        f.write('EQ_A="value with \\"escaped\\" quotes"\n')
+        f.write('EQ_B="value with \\"escaped\\" quotes" # comment\n')
+        tmp_path = f.name
+    try:
+        load_env_file(tmp_path)
+        assert os.getenv("EQ_A") == 'value with "escaped" quotes'
+        assert os.getenv("EQ_B") == 'value with "escaped" quotes'
+    finally:
+        os.environ.pop("EQ_A", None)
+        os.environ.pop("EQ_B", None)
+        os.unlink(tmp_path)
+
+
 def test_reg_exp_not_match():
     """Test regexp checks."""
 

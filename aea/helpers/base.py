@@ -158,11 +158,20 @@ def load_env_file(env_file: str) -> None:
         if not key:
             continue
         if value and value[0] in ("'", '"'):
-            # Quoted value: find matching closing quote
+            # Quoted value: find matching unescaped closing quote
             quote_char = value[0]
-            end_idx = value.find(quote_char, 1)
+            i = 1
+            end_idx = -1
+            while i < len(value):
+                if value[i] == "\\" and i + 1 < len(value):
+                    i += 2  # skip escaped character
+                elif value[i] == quote_char:
+                    end_idx = i
+                    break
+                else:
+                    i += 1
             if end_idx != -1:
-                value = value[1:end_idx]
+                value = value[1:end_idx].replace("\\" + quote_char, quote_char)
             else:
                 # No closing quote — treat as unquoted
                 value = value[1:]
