@@ -55,7 +55,6 @@ from typing import (
     cast,
 )
 
-from dotenv import load_dotenv
 from packaging.version import Version
 
 from aea.common import PathLike
@@ -138,9 +137,56 @@ def load_env_file(env_file: str) -> None:
     """
     Load the content of the environment file into the process environment.
 
+    Supports ``export`` prefixes and ``${VAR}`` interpolation, matching
+    the behaviour of ``python-dotenv``.
+
     :param env_file: save_path to the env file.
     """
-    load_dotenv(dotenv_path=Path(env_file), override=False)
+    path = Path(env_file)
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        # Strip optional 'export ' prefix
+        if line.startswith("export "):
+            line = line[7:]
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            continue
+        if value and value[0] in ("'", '"'):
+            # Quoted value: find matching unescaped closing quote
+            quote_char = value[0]
+            i = 1
+            end_idx = -1
+            while i < len(value):
+                if value[i] == "\\" and i + 1 < len(value):
+                    i += 2  # skip escaped character
+                elif value[i] == quote_char:
+                    end_idx = i
+                    break
+                else:
+                    i += 1
+            if end_idx != -1:
+                value = value[1:end_idx].replace("\\" + quote_char, quote_char)
+            else:
+                # No closing quote — treat as unquoted
+                value = value[1:]
+        else:
+            # Unquoted values: strip inline comments (space + #)
+            comment_idx = value.find(" #")
+            if comment_idx != -1:
+                value = value[:comment_idx].rstrip()
+        # Interpolate ${VAR} references (matching python-dotenv behavior)
+        value = re.sub(
+            r"\$\{([^}]+)\}",
+            lambda m: os.environ.get(m.group(1), ""),
+            value,
+        )
+        os.environ.setdefault(key, value)
 
 
 def sigint_crossplatform(process: subprocess.Popen) -> None:  # pragma: nocover
