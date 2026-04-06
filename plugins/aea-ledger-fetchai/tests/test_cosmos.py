@@ -124,6 +124,7 @@ def test_try_get_account_number_and_sequence() -> None:
         ) == (65660, 0)
 
 
+@pytest.mark.skip(reason="rest-fetchhub.fetch.ai is unreliable (501/524 errors)")
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 def test_get_transaction() -> None:
     """Test get_transaction."""
@@ -147,6 +148,7 @@ def test_send_signed_transaction() -> None:
         assert fetchai_api.send_signed_transaction({"tx": {"body": {}}}) is not None
 
 
+@pytest.mark.skip(reason="rest-fetchhub.fetch.ai is unreliable (501/524 errors)")
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
 def test_get_transaction_receipt() -> None:
     """Test get_transaction_receipt."""
