@@ -81,15 +81,18 @@ class RefResolver:
         self._store: Dict[str, Dict] = {}
         self._store[base_uri] = referrer
 
-    def resolve(self, ref: str, current_schema: Dict) -> Dict:
+    def resolve(self, ref: str, current_schema: Optional[Dict] = None) -> Dict:
         """
         Resolve a ``$ref`` string to the target sub-schema.
 
         :param ref: the ``$ref`` value, e.g. ``#/definitions/foo`` or
             ``other.json#/definitions/bar``.
-        :param current_schema: the schema containing this ``$ref``.
+        :param current_schema: the schema containing this ``$ref`` (defaults to
+            the root referrer document).
         :return: the resolved sub-schema dict.
         """
+        if current_schema is None:
+            current_schema = self._store.get(self._base_uri, {})
         if ref.startswith("#"):
             return self._resolve_pointer(ref[1:], current_schema)
 
@@ -207,14 +210,11 @@ def _validate_type(
     """Validate the ``type`` keyword."""
     if isinstance(type_value, list):
         if not any(validator.TYPE_CHECKER.is_type(instance, t) for t in type_value):
-            yield ValidationError(
-                f"data must be one of types {type_value}, got {type(instance).__name__}"
-            )
+            types = ", ".join(repr(t) for t in type_value)
+            yield ValidationError(f"{instance!r} is not of type {types}")
     elif isinstance(type_value, str):
         if not validator.TYPE_CHECKER.is_type(instance, type_value):
-            yield ValidationError(
-                f"data must be {type_value}, got {type(instance).__name__}"
-            )
+            yield ValidationError(f"{instance!r} is not of type {type_value!r}")
 
 
 def _validate_properties(
@@ -259,9 +259,7 @@ def _validate_required(
         return
     for field in required:
         if field not in instance:
-            yield ValidationError(
-                f"data must contain ['{field}'] properties (required)"
-            )
+            yield ValidationError(f"{field!r} is a required property")
 
 
 def _validate_additional_properties(
@@ -272,9 +270,9 @@ def _validate_additional_properties(
         return
     if aP is False:
         extras = list(find_additional_properties(instance, schema))
-        if extras:
+        for extra in extras:
             yield ValidationError(
-                f"data must not contain {set(extras)} properties (additionalProperties)"
+                f"Additional properties are not allowed ({extra!r} was unexpected)"
             )
     elif isinstance(aP, dict):
         for prop in find_additional_properties(instance, schema):
@@ -301,7 +299,7 @@ def _validate_enum(
 ) -> Iterator[ValidationError]:
     """Validate the ``enum`` keyword."""
     if instance not in enum:
-        yield ValidationError(f"data must be one of {enum} (enum)")
+        yield ValidationError(f"{instance!r} is not one of {enum!r}")
 
 
 def _validate_pattern(
@@ -309,7 +307,7 @@ def _validate_pattern(
 ) -> Iterator[ValidationError]:
     """Validate the ``pattern`` keyword."""
     if isinstance(instance, str) and not re.search(pattern, instance):
-        yield ValidationError(f"data must match pattern {pattern!r} (pattern)")
+        yield ValidationError(f"{instance!r} does not match {pattern!r}")
 
 
 def _validate_minimum(
@@ -319,9 +317,11 @@ def _validate_minimum(
     if isinstance(instance, (int, float)) and not isinstance(instance, bool):
         exclusive = schema.get("exclusiveMinimum", False)
         if exclusive and instance <= minimum:
-            yield ValidationError(f"data must be > {minimum} (exclusiveMinimum)")
+            yield ValidationError(
+                f"{instance} is less than or equal to the minimum of {minimum}"
+            )
         elif not exclusive and instance < minimum:
-            yield ValidationError(f"data must be >= {minimum} (minimum)")
+            yield ValidationError(f"{instance} is less than the minimum of {minimum}")
 
 
 def _validate_one_of(
@@ -333,10 +333,12 @@ def _validate_one_of(
         errors = list(validator._validate_schema(instance, sub_schema))
         if not errors:
             matches += 1
-    if matches != 1:
+    if matches == 0:
         yield ValidationError(
-            f"data must match exactly one of the given schemas (oneOf), matched {matches}"
+            f"{instance!r} is not valid under any of the given schemas"
         )
+    elif matches > 1:
+        yield ValidationError(f"{instance!r} is valid under each of {matches} schemas")
 
 
 def _validate_property_names(
@@ -362,7 +364,7 @@ def _validate_unique_items(
     seen: list = []
     for item in instance:
         if item in seen:
-            yield ValidationError("data items must be unique (uniqueItems)")
+            yield ValidationError(f"{instance!r} has non-unique elements")
             return
         seen.append(item)
 
@@ -454,27 +456,33 @@ class Draft4Validator:
         # Resolve $ref
         if "$ref" in schema:
             ref = schema["$ref"]
-            if ref.startswith("#"):
-                if self._current_root is None:  # pragma: nocover
-                    raise ValueError("No root schema set")
-                resolved = RefResolver._resolve_pointer(ref[1:], self._current_root)
-                yield from self._validate_schema(instance, resolved)
-            elif self.resolver is None:
-                yield ValidationError(
-                    f"Cannot resolve external $ref '{ref}': no RefResolver configured"
-                )
-            else:
-                if self._current_root is None:  # pragma: nocover
-                    raise ValueError("No root schema set")
-                resolved = self.resolver.resolve(ref, self._current_root)
-                # Switch root context to the external document for nested refs
-                file_part = ref.split("#", 1)[0]
-                prev_root = self._current_root
-                if file_part:
-                    full_uri = urljoin(self.resolver._base_uri, file_part)
-                    self._current_root = self.resolver._store.get(full_uri, prev_root)
-                yield from self._validate_schema(instance, resolved)
-                self._current_root = prev_root
+            try:
+                if ref.startswith("#"):
+                    if self._current_root is None:  # pragma: nocover
+                        raise ValueError("No root schema set")
+                    resolved = RefResolver._resolve_pointer(ref[1:], self._current_root)
+                    yield from self._validate_schema(instance, resolved)
+                elif self.resolver is None:
+                    yield ValidationError(
+                        f"Cannot resolve external $ref {ref!r}: "
+                        f"no RefResolver configured"
+                    )
+                else:
+                    if self._current_root is None:  # pragma: nocover
+                        raise ValueError("No root schema set")
+                    resolved = self.resolver.resolve(ref, self._current_root)
+                    # Switch root context for nested refs
+                    file_part = ref.split("#", 1)[0]
+                    prev_root = self._current_root
+                    if file_part:
+                        full_uri = urljoin(self.resolver._base_uri, file_part)
+                        self._current_root = self.resolver._store.get(
+                            full_uri, prev_root
+                        )
+                    yield from self._validate_schema(instance, resolved)
+                    self._current_root = prev_root
+            except ValueError as e:
+                yield ValidationError(str(e))
             return
 
         # Apply each keyword validator

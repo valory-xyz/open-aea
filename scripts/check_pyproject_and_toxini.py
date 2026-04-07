@@ -42,9 +42,6 @@ WHITELIST = {
     # from tox.ini exact pins, so string comparison would always mismatch
     "requests",
     "packaging",
-    # Inlined into aea.helpers.multiformat
-    "py-multicodec",
-    "py-multibase",
 }
 
 

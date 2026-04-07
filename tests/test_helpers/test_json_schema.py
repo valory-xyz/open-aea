@@ -152,7 +152,7 @@ class TestProperties:
             "additionalProperties": False,
         }
         Draft4Validator(schema).validate({"name": "Alice"})
-        with pytest.raises(ValidationError, match="additional"):
+        with pytest.raises(ValidationError, match="Additional properties"):
             Draft4Validator(schema).validate({"name": "Alice", "extra": "bad"})
 
     def test_additional_properties_true(self) -> None:
@@ -229,14 +229,14 @@ class TestScalarConstraints:
         """Test enum validation."""
         schema = {"enum": ["a", "b", "c"]}
         Draft4Validator(schema).validate("a")
-        with pytest.raises(ValidationError, match="enum"):
+        with pytest.raises(ValidationError, match="is not one of"):
             Draft4Validator(schema).validate("d")
 
     def test_pattern(self) -> None:
         """Test pattern validation."""
         schema = {"type": "string", "pattern": "^[a-z]+$"}
         Draft4Validator(schema).validate("abc")
-        with pytest.raises(ValidationError, match="pattern"):
+        with pytest.raises(ValidationError, match="does not match"):
             Draft4Validator(schema).validate("ABC")
 
     def test_minimum(self) -> None:
@@ -263,7 +263,7 @@ class TestOneOf:
     def test_no_match(self) -> None:
         """Test oneOf with no matches."""
         schema = {"oneOf": [{"type": "string"}, {"type": "integer"}]}
-        with pytest.raises(ValidationError, match="oneOf"):
+        with pytest.raises(ValidationError, match="is not valid under any"):
             Draft4Validator(schema).validate([1, 2])
 
 

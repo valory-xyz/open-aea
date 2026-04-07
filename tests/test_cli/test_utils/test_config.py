@@ -71,7 +71,7 @@ def test_config_validator() -> None:
     config = DEFAULT_CLI_CONFIG.copy()
     validate_cli_config(config)
 
-    with pytest.raises(jsonschema.ValidationError, match="must be string"):
+    with pytest.raises(jsonschema.ValidationError, match="is not of type"):
         config["author"] = None  # type: ignore
         validate_cli_config(config)
 
