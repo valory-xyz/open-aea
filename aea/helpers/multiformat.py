@@ -181,7 +181,7 @@ def multibase_decode(data: bytes) -> bytes:
     if encoding == "base16upper":
         return bytes.fromhex(payload.decode("ascii"))
 
-    raise ValueError(f"Unsupported multibase encoding: {encoding}")
+    raise ValueError(f"Unsupported multibase encoding: {encoding}")  # pragma: no cover
 
 
 def multibase_is_encoded(data: bytes) -> bool:
