@@ -48,6 +48,9 @@ def load_env_file(env_file: str) -> None
 
 Load the content of the environment file into the process environment.
 
+Supports ``export`` prefixes and ``${VAR}`` interpolation, matching
+the behaviour of ``python-dotenv``.
+
 **Arguments**:
 
 - `env_file`: save_path to the env file.

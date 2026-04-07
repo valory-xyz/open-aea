@@ -26,6 +26,7 @@ import pytest
 from aea.helpers.multiformat import (
     IDENTITY_HASH_CODE,
     SHA2_256_CODE,
+    _varint_encode,
     b58decode,
     b58encode,
     multibase_decode,
@@ -127,6 +128,11 @@ class TestMultibase:
         """Test that unsupported encoding raises ValueError."""
         with pytest.raises(ValueError, match="Unsupported multibase encoding"):
             multibase_encode("base2", b"data")
+
+    def test_invalid_base32_raises(self) -> None:
+        """Test that invalid base32 payload raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid base32"):
+            multibase_decode(b"bb")  # 'b' prefix + invalid single-char payload
 
 
 # --- multicodec ---
@@ -238,6 +244,30 @@ class TestMultihash:
         """Test decoding empty bytes raises."""
         with pytest.raises(ValueError, match="multihash is too short"):
             multihash_decode(b"")
+
+    def test_encode_decode_varint_roundtrip(self) -> None:
+        """Test that encode/decode uses varints correctly."""
+        # Test with all recognized codes
+        for func_code in (SHA2_256_CODE, IDENTITY_HASH_CODE, 0x11, 0x40):
+            digest = b"\xab" * 32
+            encoded = multihash_encode(func_code, digest)
+            decoded_code, decoded_digest = multihash_decode(encoded)
+            assert decoded_code == func_code
+            assert decoded_digest == digest
+
+    def test_decode_unknown_func_code(self) -> None:
+        """Test that unknown hash function codes are rejected."""
+        # 0x99 is not a recognized multihash code
+
+        bad_data = _varint_encode(0x99) + _varint_encode(1) + b"\xaa"
+        with pytest.raises(ValueError, match="unknown hash function"):
+            multihash_decode(bad_data)
+
+    def test_varint_encode_negative(self) -> None:
+        """Test that negative numbers cannot be varint encoded."""
+
+        with pytest.raises(ValueError, match="Cannot encode negative"):
+            _varint_encode(-1)
 
 
 # --- Integration: CID-like operations ---

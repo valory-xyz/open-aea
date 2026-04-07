@@ -140,6 +140,10 @@ def multibase_encode(encoding: str, data: bytes) -> bytes:
     elif encoding == "base32upper":
         encoded = base64.b32encode(data).rstrip(b"=")
     elif encoding == "base58btc":
+        # NOTE: py-multibase's BaseStringConverter encodes b"" as b"1",
+        # but standard base58 (and our b58encode) returns b"". This only
+        # differs for empty input which never occurs in practice (CID
+        # payloads always have content). We follow the base58 standard.
         encoded = b58encode(data)
     elif encoding == "base16":
         encoded = data.hex().encode("ascii")
@@ -172,9 +176,8 @@ def multibase_decode(data: bytes) -> bytes:
         padding = (8 - len(upper_payload) % 8) % 8
         try:
             return base64.b32decode(upper_payload + b"=" * padding, casefold=True)
-        except Exception:  # pylint: disable=broad-exception-caught
-            # Invalid base32 (e.g. wrong padding length) — return empty
-            return b""
+        except Exception as e:
+            raise ValueError("Invalid base32 multibase payload") from e
     if encoding == "base58btc":
         return b58decode(payload)
     if encoding == "base16":
@@ -182,7 +185,9 @@ def multibase_decode(data: bytes) -> bytes:
     if encoding == "base16upper":
         return bytes.fromhex(payload.decode("ascii"))
 
-    raise ValueError(f"Unsupported multibase encoding: {encoding}")
+    # All _MULTIBASE_PREFIXES values are handled above; unrecognized
+    # prefixes are caught at the top of this function.
+    raise AssertionError(f"unreachable: {encoding}")
 
 
 def multibase_is_encoded(data: bytes) -> bool:
@@ -203,6 +208,8 @@ def multibase_is_encoded(data: bytes) -> bool:
 
 def _varint_encode(number: int) -> bytes:
     """Encode an integer as an unsigned varint (LEB128)."""
+    if number < 0:
+        raise ValueError("Cannot encode negative integers as unsigned varints")
     buf = bytearray()
     while True:
         towrite = number & 0x7F
@@ -287,6 +294,24 @@ def multicodec_remove_prefix(data: bytes) -> bytes:
 
 # --- Multihash ---
 
+# Recognized multihash function codes (matching pymultihash behavior):
+# - 0x00-0x0F: application-specific codes (always accepted)
+# - Standard hash functions from pymultihash.Func enum
+_MULTIHASH_CODES = {
+    *range(0x00, 0x10),  # app-specific codes (0x00-0x0F)
+    0x11,  # sha1
+    SHA2_256_CODE,  # 0x12 sha2-256
+    0x13,  # sha2-512
+    0x14,  # sha3-512
+    0x15,  # sha3-384
+    0x16,  # sha3-256
+    0x17,  # sha3-224
+    0x18,  # shake-128
+    0x19,  # shake-256
+    0x40,  # blake2b
+    0x41,  # blake2s
+}
+
 
 def multihash_digest(data: bytes, func_code: int) -> Tuple[int, bytes]:
     """
@@ -308,13 +333,13 @@ def multihash_digest(data: bytes, func_code: int) -> Tuple[int, bytes]:
 
 def multihash_encode(func_code: int, digest: bytes) -> bytes:
     """
-    Encode a multihash: [func_code_byte, digest_length_byte, digest].
+    Encode a multihash: [varint(func_code), varint(digest_length), digest].
 
     :param func_code: the hash function code.
     :param digest: the hash digest bytes.
     :return: encoded multihash bytes.
     """
-    return bytes([func_code, len(digest)]) + digest
+    return _varint_encode(func_code) + _varint_encode(len(digest)) + digest
 
 
 def multihash_decode(data: bytes) -> Tuple[int, bytes]:
@@ -327,9 +352,12 @@ def multihash_decode(data: bytes) -> Tuple[int, bytes]:
     """
     if len(data) < 2:
         raise ValueError("multihash is too short")
-    func_code = data[0]
-    length = data[1]
-    digest = data[2:]
+    func_code, consumed_func = _varint_decode(data)
+    if func_code not in _MULTIHASH_CODES:
+        raise ValueError(f"unknown hash function code: {func_code}")
+    length, consumed_len = _varint_decode(data[consumed_func:])
+    offset = consumed_func + consumed_len
+    digest = data[offset:]
     if length != len(digest):
         raise ValueError("multihash length field does not match digest field length")
     return func_code, digest
