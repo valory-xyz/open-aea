@@ -259,7 +259,7 @@ class TestMultihash:
         # 0x99 is not a recognized multihash code
         from aea.helpers.multiformat import _varint_encode
 
-        bad_data = _varint_encode(0x99) + _varint_encode(1) + b"\xAA"
+        bad_data = _varint_encode(0x99) + _varint_encode(1) + b"\xaa"
         with pytest.raises(ValueError, match="unknown hash function"):
             multihash_decode(bad_data)
 
