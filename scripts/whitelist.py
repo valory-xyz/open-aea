@@ -351,3 +351,4 @@ from_block  # unused variable (aea/crypto/base.py:542)
 batch_size  # unused variable (aea/crypto/base.py:543)
 max_retries  # unused variable (aea/crypto/base.py:544)
 reduce_factor  # unused variable (aea/crypto/base.py:545)
+check_schema  # unused method (aea/helpers/json_schema.py) — called from tests
