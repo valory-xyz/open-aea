@@ -432,7 +432,6 @@ class Draft4Validator:
         Validate an instance and raise on the first error.
 
         :param instance: the data to validate.
-        :raises ValidationError: if the instance is invalid.
         """
         first_error = next(self.iter_errors(instance), None)
         if first_error is not None:
