@@ -187,6 +187,16 @@ class TestProperties:
         extras = list(find_additional_properties(instance, schema))
         assert extras == ["extra"]
 
+    def test_property_names(self) -> None:
+        """Test propertyNames validation."""
+        schema = {
+            "type": "object",
+            "propertyNames": {"pattern": r"^[a-z][a-z0-9_]+\/[a-z_0-9]+:\d\.\d\.\d$"},
+        }
+        Draft4Validator(schema).validate({"author/package:0.1.0": "hash"})
+        with pytest.raises(ValidationError):
+            Draft4Validator(schema).validate({"INVALID KEY": "hash"})
+
 
 # --- Array validation ---
 
@@ -274,30 +284,30 @@ class TestRef:
         with pytest.raises(ValidationError):
             Draft4Validator(schema).validate({"name": "Alice123"})
 
-    def test_cross_file_ref(self) -> None:
+    def test_cross_file_ref(self, tmp_path: Path) -> None:
         """Test cross-file reference resolution."""
-        schema_dir = Path(__file__).parent / "_test_schemas"
-        schema_dir.mkdir(exist_ok=True)
-
         defs = {"definitions": {"my_type": {"type": "string"}}}
         main = {
             "type": "object",
             "properties": {"val": {"$ref": "defs.json#/definitions/my_type"}},
         }
 
-        (schema_dir / "defs.json").write_text(json.dumps(defs))
-        (schema_dir / "main.json").write_text(json.dumps(main))
+        (tmp_path / "defs.json").write_text(json.dumps(defs))
 
-        try:
-            base_uri = schema_dir.absolute().as_uri() + "/"
-            resolver = RefResolver(base_uri, main)
-            Draft4Validator(main, resolver=resolver).validate({"val": "ok"})
-            with pytest.raises(ValidationError):
-                Draft4Validator(main, resolver=resolver).validate({"val": 123})
-        finally:
-            (schema_dir / "defs.json").unlink()
-            (schema_dir / "main.json").unlink()
-            schema_dir.rmdir()
+        base_uri = tmp_path.absolute().as_uri() + "/"
+        resolver = RefResolver(base_uri, main)
+        Draft4Validator(main, resolver=resolver).validate({"val": "ok"})
+        with pytest.raises(ValidationError):
+            Draft4Validator(main, resolver=resolver).validate({"val": 123})
+
+    def test_external_ref_without_resolver(self) -> None:
+        """Test that external $ref without resolver raises ValidationError."""
+        schema = {
+            "type": "object",
+            "properties": {"val": {"$ref": "other.json#/definitions/foo"}},
+        }
+        with pytest.raises(ValidationError, match="no RefResolver configured"):
+            Draft4Validator(schema).validate({"val": "anything"})
 
 
 # --- iter_errors ---

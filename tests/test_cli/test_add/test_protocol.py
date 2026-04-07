@@ -29,13 +29,13 @@ from unittest import mock
 
 import pytest
 import yaml
-from jsonschema import ValidationError
 
 import aea.configurations.base
 from aea.cli import cli
 from aea.cli.registry.settings import REMOTE_HTTP, REMOTE_IPFS
 from aea.configurations.base import DEFAULT_PROTOCOL_CONFIG_FILE, PublicId
 from aea.configurations.data_types import PackageId, PackageType
+from aea.helpers.json_schema import ValidationError
 from aea.test_tools.test_cases import AEATestCaseEmpty, AEATestCaseEmptyFlaky
 
 from packages.fetchai.protocols.default.message import DefaultMessage

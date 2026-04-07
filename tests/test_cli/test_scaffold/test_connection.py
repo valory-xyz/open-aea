@@ -30,15 +30,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import cast
 
-import jsonschema
 import yaml
-from jsonschema import Draft4Validator, ValidationError
 
 from aea.cli import cli
 from aea.cli.packages import get_package_manager
 from aea.configurations.base import DEFAULT_CONNECTION_CONFIG_FILE
 from aea.configurations.data_types import PackageId
 from aea.configurations.loader import make_jsonschema_base_uri
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator, ValidationError
 from aea.package_manager.v1 import PackageManagerV1
 
 from tests.conftest import (

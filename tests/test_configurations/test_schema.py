@@ -26,12 +26,12 @@ import os
 from itertools import zip_longest
 from pathlib import Path
 
-import jsonschema
 import pytest
 import yaml
-from jsonschema import Draft4Validator  # type: ignore
 
 from aea.configurations.validation import make_jsonschema_base_uri
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from tests.conftest import (
     AGENT_CONFIGURATION_SCHEMA,

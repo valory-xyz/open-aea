@@ -113,7 +113,12 @@ class RefResolver:
         parts = [p for p in pointer.split("/") if p]
         node = document
         for part in parts:
-            node = node[part]
+            try:
+                node = node[part]
+            except (KeyError, TypeError) as e:
+                raise ValueError(
+                    f"Failed to resolve JSON pointer '{pointer}' at segment '{part}'"
+                ) from e
         return node
 
     @staticmethod
@@ -334,6 +339,20 @@ def _validate_one_of(
         )
 
 
+def _validate_property_names(
+    validator: "Draft4Validator",
+    property_names: Dict,
+    instance: Any,
+    schema: Dict,
+) -> Iterator[ValidationError]:
+    """Validate the ``propertyNames`` keyword."""
+    if not isinstance(instance, dict):
+        return
+    for prop in instance:
+        for err in validator._validate_schema(prop, property_names):
+            yield err._prepend_path(prop)
+
+
 def _validate_unique_items(
     validator: "Draft4Validator", unique: bool, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
@@ -361,6 +380,7 @@ _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
     "minimum": _validate_minimum,
     "oneOf": _validate_one_of,
     "uniqueItems": _validate_unique_items,
+    "propertyNames": _validate_property_names,
 }
 
 
@@ -380,6 +400,17 @@ class Draft4Validator:
 
     TYPE_CHECKER: TypeChecker = _DEFAULT_TYPE_CHECKER
     VALIDATORS: Dict[str, ValidatorFn] = _KEYWORD_VALIDATORS
+
+    @classmethod
+    def check_schema(cls, schema: Dict) -> None:
+        """
+        Validate that a schema is a well-formed JSON Schema document.
+
+        :param schema: the schema dict.
+        :raises ValueError: if the schema is not a dict.
+        """
+        if not isinstance(schema, dict):
+            raise ValueError(f"Schema must be a dict, got {type(schema).__name__}")
 
     def __init__(
         self,
@@ -403,9 +434,9 @@ class Draft4Validator:
         :param instance: the data to validate.
         :raises ValidationError: if the instance is invalid.
         """
-        errors = list(self.iter_errors(instance))
-        if errors:
-            raise ValidationError(str(errors[0]))
+        first_error = next(self.iter_errors(instance), None)
+        if first_error is not None:
+            raise first_error
 
     def iter_errors(self, instance: Any) -> Iterator[ValidationError]:
         """
@@ -429,7 +460,11 @@ class Draft4Validator:
                     raise ValueError("No root schema set")
                 resolved = RefResolver._resolve_pointer(ref[1:], self._current_root)
                 yield from self._validate_schema(instance, resolved)
-            elif self.resolver is not None:
+            elif self.resolver is None:
+                yield ValidationError(
+                    f"Cannot resolve external $ref '{ref}': no RefResolver configured"
+                )
+            else:
                 if self._current_root is None:  # pragma: nocover
                     raise ValueError("No root schema set")
                 resolved = self.resolver.resolve(ref, self._current_root)

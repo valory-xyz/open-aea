@@ -27,11 +27,11 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
-import jsonschema
 import pytest
-from jsonschema import Draft4Validator
 
 from aea.cli import cli
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from tests.conftest import (
     AGENT_CONFIGURATION_SCHEMA,
