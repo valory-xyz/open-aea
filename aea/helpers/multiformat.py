@@ -140,6 +140,10 @@ def multibase_encode(encoding: str, data: bytes) -> bytes:
     elif encoding == "base32upper":
         encoded = base64.b32encode(data).rstrip(b"=")
     elif encoding == "base58btc":
+        # NOTE: py-multibase's BaseStringConverter encodes b"" as b"1",
+        # but standard base58 (and our b58encode) returns b"". This only
+        # differs for empty input which never occurs in practice (CID
+        # payloads always have content). We follow the base58 standard.
         encoded = b58encode(data)
     elif encoding == "base16":
         encoded = data.hex().encode("ascii")
@@ -286,9 +290,11 @@ def multicodec_remove_prefix(data: bytes) -> bytes:
 
 # --- Multihash ---
 
-# Recognized multihash function codes (matching pymultihash.Func + identity)
+# Recognized multihash function codes (matching pymultihash behavior):
+# - 0x00-0x0F: application-specific codes (always accepted)
+# - Standard hash functions from pymultihash.Func enum
 _MULTIHASH_CODES = {
-    IDENTITY_HASH_CODE,  # 0x00 identity
+    *range(0x00, 0x10),  # app-specific codes (0x00-0x0F)
     0x11,  # sha1
     SHA2_256_CODE,  # 0x12 sha2-256
     0x13,  # sha2-512
