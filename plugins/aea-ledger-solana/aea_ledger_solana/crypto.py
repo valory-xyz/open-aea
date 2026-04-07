@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2023 Valory AG
+#   Copyright 2023-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import json
 from pathlib import Path
 from typing import Optional, Union
 
-import base58
 from aea_ledger_solana.constants import _SOLANA
 from cryptography.fernet import Fernet  # type: ignore
 from solana.transaction import Transaction as SolanaTransaction
@@ -38,6 +37,7 @@ from solders.transaction import Transaction, VersionedTransaction
 from aea.common import JSONLike
 from aea.crypto.base import Crypto
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
+from aea.helpers.multiformat import b58encode
 
 
 class SolanaCrypto(Crypto[Keypair]):
@@ -80,7 +80,7 @@ class SolanaCrypto(Crypto[Keypair]):
         """
         seed = bytes(self.entity.secret())
         private_key = seed + bytes.fromhex(self.public_key)
-        return base58.b58encode(private_key).decode()
+        return b58encode(private_key).decode()
 
     @property
     def public_key(self) -> str:

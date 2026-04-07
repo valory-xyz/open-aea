@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2023 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,9 @@ from binascii import unhexlify
 from typing import Dict, List, Optional
 
 # following imports needed only if checks are enabled  # isort:skip
-from base58 import b58decode
 from ecdsa import SigningKey, curves
-from multihash import decode as multihashdecode  # type: ignore
+
+from aea.helpers.multiformat import b58decode, multihash_decode
 
 
 class AcnNodeConfig:
@@ -193,7 +193,7 @@ class AcnNodeConfig:
         parts = maddr.split("/")
         if len(parts) != 7:
             raise ValueError("Malformed multiaddress '{}'".format(maddr))
-        multihashdecode(b58decode(parts[-1]))
+        multihash_decode(b58decode(parts[-1]))
 
 
 class AcnNodeStandalone:

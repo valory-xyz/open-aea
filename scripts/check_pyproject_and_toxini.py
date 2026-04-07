@@ -33,7 +33,6 @@ PYPROJECT_TOML = "pyproject.toml"
 
 # Packages to skip: specified in setup.py as core deps, or not relevant to tox
 WHITELIST = {
-    "base58",
     "tomte",
     "memory-profiler",
     "apduboy",
@@ -41,7 +40,6 @@ WHITELIST = {
     "open-aea-flashbots",
     # Core deps declared in [tool.poetry.dependencies] — version ranges differ
     # from tox.ini exact pins, so string comparison would always mismatch
-    "semver",
     "requests",
     "packaging",
 }

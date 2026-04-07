@@ -21,11 +21,11 @@
 
 from unittest import mock
 
-import base58
 import pytest
 from aea_ledger_fetchai import FetchAICrypto
 
 from aea.configurations.constants import PRIVATE_KEY_PATH_SCHEMA
+from aea.helpers.multiformat import b58decode
 from aea.test_tools.test_cases import AEATestCaseEmpty, _get_password_option_args
 
 from packages.fetchai.connections.stub.connection import (
@@ -61,7 +61,7 @@ class TestGetMultiAddressCommandPositive(AEATestCaseEmpty):
 
         assert result.exit_code == 0
         # test we can decode the output
-        base58.b58decode(result.stdout)
+        b58decode(result.stdout.strip())
 
 
 @method_scope
@@ -135,7 +135,7 @@ class TestGetMultiAddressCommandConnectionIdPositive(AEATestCaseEmpty):
         expected_multiaddr_prefix = "/dns4/127.0.0.1/tcp/10000/p2p/"
         assert expected_multiaddr_prefix in result.stdout
         base58_addr = str(result.stdout).replace(expected_multiaddr_prefix, "")
-        base58.b58decode(base58_addr)
+        b58decode(base58_addr.strip())
 
 
 @method_scope
@@ -179,7 +179,7 @@ class TestGetMultiAddressCommandConnectionIdURIPositive(AEATestCaseEmpty):
         expected_multiaddr_prefix = f"/dns4/{host}/tcp/{port}/p2p/"
         assert expected_multiaddr_prefix in result.stdout
         base58_addr = str(result.stdout).replace(expected_multiaddr_prefix, "")
-        base58.b58decode(base58_addr)
+        b58decode(base58_addr.strip())
 
 
 # class TestGetMultiAddressCommandConnectionIdURIAgentOverridesPositive(AEATestCaseEmpty):  # noqa: E800
@@ -219,7 +219,7 @@ class TestGetMultiAddressCommandConnectionIdURIPositive(AEATestCaseEmpty):
 #         expected_multiaddr_prefix = f"/dns4/{host}/tcp/{port}/p2p/"  # noqa: E800
 #         assert expected_multiaddr_prefix in result.stdout  # noqa: E800
 #         base58_addr = str(result.stdout).replace(expected_multiaddr_prefix, "")  # noqa: E800
-#         base58.b58decode(base58_addr)  # noqa: E800
+#         b58decode(base58_addr.strip())  # noqa: E800
 
 
 @method_scope
@@ -249,7 +249,7 @@ class TestGetMultiAddressCommandConnectionNegative(AEATestCaseEmpty):
 
         assert result.exit_code == 0
         # test we can decode the output
-        base58.b58decode(result.stdout)
+        b58decode(result.stdout.strip())
 
 
 @method_scope
