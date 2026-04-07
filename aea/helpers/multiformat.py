@@ -185,7 +185,9 @@ def multibase_decode(data: bytes) -> bytes:
     if encoding == "base16upper":
         return bytes.fromhex(payload.decode("ascii"))
 
-    raise ValueError(f"Unsupported multibase encoding: {encoding}")  # pragma: no cover
+    # All _MULTIBASE_PREFIXES values are handled above; unrecognized
+    # prefixes are caught at the top of this function.
+    raise AssertionError(f"unreachable: {encoding}")
 
 
 def multibase_is_encoded(data: bytes) -> bool:
@@ -206,6 +208,8 @@ def multibase_is_encoded(data: bytes) -> bool:
 
 def _varint_encode(number: int) -> bytes:
     """Encode an integer as an unsigned varint (LEB128)."""
+    if number < 0:
+        raise ValueError("Cannot encode negative integers as unsigned varints")
     buf = bytearray()
     while True:
         towrite = number & 0x7F

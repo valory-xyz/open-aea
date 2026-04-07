@@ -26,6 +26,7 @@ import pytest
 from aea.helpers.multiformat import (
     IDENTITY_HASH_CODE,
     SHA2_256_CODE,
+    _varint_encode,
     b58decode,
     b58encode,
     multibase_decode,
@@ -257,11 +258,16 @@ class TestMultihash:
     def test_decode_unknown_func_code(self) -> None:
         """Test that unknown hash function codes are rejected."""
         # 0x99 is not a recognized multihash code
-        from aea.helpers.multiformat import _varint_encode
 
         bad_data = _varint_encode(0x99) + _varint_encode(1) + b"\xaa"
         with pytest.raises(ValueError, match="unknown hash function"):
             multihash_decode(bad_data)
+
+    def test_varint_encode_negative(self) -> None:
+        """Test that negative numbers cannot be varint encoded."""
+
+        with pytest.raises(ValueError, match="Cannot encode negative"):
+            _varint_encode(-1)
 
 
 # --- Integration: CID-like operations ---
