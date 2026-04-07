@@ -245,16 +245,23 @@ class TestMultihash:
             multihash_decode(b"")
 
     def test_encode_decode_varint_roundtrip(self) -> None:
-        """Test that encode/decode uses varints correctly for multi-byte codes."""
-        # Use a func_code > 127 that requires multi-byte varint
-        func_code = 0x1012  # arbitrary large code
-        digest = b"\xab" * 32
-        encoded = multihash_encode(func_code, digest)
-        # First bytes should NOT be a single byte for func_code
-        assert encoded[0] != 0x12  # varint for 0x1012 is multi-byte
-        decoded_code, decoded_digest = multihash_decode(encoded)
-        assert decoded_code == func_code
-        assert decoded_digest == digest
+        """Test that encode/decode uses varints correctly."""
+        # Test with all recognized codes
+        for func_code in (SHA2_256_CODE, IDENTITY_HASH_CODE, 0x11, 0x40):
+            digest = b"\xab" * 32
+            encoded = multihash_encode(func_code, digest)
+            decoded_code, decoded_digest = multihash_decode(encoded)
+            assert decoded_code == func_code
+            assert decoded_digest == digest
+
+    def test_decode_unknown_func_code(self) -> None:
+        """Test that unknown hash function codes are rejected."""
+        # 0x99 is not a recognized multihash code
+        from aea.helpers.multiformat import _varint_encode
+
+        bad_data = _varint_encode(0x99) + _varint_encode(1) + b"\xAA"
+        with pytest.raises(ValueError, match="unknown hash function"):
+            multihash_decode(bad_data)
 
 
 # --- Integration: CID-like operations ---

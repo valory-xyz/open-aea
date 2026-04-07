@@ -286,6 +286,22 @@ def multicodec_remove_prefix(data: bytes) -> bytes:
 
 # --- Multihash ---
 
+# Recognized multihash function codes (matching pymultihash.Func + identity)
+_MULTIHASH_CODES = {
+    IDENTITY_HASH_CODE,  # 0x00 identity
+    0x11,  # sha1
+    SHA2_256_CODE,  # 0x12 sha2-256
+    0x13,  # sha2-512
+    0x14,  # sha3-512
+    0x15,  # sha3-384
+    0x16,  # sha3-256
+    0x17,  # sha3-224
+    0x18,  # shake-128
+    0x19,  # shake-256
+    0x40,  # blake2b
+    0x41,  # blake2s
+}
+
 
 def multihash_digest(data: bytes, func_code: int) -> Tuple[int, bytes]:
     """
@@ -327,6 +343,8 @@ def multihash_decode(data: bytes) -> Tuple[int, bytes]:
     if len(data) < 2:
         raise ValueError("multihash is too short")
     func_code, consumed_func = _varint_decode(data)
+    if func_code not in _MULTIHASH_CODES:
+        raise ValueError(f"unknown hash function code: {func_code}")
     length, consumed_len = _varint_decode(data[consumed_func:])
     offset = consumed_func + consumed_len
     digest = data[offset:]
