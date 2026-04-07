@@ -20,6 +20,7 @@
 
 """This test module contains the tests for aea.cli.utils.config module."""
 
+import re
 from unittest import TestCase, mock
 
 import pytest
@@ -71,10 +72,16 @@ def test_config_validator() -> None:
     config = DEFAULT_CLI_CONFIG.copy()
     validate_cli_config(config)
 
-    with pytest.raises(jsonschema.ValidationError, match="is not of type"):
+    with pytest.raises(
+        jsonschema.ValidationError,
+        match=re.escape("None is not of type 'string'"),
+    ):
         config["author"] = None  # type: ignore
         validate_cli_config(config)
 
-    with pytest.raises(jsonschema.ValidationError, match="required"):
+    with pytest.raises(
+        jsonschema.ValidationError,
+        match=re.escape("'author' is a required property"),
+    ):
         del config["author"]
         validate_cli_config(config)
