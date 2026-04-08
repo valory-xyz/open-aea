@@ -32,7 +32,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any, Collection, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-import jsonschema
 from packaging.specifiers import SpecifierSet
 
 from aea.aea import AEA
@@ -104,6 +103,7 @@ from aea.helpers.env_vars import apply_env_variables
 from aea.helpers.exception_policy import ExceptionPolicyEnum
 from aea.helpers.install_dependency import install_dependency
 from aea.helpers.io import open_file
+from aea.helpers.json_schema import ValidationError
 from aea.helpers.logging import AgentLoggerAdapter, WithLogger, get_logger
 from aea.identity.base import Identity
 from aea.registries.resources import Resources
@@ -1701,7 +1701,7 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
             )
         except (
             AEAValidationError,
-            jsonschema.exceptions.ValidationError,
+            ValidationError,
             ExtraPropertiesError,
         ) as e:  # pragma: nocover
             raise AEAValidationError(

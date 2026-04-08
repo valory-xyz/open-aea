@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Tuple, Union, cast
 
 import click
-from jsonschema import ValidationError
 
 from aea.cli.utils.click_utils import PytestArgs
 from aea.cli.utils.config import (
@@ -49,6 +48,7 @@ from aea.configurations.loader import ConfigLoaders
 from aea.exceptions import AEAException, AEAValidationError, enforce
 from aea.helpers.base import decorator_with_optional_params
 from aea.helpers.io import open_file
+from aea.helpers.json_schema import ValidationError
 
 pass_ctx = click.make_pass_decorator(Context)
 

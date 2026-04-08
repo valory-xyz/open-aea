@@ -26,7 +26,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import click
-from jsonschema import ValidationError
 
 from aea import AEA_DIR, get_current_aea_version
 from aea.cli.fingerprint import fingerprint_item
@@ -75,6 +74,7 @@ from aea.helpers.base import compute_specifier_from_version, recursive_update
 from aea.helpers.dependency_tree import COMPONENTS
 from aea.helpers.io import open_file
 from aea.helpers.ipfs.base import IPFSHashOnly
+from aea.helpers.json_schema import ValidationError
 from aea.helpers.sym_link import create_symlink
 
 DISTRIBUTED_PACKAGES = [PublicId.from_str(dp) for dp in DISTRIBUTED_PACKAGES_STR]

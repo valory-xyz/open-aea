@@ -226,12 +226,11 @@ version = "26.1.0"
 description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"},
     {file = "attrs-26.1.0.tar.gz", hash = "sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32"},
 ]
-markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all\""}
 
 [[package]]
 name = "backports-asyncio-runner"
@@ -2460,12 +2459,11 @@ version = "4.23.0"
 description = "An implementation of JSON Schema validation for Python"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "jsonschema-4.23.0-py3-none-any.whl", hash = "sha256:fbadb6f8b144a8f8cf9f0b89ba94501d143e50411a1278633f56a7acf7fd5566"},
     {file = "jsonschema-4.23.0.tar.gz", hash = "sha256:d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4"},
 ]
-markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all\""}
 
 [package.dependencies]
 attrs = ">=22.2.0"
@@ -2501,12 +2499,11 @@ version = "2025.9.1"
 description = "The JSON Schema meta-schemas and vocabularies, exposed as a Registry"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"},
     {file = "jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d"},
 ]
-markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all\""}
 
 [package.dependencies]
 referencing = ">=0.31.0"
@@ -4536,12 +4533,11 @@ version = "0.36.2"
 description = "JSON Referencing + Python"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "referencing-0.36.2-py3-none-any.whl", hash = "sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0"},
     {file = "referencing-0.36.2.tar.gz", hash = "sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa"},
 ]
-markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all\""}
 
 [package.dependencies]
 attrs = ">=22.2.0"
@@ -4755,7 +4751,7 @@ version = "0.30.0"
 description = "Python bindings to Rust's persistent data structures (rpds)"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "rpds_py-0.30.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:679ae98e00c0e8d68a7fda324e16b90fd5260945b45d3b824c892cec9eea3288"},
     {file = "rpds_py-0.30.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4cc2206b76b4f576934f0ed374b10d7ca5f457858b157ca52064bdfc26b9fc00"},
@@ -4873,7 +4869,6 @@ files = [
     {file = "rpds_py-0.30.0-pp311-pypy311_pp73-musllinux_1_2_x86_64.whl", hash = "sha256:ac37f9f516c51e5753f27dfdef11a88330f04de2d564be3991384b2f3535d02e"},
     {file = "rpds_py-0.30.0.tar.gz", hash = "sha256:dd8ff7cf90014af0c0f787eea34794ebf6415242ee1d6fa91eaba725cc441e84"},
 ]
-markers = {main = "extra == \"cli\" or extra == \"test-tools\" or extra == \"all\""}
 
 [[package]]
 name = "semantic-version"
@@ -5231,7 +5226,7 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
-markers = {main = "python_version < \"3.13\" and (extra == \"cli\" or extra == \"test-tools\" or extra == \"all\")"}
+markers = {main = "(extra == \"cli\" or extra == \"test-tools\" or extra == \"all\") and python_version == \"3.10\""}
 
 [[package]]
 name = "typing-inspection"
@@ -5706,11 +5701,11 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more_it
 type = ["pytest-mypy"]
 
 [extras]
-all = ["click", "coverage", "jsonschema", "packaging", "pytest", "pyyaml"]
-cli = ["click", "coverage", "jsonschema", "packaging", "pytest", "pyyaml"]
-test-tools = ["click", "coverage", "jsonschema", "packaging", "pytest", "pyyaml"]
+all = ["click", "coverage", "packaging", "pytest", "pyyaml"]
+cli = ["click", "coverage", "packaging", "pytest", "pyyaml"]
+test-tools = ["click", "coverage", "packaging", "pytest", "pyyaml"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.16"
-content-hash = "01417207c3049c4782251cc479a9b3a103cf9ebf06116e8283da21df9ee4ddd7"
+content-hash = "6f6cbb0959def69e87cd65ada16c8573a1f2c11ca90a8ddc0251f3621edcad15"

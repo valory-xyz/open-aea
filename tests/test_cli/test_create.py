@@ -29,10 +29,8 @@ from typing import Dict
 from unittest import TestCase
 from unittest.mock import patch
 
-import jsonschema
 import pytest
 import yaml
-from jsonschema import Draft4Validator
 from packaging.version import Version
 
 import aea
@@ -40,6 +38,8 @@ from aea.cli import cli
 from aea.configurations.constants import DEFAULT_AEA_CONFIG_FILE
 from aea.configurations.data_types import PublicId
 from aea.configurations.loader import ConfigLoader, make_jsonschema_base_uri
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from packages.open_aea.protocols.signing.message import SigningMessage
 
@@ -121,7 +121,7 @@ class TestCreate:
         """Check that the agent's configuration file is compliant with the schema."""
         try:
             self.validator.validate(instance=self.agent_config)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.ValidationError as e:
             pytest.fail(
                 "Configuration file is not compliant with the schema. Exception: {}".format(
                     str(e)

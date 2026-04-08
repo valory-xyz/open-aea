@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -351,3 +351,4 @@ from_block  # unused variable (aea/crypto/base.py:542)
 batch_size  # unused variable (aea/crypto/base.py:543)
 max_retries  # unused variable (aea/crypto/base.py:544)
 reduce_factor  # unused variable (aea/crypto/base.py:545)
+check_schema  # unused method (aea/helpers/json_schema.py) — called from tests
