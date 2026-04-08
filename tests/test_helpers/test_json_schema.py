@@ -267,6 +267,188 @@ class TestOneOf:
             Draft4Validator(schema).validate([1, 2])
 
 
+# --- anyOf, allOf, not ---
+
+
+class TestCombiners:
+    """Tests for anyOf, allOf, not keywords."""
+
+    def test_any_of_pass(self) -> None:
+        """Test anyOf with a matching schema."""
+        schema = {"anyOf": [{"type": "string"}, {"type": "integer"}]}
+        Draft4Validator(schema).validate("hello")
+        Draft4Validator(schema).validate(42)
+
+    def test_any_of_fail(self) -> None:
+        """Test anyOf with no matching schema."""
+        schema = {"anyOf": [{"type": "string"}, {"type": "integer"}]}
+        with pytest.raises(ValidationError, match="is not valid under any"):
+            Draft4Validator(schema).validate([])
+
+    def test_all_of_pass(self) -> None:
+        """Test allOf with all schemas matching."""
+        schema = {"allOf": [{"type": "integer"}, {"minimum": 5}]}
+        Draft4Validator(schema).validate(10)
+
+    def test_all_of_fail(self) -> None:
+        """Test allOf with one schema failing."""
+        schema = {"allOf": [{"type": "integer"}, {"minimum": 5}]}
+        with pytest.raises(ValidationError):
+            Draft4Validator(schema).validate(3)
+
+    def test_not_pass(self) -> None:
+        """Test not when instance does not match."""
+        schema = {"not": {"type": "string"}}
+        Draft4Validator(schema).validate(42)
+
+    def test_not_fail(self) -> None:
+        """Test not when instance matches (should fail)."""
+        schema = {"not": {"type": "string"}}
+        with pytest.raises(ValidationError, match="should not be valid"):
+            Draft4Validator(schema).validate("hello")
+
+
+# --- maximum, minLength, maxLength, minItems, maxItems ---
+
+
+class TestConstraints:
+    """Tests for numeric and length constraint keywords."""
+
+    def test_maximum(self) -> None:
+        """Test maximum validation."""
+        Draft4Validator({"type": "number", "maximum": 10}).validate(10)
+        with pytest.raises(ValidationError, match="greater than the maximum"):
+            Draft4Validator({"type": "number", "maximum": 10}).validate(11)
+
+    def test_exclusive_maximum(self) -> None:
+        """Test exclusiveMaximum validation."""
+        Draft4Validator(
+            {"type": "number", "maximum": 10, "exclusiveMaximum": True}
+        ).validate(9)
+        with pytest.raises(ValidationError, match="greater than or equal"):
+            Draft4Validator(
+                {"type": "number", "maximum": 10, "exclusiveMaximum": True}
+            ).validate(10)
+
+    def test_min_length(self) -> None:
+        """Test minLength validation."""
+        Draft4Validator({"type": "string", "minLength": 2}).validate("ab")
+        with pytest.raises(ValidationError, match="too short"):
+            Draft4Validator({"type": "string", "minLength": 2}).validate("a")
+
+    def test_max_length(self) -> None:
+        """Test maxLength validation."""
+        Draft4Validator({"type": "string", "maxLength": 3}).validate("abc")
+        with pytest.raises(ValidationError, match="too long"):
+            Draft4Validator({"type": "string", "maxLength": 3}).validate("abcd")
+
+    def test_min_items(self) -> None:
+        """Test minItems validation."""
+        Draft4Validator({"type": "array", "minItems": 1}).validate([1])
+        with pytest.raises(ValidationError, match="too short"):
+            Draft4Validator({"type": "array", "minItems": 1}).validate([])
+
+    def test_max_items(self) -> None:
+        """Test maxItems validation."""
+        Draft4Validator({"type": "array", "maxItems": 2}).validate([1, 2])
+        with pytest.raises(ValidationError, match="too long"):
+            Draft4Validator({"type": "array", "maxItems": 2}).validate([1, 2, 3])
+
+
+# --- dependencies ---
+
+
+class TestDependencies:
+    """Tests for dependencies keyword."""
+
+    def test_dep_present(self) -> None:
+        """Test dependency satisfied."""
+        schema = {"type": "object", "dependencies": {"a": ["b"]}}
+        Draft4Validator(schema).validate({"a": 1, "b": 2})
+
+    def test_dep_missing(self) -> None:
+        """Test dependency missing."""
+        schema = {"type": "object", "dependencies": {"a": ["b"]}}
+        with pytest.raises(ValidationError, match="dependency"):
+            Draft4Validator(schema).validate({"a": 1})
+
+    def test_dep_not_triggered(self) -> None:
+        """Test dependency not triggered when property absent."""
+        schema = {"type": "object", "dependencies": {"a": ["b"]}}
+        Draft4Validator(schema).validate({"b": 2})
+
+
+# --- tuple items ---
+
+
+class TestTupleItems:
+    """Tests for items as list (tuple validation)."""
+
+    def test_tuple_valid(self) -> None:
+        """Test valid tuple items."""
+        schema = {"type": "array", "items": [{"type": "string"}, {"type": "integer"}]}
+        Draft4Validator(schema).validate(["hello", 42])
+
+    def test_tuple_wrong_types(self) -> None:
+        """Test tuple items with wrong types."""
+        schema = {"type": "array", "items": [{"type": "string"}, {"type": "integer"}]}
+        errors = list(Draft4Validator(schema).iter_errors([42, "wrong"]))
+        assert len(errors) == 2
+
+
+# --- enum type awareness ---
+
+
+class TestEnumTypeAwareness:
+    """Tests for bool/int distinction in enum."""
+
+    def test_bool_not_in_int_enum(self) -> None:
+        """Test that True does not match enum [1, 2]."""
+        with pytest.raises(ValidationError):
+            Draft4Validator({"enum": [1, 2, 3]}).validate(True)
+
+    def test_int_not_in_bool_enum(self) -> None:
+        """Test that 1 does not match enum [True, False]."""
+        with pytest.raises(ValidationError):
+            Draft4Validator({"enum": [True, False]}).validate(1)
+
+    def test_bool_in_bool_enum(self) -> None:
+        """Test that True matches enum [True, False]."""
+        Draft4Validator({"enum": [True, False]}).validate(True)
+
+    def test_int_in_int_enum(self) -> None:
+        """Test that 1 matches enum [1, 2]."""
+        Draft4Validator({"enum": [1, 2]}).validate(1)
+
+
+# --- check_schema ---
+
+
+class TestCheckSchema:
+    """Tests for check_schema meta-validation."""
+
+    def test_valid_schema(self) -> None:
+        """Test that a valid schema passes."""
+        Draft4Validator.check_schema(
+            {"type": "object", "properties": {"a": {"type": "string"}}}
+        )
+
+    def test_invalid_required_type(self) -> None:
+        """Test that invalid required (not a list) fails."""
+        with pytest.raises(ValidationError):
+            Draft4Validator.check_schema({"required": "not_a_list"})
+
+    def test_all_aea_schemas(self) -> None:
+        """Test that all AEA config schemas pass check_schema."""
+        schemas_dir = (
+            Path(__file__).parent.parent.parent / "aea" / "configurations" / "schemas"
+        )
+        for f in sorted(schemas_dir.glob("*.json")):
+            with open(f) as fp:
+                schema = json.load(fp)
+            Draft4Validator.check_schema(schema)
+
+
 # --- $ref ---
 
 
