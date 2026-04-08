@@ -199,7 +199,7 @@ def test_ensure_bytes_and_unicode_usage() -> None:
     "cid_bytes, error_message",
     [
         (b"b", "argument length can not be zero"),
-        (b"bb", "cid length is invalid"),
+        (b"bb", "invalid multibase encoding"),
         (bytes(2), "multihash is too short"),
         (bytes(10), "multihash length field does not match digest field length"),
         (

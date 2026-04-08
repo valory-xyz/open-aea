@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2024 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,9 +30,7 @@ import unittest.mock
 from pathlib import Path
 from typing import cast
 
-import jsonschema
 import yaml
-from jsonschema import Draft4Validator, ValidationError
 
 from aea import AEA_DIR
 from aea.cli import cli
@@ -41,6 +39,8 @@ from aea.configurations.base import DEFAULT_SKILL_CONFIG_FILE, DEFAULT_VERSION
 from aea.configurations.constants import DEFAULT_AEA_CONFIG_FILE, PACKAGES, SKILL
 from aea.configurations.data_types import PackageId
 from aea.configurations.loader import make_jsonschema_base_uri
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator, ValidationError
 from aea.package_manager.v1 import PackageManagerV1
 
 from tests.conftest import (

@@ -29,7 +29,6 @@ from unittest import mock
 
 import pytest
 import yaml
-from jsonschema import ValidationError
 
 import aea
 from aea.cli import cli
@@ -43,6 +42,7 @@ from aea.configurations.base import (
     PublicId,
 )
 from aea.configurations.data_types import PackageId, PackageType
+from aea.helpers.json_schema import ValidationError
 from aea.test_tools.test_cases import AEATestCaseEmpty, AEATestCaseEmptyFlaky
 
 from packages.fetchai.skills.echo import PUBLIC_ID as ECHO_PUBLIC_ID
