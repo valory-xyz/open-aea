@@ -120,13 +120,23 @@ class RefResolver:
 
     @staticmethod
     def _resolve_pointer(pointer: str, document: Dict) -> Dict:
-        """Resolve a JSON pointer like ``/definitions/foo``."""
-        parts = [p for p in pointer.split("/") if p]
+        """Resolve a JSON pointer (RFC 6901) like ``/definitions/foo``."""
+        if not pointer:
+            return document
+        parts = pointer.split("/")
+        # Leading '/' produces an empty first element — skip it
+        if parts and parts[0] == "":
+            parts = parts[1:]
         node = document
         for part in parts:
+            # RFC 6901 unescaping: ~1 -> /, ~0 -> ~
+            part = part.replace("~1", "/").replace("~0", "~")
             try:
-                node = node[part]
-            except (KeyError, TypeError) as e:
+                if isinstance(node, list):
+                    node = node[int(part)]
+                else:
+                    node = node[part]
+            except (KeyError, TypeError, ValueError, IndexError) as e:
                 raise ValueError(
                     f"Failed to resolve JSON pointer '{pointer}' at segment '{part}'"
                 ) from e
@@ -197,7 +207,8 @@ def find_additional_properties(instance: Dict, schema: Dict) -> Iterator[str]:
     for prop in instance:
         if prop in properties:
             continue
-        if any(re.search(p, prop) for p in pattern_list):
+        prop_str = str(prop) if not isinstance(prop, str) else prop
+        if any(re.search(p, prop_str) for p in pattern_list):
             continue
         yield prop
 
@@ -252,7 +263,8 @@ def _validate_pattern_properties(
         return
     for pattern, sub_schema in pattern_props.items():
         for prop, value in instance.items():
-            if re.search(pattern, prop):
+            prop_str = str(prop) if not isinstance(prop, str) else prop
+            if re.search(pattern, prop_str):
                 for err in validator._validate_schema(value, sub_schema):
                     yield err._prepend_path(prop)
 
@@ -310,19 +322,41 @@ def _validate_items(
                 yield err._prepend_path(idx)
 
 
-def _strict_enum_contains(enum: List, instance: Any) -> bool:  # noqa: DAR
-    """Check if instance is in enum with type-aware equality.
+def _strict_equal(a: Any, b: Any) -> bool:
+    """Deep type-aware equality: booleans and integers are distinguished.
 
-    Booleans and integers are distinguished (``True != 1``).
+    :param a: first value.
+    :param b: second value.
+    :return: True if a and b are deeply equal with type awareness.
+    """
+    if isinstance(a, bool) != isinstance(b, bool):
+        return False
+    if type(a) is not type(b):  # noqa: E721
+        # Same-kind check for dicts, lists, etc.
+        if not (isinstance(a, (int, float)) and isinstance(b, (int, float))):
+            return False
+    if isinstance(a, dict):
+        if a.keys() != b.keys():
+            return False
+        return all(_strict_equal(a[k], b[k]) for k in a)
+    if isinstance(a, list):
+        if len(a) != len(b):
+            return False
+        return all(_strict_equal(x, y) for x, y in zip(a, b))
+    return a == b
+
+
+def _strict_enum_contains(enum: List, instance: Any) -> bool:  # noqa: DAR
+    """Check if instance is in enum with deep type-aware equality.
+
+    Booleans and integers are distinguished at all nesting levels.
 
     :param enum: the allowed values.
     :param instance: the value to check.
     :return: True if instance matches any enum value with type awareness.
     """
     for val in enum:
-        if isinstance(val, bool) != isinstance(instance, bool):
-            continue
-        if val == instance:
+        if _strict_equal(val, instance):
             return True
     return False
 
@@ -339,8 +373,13 @@ def _validate_pattern(
     validator: "Draft4Validator", pattern: str, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
     """Validate the ``pattern`` keyword."""
-    if isinstance(instance, str) and not re.search(pattern, instance):
-        yield ValidationError(f"{instance!r} does not match {pattern!r}")
+    if not isinstance(instance, str):
+        return
+    try:
+        if not re.search(pattern, instance):
+            yield ValidationError(f"{instance!r} does not match {pattern!r}")
+    except re.error as e:
+        yield ValidationError(f"Invalid regex pattern {pattern!r}: {e}")
 
 
 def _validate_minimum(
@@ -396,7 +435,7 @@ def _validate_unique_items(
         return
     seen: list = []
     for item in instance:
-        if item in seen:
+        if any(_strict_equal(item, s) for s in seen):
             yield ValidationError(f"{instance!r} has non-unique elements")
             return
         seen.append(item)
@@ -646,8 +685,10 @@ class Draft4Validator:
                         full_uri = urljoin(self.resolver._base_uri, file_part)
                         new_root = self.resolver._store.get(full_uri, current_root)
                         token = _current_root_var.set(new_root)
-                        yield from self._validate_schema(instance, resolved)
-                        _current_root_var.reset(token)
+                        try:
+                            yield from self._validate_schema(instance, resolved)
+                        finally:
+                            _current_root_var.reset(token)
                     else:
                         yield from self._validate_schema(instance, resolved)
             except ValueError as e:
