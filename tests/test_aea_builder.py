@@ -571,6 +571,7 @@ def test_set_from_config_default():
     agent_configuration.protocols = agent_configuration.connections = (
         agent_configuration.contracts
     ) = agent_configuration.skills = []
+    agent_configuration.component_configurations = {}
 
     with patch.object(builder, "set_default_connection"):
         builder.set_from_configuration(agent_configuration, aea_project_path="/anydir")
@@ -613,6 +614,7 @@ def test_set_from_config_custom():
     agent_configuration.protocols = agent_configuration.connections = (
         agent_configuration.contracts
     ) = agent_configuration.skills = []
+    agent_configuration.component_configurations = {}
 
     with patch.object(builder, "set_default_connection"):
         builder.set_from_configuration(agent_configuration, aea_project_path="/anydir")

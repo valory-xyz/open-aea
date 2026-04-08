@@ -28,7 +28,6 @@ from unittest import TestCase
 
 import pytest
 import yaml
-from jsonschema.exceptions import ValidationError  # type: ignore
 
 from aea.aea import AEA
 from aea.aea_builder import AEABuilder
@@ -42,6 +41,7 @@ from aea.configurations.base import (
 from aea.configurations.loader import ConfigLoader, ConfigLoaders
 from aea.exceptions import AEAValidationError
 from aea.helpers.exception_policy import ExceptionPolicyEnum
+from aea.helpers.json_schema import ValidationError
 from aea.helpers.yaml_utils import yaml_load_all
 
 from tests.conftest import CUR_PATH, ROOT_DIR

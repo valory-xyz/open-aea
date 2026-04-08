@@ -10,8 +10,21 @@ Open AEA (Autonomous Economic Agent) Framework — a Python framework for buildi
 
 ### Environment Setup
 ```bash
-make new_env          # Create pipenv environment with all dev dependencies
-pipenv shell          # Enter virtual environment
+make new_env          # Create poetry environment with all dev dependencies
+poetry shell          # Enter virtual environment
+```
+
+### External Tools (optional, needed for full test suite)
+```bash
+# Protobuf compiler (needed for protocol generator tests)
+# macOS: brew install protobuf
+# Linux: download from https://github.com/protocolbuffers/protobuf/releases
+
+# protolint (needs Go installed)
+make protolint_install
+
+# IPFS v0.6.0 (needed for TestDirectoryHashing only)
+# Download from https://github.com/valory-xyz/open-aea/releases/tag/ipfs-v0.6.0-binaries
 ```
 
 ### Formatting and Linting

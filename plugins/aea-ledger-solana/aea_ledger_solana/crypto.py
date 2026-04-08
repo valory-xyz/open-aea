@@ -37,6 +37,7 @@ from solders.transaction import Transaction, VersionedTransaction
 from aea.common import JSONLike
 from aea.crypto.base import Crypto
 from aea.crypto.helpers import DecryptError, KeyIsIncorrect
+from aea.helpers.multiformat import b58encode
 
 
 class SolanaCrypto(Crypto[Keypair]):
@@ -79,8 +80,6 @@ class SolanaCrypto(Crypto[Keypair]):
         """
         seed = bytes(self.entity.secret())
         private_key = seed + bytes.fromhex(self.public_key)
-        from aea.helpers.multiformat import b58encode
-
         return b58encode(private_key).decode()
 
     @property
