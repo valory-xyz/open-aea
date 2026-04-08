@@ -363,8 +363,8 @@ def _validate_one_of(
     """Validate the ``oneOf`` keyword."""
     matches = 0
     for sub_schema in one_of:
-        errors = list(validator._validate_schema(instance, sub_schema))
-        if not errors:
+        first_error = next(validator._validate_schema(instance, sub_schema), None)
+        if first_error is None:
             matches += 1
     if matches == 0:
         yield ValidationError(
@@ -455,7 +455,7 @@ def _validate_any_of(
 ) -> Iterator[ValidationError]:
     """Validate the ``anyOf`` keyword."""
     for sub_schema in any_of:
-        if not list(validator._validate_schema(instance, sub_schema)):
+        if next(validator._validate_schema(instance, sub_schema), None) is None:
             return
     yield ValidationError(f"{instance!r} is not valid under any of the given schemas")
 
@@ -472,7 +472,7 @@ def _validate_not(
     validator: "Draft4Validator", not_schema: Dict, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
     """Validate the ``not`` keyword."""
-    if not list(validator._validate_schema(instance, not_schema)):
+    if next(validator._validate_schema(instance, not_schema), None) is None:
         yield ValidationError(
             f"{instance!r} should not be valid under the given schema"
         )
@@ -511,6 +511,10 @@ def _validate_additional_items(
         return
     if additional_items is False and len(instance) > len(items):
         yield ValidationError("Additional items are not allowed")
+    elif isinstance(additional_items, dict):
+        for idx in range(len(items), len(instance)):
+            for err in validator._validate_schema(instance[idx], additional_items):
+                yield err._prepend_path(idx)
 
 
 # Default keyword validators
@@ -549,9 +553,11 @@ class Draft4Validator:
     """
     JSON Schema Draft-04 validator.
 
-    Supports: type, properties, patternProperties, required,
-    additionalProperties, items, enum, pattern, minimum, oneOf,
-    uniqueItems, $ref, definitions.
+    Supports all Draft-04 keywords: type, properties, patternProperties,
+    propertyNames, required, additionalProperties, items, additionalItems,
+    enum, pattern, minimum, maximum, exclusiveMinimum, exclusiveMaximum,
+    minLength, maxLength, minItems, maxItems, oneOf, anyOf, allOf, not,
+    uniqueItems, dependencies, $ref, definitions.
     """
 
     TYPE_CHECKER: TypeChecker = _DEFAULT_TYPE_CHECKER

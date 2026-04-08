@@ -421,6 +421,51 @@ class TestEnumTypeAwareness:
         Draft4Validator({"enum": [1, 2]}).validate(1)
 
 
+# --- additionalItems ---
+
+
+class TestAdditionalItems:
+    """Tests for additionalItems keyword."""
+
+    def test_false_valid(self) -> None:
+        """Test no extra items allowed."""
+        schema = {
+            "type": "array",
+            "items": [{"type": "string"}],
+            "additionalItems": False,
+        }
+        Draft4Validator(schema).validate(["hi"])
+
+    def test_false_invalid(self) -> None:
+        """Test extra items rejected when False."""
+        schema = {
+            "type": "array",
+            "items": [{"type": "string"}],
+            "additionalItems": False,
+        }
+        with pytest.raises(ValidationError, match="Additional items"):
+            Draft4Validator(schema).validate(["hi", "extra"])
+
+    def test_dict_valid(self) -> None:
+        """Test extra items validated against schema."""
+        schema = {
+            "type": "array",
+            "items": [{"type": "string"}],
+            "additionalItems": {"type": "integer"},
+        }
+        Draft4Validator(schema).validate(["hi", 42])
+
+    def test_dict_invalid(self) -> None:
+        """Test extra items fail validation against schema."""
+        schema = {
+            "type": "array",
+            "items": [{"type": "string"}],
+            "additionalItems": {"type": "integer"},
+        }
+        with pytest.raises(ValidationError):
+            Draft4Validator(schema).validate(["hi", "bad"])
+
+
 # --- check_schema ---
 
 

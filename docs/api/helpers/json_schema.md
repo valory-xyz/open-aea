@@ -142,9 +142,11 @@ class Draft4Validator()
 
 JSON Schema Draft-04 validator.
 
-Supports: type, properties, patternProperties, required,
-additionalProperties, items, enum, pattern, minimum, oneOf,
-uniqueItems, $ref, definitions.
+Supports all Draft-04 keywords: type, properties, patternProperties,
+propertyNames, required, additionalProperties, items, additionalItems,
+enum, pattern, minimum, maximum, exclusiveMinimum, exclusiveMaximum,
+minLength, maxLength, minItems, maxItems, oneOf, anyOf, allOf, not,
+uniqueItems, dependencies, $ref, definitions.
 
 <a id="aea.helpers.json_schema.Draft4Validator.check_schema"></a>
 
