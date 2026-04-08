@@ -23,8 +23,6 @@
 from binascii import unhexlify
 from typing import Optional
 
-from ecdsa import VerifyingKey, curves, keys
-
 from aea.helpers.multiaddr.crypto_pb2 import KeyType, PublicKey  # type: ignore
 from aea.helpers.multiformat import (
     IDENTITY_HASH_CODE,
@@ -35,6 +33,7 @@ from aea.helpers.multiformat import (
     multihash_digest,
     multihash_encode,
 )
+from aea.helpers.secp256k1 import validate_secp256k1_compressed_pubkey
 
 # NOTE:
 # - Reference: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#keys
@@ -88,10 +87,8 @@ class MultiAddr:
 
         if public_key is not None:
             try:
-                VerifyingKey._from_compressed(
-                    _hex_to_bytes(public_key), curves.SECP256k1
-                )
-            except keys.MalformedPointError as e:  # pragma: no cover
+                validate_secp256k1_compressed_pubkey(_hex_to_bytes(public_key))
+            except ValueError as e:  # pragma: no cover
                 raise ValueError(
                     "Malformed public key '{}': {}".format(public_key, str(e))
                 )

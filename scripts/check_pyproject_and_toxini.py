@@ -42,6 +42,8 @@ WHITELIST = {
     # from tox.ini exact pins, so string comparison would always mismatch
     "requests",
     "packaging",
+    # Removed from core deps but needed by packages (p2p connections)
+    "ecdsa",
 }
 
 
