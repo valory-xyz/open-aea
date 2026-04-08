@@ -32,9 +32,9 @@ from aea_cli_ipfs.ipfs_client import (
     IPFSHTTPClient,
     StatusError,
     _encode_bytes,
-    _encode_directory,
     _multipart_boundary,
     _quote_filename,
+    _stream_directory,
 )
 
 # ---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class TestMultipartEncoding:
             p = Path(tmp) / "test.txt"
             p.write_text("hello")
             boundary = "test-boundary"
-            body, ct = _encode_directory(str(p), boundary)
+            body = b"".join(_stream_directory(str(p), boundary))
             assert b"hello" in body
             assert b"test.txt" in body
             assert b"--test-boundary--" in body
@@ -77,7 +77,7 @@ class TestMultipartEncoding:
             (sub / "c.txt").write_text("ccc")
 
             boundary = "test-boundary"
-            body, ct = _encode_directory(str(root), boundary, recursive=True)
+            body = b"".join(_stream_directory(str(root), boundary, recursive=True))
 
             assert b"aaa" in body
             assert b"bbb" in body
@@ -111,7 +111,7 @@ class TestMultipartEncoding:
             (sub / "b.txt").write_text("bbb")
 
             boundary = "test-boundary"
-            body, _ = _encode_directory(str(root), boundary, recursive=False)
+            body = b"".join(_stream_directory(str(root), boundary, recursive=False))
             assert b"aaa" in body
             assert b"bbb" not in body  # subdirectory content excluded
 
@@ -255,7 +255,10 @@ class TestGet:
             tar.addfile(info, io.BytesIO(data))
         tar_bytes = buf.getvalue()
 
-        mock_post.return_value = _mock_response(status_code=200, content=tar_bytes)
+        resp = _mock_response(status_code=200, content=tar_bytes)
+        resp.raw = io.BytesIO(tar_bytes)
+        resp.raw.decode_content = True
+        mock_post.return_value = resp
 
         with tempfile.TemporaryDirectory() as tmp:
             client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")

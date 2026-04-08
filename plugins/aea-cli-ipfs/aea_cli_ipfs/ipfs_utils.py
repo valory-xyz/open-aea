@@ -290,13 +290,14 @@ class IPFSTool:
             recursive=recursive,
             wrap_with_directory=wrap_with_directory,
         )
+        # add() returns a dict for single items, list for multiple
+        if isinstance(response, dict):
+            return response["Name"], response["Hash"], []
+
         if wrap_with_directory:
             return response[-2]["Name"], response[-1]["Hash"], response[:-1]
 
-        if Path(dir_path).is_dir():
-            return response[-1]["Name"], response[-1]["Hash"], response[:-1]
-
-        return response["Name"], response["Hash"], []  # type: ignore[call-overload]
+        return response[-1]["Name"], response[-1]["Hash"], response[:-1]
 
     def pin(self, hash_id: str) -> Dict:
         """Pin content with hash_id"""
