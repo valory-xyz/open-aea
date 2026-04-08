@@ -26,12 +26,12 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import jsonschema
 import pytest
-from jsonschema import Draft4Validator
 
 from aea.cli import cli
 from aea.configurations.loader import make_jsonschema_base_uri
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from tests.conftest import (
     AGENT_CONFIGURATION_SCHEMA,

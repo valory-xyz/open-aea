@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2021 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,11 +27,11 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
-import jsonschema
 import pytest
-from jsonschema import Draft4Validator
 
 from aea.cli import cli
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from tests.conftest import (
     AGENT_CONFIGURATION_SCHEMA,

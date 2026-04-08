@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #   Copyright 2018-2019 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,11 +27,11 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
-import jsonschema
 import pytest
-from jsonschema import Draft4Validator
 
 from aea.cli import cli
+from aea.helpers import json_schema as jsonschema
+from aea.helpers.json_schema import Draft4Validator
 
 from packages.fetchai.skills.echo import PUBLIC_ID as ECHO_SKILL_PUBLIC_ID
 from packages.fetchai.skills.error import PUBLIC_ID as ERROR_SKILL_PUBLIC_ID

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #   Copyright 2018-2020 Fetch.AI Limited
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,12 +23,12 @@
 import re
 from unittest import TestCase, mock
 
-import jsonschema
 import pytest
 
 from aea.cli.utils.config import validate_cli_config, validate_item_config
 from aea.cli.utils.constants import DEFAULT_CLI_CONFIG
 from aea.cli.utils.exceptions import AEAConfigException
+from aea.helpers import json_schema as jsonschema
 
 from tests.test_cli.tools_for_testing import (
     AgentConfigMock,
@@ -73,14 +73,14 @@ def test_config_validator() -> None:
     validate_cli_config(config)
 
     with pytest.raises(
-        jsonschema.exceptions.ValidationError,
+        jsonschema.ValidationError,
         match=re.escape("None is not of type 'string'"),
     ):
         config["author"] = None  # type: ignore
         validate_cli_config(config)
 
     with pytest.raises(
-        jsonschema.exceptions.ValidationError,
+        jsonschema.ValidationError,
         match=re.escape("'author' is a required property"),
     ):
         del config["author"]

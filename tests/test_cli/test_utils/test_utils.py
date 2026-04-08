@@ -34,7 +34,6 @@ import yaml
 from aea_ledger_fetchai import FetchAICrypto
 from click import BadParameter, ClickException
 from click.testing import CliRunner
-from jsonschema import ValidationError
 from yaml import YAMLError
 
 from aea.cli.utils.click_utils import PublicIdParameter, password_option
@@ -69,6 +68,7 @@ from aea.configurations.constants import DEFAULT_LEDGER
 from aea.crypto.ledger_apis import ETHEREUM_DEFAULT_CHAIN_ID, LedgerApis
 from aea.crypto.wallet import Wallet
 from aea.helpers.base import cd
+from aea.helpers.json_schema import ValidationError
 from aea.test_tools.test_cases import AEATestCaseEmpty
 
 from packages.fetchai.protocols.default.message import DefaultMessage
