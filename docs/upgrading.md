@@ -9,6 +9,13 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.1.0` to `v2.1.1`
+
+- No manual migration steps are required.
+- `AEABuilder` now resolves `${VAR:type:default}` patterns inside component override sections (the `---` separated YAML documents in `aea-config.yaml`), in addition to the main agent config. Previously these patterns were passed through as raw strings on the local `aea run` path, requiring `config-replace` workarounds to physically rewrite YAML before loading.
+
+If your downstream tooling relied on overrides being delivered as **unresolved** raw strings (for example, custom code that performed its own `${VAR:...}` substitution after the builder ran), audit those paths — overrides are now resolved against `os.environ` at build time and unset variables without a default will raise during configuration loading, matching the existing behaviour for the main agent config.
+
 ## `v2.0.8` to `v2.1.0`
 
 - Python support is now `3.10-3.14` (previously `3.10-3.11`).

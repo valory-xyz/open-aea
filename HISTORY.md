@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 2.1.1 (2026-04-08)
+
+AEA:
+- Fixes `AEABuilder` to resolve environment variables on component override sections, making the local `aea run` path consistent with Docker/service deployments and removing the need for `config-replace` workarounds.
+
+
 ## 2.1.0 (2026-03-06)
 
 AEA:
