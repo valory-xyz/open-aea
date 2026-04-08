@@ -25,17 +25,25 @@ Inlined JSON Schema Draft-04 validator.
 Replaces the external ``jsonschema`` package. Implements only the subset
 of Draft-04 keywords used by the AEA configuration schemas.
 
-Supported keywords: type, properties, patternProperties, required,
-additionalProperties, items, enum, pattern, minimum, oneOf, uniqueItems,
-$ref, definitions, default, description.
+Supported keywords: type, properties, patternProperties, propertyNames,
+required, additionalProperties, items, enum, pattern, minimum, maximum,
+exclusiveMinimum, exclusiveMaximum, minLength, maxLength, minItems,
+maxItems, oneOf, anyOf, allOf, not, uniqueItems, dependencies,
+additionalItems, $ref, definitions, default, description.
 """
 
+import contextvars
 import json
 import re
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Type
 from urllib.parse import urljoin, urlsplit
 from urllib.request import urlopen
+
+# Thread-safe / async-safe context for $ref root tracking
+_current_root_var: contextvars.ContextVar[Optional[Dict]] = contextvars.ContextVar(
+    "_current_root", default=None
+)
 
 # ---------------------------------------------------------------------------
 # ValidationError
@@ -294,11 +302,28 @@ def _validate_items(
             yield err._prepend_path(idx)
 
 
+def _strict_enum_contains(enum: List, instance: Any) -> bool:  # noqa: DAR
+    """Check if instance is in enum with type-aware equality.
+
+    Booleans and integers are distinguished (``True != 1``).
+
+    :param enum: the allowed values.
+    :param instance: the value to check.
+    :return: True if instance matches any enum value with type awareness.
+    """
+    for val in enum:
+        if isinstance(val, bool) != isinstance(instance, bool):
+            continue
+        if val == instance:
+            return True
+    return False
+
+
 def _validate_enum(
     validator: "Draft4Validator", enum: List, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
     """Validate the ``enum`` keyword."""
-    if instance not in enum:
+    if not _strict_enum_contains(enum, instance):
         yield ValidationError(f"{instance!r} is not one of {enum!r}")
 
 
@@ -369,6 +394,117 @@ def _validate_unique_items(
         seen.append(item)
 
 
+def _validate_maximum(
+    validator: "Draft4Validator", maximum: Any, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``maximum`` keyword."""
+    if isinstance(instance, (int, float)) and not isinstance(instance, bool):
+        exclusive = schema.get("exclusiveMaximum", False)
+        if exclusive and instance >= maximum:
+            yield ValidationError(
+                f"{instance} is greater than or equal to the maximum of {maximum}"
+            )
+        elif not exclusive and instance > maximum:
+            yield ValidationError(
+                f"{instance} is greater than the maximum of {maximum}"
+            )
+
+
+def _validate_min_length(
+    validator: "Draft4Validator", min_length: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``minLength`` keyword."""
+    if isinstance(instance, str) and len(instance) < min_length:
+        yield ValidationError(f"{instance!r} is too short")
+
+
+def _validate_max_length(
+    validator: "Draft4Validator", max_length: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``maxLength`` keyword."""
+    if isinstance(instance, str) and len(instance) > max_length:
+        yield ValidationError(f"{instance!r} is too long")
+
+
+def _validate_min_items(
+    validator: "Draft4Validator", min_items: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``minItems`` keyword."""
+    if isinstance(instance, list) and len(instance) < min_items:
+        yield ValidationError(f"{instance!r} is too short")
+
+
+def _validate_max_items(
+    validator: "Draft4Validator", max_items: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``maxItems`` keyword."""
+    if isinstance(instance, list) and len(instance) > max_items:
+        yield ValidationError(f"{instance!r} is too long")
+
+
+def _validate_any_of(
+    validator: "Draft4Validator", any_of: List[Dict], instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``anyOf`` keyword."""
+    for sub_schema in any_of:
+        if not list(validator._validate_schema(instance, sub_schema)):
+            return
+    yield ValidationError(f"{instance!r} is not valid under any of the given schemas")
+
+
+def _validate_all_of(
+    validator: "Draft4Validator", all_of: List[Dict], instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``allOf`` keyword."""
+    for sub_schema in all_of:
+        yield from validator._validate_schema(instance, sub_schema)
+
+
+def _validate_not(
+    validator: "Draft4Validator", not_schema: Dict, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``not`` keyword."""
+    if not list(validator._validate_schema(instance, not_schema)):
+        yield ValidationError(
+            f"{instance!r} should not be valid under the given schema"
+        )
+
+
+def _validate_dependencies(
+    validator: "Draft4Validator", dependencies: Dict, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``dependencies`` keyword."""
+    if not isinstance(instance, dict):
+        return
+    for prop, dep in dependencies.items():
+        if prop not in instance:
+            continue
+        if isinstance(dep, list):
+            for required_prop in dep:
+                if required_prop not in instance:
+                    yield ValidationError(
+                        f"{required_prop!r} is a dependency of {prop!r}"
+                    )
+        elif isinstance(dep, dict):
+            yield from validator._validate_schema(instance, dep)
+
+
+def _validate_additional_items(
+    validator: "Draft4Validator",
+    additional_items: Any,
+    instance: Any,
+    schema: Dict,
+) -> Iterator[ValidationError]:
+    """Validate the ``additionalItems`` keyword."""
+    if not isinstance(instance, list):
+        return
+    items = schema.get("items")
+    if not isinstance(items, list):
+        return
+    if additional_items is False and len(instance) > len(items):
+        yield ValidationError("Additional items are not allowed")
+
+
 # Default keyword validators
 _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
     "type": _validate_type,
@@ -381,8 +517,18 @@ _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
     "pattern": _validate_pattern,
     "minimum": _validate_minimum,
     "oneOf": _validate_one_of,
+    "anyOf": _validate_any_of,
+    "allOf": _validate_all_of,
+    "not": _validate_not,
     "uniqueItems": _validate_unique_items,
     "propertyNames": _validate_property_names,
+    "maximum": _validate_maximum,
+    "minLength": _validate_min_length,
+    "maxLength": _validate_max_length,
+    "minItems": _validate_min_items,
+    "maxItems": _validate_max_items,
+    "dependencies": _validate_dependencies,
+    "additionalItems": _validate_additional_items,
 }
 
 
@@ -403,16 +549,22 @@ class Draft4Validator:
     TYPE_CHECKER: TypeChecker = _DEFAULT_TYPE_CHECKER
     VALIDATORS: Dict[str, ValidatorFn] = _KEYWORD_VALIDATORS
 
+    # Draft-04 meta-schema for validating schemas themselves
+    META_SCHEMA: Dict = json.loads(
+        '{"id":"http://json-schema.org/draft-04/schema#","$schema":"http://json-schema.org/draft-04/schema#","description":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"positiveInteger":{"type":"integer","minimum":0},"positiveIntegerDefault0":{"allOf":[{"$ref":"#/definitions/positiveInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"minItems":1,"uniqueItems":true}},"type":"object","properties":{"id":{"type":"string"},"$schema":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"},"default":{},"multipleOf":{"type":"number","minimum":0,"exclusiveMinimum":true},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"boolean","default":false},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"boolean","default":false},"maxLength":{"$ref":"#/definitions/positiveInteger"},"minLength":{"$ref":"#/definitions/positiveIntegerDefault0"},"pattern":{"type":"string"},"additionalItems":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":{}},"maxItems":{"$ref":"#/definitions/positiveInteger"},"minItems":{"$ref":"#/definitions/positiveIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxProperties":{"$ref":"#/definitions/positiveInteger"},"minProperties":{"$ref":"#/definitions/positiveIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"anyOf":[{"type":"boolean"},{"$ref":"#"}],"default":{}},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"enum":{"type":"array","minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"dependencies":{"exclusiveMaximum":["maximum"],"exclusiveMinimum":["minimum"]},"default":{}}'
+    )
+
     @classmethod
     def check_schema(cls, schema: Dict) -> None:
         """
         Validate that a schema is a well-formed JSON Schema document.
 
+        Validates *schema* against the Draft-04 meta-schema.
+
         :param schema: the schema dict.
-        :raises ValueError: if the schema is not a dict.
         """
-        if not isinstance(schema, dict):
-            raise ValueError(f"Schema must be a dict, got {type(schema).__name__}")
+        v = cls(cls.META_SCHEMA)
+        v.validate(schema)
 
     def __init__(
         self,
@@ -427,7 +579,6 @@ class Draft4Validator:
         """
         self.schema = schema
         self.resolver = resolver
-        self._current_root: Optional[Dict] = None
 
     def validate(self, instance: Any) -> None:
         """
@@ -446,8 +597,11 @@ class Draft4Validator:
         :param instance: the data to validate.
         :yield: validation errors.
         """
-        self._current_root = self.schema
-        yield from self._validate_schema(instance, self.schema)
+        token = _current_root_var.set(self.schema)
+        try:
+            yield from self._validate_schema(instance, self.schema)
+        finally:
+            _current_root_var.reset(token)
 
     def _validate_schema(
         self, instance: Any, schema: Dict
@@ -456,11 +610,12 @@ class Draft4Validator:
         # Resolve $ref
         if "$ref" in schema:
             ref = schema["$ref"]
+            current_root = _current_root_var.get()
             try:
                 if ref.startswith("#"):
-                    if self._current_root is None:  # pragma: nocover
+                    if current_root is None:  # pragma: nocover
                         raise ValueError("No root schema set")
-                    resolved = RefResolver._resolve_pointer(ref[1:], self._current_root)
+                    resolved = RefResolver._resolve_pointer(ref[1:], current_root)
                     yield from self._validate_schema(instance, resolved)
                 elif self.resolver is None:
                     yield ValidationError(
@@ -468,19 +623,19 @@ class Draft4Validator:
                         f"no RefResolver configured"
                     )
                 else:
-                    if self._current_root is None:  # pragma: nocover
+                    if current_root is None:  # pragma: nocover
                         raise ValueError("No root schema set")
-                    resolved = self.resolver.resolve(ref, self._current_root)
+                    resolved = self.resolver.resolve(ref, current_root)
                     # Switch root context for nested refs
                     file_part = ref.split("#", 1)[0]
-                    prev_root = self._current_root
                     if file_part:
                         full_uri = urljoin(self.resolver._base_uri, file_part)
-                        self._current_root = self.resolver._store.get(
-                            full_uri, prev_root
-                        )
-                    yield from self._validate_schema(instance, resolved)
-                    self._current_root = prev_root
+                        new_root = self.resolver._store.get(full_uri, current_root)
+                        token = _current_root_var.set(new_root)
+                        yield from self._validate_schema(instance, resolved)
+                        _current_root_var.reset(token)
+                    else:
+                        yield from self._validate_schema(instance, resolved)
             except ValueError as e:
                 yield ValidationError(str(e))
             return

@@ -7,9 +7,11 @@ Inlined JSON Schema Draft-04 validator.
 Replaces the external ``jsonschema`` package. Implements only the subset
 of Draft-04 keywords used by the AEA configuration schemas.
 
-Supported keywords: type, properties, patternProperties, required,
-additionalProperties, items, enum, pattern, minimum, oneOf, uniqueItems,
-$ref, definitions, default, description.
+Supported keywords: type, properties, patternProperties, propertyNames,
+required, additionalProperties, items, enum, pattern, minimum, maximum,
+exclusiveMinimum, exclusiveMaximum, minLength, maxLength, minItems,
+maxItems, oneOf, anyOf, allOf, not, uniqueItems, dependencies,
+additionalItems, $ref, definitions, default, description.
 
 <a id="aea.helpers.json_schema.ValidationError"></a>
 
@@ -155,13 +157,11 @@ def check_schema(cls, schema: Dict) -> None
 
 Validate that a schema is a well-formed JSON Schema document.
 
+Validates *schema* against the Draft-04 meta-schema.
+
 **Arguments**:
 
 - `schema`: the schema dict.
-
-**Raises**:
-
-- `ValueError`: if the schema is not a dict.
 
 <a id="aea.helpers.json_schema.Draft4Validator.__init__"></a>
 
