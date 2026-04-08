@@ -109,7 +109,13 @@ class RefResolver:
         file_ref = parts[0]
         pointer = parts[1] if len(parts) > 1 else ""
 
-        full_uri = urljoin(self._base_uri, file_ref)
+        current_base_uri = self._base_uri
+        for uri, sch in self._store.items():
+            if sch is current_schema:
+                current_base_uri = uri
+                break
+
+        full_uri = urljoin(current_base_uri, file_ref)
         if full_uri not in self._store:
             self._store[full_uri] = self._fetch(full_uri)
 
@@ -134,7 +140,7 @@ class RefResolver:
             try:
                 if isinstance(node, list):
                     # RFC 6901: indices must be non-negative, no leading zeros
-                    if part != "0" and (part.startswith("0") or part.startswith("-")):
+                    if not re.match(r"^(0|[1-9][0-9]*)$", part):
                         raise ValueError(f"Invalid array index: {part!r}")
                     node = node[int(part)]
                 else:
@@ -163,7 +169,7 @@ class RefResolver:
 
 _TYPE_MAP = {
     "string": lambda x: isinstance(x, str),
-    "integer": lambda x: isinstance(x, int) and not isinstance(x, bool),
+    "integer": lambda x: (isinstance(x, int) and not isinstance(x, bool)) or (isinstance(x, float) and x.is_integer()),
     "number": lambda x: isinstance(x, (int, float)) and not isinstance(x, bool),
     "boolean": lambda x: isinstance(x, bool),
     "null": lambda x: x is None,
@@ -546,6 +552,11 @@ def _validate_dependencies(
                     yield ValidationError(
                         f"{required_prop!r} is a dependency of {prop!r}"
                     )
+        elif isinstance(dep, str):
+            if dep not in instance:
+                yield ValidationError(
+                    f"{dep!r} is a dependency of {prop!r}"
+                )
         elif isinstance(dep, dict):
             yield from validator._validate_schema(instance, dep)
 
@@ -569,6 +580,34 @@ def _validate_additional_items(
             for err in validator._validate_schema(instance[idx], additional_items):
                 yield err._prepend_path(idx)
 
+
+def _validate_multiple_of(
+    validator: "Draft4Validator", multiple_of: Any, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``multipleOf`` keyword."""
+    if isinstance(instance, (int, float)) and not isinstance(instance, bool):
+        if abs(instance % multiple_of) > 1e-8 and abs((instance % multiple_of) - multiple_of) > 1e-8:
+            yield ValidationError(f"{instance!r} is not a multiple of {multiple_of}")
+
+def _validate_min_properties(
+    validator: "Draft4Validator", min_properties: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``minProperties`` keyword."""
+    if isinstance(instance, dict) and len(instance) < min_properties:
+        yield ValidationError(f"{instance!r} has fewer than {min_properties} properties")
+
+def _validate_max_properties(
+    validator: "Draft4Validator", max_properties: int, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``maxProperties`` keyword."""
+    if isinstance(instance, dict) and len(instance) > max_properties:
+        yield ValidationError(f"{instance!r} has more than {max_properties} properties")
+
+def _validate_format(
+    validator: "Draft4Validator", format_str: str, instance: Any, schema: Dict
+) -> Iterator[ValidationError]:
+    """Validate the ``format`` keyword."""
+    pass
 
 # Default keyword validators
 _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
@@ -594,6 +633,10 @@ _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
     "maxItems": _validate_max_items,
     "dependencies": _validate_dependencies,
     "additionalItems": _validate_additional_items,
+    "multipleOf": _validate_multiple_of,
+    "minProperties": _validate_min_properties,
+    "maxProperties": _validate_max_properties,
+    "format": _validate_format,
 }
 
 
@@ -696,7 +739,12 @@ class Draft4Validator:
                     # Switch root context for nested refs
                     file_part = ref.split("#", 1)[0]
                     if file_part:
-                        full_uri = urljoin(self.resolver._base_uri, file_part)
+                        current_base_uri = self.resolver._base_uri
+                        for uri, sch in self.resolver._store.items():
+                            if sch is current_root:
+                                current_base_uri = uri
+                                break
+                        full_uri = urljoin(current_base_uri, file_part)
                         new_root = self.resolver._store.get(full_uri, current_root)
                         token = _current_root_var.set(new_root)
                         try:
