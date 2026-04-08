@@ -38,6 +38,7 @@ from aea_cli_ipfs.exceptions import (
     PublishError,
     RemoveError,
 )
+from aea_cli_ipfs.ipfs_client import IPFSHTTPClient
 
 DEFAULT_IPFS_URI_BASE = str(os.environ.get("OPEN_AEA_IPFS_ADDR_BASE", "api/v0"))
 DEFAULT_IPFS_URL = "/dns/registry.autonolas.tech/tcp/443/https"
@@ -224,10 +225,6 @@ class IPFSTool:
 
         if addr is None:
             addr = os.environ.get("OPEN_AEA_IPFS_ADDR", DEFAULT_IPFS_URL)
-
-        from aea_cli_ipfs.ipfs_client import (  # pylint: disable=import-outside-toplevel
-            IPFSHTTPClient,
-        )
 
         _, host, *_ = resolve_addr(cast(str, addr))  # verify addr
 

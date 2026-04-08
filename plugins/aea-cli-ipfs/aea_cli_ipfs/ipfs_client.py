@@ -132,7 +132,6 @@ def _encode_directory(
     dir_path: str,
     boundary: str,
     recursive: bool = True,
-    wrap_with_directory: bool = True,
 ) -> Tuple[bytes, str]:
     """
     Encode a directory as multipart form-data for IPFS /api/v0/add.
@@ -140,7 +139,6 @@ def _encode_directory(
     :param dir_path: path to directory.
     :param boundary: multipart boundary string.
     :param recursive: include subdirectories.
-    :param wrap_with_directory: wrap in parent directory.
     :return: (body_bytes, content_type).
     """
     parts: List[bytes] = []
@@ -384,7 +382,6 @@ class IPFSHTTPClient:
             file_or_dir,
             boundary,
             recursive=recursive,
-            wrap_with_directory=wrap_with_directory,
         )
         params = {
             "pin": str(pin).lower(),
@@ -402,6 +399,8 @@ class IPFSHTTPClient:
             )
         except requests.exceptions.ConnectionError as e:
             raise CommunicationError(str(e)) from e
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError(str(e)) from e
 
         if resp.status_code != 200:
             try:
@@ -447,12 +446,23 @@ class IPFSHTTPClient:
             )
         except requests.exceptions.ConnectionError as e:
             raise CommunicationError(str(e)) from e
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError(str(e)) from e
 
         if resp.status_code != 200:
+            try:
+                err = resp.json()
+                if isinstance(err, dict) and "Message" in err:
+                    raise ErrorResponse(err["Message"])
+            except (ValueError, KeyError):
+                pass
             raise StatusError(
                 f"IPFS API returned status {resp.status_code}: {resp.text}"
             )
-        return resp.json()["Hash"]
+        result = resp.json()
+        if "Hash" not in result:
+            raise StatusError(f"IPFS API response missing 'Hash' key: {result}")
+        return result["Hash"]
 
     def get(self, cid: str, target: str = ".") -> None:
         """
@@ -473,6 +483,8 @@ class IPFSHTTPClient:
             )
         except requests.exceptions.ConnectionError as e:
             raise CommunicationError(str(e)) from e
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError(str(e)) from e
 
         if resp.status_code != 200:
             try:
@@ -486,4 +498,10 @@ class IPFSHTTPClient:
         # Extract tar archive to target directory
         buf = io.BytesIO(resp.content)
         with tarfile.open(fileobj=buf, mode="r") as tar:
-            tar.extractall(path=target)  # nosec
+            # Filter members to prevent path traversal (CVE-2007-4559)
+            safe_members = [
+                m
+                for m in tar.getmembers()
+                if not m.name.startswith("/") and ".." not in m.name
+            ]
+            tar.extractall(path=target, members=safe_members)  # nosec
