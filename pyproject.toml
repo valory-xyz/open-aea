@@ -10,7 +10,7 @@ packages = [{include = "aea"}]
 python = ">=3.10,<3.16"
 # Core dependencies
 packaging = ">=22.0,<27"
-protobuf = ">=5,<8"
+protobuf = ">=5,<7"
 pyyaml = ">=6.0.1,<7"
 requests = ">=2.20.0,<3"
 pywin32 = {version = ">=304", markers = "sys_platform == 'win32'"}
@@ -41,7 +41,7 @@ numpy = ">=1.18.1"
 openapi-core = "==0.22.0"
 openapi-spec-validator = ">=0.7.0,<0.8.0"
 pexpect = "==4.8.0"
-protobuf = ">=5,<6"
+protobuf = ">=5,<7"
 psutil = "==5.7.0"
 pycryptodome = ">=3.10.1"
 pytest-custom-exit-code = "==0.3.0"

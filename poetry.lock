@@ -5708,4 +5708,4 @@ test-tools = ["click", "coverage", "packaging", "pytest", "pyyaml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.16"
-content-hash = "47c84ec9a0fbd4e975ff7d25f38ea835766746f9ac681b86eb1f9aace80b22e9"
+content-hash = "279914751e787cbe6d59e17a6b7c5ebf60acb0205c420c7139caab2e18344981"
