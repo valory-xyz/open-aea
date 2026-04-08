@@ -326,6 +326,7 @@ jobs:
       - copyright_check
       - dependencies_checks
       - plugins_install_check
+      - platform_checks
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
@@ -365,6 +366,7 @@ jobs:
       - copyright_check
       - dependencies_checks
       - plugins_install_check
+      - platform_checks
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
@@ -399,6 +401,7 @@ jobs:
       - copyright_check
       - dependencies_checks
       - plugins_install_check
+      - platform_checks
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -418,7 +421,7 @@ jobs:
         run: tox -e packages-py3.10 -- -m 'integration and not unstable and ledger and not profiling'
 
   platform_checks:
-    continue-on-error: True
+    continue-on-error: False
     needs:
       - common_checks_1
       - common_checks_2
@@ -433,8 +436,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest-large, windows-latest]
+        os: [ubuntu-latest]
         python_version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        include:
+          - os: macos-latest-large
+            python_version: '3.10'
+          - os: macos-latest-large
+            python_version: '3.14'
+          - os: windows-latest
+            python_version: '3.10'
+          - os: windows-latest
+            python_version: '3.14'
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@master
