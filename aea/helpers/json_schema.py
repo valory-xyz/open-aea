@@ -133,6 +133,9 @@ class RefResolver:
             part = part.replace("~1", "/").replace("~0", "~")
             try:
                 if isinstance(node, list):
+                    # RFC 6901: indices must be non-negative, no leading zeros
+                    if part != "0" and (part.startswith("0") or part.startswith("-")):
+                        raise ValueError(f"Invalid array index: {part!r}")
                     node = node[int(part)]
                 else:
                     node = node[part]
@@ -208,8 +211,11 @@ def find_additional_properties(instance: Dict, schema: Dict) -> Iterator[str]:
         if prop in properties:
             continue
         prop_str = str(prop) if not isinstance(prop, str) else prop
-        if any(re.search(p, prop_str) for p in pattern_list):
-            continue
+        try:
+            if any(re.search(p, prop_str) for p in pattern_list):
+                continue
+        except re.error:
+            continue  # treat invalid regex as non-matching
         yield prop
 
 
@@ -264,7 +270,11 @@ def _validate_pattern_properties(
     for pattern, sub_schema in pattern_props.items():
         for prop, value in instance.items():
             prop_str = str(prop) if not isinstance(prop, str) else prop
-            if re.search(pattern, prop_str):
+            try:
+                matched = re.search(pattern, prop_str)
+            except re.error:
+                continue
+            if matched:
                 for err in validator._validate_schema(value, sub_schema):
                     yield err._prepend_path(prop)
 
@@ -329,20 +339,20 @@ def _strict_equal(a: Any, b: Any) -> bool:
     :param b: second value.
     :return: True if a and b are deeply equal with type awareness.
     """
+    # Distinguish bool from int (JSON Schema treats them as different types)
     if isinstance(a, bool) != isinstance(b, bool):
         return False
-    if type(a) is not type(b):  # noqa: E721
-        # Same-kind check for dicts, lists, etc.
-        if not (isinstance(a, (int, float)) and isinstance(b, (int, float))):
-            return False
-    if isinstance(a, dict):
-        if a.keys() != b.keys():
+    # Recursively compare dicts (including OrderedDict and other Mappings)
+    if isinstance(a, dict) and isinstance(b, dict):
+        if set(a.keys()) != set(b.keys()):
             return False
         return all(_strict_equal(a[k], b[k]) for k in a)
-    if isinstance(a, list):
+    # Recursively compare lists (including tuples)
+    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
         if len(a) != len(b):
             return False
         return all(_strict_equal(x, y) for x, y in zip(a, b))
+    # For scalars, use standard equality
     return a == b
 
 
