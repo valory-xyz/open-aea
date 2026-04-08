@@ -187,6 +187,20 @@ class TestProperties:
         extras = list(find_additional_properties(instance, schema))
         assert extras == ["extra"]
 
+    def test_invalid_regex_in_pattern_properties_yields_extra(self) -> None:
+        """Test that invalid regex in patternProperties treats property as extra."""
+        schema = {
+            "type": "object",
+            "patternProperties": {"[invalid": {"type": "string"}},
+            "additionalProperties": False,
+        }
+        # With an invalid regex, no property can match the pattern,
+        # so "foo" should be flagged as an additional property
+        errors = list(Draft4Validator(schema).iter_errors({"foo": "bar"}))
+        assert (
+            len(errors) > 0
+        ), "Invalid regex should cause property to be flagged as extra"
+
     def test_property_names(self) -> None:
         """Test propertyNames validation."""
         schema = {

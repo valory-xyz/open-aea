@@ -211,12 +211,16 @@ def find_additional_properties(instance: Dict, schema: Dict) -> Iterator[str]:
         if prop in properties:
             continue
         prop_str = str(prop) if not isinstance(prop, str) else prop
-        try:
-            if any(re.search(p, prop_str) for p in pattern_list):
-                continue
-        except re.error:
-            continue  # treat invalid regex as non-matching
-        yield prop
+        matched = False
+        for p in pattern_list:
+            try:
+                if re.search(p, prop_str):
+                    matched = True
+                    break
+            except re.error:
+                continue  # skip invalid pattern, check others
+        if not matched:
+            yield prop
 
 
 # ---------------------------------------------------------------------------
