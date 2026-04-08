@@ -38,7 +38,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Type
 from urllib.parse import urljoin, urlsplit
-from urllib.request import urlopen
+from urllib.request import url2pathname, urlopen
 
 # Thread-safe / async-safe context for $ref root tracking
 _current_root_var: contextvars.ContextVar[Optional[Dict]] = contextvars.ContextVar(
@@ -137,7 +137,8 @@ class RefResolver:
         """Fetch and parse a JSON document from a URI."""
         parsed = urlsplit(uri)
         if parsed.scheme == "file":
-            path = Path(parsed.path)
+            # url2pathname handles Windows drive letters correctly
+            path = Path(url2pathname(parsed.path))
             return json.loads(path.read_text(encoding="utf-8"))
         with urlopen(uri) as resp:  # pragma: nocover  # nosec B310
             return json.loads(resp.read().decode("utf-8"))
@@ -192,11 +193,11 @@ def find_additional_properties(instance: Dict, schema: Dict) -> Iterator[str]:
     :yield: property names not covered by the schema.
     """
     properties = schema.get("properties", {})
-    patterns = "|".join(schema.get("patternProperties", {}))
+    pattern_list = list(schema.get("patternProperties", {}).keys())
     for prop in instance:
         if prop in properties:
             continue
-        if patterns and re.search(patterns, prop):
+        if any(re.search(p, prop) for p in pattern_list):
             continue
         yield prop
 
@@ -290,16 +291,23 @@ def _validate_additional_properties(
 
 def _validate_items(
     validator: "Draft4Validator",
-    items: Dict,
+    items: Any,
     instance: Any,
     schema: Dict,
 ) -> Iterator[ValidationError]:
     """Validate the ``items`` keyword."""
     if not isinstance(instance, list):
         return
-    for idx, item in enumerate(instance):
-        for err in validator._validate_schema(item, items):
-            yield err._prepend_path(idx)
+    if isinstance(items, list):
+        # Tuple validation: each item validated against positional schema
+        for idx, (item, item_schema) in enumerate(zip(instance, items)):
+            for err in validator._validate_schema(item, item_schema):
+                yield err._prepend_path(idx)
+    elif isinstance(items, dict):
+        # All items validated against single schema
+        for idx, item in enumerate(instance):
+            for err in validator._validate_schema(item, items):
+                yield err._prepend_path(idx)
 
 
 def _strict_enum_contains(enum: List, instance: Any) -> bool:  # noqa: DAR
