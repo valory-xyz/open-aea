@@ -169,7 +169,8 @@ class RefResolver:
 
 _TYPE_MAP = {
     "string": lambda x: isinstance(x, str),
-    "integer": lambda x: (isinstance(x, int) and not isinstance(x, bool)) or (isinstance(x, float) and x.is_integer()),
+    "integer": lambda x: (isinstance(x, int) and not isinstance(x, bool))
+    or (isinstance(x, float) and x.is_integer()),
     "number": lambda x: isinstance(x, (int, float)) and not isinstance(x, bool),
     "boolean": lambda x: isinstance(x, bool),
     "null": lambda x: x is None,
@@ -554,9 +555,7 @@ def _validate_dependencies(
                     )
         elif isinstance(dep, str):
             if dep not in instance:
-                yield ValidationError(
-                    f"{dep!r} is a dependency of {prop!r}"
-                )
+                yield ValidationError(f"{dep!r} is a dependency of {prop!r}")
         elif isinstance(dep, dict):
             yield from validator._validate_schema(instance, dep)
 
@@ -586,15 +585,22 @@ def _validate_multiple_of(
 ) -> Iterator[ValidationError]:
     """Validate the ``multipleOf`` keyword."""
     if isinstance(instance, (int, float)) and not isinstance(instance, bool):
-        if abs(instance % multiple_of) > 1e-8 and abs((instance % multiple_of) - multiple_of) > 1e-8:
+        if (
+            abs(instance % multiple_of) > 1e-8
+            and abs((instance % multiple_of) - multiple_of) > 1e-8
+        ):
             yield ValidationError(f"{instance!r} is not a multiple of {multiple_of}")
+
 
 def _validate_min_properties(
     validator: "Draft4Validator", min_properties: int, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
     """Validate the ``minProperties`` keyword."""
     if isinstance(instance, dict) and len(instance) < min_properties:
-        yield ValidationError(f"{instance!r} has fewer than {min_properties} properties")
+        yield ValidationError(
+            f"{instance!r} has fewer than {min_properties} properties"
+        )
+
 
 def _validate_max_properties(
     validator: "Draft4Validator", max_properties: int, instance: Any, schema: Dict
@@ -603,11 +609,13 @@ def _validate_max_properties(
     if isinstance(instance, dict) and len(instance) > max_properties:
         yield ValidationError(f"{instance!r} has more than {max_properties} properties")
 
+
 def _validate_format(
-    validator: "Draft4Validator", format_str: str, instance: Any, schema: Dict
+    validator: "Draft4Validator", _format_str: str, instance: Any, schema: Dict
 ) -> Iterator[ValidationError]:
     """Validate the ``format`` keyword."""
-    pass
+    yield from ()
+
 
 # Default keyword validators
 _KEYWORD_VALIDATORS: Dict[str, ValidatorFn] = {
