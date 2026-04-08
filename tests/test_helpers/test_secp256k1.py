@@ -38,23 +38,17 @@ class TestValidKeys:
 
     def test_even_prefix(self) -> None:
         """Test key with 0x02 prefix (even y)."""
-        for _ in range(10):
-            sk = SigningKey.generate(curve=SECP256k1)
-            compressed = sk.get_verifying_key().to_string("compressed")
-            if compressed[0] == 0x02:
-                validate_secp256k1_compressed_pubkey(compressed)
-                return
-        pytest.skip("No even-prefix key generated")
+        key = bytes.fromhex(
+            "025bb1b7fd08e741f1c6bf1d5ea508e4f47ddff51ac6a710b25657b6e69a43ffa5"
+        )
+        validate_secp256k1_compressed_pubkey(key)
 
     def test_odd_prefix(self) -> None:
         """Test key with 0x03 prefix (odd y)."""
-        for _ in range(10):
-            sk = SigningKey.generate(curve=SECP256k1)
-            compressed = sk.get_verifying_key().to_string("compressed")
-            if compressed[0] == 0x03:
-                validate_secp256k1_compressed_pubkey(compressed)
-                return
-        pytest.skip("No odd-prefix key generated")
+        key = bytes.fromhex(
+            "03fb9b7bb2d1e5a7a78e31decc5236300fc93e7c4abb84181757eeaaead95446a2"
+        )
+        validate_secp256k1_compressed_pubkey(key)
 
 
 class TestInvalidKeys:
@@ -77,17 +71,10 @@ class TestInvalidKeys:
 
     def test_x_not_on_curve(self) -> None:
         """Test rejection of x where y² has no square root."""
-        # x = 2: y² = 8 + 7 = 15. Check if 15 has no sqrt mod p.
-        P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
-        x = 2
-        y_sq = (pow(x, 3, P) + 7) % P
-        y = pow(y_sq, (P + 1) // 4, P)
-        if (y * y) % P != y_sq:
-            key = b"\x02" + x.to_bytes(32, "big")
-            with pytest.raises(ValueError, match="not on.*curve"):
-                validate_secp256k1_compressed_pubkey(key)
-        else:
-            pytest.skip("x=2 is on curve")
+        # x = 5: y² = 125 + 7 = 132 has no square root mod p
+        key = b"\x02" + (5).to_bytes(32, "big")
+        with pytest.raises(ValueError, match="not on.*curve"):
+            validate_secp256k1_compressed_pubkey(key)
 
     def test_empty_bytes(self) -> None:
         """Test rejection of empty input."""
