@@ -21,12 +21,12 @@
 
 import os
 import re
+import urllib.error
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
 import pytest
-import requests
 from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.ipfs_utils import (
     DownloadError,
@@ -122,16 +122,19 @@ def test_daemon_ipfs_not_found() -> None:
 def test_daemon_is_started_externally() -> None:
     """Test IPFSDaemon is started externally."""
     daemon = IPFSDaemon()
-    response_mock = Mock()
-    response_mock.status_code = 200
-    with patch("requests.post", return_value=response_mock):
+
+    mock_resp = Mock()
+    mock_resp.status = 200
+    mock_resp.__enter__ = lambda s: s
+    mock_resp.__exit__ = Mock(return_value=False)
+    with patch("urllib.request.urlopen", return_value=mock_resp):
         assert daemon.is_started_externally()
 
-    response_mock.status_code = 400
-    with patch("requests.post", return_value=response_mock):
+    mock_resp.status = 400
+    with patch("urllib.request.urlopen", return_value=mock_resp):
         assert not daemon.is_started_externally()
 
-    with patch("requests.post", side_effect=requests.exceptions.ConnectionError()):
+    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("refused")):
         assert not daemon.is_started_externally()
 
     assert not daemon.is_started()

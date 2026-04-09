@@ -19,13 +19,15 @@
 
 """Tests for the inlined IPFS HTTP client."""
 
+import io
 import json
+import tarfile
 import tempfile
+import urllib.error
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-import requests
 from aea_cli_ipfs.ipfs_client import (
     CommunicationError,
     ErrorResponse,
@@ -36,6 +38,18 @@ from aea_cli_ipfs.ipfs_client import (
     _multipart_boundary,
     _quote_filename,
 )
+
+
+def _mock_urlopen(status: int = 200, body: bytes = b"{}") -> MagicMock:
+    """Create a mock context manager for urllib.request.urlopen."""
+    resp = MagicMock()
+    resp.status = status
+    resp.read.return_value = body
+    resp.url = ""
+    resp.__enter__ = lambda s: s
+    resp.__exit__ = MagicMock(return_value=False)
+    return resp
+
 
 # ---------------------------------------------------------------------------
 # Multipart encoding tests
@@ -136,37 +150,26 @@ class TestClientConstruction:
 
 
 # ---------------------------------------------------------------------------
-# API methods (mocked HTTP)
+# API methods (mocked HTTP via urllib)
 # ---------------------------------------------------------------------------
-
-
-def _mock_response(status_code=200, json_data=None, text="", content=b""):
-    """Create a mock requests.Response."""
-    resp = MagicMock()
-    resp.status_code = status_code
-    resp.json.return_value = json_data or {}
-    resp.text = text or json.dumps(json_data or {})
-    resp.content = content
-    return resp
 
 
 class TestId:
     """Tests for id() method."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_id(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_id(self, mock_urlopen: MagicMock) -> None:
         """Test id returns node info."""
-        mock_post.return_value = _mock_response(
-            json_data={"ID": "Qm123", "AgentVersion": "go-ipfs/0.6.0"}
-        )
+        body = json.dumps({"ID": "Qm123", "AgentVersion": "go-ipfs/0.6.0"}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.id()
         assert result["ID"] == "Qm123"
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_id_connection_error(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_id_connection_error(self, mock_urlopen: MagicMock) -> None:
         """Test id raises CommunicationError on connection failure."""
-        mock_post.side_effect = requests.exceptions.ConnectionError("refused")
+        mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(CommunicationError):
             client.id()
@@ -175,26 +178,24 @@ class TestId:
 class TestAdd:
     """Tests for add() and add_bytes() methods."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_add_bytes(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_bytes(self, mock_urlopen: MagicMock) -> None:
         """Test add_bytes returns hash."""
-        mock_post.return_value = _mock_response(
-            json_data={"Hash": "QmTest123", "Name": "bytes"}
-        )
+        body = json.dumps({"Hash": "QmTest123", "Name": "bytes"}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.add_bytes(b"test data")
         assert result == "QmTest123"
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_add_directory(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_directory(self, mock_urlopen: MagicMock) -> None:
         """Test add returns list of items."""
         ndjson = (
             '{"Name":"mydir/a.txt","Hash":"Qm1"}\n'
             '{"Name":"mydir","Hash":"Qm2"}\n'
             '{"Name":"","Hash":"QmWrapped"}\n'
         )
-        mock_post.return_value = _mock_response(text=ndjson, status_code=200)
-        mock_post.return_value.json.side_effect = ValueError("ndjson")
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "mydir"
@@ -206,12 +207,11 @@ class TestAdd:
             assert isinstance(result, list)
             assert len(result) == 3
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_add_single_file_returns_dict(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_single_file_returns_dict(self, mock_urlopen: MagicMock) -> None:
         """Test add returns dict for single file (matches ipfshttpclient)."""
         ndjson = '{"Name":"test.txt","Hash":"QmSingle"}\n'
-        mock_post.return_value = _mock_response(text=ndjson, status_code=200)
-        mock_post.return_value.json.side_effect = ValueError("ndjson")
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
 
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "test.txt"
@@ -221,11 +221,12 @@ class TestAdd:
             assert isinstance(result, dict)
             assert result["Hash"] == "QmSingle"
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_add_error_response(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_error_response(self, mock_urlopen: MagicMock) -> None:
         """Test add raises ErrorResponse on IPFS error."""
-        mock_post.return_value = _mock_response(
-            status_code=500, json_data={"Message": "something broke"}
+        body = json.dumps({"Message": "something broke"}).encode()
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=500, msg="", hdrs=None, fp=io.BytesIO(body)  # type: ignore
         )
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "mydir"
@@ -240,13 +241,9 @@ class TestAdd:
 class TestGet:
     """Tests for get() method."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_get_extracts_tar(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_get_extracts_tar(self, mock_urlopen: MagicMock) -> None:
         """Test get downloads and extracts tar archive."""
-        import io
-        import tarfile
-
-        # Create a tar archive in memory
         buf = io.BytesIO()
         with tarfile.open(fileobj=buf, mode="w") as tar:
             data = b"file contents"
@@ -255,7 +252,7 @@ class TestGet:
             tar.addfile(info, io.BytesIO(data))
         tar_bytes = buf.getvalue()
 
-        mock_post.return_value = _mock_response(status_code=200, content=tar_bytes)
+        mock_urlopen.return_value = _mock_urlopen(200, tar_bytes)
 
         with tempfile.TemporaryDirectory() as tmp:
             client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
@@ -263,50 +260,156 @@ class TestGet:
             extracted = Path(tmp) / "QmTest" / "file.txt"
             assert extracted.read_bytes() == b"file contents"
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_get_status_error(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_get_status_error(self, mock_urlopen: MagicMock) -> None:
         """Test get raises StatusError on bad status."""
-        mock_post.return_value = _mock_response(status_code=504, text="timeout")
-        mock_post.return_value.json.side_effect = ValueError("not json")
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=504, msg="", hdrs=None, fp=io.BytesIO(b"timeout")  # type: ignore
+        )
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(StatusError):
             client.get("QmBad", "/tmp")
 
 
+class TestTimeout:
+    """Tests for timeout handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_timeout(self, mock_urlopen: MagicMock) -> None:
+        """Test add raises CommunicationError on timeout."""
+        mock_urlopen.side_effect = urllib.error.URLError("timed out")
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "f.txt").write_text("x")
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            with pytest.raises(CommunicationError):
+                client.add(str(Path(tmp) / "f.txt"))
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_bytes_timeout(self, mock_urlopen: MagicMock) -> None:
+        """Test add_bytes raises CommunicationError on timeout."""
+        mock_urlopen.side_effect = urllib.error.URLError("timed out")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(CommunicationError):
+            client.add_bytes(b"data")
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_get_timeout(self, mock_urlopen: MagicMock) -> None:
+        """Test get raises CommunicationError on timeout."""
+        mock_urlopen.side_effect = urllib.error.URLError("timed out")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(CommunicationError):
+            client.get("QmBad", "/tmp")
+
+
+class TestAddBytesErrorHandling:
+    """Tests for add_bytes error handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_bytes_error_response(self, mock_urlopen: MagicMock) -> None:
+        """Test add_bytes raises ErrorResponse on IPFS error."""
+        body = json.dumps({"Message": "add failed"}).encode()
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=500, msg="", hdrs=None, fp=io.BytesIO(body)  # type: ignore
+        )
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(ErrorResponse, match="add failed"):
+            client.add_bytes(b"data")
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_bytes_missing_hash(self, mock_urlopen: MagicMock) -> None:
+        """Test add_bytes raises StatusError when Hash key missing."""
+        body = json.dumps({"Name": "bytes"}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(StatusError, match="missing.*Hash"):
+            client.add_bytes(b"data")
+
+
+class TestTarSafety:
+    """Tests for tar extraction safety."""
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_path_traversal_filtered(self, mock_urlopen: MagicMock) -> None:
+        """Test that tar members with path traversal are filtered out."""
+        buf = io.BytesIO()
+        with tarfile.open(fileobj=buf, mode="w") as tar:
+            safe_data = b"safe content"
+            safe_info = tarfile.TarInfo(name="QmTest/safe.txt")
+            safe_info.size = len(safe_data)
+            tar.addfile(safe_info, io.BytesIO(safe_data))
+            bad_data = b"malicious"
+            bad_info = tarfile.TarInfo(name="../../../etc/passwd")
+            bad_info.size = len(bad_data)
+            tar.addfile(bad_info, io.BytesIO(bad_data))
+        tar_bytes = buf.getvalue()
+
+        mock_urlopen.return_value = _mock_urlopen(200, tar_bytes)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            client.get("QmTest", tmp)
+            assert (Path(tmp) / "QmTest" / "safe.txt").read_bytes() == b"safe content"
+            all_files = list(Path(tmp).rglob("*"))
+            assert sorted(str(f.relative_to(tmp)) for f in all_files) == [
+                "QmTest",
+                str(Path("QmTest") / "safe.txt"),
+            ]
+
+
+class TestEmptyDirAdd:
+    """Tests for empty directory add handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_empty_dir_returns_dict(self, mock_urlopen: MagicMock) -> None:
+        """Test add with empty dir (single IPFS response item) returns correctly."""
+        ndjson = '{"Name":"emptydir","Hash":"QmEmpty"}\n'
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "emptydir"
+            d.mkdir()
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            result = client.add(str(d))
+            assert isinstance(result, dict)
+            assert result["Hash"] == "QmEmpty"
+
+
 class TestPin:
     """Tests for pin operations."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_pin_ls(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_pin_ls(self, mock_urlopen: MagicMock) -> None:
         """Test pin.ls returns pinned keys."""
-        mock_post.return_value = _mock_response(
-            json_data={"Keys": {"Qm1": {"Type": "recursive"}}}
-        )
+        body = json.dumps({"Keys": {"Qm1": {"Type": "recursive"}}}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.pin.ls(type="recursive")
         assert "Qm1" in result["Keys"]
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_pin_add(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_pin_add(self, mock_urlopen: MagicMock) -> None:
         """Test pin.add."""
-        mock_post.return_value = _mock_response(json_data={"Pins": ["Qm1"]})
+        body = json.dumps({"Pins": ["Qm1"]}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.pin.add("Qm1")
         assert "Qm1" in result["Pins"]
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_pin_rm(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_pin_rm(self, mock_urlopen: MagicMock) -> None:
         """Test pin.rm."""
-        mock_post.return_value = _mock_response(json_data={"Pins": ["Qm1"]})
+        body = json.dumps({"Pins": ["Qm1"]}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.pin.rm("Qm1")
         assert "Qm1" in result["Pins"]
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_pin_add_error(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_pin_add_error(self, mock_urlopen: MagicMock) -> None:
         """Test pin.add raises ErrorResponse."""
-        mock_post.return_value = _mock_response(
-            status_code=500, json_data={"Message": "pin error"}
+        body = json.dumps({"Message": "pin error"}).encode()
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=500, msg="", hdrs=None, fp=io.BytesIO(body)  # type: ignore
         )
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(ErrorResponse):
@@ -316,12 +419,11 @@ class TestPin:
 class TestNamePublish:
     """Tests for name.publish."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_publish(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_publish(self, mock_urlopen: MagicMock) -> None:
         """Test name.publish."""
-        mock_post.return_value = _mock_response(
-            json_data={"Name": "Qm123", "Value": "/ipfs/QmHash"}
-        )
+        body = json.dumps({"Name": "Qm123", "Value": "/ipfs/QmHash"}).encode()
+        mock_urlopen.return_value = _mock_urlopen(200, body)
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.name.publish("/ipfs/QmHash")
         assert result["Value"] == "/ipfs/QmHash"
@@ -330,13 +432,11 @@ class TestNamePublish:
 class TestRepoGc:
     """Tests for repo.gc."""
 
-    @patch("aea_cli_ipfs.ipfs_client.requests.post")
-    def test_gc(self, mock_post: MagicMock) -> None:
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_gc(self, mock_urlopen: MagicMock) -> None:
         """Test repo.gc returns list of removed objects."""
         ndjson = '{"Key":"Qm1"}\n{"Key":"Qm2"}\n'
-        resp = _mock_response(status_code=200, text=ndjson)
-        resp.json.side_effect = ValueError("ndjson")
-        mock_post.return_value = resp
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         result = client.repo.gc()
         assert len(result) == 2

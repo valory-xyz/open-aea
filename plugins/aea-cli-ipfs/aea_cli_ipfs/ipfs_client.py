@@ -23,13 +23,15 @@
 Lightweight IPFS HTTP API client.
 
 Replaces the ``ipfshttpclient`` package. Talks directly to the IPFS
-daemon's HTTP API (``/api/v0/*``) using ``requests``.
+daemon's HTTP API (``/api/v0/*``) using ``urllib``.
 """
 
+import http.client
 import io
 import json
 import mimetypes
 import os
+import socket
 import tarfile
 import urllib.error
 import urllib.parse
@@ -338,12 +340,18 @@ class IPFSHTTPClient:
             with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
                 return resp.status, resp.read()
         except urllib.error.HTTPError as e:
-            return e.code, e.read()
+            try:
+                body = e.read()
+            except Exception:  # pylint: disable=broad-except
+                body = b""
+            return e.code, body
+        except socket.timeout as e:
+            raise TimeoutError(str(e)) from e
         except urllib.error.URLError as e:
             if "timed out" in str(e):
                 raise TimeoutError(str(e)) from e
             raise CommunicationError(str(e)) from e
-        except OSError as e:
+        except (http.client.HTTPException, OSError) as e:
             raise CommunicationError(str(e)) from e
 
     def _api_post(
@@ -455,8 +463,17 @@ class IPFSHTTPClient:
 
         if status != 200:
             text = resp_body.decode("utf-8", errors="replace")
+            try:
+                err = json.loads(resp_body)
+                if isinstance(err, dict) and "Message" in err:
+                    raise ErrorResponse(err["Message"])
+            except (ValueError, KeyError):
+                pass
             raise StatusError(f"IPFS API returned status {status}: {text}")
-        return json.loads(resp_body)["Hash"]
+        result = json.loads(resp_body)
+        if "Hash" not in result:
+            raise StatusError(f"IPFS API response missing 'Hash' key: {result}")
+        return result["Hash"]
 
     def get(self, cid: str, target: str = ".") -> None:
         """
@@ -480,7 +497,19 @@ class IPFSHTTPClient:
                 pass
             raise StatusError(f"IPFS API returned status {status}")
 
-        # Extract tar archive to target directory
+        # Extract tar archive with path traversal prevention (CVE-2007-4559)
+        abs_target = os.path.abspath(target)
         buf = io.BytesIO(resp_body)
         with tarfile.open(fileobj=buf, mode="r") as tar:
-            tar.extractall(path=target)  # nosec
+            for member in tar:
+                member_path = os.path.normpath(member.name)
+                if member_path.startswith("/") or ".." in member_path.split(os.sep):
+                    continue
+                full_path = os.path.normpath(os.path.join(abs_target, member_path))
+                if not full_path.startswith(abs_target):
+                    continue
+                # filter="data" is the safe default on 3.14+; explicit
+                # here to silence the DeprecationWarning on 3.12/3.13.
+                tar.extract(
+                    member, path=target, set_attrs=False, filter="data"
+                )  # nosec

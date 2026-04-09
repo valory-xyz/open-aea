@@ -18,8 +18,6 @@
 #
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-positional-arguments,unused-argument,import-outside-toplevel
-
 """
 Minimal HTTP helpers backed by :mod:`urllib` from the standard library.
 
@@ -27,15 +25,47 @@ Replaces the ``requests`` package for the few HTTP calls the core
 framework needs (registry API, package downloads, GitHub tag fetches).
 """
 
-import json
+import http.client
+import os
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Dict, Optional, Union
+import uuid
+from json import loads as json_loads
+from typing import Any, Dict, Optional, Tuple, Union
 
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 
 DEFAULT_TIMEOUT = NETWORK_REQUEST_DEFAULT_TIMEOUT
+_ALLOWED_SCHEMES = ("http", "https")
+
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Disable automatic redirect following to match requests behaviour."""
+
+    def redirect_request(  # pylint: disable=too-many-positional-arguments
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+        newurl: str,
+    ) -> None:
+        """Disable redirects.
+
+        :param req: the original request.
+        :param fp: the response file-like object.
+        :param code: HTTP status code.
+        :param msg: HTTP status message.
+        :param headers: response headers.
+        :param newurl: the redirect target URL.
+        :return: None (suppresses redirect).
+        """
+        return None  # type: ignore[return-value]
+
+
+_opener = urllib.request.build_opener(_NoRedirectHandler)
 
 
 class HTTPResponse:
@@ -64,7 +94,7 @@ class HTTPResponse:
 
     def json(self) -> Any:
         """Parse response body as JSON."""
-        return json.loads(self._data)
+        return json_loads(self._data)
 
     def read(self) -> bytes:
         """Read response body (for compatibility with file-like usage)."""
@@ -75,19 +105,26 @@ class ConnectionError(OSError):  # noqa: A001  # pylint: disable=redefined-built
     """HTTP connection error."""
 
 
-class HTTPError(Exception):
-    """HTTP non-2xx status error."""
+def _safe_read(exc: urllib.error.HTTPError) -> bytes:
+    """Read error body, returning empty bytes on failure.
+
+    :param exc: the HTTPError to read from.
+    :return: body bytes.
+    """
+    try:
+        return exc.read()
+    except Exception:  # pylint: disable=broad-except
+        return b""
 
 
-def request(
+def request(  # pylint: disable=too-many-positional-arguments
     method: str,
     url: str,
     params: Optional[Dict[str, str]] = None,
-    data: Optional[Union[bytes, Dict]] = None,
+    data: Optional[Union[bytes, Dict[str, str]]] = None,
     headers: Optional[Dict[str, str]] = None,
-    files: Optional[Dict] = None,
+    files: Optional[Dict[str, Any]] = None,
     timeout: float = DEFAULT_TIMEOUT,
-    **kwargs: Any,
 ) -> HTTPResponse:
     """
     Perform an HTTP request using urllib.
@@ -99,17 +136,24 @@ def request(
     :param headers: optional headers dict.
     :param files: optional dict of {field: file_obj} for multipart upload.
     :param timeout: request timeout in seconds.
-    :param kwargs: additional keyword arguments (ignored, for compatibility).
     :return: HTTPResponse.
+    :raises ValueError: if the URL scheme is not http or https.
+    :raises ConnectionError: on connection failure.
     """
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in _ALLOWED_SCHEMES:
+        raise ValueError(f"Unsupported URL scheme: {parsed.scheme!r}")
+
     if params:
-        url = url + "?" + urllib.parse.urlencode(params)
+        sep = "&" if parsed.query else "?"
+        url = url + sep + urllib.parse.urlencode(params)
 
     headers = dict(headers) if headers else {}
     body: Optional[bytes] = None
 
     if files:
-        body, content_type = _encode_multipart(data or {}, files)  # type: ignore[arg-type]
+        fields = data if isinstance(data, dict) else {}
+        body, content_type = _encode_multipart(fields, files)
         headers["Content-Type"] = content_type
     elif isinstance(data, dict):
         body = urllib.parse.urlencode(data).encode("utf-8")
@@ -120,28 +164,46 @@ def request(
     req = urllib.request.Request(url, data=body, headers=headers, method=method.upper())
 
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec
+        with _opener.open(req, timeout=timeout) as resp:  # nosec
             return HTTPResponse(resp.status, resp.read(), url=resp.url)
     except urllib.error.HTTPError as e:
-        return HTTPResponse(e.code, e.read(), url=url)
-    except (urllib.error.URLError, OSError) as e:
+        return HTTPResponse(e.code, _safe_read(e), url=url)
+    except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
         raise ConnectionError(str(e)) from e
 
 
 def get(url: str, timeout: float = DEFAULT_TIMEOUT, **kwargs: Any) -> HTTPResponse:
-    """HTTP GET."""
+    """HTTP GET.
+
+    :param url: the URL.
+    :param timeout: request timeout in seconds.
+    :param kwargs: additional keyword arguments passed to request().
+    :return: HTTPResponse.
+    """
     return request("GET", url, timeout=timeout, **kwargs)
 
 
 def post(url: str, timeout: float = DEFAULT_TIMEOUT, **kwargs: Any) -> HTTPResponse:
-    """HTTP POST."""
+    """HTTP POST.
+
+    :param url: the URL.
+    :param timeout: request timeout in seconds.
+    :param kwargs: additional keyword arguments passed to request().
+    :return: HTTPResponse.
+    """
     return request("POST", url, timeout=timeout, **kwargs)
 
 
-def _encode_multipart(fields: Dict[str, str], files: Dict[str, Any]) -> tuple:
-    """Encode multipart/form-data body for file uploads."""
-    import uuid
+def _encode_multipart(
+    fields: Dict[str, str], files: Dict[str, Any]
+) -> Tuple[bytes, str]:
+    """
+    Encode multipart/form-data body for file uploads.
 
+    :param fields: form field key-value pairs.
+    :param files: dict of {field_name: file_obj} for multipart upload.
+    :return: tuple of (body_bytes, content_type).
+    """
     boundary = uuid.uuid4().hex
     parts: list = []
 
@@ -151,7 +213,7 @@ def _encode_multipart(fields: Dict[str, str], files: Dict[str, Any]) -> tuple:
         parts.append(f"{value}\r\n".encode())
 
     for field_name, file_obj in files.items():
-        filename = getattr(file_obj, "name", field_name)
+        filename = os.path.basename(getattr(file_obj, "name", field_name))
         file_data = file_obj.read()
         parts.append(f"--{boundary}\r\n".encode())
         parts.append(

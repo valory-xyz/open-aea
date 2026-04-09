@@ -166,7 +166,7 @@ def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
         raise click.ClickException(
             "The remote registry is not initialized. Remote registry command currently not supported - manually edit config file!"
         )
-    request_kwargs = dict(
+    resp = http_requests.request(
         method=method,
         url="{}{}".format(registry_api_url, path),
         params=params,
@@ -174,7 +174,6 @@ def _perform_registry_request(  # pylint: disable=too-many-positional-arguments
         data=data,
         headers=headers,
     )
-    resp = http_requests.request(**request_kwargs)  # type: ignore[arg-type]
     return resp
 
 
@@ -190,7 +189,6 @@ def download_file(url: str, cwd: str, timeout: float = FILE_DOWNLOAD_TIMEOUT) ->
     """
     local_filename = url.split("/")[-1]
     filepath = os.path.join(cwd, local_filename)
-    # NOTE the stream=True parameter below
     response = http_requests.get(url, timeout=timeout)
     if response.status_code == 200:
         with open(filepath, "wb") as f:
