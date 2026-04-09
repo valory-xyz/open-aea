@@ -31,6 +31,7 @@ from aea_cli_ipfs.ipfs_client import (
     ErrorResponse,
     IPFSHTTPClient,
     StatusError,
+    TimeoutError,
     _encode_bytes,
     _multipart_boundary,
     _quote_filename,
@@ -274,6 +275,117 @@ class TestGet:
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(StatusError):
             client.get("QmBad", "/tmp")
+
+
+class TestTimeout:
+    """Tests for timeout handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_add_timeout(self, mock_post: MagicMock) -> None:
+        """Test add raises TimeoutError on timeout."""
+        mock_post.side_effect = requests.exceptions.Timeout("timed out")
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "f.txt").write_text("x")
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            with pytest.raises(TimeoutError):
+                client.add(str(Path(tmp) / "f.txt"))
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_add_bytes_timeout(self, mock_post: MagicMock) -> None:
+        """Test add_bytes raises TimeoutError on timeout."""
+        mock_post.side_effect = requests.exceptions.Timeout("timed out")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(TimeoutError):
+            client.add_bytes(b"data")
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_get_timeout(self, mock_post: MagicMock) -> None:
+        """Test get raises TimeoutError on timeout."""
+        mock_post.side_effect = requests.exceptions.Timeout("timed out")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(TimeoutError):
+            client.get("QmBad", "/tmp")
+
+
+class TestAddBytesErrorHandling:
+    """Tests for add_bytes error handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_add_bytes_error_response(self, mock_post: MagicMock) -> None:
+        """Test add_bytes raises ErrorResponse on IPFS error."""
+        mock_post.return_value = _mock_response(
+            status_code=500, json_data={"Message": "add failed"}
+        )
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(ErrorResponse, match="add failed"):
+            client.add_bytes(b"data")
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_add_bytes_missing_hash(self, mock_post: MagicMock) -> None:
+        """Test add_bytes raises StatusError when Hash key missing."""
+        mock_post.return_value = _mock_response(
+            status_code=200, json_data={"Name": "bytes"}
+        )
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(StatusError, match="missing.*Hash"):
+            client.add_bytes(b"data")
+
+
+class TestTarSafety:
+    """Tests for tar extraction safety."""
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_path_traversal_filtered(self, mock_post: MagicMock) -> None:
+        """Test that tar members with path traversal are filtered out."""
+        import io as _io
+        import tarfile as _tarfile
+
+        buf = _io.BytesIO()
+        with _tarfile.open(fileobj=buf, mode="w") as tar:
+            # Safe member
+            safe_data = b"safe content"
+            safe_info = _tarfile.TarInfo(name="QmTest/safe.txt")
+            safe_info.size = len(safe_data)
+            tar.addfile(safe_info, _io.BytesIO(safe_data))
+            # Malicious member with path traversal
+            bad_data = b"malicious"
+            bad_info = _tarfile.TarInfo(name="../../../etc/passwd")
+            bad_info.size = len(bad_data)
+            tar.addfile(bad_info, _io.BytesIO(bad_data))
+        tar_bytes = buf.getvalue()
+
+        resp = _mock_response(status_code=200, content=tar_bytes)
+        resp.raw = _io.BytesIO(tar_bytes)
+        resp.raw.decode_content = True
+        mock_post.return_value = resp
+
+        with tempfile.TemporaryDirectory() as tmp:
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            client.get("QmTest", tmp)
+            # Safe file extracted
+            assert (Path(tmp) / "QmTest" / "safe.txt").read_bytes() == b"safe content"
+            # Malicious file NOT extracted
+            assert not (Path(tmp) / ".." / ".." / ".." / "etc" / "passwd").exists()
+
+
+class TestEmptyDirAdd:
+    """Tests for empty directory add handling."""
+
+    @patch("aea_cli_ipfs.ipfs_client.requests.post")
+    def test_empty_dir_returns_dict(self, mock_post: MagicMock) -> None:
+        """Test add with empty dir (single IPFS response item) returns correctly."""
+        ndjson = '{"Name":"emptydir","Hash":"QmEmpty"}\n'
+        mock_post.return_value = _mock_response(text=ndjson, status_code=200)
+        mock_post.return_value.json.side_effect = ValueError("ndjson")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "emptydir"
+            d.mkdir()
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            result = client.add(str(d))
+            # Single item -> dict
+            assert isinstance(result, dict)
+            assert result["Hash"] == "QmEmpty"
 
 
 class TestPin:
