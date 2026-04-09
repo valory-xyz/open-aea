@@ -70,26 +70,53 @@ def check_pyproject() -> None:
 @click.command(name="check-pkg-versions")
 def check_pkg_versions() -> None:
     """Verify package IDs in documentation match actual package configurations."""
-    from aea_ci_helpers.check_pkg_versions import main as check_main  # pylint: disable=import-outside-toplevel
+    from pathlib import Path  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.check_pkg_versions import (  # pylint: disable=import-outside-toplevel
+        check_file,
+        PackageIdNotFound,
+        handle_package_not_found,
+    )
 
-    check_main()
+    docs_files = Path("docs").glob("**/*.md")
+    try:
+        for file_ in docs_files:
+            click.echo(f"Processing {file_}")
+            check_file(file_)
+    except PackageIdNotFound as e:
+        handle_package_not_found(e)
+        sys.exit(1)
+
+    click.echo("Done!")
+    sys.exit(0)
 
 
 @click.command(name="check-imports")
 def check_imports() -> None:
     """Verify all imports are declared as dependencies."""
-    from aea_ci_helpers.check_imports import main as check_main  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.check_imports import CheckTool  # pylint: disable=import-outside-toplevel
 
-    check_main()
+    CheckTool.run()
 
 
 @click.command(name="generate-api-docs")
 @click.option("--check", "check_clean", is_flag=True, help="Check docs are up to date without generating.")
 def generate_api_docs(check_clean: bool) -> None:
     """Generate API documentation from source."""
-    from aea_ci_helpers.generate_api_docs import main as gen_main  # pylint: disable=import-outside-toplevel
+    import shutil  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.generate_api_docs import generate_api_docs as gen_docs  # pylint: disable=import-outside-toplevel
+    from aea.helpers.git import check_working_tree_is_dirty  # pylint: disable=import-outside-toplevel
 
-    gen_main(check_clean=check_clean)
+    res = shutil.which("pydoc-markdown")
+    if res is None:
+        click.echo("pydoc-markdown not found. Install it: pip install pydoc-markdown==3.3.0")
+        sys.exit(1)
+
+    gen_docs()
+
+    if check_clean:
+        is_clean = check_working_tree_is_dirty()
+        if not is_clean:
+            sys.exit(1)
 
 
 @click.command(name="generate-pkg-list")
