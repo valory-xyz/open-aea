@@ -364,8 +364,12 @@ class TestTarSafety:
             client.get("QmTest", tmp)
             # Safe file extracted
             assert (Path(tmp) / "QmTest" / "safe.txt").read_bytes() == b"safe content"
-            # Malicious file NOT extracted
-            assert not (Path(tmp) / ".." / ".." / ".." / "etc" / "passwd").exists()
+            # Only the safe file was extracted — no other files in the temp dir
+            all_files = list(Path(tmp).rglob("*"))
+            assert sorted(str(f.relative_to(tmp)) for f in all_files) == [
+                "QmTest",
+                str(Path("QmTest") / "safe.txt"),
+            ]
 
 
 class TestEmptyDirAdd:

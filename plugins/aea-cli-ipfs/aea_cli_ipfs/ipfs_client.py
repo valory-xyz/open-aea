@@ -501,4 +501,8 @@ class IPFSHTTPClient:
                 full_path = os.path.normpath(os.path.join(abs_target, member_path))
                 if not full_path.startswith(abs_target):
                     continue
-                tar.extract(member, path=target, set_attrs=False)  # nosec
+                # filter="data" is the safe default on 3.14+; explicit
+                # here to silence the DeprecationWarning on 3.12/3.13.
+                tar.extract(
+                    member, path=target, set_attrs=False, filter="data"
+                )  # nosec
