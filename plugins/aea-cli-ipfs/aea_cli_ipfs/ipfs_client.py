@@ -491,9 +491,14 @@ class IPFSHTTPClient:
 
         # Stream tar extraction to avoid buffering entire archive in memory
         resp.raw.decode_content = True
+        abs_target = os.path.abspath(target)
         with tarfile.open(fileobj=resp.raw, mode="r|") as tar:
             for member in tar:
-                # Filter members to prevent path traversal (CVE-2007-4559)
-                if member.name.startswith("/") or ".." in member.name:
+                # Prevent path traversal (CVE-2007-4559)
+                member_path = os.path.normpath(member.name)
+                if member_path.startswith("/") or ".." in member_path.split(os.sep):
                     continue
-                tar.extract(member, path=target)  # nosec
+                full_path = os.path.normpath(os.path.join(abs_target, member_path))
+                if not full_path.startswith(abs_target):
+                    continue
+                tar.extract(member, path=target, set_attrs=False)  # nosec
