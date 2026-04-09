@@ -51,9 +51,9 @@ def get_all_extras() -> Dict:
 all_extras = get_all_extras()
 
 base_deps = [
-    "packaging>=22.0",
-    "protobuf>=5,<8",
-    "pyyaml>=6.0.1",
+    "packaging>=22.0,<27",
+    "protobuf>=5,<7",
+    "pyyaml>=6.0.1,<7",
 ]
 
 if os.name == "nt" or os.getenv("WIN_BUILD_WHEEL", None) == "1":

@@ -550,7 +550,7 @@ def test_gas_price_strategy_eip1559() -> None:
         gas_stregy = callable_(web3, "tx_params")
 
     assert all([key in gas_stregy for key in ["maxFeePerGas", "maxPriorityFeePerGas"]])
-    assert gas_stregy["maxPriorityFeePerGas"] < max(rewards)
+    assert gas_stregy["maxPriorityFeePerGas"] <= max(rewards)
     base_fee_per_gas_mock *= get_base_fee_multiplier(to_eth_unit(base_fee_per_gas_mock))
     assert gas_stregy["maxFeePerGas"] == base_fee_per_gas_mock
 

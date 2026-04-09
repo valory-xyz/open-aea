@@ -7,7 +7,7 @@ LEDGER_ID_REGEX: "^[^\\d\\W]\\w*\\Z"
 ``` yaml
 agent_name: my_agent                            # Name of the AEA project (must satisfy PACKAGE_REGEX)
 author: fetchai                                 # Author handle of the project's author (must satisfy AUTHOR_REGEX)
-version: 0.1.0                                  # Version of the AEA project (a semantic version number, see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string")
+version: 0.1.0                                  # Version of the AEA project (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 description: A demo project                     # Description of the AEA project
 license: Apache-2.0                             # License of the AEA project
 aea_version: '>=2.0.0, <3.0.0'               # AEA framework version(s) compatible with the AEA project (a version number that matches PEP 440 version schemes, or a comma-separated list of PEP 440 version specifiers, see https://www.python.org/dev/peps/pep-0440/#version-specifiers)
@@ -71,7 +71,7 @@ models:                                         # override configurations for mo
 ``` yaml
 name: scaffold                                  # Name of the package (must satisfy PACKAGE_REGEX)
 author: fetchai                                 # Author handle of the package's author (must satisfy AUTHOR_REGEX)
-version: 0.1.0                                  # Version of the package (a semantic version number, see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string")
+version: 0.1.0                                  # Version of the package (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 type: connection                                # The type of the package; for connections, it must be "connection"
 description: A scaffold connection              # Description of the package
 license: Apache-2.0                             # License of the package
@@ -93,7 +93,7 @@ is_abstract: false                              # An optional boolean that if `t
 ``` yaml
 name: scaffold                                  # Name of the package (must satisfy PACKAGE_REGEX)
 author: fetchai                                 # Author handle of the package's author (must satisfy AUTHOR_REGEX)
-version: 0.1.0                                  # Version of the package (a semantic version number, see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string")
+version: 0.1.0                                  # Version of the package (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 type: contract                                  # The type of the package; for contracts, it must be "contract"
 description: A scaffold contract                # Description of the package
 license: Apache-2.0                             # License of the package
@@ -111,7 +111,7 @@ dependencies: {}                                # The python dependencies the pa
 ``` yaml
 name: scaffold                                  # Name of the package (must satisfy PACKAGE_REGEX)
 author: fetchai                                 # Author handle of the package's author (must satisfy AUTHOR_REGEX)
-version: 0.1.0                                  # Version of the package (a semantic version number, see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string")
+version: 0.1.0                                  # Version of the package (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 type: protocol                                  # The type of the package; for protocols, it must be "protocol" 
 description: A scaffold protocol                # Description of the package
 license: Apache-2.0                             # License of the package
@@ -126,7 +126,7 @@ dependencies: {}                                # The python dependencies the pa
 ``` yaml
 name: scaffold                                  # Name of the package (must satisfy PACKAGE_REGEX)
 author: fetchai                                 # Author handle of the package's author (must satisfy AUTHOR_REGEX)
-version: 0.1.0                                  # Version of the package (a semantic version number, see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string")
+version: 0.1.0                                  # Version of the package (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 type: skill                                     # The type of the package; for skills, it must be "skill"
 description: A scaffold skill                   # Description of the package
 license: Apache-2.0                             # License of the package

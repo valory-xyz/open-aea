@@ -39,6 +39,7 @@ from aea_cli_ipfs.exceptions import (
     PublishError,
     RemoveError,
 )
+from aea_cli_ipfs.ipfs_client import IPFSHTTPClient
 
 DEFAULT_IPFS_URI_BASE = str(os.environ.get("OPEN_AEA_IPFS_ADDR_BASE", "api/v0"))
 DEFAULT_IPFS_URL = "/dns/registry.autonolas.tech/tcp/443/https"
@@ -227,10 +228,6 @@ class IPFSTool:
         if addr is None:
             addr = os.environ.get("OPEN_AEA_IPFS_ADDR", DEFAULT_IPFS_URL)
 
-        from aea_cli_ipfs.ipfs_client import (  # pylint: disable=import-outside-toplevel
-            IPFSHTTPClient,
-        )
-
         _, host, *_ = resolve_addr(cast(str, addr))  # verify addr
 
         self._addr = addr
@@ -295,13 +292,14 @@ class IPFSTool:
             recursive=recursive,
             wrap_with_directory=wrap_with_directory,
         )
+        # add() returns a dict for single items, list for multiple
+        if isinstance(response, dict):
+            return response["Name"], response["Hash"], []
+
         if wrap_with_directory:
             return response[-2]["Name"], response[-1]["Hash"], response[:-1]
 
-        if Path(dir_path).is_dir():
-            return response[-1]["Name"], response[-1]["Hash"], response[:-1]
-
-        return response["Name"], response["Hash"], []  # type: ignore[call-overload]
+        return response[-1]["Name"], response[-1]["Hash"], response[:-1]
 
     def pin(self, hash_id: str) -> Dict:
         """Pin content with hash_id"""

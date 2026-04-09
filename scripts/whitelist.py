@@ -351,6 +351,7 @@ from_block  # unused variable (aea/crypto/base.py:542)
 batch_size  # unused variable (aea/crypto/base.py:543)
 max_retries  # unused variable (aea/crypto/base.py:544)
 reduce_factor  # unused variable (aea/crypto/base.py:545)
+check_schema  # unused method (aea/helpers/json_schema.py) — called from tests
 post  # aea/helpers/http_requests.py — used by plugins; vulture can't see cross-package usage
 redirect_request  # aea/helpers/http_requests.py — override called by urllib internals
 newurl  # aea/helpers/http_requests.py — required by redirect_request override signature

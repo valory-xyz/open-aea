@@ -39,6 +39,7 @@ from aea.helpers.json_schema import (
     RefResolver,
     TypeChecker,
     ValidationError,
+    _validate_additional_properties,
     extend,
     find_additional_properties,
 )
@@ -107,10 +108,9 @@ class CustomTypeChecker(TypeChecker):
 
 def own_additional_properties(validator, aP, instance, schema) -> Iterator:  # type: ignore  # pylint: disable=unused-argument
     """Additional properties validator."""
-    if aP is False and isinstance(instance, dict):
-        extras = list(find_additional_properties(instance, schema))
-        if extras:
-            raise ExtraPropertiesError(extras)
+    errors = list(_validate_additional_properties(validator, aP, instance, schema))
+    if errors:
+        raise ExtraPropertiesError(list(find_additional_properties(instance, schema)))
     return iter(())
 
 

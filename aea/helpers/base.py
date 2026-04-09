@@ -137,6 +137,9 @@ def load_env_file(env_file: str) -> None:
     """
     Load the content of the environment file into the process environment.
 
+    Supports ``export`` prefixes and ``${VAR}`` interpolation, matching
+    the behaviour of ``python-dotenv``.
+
     :param env_file: save_path to the env file.
     """
     path = Path(env_file)
@@ -146,13 +149,43 @@ def load_env_file(env_file: str) -> None:
         line = line.strip()
         if not line or line.startswith("#"):
             continue
+        # Strip optional 'export ' prefix
+        if line.startswith("export "):
+            line = line[7:]
         key, _, value = line.partition("=")
         key = key.strip()
         value = value.strip()
         if not key:
             continue
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
-            value = value[1:-1]
+        if value and value[0] in ("'", '"'):
+            # Quoted value: find matching unescaped closing quote
+            quote_char = value[0]
+            i = 1
+            end_idx = -1
+            while i < len(value):
+                if value[i] == "\\" and i + 1 < len(value):
+                    i += 2  # skip escaped character
+                elif value[i] == quote_char:
+                    end_idx = i
+                    break
+                else:
+                    i += 1
+            if end_idx != -1:
+                value = value[1:end_idx].replace("\\" + quote_char, quote_char)
+            else:
+                # No closing quote — treat as unquoted
+                value = value[1:]
+        else:
+            # Unquoted values: strip inline comments (space + #)
+            comment_idx = value.find(" #")
+            if comment_idx != -1:
+                value = value[:comment_idx].rstrip()
+        # Interpolate ${VAR} references (matching python-dotenv behavior)
+        value = re.sub(
+            r"\$\{([^}]+)\}",
+            lambda m: os.environ.get(m.group(1), ""),
+            value,
+        )
         os.environ.setdefault(key, value)
 
 
