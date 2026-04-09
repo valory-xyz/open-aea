@@ -44,6 +44,8 @@ WHITELIST = {
     "packaging",
     # Removed from core deps but needed by packages (p2p connections)
     "ecdsa",
+    # Replaced by inlined IPFS client
+    "ipfshttpclient",
 }
 
 

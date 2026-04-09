@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022-2023 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
-import ipfshttpclient
 import pytest
 import requests
+from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.ipfs_utils import (
     DownloadError,
     IPFSDaemon,
@@ -186,9 +186,7 @@ def test_tool_add_pin() -> None:
         assert ipfs_tool.pin("some")
 
         with pytest.raises(PinError):
-            client_mock.pin.add = Mock(
-                side_effect=ipfshttpclient.exceptions.ErrorResponse(Mock(), Mock())
-            )
+            client_mock.pin.add = Mock(side_effect=ipfs_exc.ErrorResponse("mock error"))
             ipfs_tool.pin("some")
 
 
@@ -201,9 +199,7 @@ def test_tool_remove_unpinned_files() -> None:
         ipfs_tool.remove_unpinned_files()
 
         with pytest.raises(RemoveError):
-            client_mock.repo.gc = Mock(
-                side_effect=ipfshttpclient.exceptions.ErrorResponse(Mock(), Mock())
-            )
+            client_mock.repo.gc = Mock(side_effect=ipfs_exc.ErrorResponse("mock error"))
             ipfs_tool.remove_unpinned_files()
 
 
@@ -211,9 +207,7 @@ def test_tool_download() -> None:
     """Test IPFSTool.download method."""
     ipfs_tool = IPFSTool()
     client_mock = Mock()
-    client_mock.get = Mock(
-        side_effect=ipfshttpclient.exceptions.StatusError(Mock(), Mock())
-    )
+    client_mock.get = Mock(side_effect=ipfs_exc.StatusError("mock status error"))
     with patch.object(
         ipfs_tool, "client", client_mock
     ), TemporaryDirectory() as tmp_dir, patch(
