@@ -528,15 +528,26 @@ class IPFSHTTPClient:
         if resp.status != 200:
             raise StatusError(f"IPFS API returned status {resp.status}")
 
-        # Stream tar extraction with path traversal prevention (CVE-2007-4559)
+        # Stream tar extraction with path traversal prevention (CVE-2007-4559).
+        # Cross-platform: tar names use "/" but on Windows os.path treats
+        # "\" as separator too, so we check both forms and use os.path.isabs.
         abs_target = os.path.abspath(target)
         with tarfile.open(fileobj=resp, mode="r|") as tar:
             for member in tar:
                 member_path = os.path.normpath(member.name)
-                if member_path.startswith("/") or ".." in member_path.split(os.sep):
+                # Reject absolute paths (POSIX or Windows) and any traversal
+                if (
+                    os.path.isabs(member_path)
+                    or member_path.startswith("/")
+                    or member_path.startswith("\\")
+                    or ".." in member_path.replace("\\", "/").split("/")
+                ):
                     continue
                 full_path = os.path.normpath(os.path.join(abs_target, member_path))
-                if not full_path.startswith(abs_target):
+                # Defence-in-depth: ensure the resolved path stays inside target
+                if full_path != abs_target and not full_path.startswith(
+                    abs_target + os.sep
+                ):
                     continue
                 # filter="data" is the safe default on 3.14+; explicit
                 # here to silence the DeprecationWarning on 3.12/3.13.

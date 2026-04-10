@@ -189,7 +189,7 @@ class TestAdd:
 
     @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
     def test_add_directory(self, mock_urlopen: MagicMock) -> None:
-        """Test add returns list of items."""
+        """Test add returns list of items and uses streaming generator."""
         ndjson = (
             '{"Name":"mydir/a.txt","Hash":"Qm1"}\n'
             '{"Name":"mydir","Hash":"Qm2"}\n'
@@ -206,6 +206,11 @@ class TestAdd:
             result = client.add(str(root))
             assert isinstance(result, list)
             assert len(result) == 3
+            # Verify the request body was passed as a generator (streaming),
+            # not a buffered bytes object — this is how main streamed uploads
+            req = mock_urlopen.call_args[0][0]
+            assert not isinstance(req.data, (bytes, bytearray))
+            assert hasattr(req.data, "__iter__")
 
     @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
     def test_add_single_file_returns_dict(self, mock_urlopen: MagicMock) -> None:
@@ -337,10 +342,18 @@ class TestTarSafety:
             safe_info = tarfile.TarInfo(name="QmTest/safe.txt")
             safe_info.size = len(safe_data)
             tar.addfile(safe_info, io.BytesIO(safe_data))
-            bad_data = b"malicious"
-            bad_info = tarfile.TarInfo(name="../../../etc/passwd")
-            bad_info.size = len(bad_data)
-            tar.addfile(bad_info, io.BytesIO(bad_data))
+            # Multiple malicious patterns: parent traversal, posix abs,
+            # windows-style backslash abs
+            for bad_name in (
+                "../../../etc/passwd",
+                "/etc/passwd",
+                "\\windows\\system32\\evil.exe",
+                "..\\..\\windows\\evil.exe",
+            ):
+                bad_data = b"malicious"
+                bad_info = tarfile.TarInfo(name=bad_name)
+                bad_info.size = len(bad_data)
+                tar.addfile(bad_info, io.BytesIO(bad_data))
         tar_bytes = buf.getvalue()
 
         mock_urlopen.return_value = _mock_urlopen(200, tar_bytes)
@@ -350,6 +363,7 @@ class TestTarSafety:
             client.get("QmTest", tmp)
             assert (Path(tmp) / "QmTest" / "safe.txt").read_bytes() == b"safe content"
             all_files = list(Path(tmp).rglob("*"))
+            # Only the safe file should be extracted, no traversal escape
             assert sorted(str(f.relative_to(tmp)) for f in all_files) == [
                 "QmTest",
                 str(Path("QmTest") / "safe.txt"),

@@ -43,7 +43,7 @@ setup(
             "test_tools/data/*",
         ]
     },
-    install_requires=["open-aea-ledger-cosmos~=2.1.0"],
+    install_requires=["open-aea-ledger-cosmos~=2.1.0", "requests>=2.20.0,<3"],
     tests_require=["pytest"],
     entry_points={
         "aea.cryptos": ["fetchai = aea_ledger_fetchai:FetchAICrypto"],
