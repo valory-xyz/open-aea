@@ -216,7 +216,7 @@ class ToxFile:
         """Initialize object."""
         self.dependencies = dependencies
         self.file = file
-        self.extra: Dict[str, Any] = {}
+        self.extra: Dict[str, Dependency] = {}
 
     def __iter__(self) -> Iterator[Dependency]:
         """Iter dependencies."""

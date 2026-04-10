@@ -97,9 +97,9 @@ def get_public_id_from_yaml(configuration_file: Path):
     return PublicId(author, name, version)
 
 
-def find_all_packages_ids() -> Set:
+def find_all_packages_ids() -> Set[PackageId]:
     """Find all packages ids."""
-    package_ids: Set = set()
+    package_ids: Set[PackageId] = set()
     packages_dir = Path("packages")
     config_files = [
         path
@@ -308,7 +308,7 @@ def check_and_upload(package_id, runner: CliRunner) -> None:
         )
 
 
-def upload_new_packages(runner: CliRunner, all_package_ids: Set) -> None:
+def upload_new_packages(runner: CliRunner, all_package_ids: Set[PackageId]) -> None:
     """
     Upload new packages.
 

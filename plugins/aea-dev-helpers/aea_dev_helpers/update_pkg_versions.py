@@ -242,7 +242,7 @@ def public_id_in_registry(type_: str, name: str):
     return highest
 
 
-def get_all_protocol_spec_ids() -> Set:
+def get_all_protocol_spec_ids() -> Set[PublicId]:
     """
     Get all protocol specification ids.
 
@@ -251,7 +251,7 @@ def get_all_protocol_spec_ids() -> Set:
     they are only used to find clashes with protocol ids.
     :return: a set of package ids.
     """
-    result: Set = set()
+    result: Set[PublicId] = set()
     protocol_packages = set(PACKAGES_DIR.rglob("**/**/protocols/**")) - set(
         PACKAGES_DIR.rglob("**/**/protocols")
     )
@@ -264,9 +264,9 @@ def get_all_protocol_spec_ids() -> Set:
     return result
 
 
-def get_all_package_ids() -> Set:
+def get_all_package_ids() -> Set[PackageId]:
     """Get all the package ids in the local repository."""
-    result: Set = set()
+    result: Set[PackageId] = set()
     now = get_hashes_from_current_release()
     now_by_type = split_hashes_by_type(now)
     for type_, name_to_hashes in now_by_type.items():
@@ -280,7 +280,7 @@ def get_all_package_ids() -> Set:
     return result
 
 
-def get_public_ids_to_update() -> Set:
+def get_public_ids_to_update() -> Set[PackageId]:
     """
     Get all the public ids to be updated.
 
@@ -292,7 +292,7 @@ def get_public_ids_to_update() -> Set:
       are already the same.
     :return: set of package ids to update
     """
-    result: Set = set()
+    result: Set[PackageId] = set()
     last = get_hashes_from_last_release()
     now = get_hashes_from_current_release()
     last_by_type = split_hashes_by_type(last)
@@ -336,10 +336,10 @@ def get_public_ids_to_update() -> Set:
     return result
 
 
-def _get_ambiguous_public_ids() -> Set:
+def _get_ambiguous_public_ids() -> Set[PublicId]:
     """Get the public ids that are the public ids of more than one package id."""
     all_package_ids = get_all_package_ids()
-    result: Set = set(
+    result: Set[PublicId] = set(
         map(
             operator.itemgetter(0),
             filter(
@@ -351,7 +351,7 @@ def _get_ambiguous_public_ids() -> Set:
     return result
 
 
-def _sort_in_update_order(package_ids: Set) -> List:
+def _sort_in_update_order(package_ids: Set[PackageId]) -> List[PackageId]:
     """
     Sort the set of package id in the order of update.
 
@@ -623,8 +623,8 @@ class Updater:
 
     def process_packages(
         self,
-        all_package_ids_to_update: Set,
-        ambiguous_public_ids: Set,
+        all_package_ids_to_update: Set[PackageId],
+        ambiguous_public_ids: Set[PublicId],
     ) -> None:
         """Process the package versions."""
         print("*" * 100)
