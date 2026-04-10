@@ -520,7 +520,8 @@ jobs:
           # wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-win64.zip
           # unzip protoc-24.3-win64.zip -d protoc
           # sudo mv protoc/bin/protoc /usr/local/bin/protoc
-          python scripts/update_symlinks_cross_platform.py
+          pip install ./plugins/aea-dev-helpers
+          aea-dev update-symlinks
           make protolint_install_win
           # just check protolint runs
           protolint version
