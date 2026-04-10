@@ -190,7 +190,7 @@ class TestErrorHandling:
             hdrs=None,  # type: ignore
             fp=io.BytesIO(b""),
         )
-        exc.read = MagicMock(side_effect=OSError("read failed"))
+        exc.read = MagicMock(side_effect=OSError("read failed"))  # type: ignore[method-assign]
         mock_open.side_effect = exc
         resp = http_requests.get("http://example.com")
         assert resp.status_code == 500
