@@ -37,6 +37,7 @@ from cosmpy.protos.cosmos.base.v1beta1.coin_pb2 import Coin
 from google.protobuf.any_pb2 import Any as ProtoAny
 
 from aea.crypto.helpers import KeyIsIncorrect
+from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 
 from tests.conftest import FETCHAI_TESTNET_CONFIG, MAX_FLAKY_RERUNS, ROOT_DIR
 
@@ -310,13 +311,15 @@ def test_successful_faucet_operation(mock_post, mock_get):
             call(
                 url=f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims",
                 json={"address": address},
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             )
         ]
     )
     mock_get.assert_has_calls(
         [
             call(
-                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here"
+                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here",
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             )
         ]
     )
@@ -376,19 +379,23 @@ def test_successful_realistic_faucet_operation(mock_post, mock_get):
             call(
                 url=f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims",
                 json={"address": address},
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             )
         ]
     )
     mock_get.assert_has_calls(
         [
             call(
-                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here"
+                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here",
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             ),
             call(
-                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here"
+                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here",
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             ),
             call(
-                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here"
+                f"{FetchAIFaucetApi.testnet_faucet_url}/api/v3/claims/a-uuid-v4-would-be-here",
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             ),
         ]
     )
