@@ -30,39 +30,22 @@ CLI_REGEX = r"(?P<cli>aea)"
 # CMD_REGEX should be r"(?P<cmd>(\S+\s(\s--\S+)*)+)",
 # but python implementation differs from others and does not match it properly
 CMD_REGEX = r"(?P<cmd>.*)"
-VENDOR_REGEX: Optional[str] = None
-PACKAGE_REGEX: Optional[str] = None
+# Hardcoded from aea.helpers.base — these are stable AEA constants
+SIMPLE_ID_REGEX = r"[a-z_][a-z0-9_]{0,127}"
+IPFS_HASH_REGEX = r"((Qm[a-zA-Z0-9]{44})|(ba[a-zA-Z0-9]{57}))"
+VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
+PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
 VERSION_REGEX = r"(?P<version>\d+\.\d+\.\d+)"
 FLAGS_REGEX = r"(?P<flags>(\s--.*)?)"
 PACKAGE_TYPE_REGEX = (
     r"(?P<package_type>(skill|protocol|connection|contract|agent|service))"
 )
 
-AEA_COMMAND_REGEX: Optional[str] = None
-FULL_PACKAGE_REGEX: Optional[str] = None
-PACKAGE_TABLE_REGEX: Optional[str] = None
+AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}){FLAGS_REGEX})"
+FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
+PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
 
 ROOT_DIR = Path(__file__).parent.parent.parent.parent
-
-
-def _ensure_regex_constants() -> None:
-    """Lazily initialise module-level regex constants that depend on aea helpers."""
-    global VENDOR_REGEX, PACKAGE_REGEX, AEA_COMMAND_REGEX, FULL_PACKAGE_REGEX, PACKAGE_TABLE_REGEX  # noqa: E501
-
-    if AEA_COMMAND_REGEX is not None:
-        return  # already initialised
-
-    from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
-        IPFS_HASH_REGEX,
-        SIMPLE_ID_REGEX,
-    )
-
-    VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
-    PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
-
-    AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}){FLAGS_REGEX})"
-    FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
-    PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
 
 
 def read_file(filepath: str) -> str:

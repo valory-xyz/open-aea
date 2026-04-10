@@ -26,10 +26,10 @@ from pathlib import Path
 from typing import Dict, Union, cast
 
 import click
+from aea_ci_helpers.check_doc_hashes import read_file
 from click.core import Command, Group, Option
 
 from aea.cli import cli as aea_cli
-from scripts.check_doc_ipfs_hashes import read_file
 
 
 def get_cmd_data(cmd: Union[Command, Group]) -> Dict:
