@@ -27,6 +27,7 @@ daemon's HTTP API (``/api/v0/*``) using ``urllib``.
 """
 
 import http.client
+import inspect
 import json
 import mimetypes
 import os
@@ -542,6 +543,15 @@ class IPFSHTTPClient:
         # Cross-platform: tar names use "/" but on Windows os.path treats
         # "\" as separator too, so we check both forms and use os.path.isabs.
         abs_target = os.path.abspath(target)
+        # The ``filter`` kwarg for tarfile.extract() was backported in
+        # 3.9.17 / 3.10.12 / 3.11.4 as a security fix (CVE-2007-4559),
+        # and defaults to "data" on 3.14+. Older patch versions (e.g.
+        # Python 3.10.11 on Windows hosted runners) do not have it —
+        # detect at runtime and fall back to the manual path-traversal
+        # check below, which is defence-in-depth in any case.
+        extract_kwargs: Dict[str, Any] = {"path": target, "set_attrs": False}
+        if "filter" in inspect.signature(tarfile.TarFile.extract).parameters:
+            extract_kwargs["filter"] = "data"
         with tarfile.open(fileobj=stream, mode="r|") as tar:
             for member in tar:
                 member_path = os.path.normpath(member.name)
@@ -559,8 +569,4 @@ class IPFSHTTPClient:
                     abs_target + os.sep
                 ):
                     continue
-                # filter="data" is the safe default on 3.14+; explicit here
-                # to silence the DeprecationWarning on 3.12/3.13.
-                tar.extract(  # nosec
-                    member, path=target, set_attrs=False, filter="data"
-                )
+                tar.extract(member, **extract_kwargs)  # nosec
