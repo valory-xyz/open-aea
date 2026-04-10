@@ -40,7 +40,8 @@ def test_fetchd_fixture() -> None:
     # started
     try:
         response = requests.get(
-            f"{DEFAULT_FETCH_LEDGER_ADDR}:{DEFAULT_FETCH_LEDGER_RPC_PORT}/net_info?"
+            f"{DEFAULT_FETCH_LEDGER_ADDR}:{DEFAULT_FETCH_LEDGER_RPC_PORT}/net_info?",
+            timeout=30,
         )
         assert response.status_code == 200
     finally:

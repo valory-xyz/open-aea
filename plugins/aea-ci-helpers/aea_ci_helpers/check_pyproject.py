@@ -38,14 +38,18 @@ WHITELIST = {
     "apduboy",
     "matplotlib",
     "open-aea-flashbots",
-    # Core deps declared in [tool.poetry.dependencies] — version ranges differ
-    # from tox.ini exact pins, so string comparison would always mismatch
+    # Dev deps declared with version ranges in pyproject.toml but pinned
+    # exactly in tox.ini — string comparison would always mismatch
     "requests",
     "packaging",
     # Removed from core deps but needed by packages (p2p connections)
     "ecdsa",
     # Replaced by inlined IPFS client
     "ipfshttpclient",
+    # Only needed in individual tox envs (pylint, mypy), not as project deps
+    "types-requests",
+    "urllib3",
+    "certifi",
 }
 
 

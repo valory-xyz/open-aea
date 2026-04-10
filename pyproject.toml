@@ -12,7 +12,6 @@ python = ">=3.10,<3.16"
 packaging = ">=22.0,<27"
 protobuf = ">=5,<7"
 pyyaml = ">=6.0.1,<7"
-requests = ">=2.20.0,<3"
 pywin32 = {version = ">=304", markers = "sys_platform == 'win32'"}
 # Optional deps for extras
 click = {version = ">=8.1.0,<8.4.0", optional = true}
@@ -26,6 +25,9 @@ all = ["click", "pyyaml", "packaging", "pytest", "coverage"]
 
 [tool.poetry.group.dev.dependencies]
 setuptools = "==59.6.0"
+# Used by plugins (cosmos, ethereum, fetchai) at runtime and by tests;
+# kept here as a dev dep so `poetry install` provisions it for development.
+requests = ">=2.20.0,<3"
 aiohttp = ">=3.8.5,<4.0.0"
 asn1crypto = ">=1.4.0,<1.5.0"
 bech32 = "==1.2.0"

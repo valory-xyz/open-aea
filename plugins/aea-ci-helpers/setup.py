@@ -37,7 +37,6 @@ setup(
     },
     install_requires=[
         "click>=8.1.0,<9",
-        "requests>=2.28.0,<3",
         "packaging",
         "tomli",
     ],

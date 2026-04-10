@@ -5,7 +5,7 @@
 Lightweight IPFS HTTP API client.
 
 Replaces the ``ipfshttpclient`` package. Talks directly to the IPFS
-daemon's HTTP API (``/api/v0/*``) using ``requests``.
+daemon's HTTP API (``/api/v0/*``) using ``urllib``.
 
 <a id="plugins.aea-cli-ipfs.aea_cli_ipfs.ipfs_client.IPFSError"></a>
 

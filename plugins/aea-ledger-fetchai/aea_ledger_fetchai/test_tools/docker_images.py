@@ -34,8 +34,10 @@ except ImportError:  # pragma: nocover
     Container = Any
 
 
+import requests
+
 from aea.exceptions import enforce
-from aea.helpers import http_requests as requests
+from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
 from aea.test_tools.docker_image import DockerImage
 
 logger = logging.getLogger(__name__)
@@ -127,7 +129,7 @@ class FetchLedgerDockerImage(DockerImage):
         for i in range(max_attempts):
             try:
                 url = f"{self._addr}:{self._port}/net_info?"
-                response = requests.get(url)
+                response = requests.get(url, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
                 enforce(response.status_code == 200, "")
                 return True
             except Exception:  # pylint: disable=broad-except

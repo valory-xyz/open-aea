@@ -54,7 +54,6 @@ base_deps = [
     "packaging>=22.0,<27",
     "protobuf>=5,<7",
     "pyyaml>=6.0.1,<7",
-    "requests>=2.20.0,<3",
 ]
 
 if os.name == "nt" or os.getenv("WIN_BUILD_WHEEL", None) == "1":

@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """This module contains testing utilities."""
 
+import json
 import logging
 import os
 import re
@@ -34,7 +35,9 @@ from docker import DockerClient
 from docker.models.containers import Container
 
 from aea.exceptions import enforce
-from aea.helpers import http_requests as requests
+from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
+from aea.helpers.http_requests import get as http_get
+from aea.helpers.http_requests import post as http_post
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +171,12 @@ class GanacheDockerImage(DockerImage):
         request = dict(jsonrpc=2.0, method="web3_clientVersion", params=[], id=1)
         for i in range(max_attempts):
             try:
-                response = requests.post(f"{self._addr}:{self._port}", json=request)
+                response = http_post(
+                    f"{self._addr}:{self._port}",
+                    data=json.dumps(request).encode(),
+                    headers={"Content-Type": "application/json"},
+                    timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
+                )
                 enforce(response.status_code == 200, "")
                 return True
             except Exception:
@@ -264,7 +272,7 @@ class FetchLedgerDockerImage(DockerImage):
         for i in range(max_attempts):
             try:
                 url = f"{self._addr}:{self._port}/net_info?"
-                response = requests.get(url)
+                response = http_get(url, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT)
                 enforce(response.status_code == 200, "")
                 return True
             except Exception:
