@@ -46,6 +46,10 @@ WHITELIST = {
     "ecdsa",
     # Replaced by inlined IPFS client
     "ipfshttpclient",
+    # Only needed in individual tox envs (pylint, mypy), not as project deps
+    "types-requests",
+    "urllib3",
+    "certifi",
 }
 
 
