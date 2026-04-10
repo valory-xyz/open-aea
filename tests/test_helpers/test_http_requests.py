@@ -226,12 +226,12 @@ class TestSchemeValidation:
         assert resp.status_code == 200
 
 
-class TestNoRedirect:
-    """Tests for redirect suppression."""
+class TestRedirectBehaviour:
+    """Tests for method-specific redirect handling (matches requests library)."""
 
     @patch("aea.helpers.http_requests._opener.open")
-    def test_redirect_returned_as_response(self, mock_open: MagicMock) -> None:
-        """Test 301/302 responses are returned, not followed."""
+    def test_post_redirect_returned_as_response(self, mock_open: MagicMock) -> None:
+        """POST 301/302 should NOT be followed, match requests default."""
         mock_open.side_effect = urllib.error.HTTPError(
             url="",
             code=301,
@@ -241,6 +241,86 @@ class TestNoRedirect:
         )
         resp = http_requests.post("http://example.com/api")
         assert resp.status_code == 301
+
+    def test_get_follows_redirect_via_conditional_handler(self) -> None:
+        """GET requests should follow redirects (match requests default)."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        # Simulate a GET request receiving a 302 redirect
+        req = urllib.request.Request("http://example.com/a", method="GET")
+        result = handler.redirect_request(
+            req,
+            io.BytesIO(b""),
+            302,
+            "Found",
+            {"location": "http://example.com/b"},
+            "http://example.com/b",
+        )
+        # For GET, should return a new Request (to follow the redirect)
+        assert result is not None
+        assert isinstance(result, urllib.request.Request)
+
+    def test_post_suppresses_redirect_via_conditional_handler(self) -> None:
+        """POST requests should NOT follow redirects."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        req = urllib.request.Request("http://example.com/a", data=b"x", method="POST")
+        result = handler.redirect_request(
+            req,
+            io.BytesIO(b""),
+            302,
+            "Found",
+            {"location": "http://example.com/b"},
+            "http://example.com/b",
+        )
+        assert result is None
+
+    @pytest.mark.parametrize("method", ["PUT", "DELETE", "PATCH"])
+    def test_other_unsafe_methods_suppress_redirects(self, method: str) -> None:
+        """PUT/DELETE/PATCH should not follow redirects either."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        req = urllib.request.Request("http://example.com/a", data=b"x", method=method)
+        result = handler.redirect_request(
+            req,
+            io.BytesIO(b""),
+            302,
+            "Found",
+            {"location": "http://example.com/b"},
+            "http://example.com/b",
+        )
+        assert result is None
+
+
+class TestBackwardsCompatShims:
+    """Tests for backwards-compatible re-exports."""
+
+    def test_response_alias(self) -> None:
+        """Response is an alias for HTTPResponse."""
+        assert http_requests.Response is http_requests.HTTPResponse
+
+    def test_exceptions_connection_error(self) -> None:
+        """exceptions.ConnectionError is our ConnectionError."""
+        assert http_requests.exceptions.ConnectionError is http_requests.ConnectionError
+
+    def test_exceptions_request_exception(self) -> None:
+        """exceptions.RequestException maps to ConnectionError."""
+        assert (
+            http_requests.exceptions.RequestException is http_requests.ConnectionError
+        )
+
+    def test_json_decode_error(self) -> None:
+        """Verify JSONDecodeError re-exports the stdlib one."""
+        assert http_requests.JSONDecodeError is json.JSONDecodeError
+
+    def test_head_function(self) -> None:
+        """head() is a thin wrapper over request('HEAD', ...)."""
+        assert callable(http_requests.head)
+
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_head_makes_head_request(self, mock_open: MagicMock) -> None:
+        """head() actually sends a HEAD request."""
+        mock_open.return_value = _mock_urlopen(200, b"")
+        http_requests.head("http://example.com")
+        req = mock_open.call_args[0][0]
+        assert req.get_method() == "HEAD"
 
 
 class TestDownloadToFile:

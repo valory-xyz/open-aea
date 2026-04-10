@@ -7,26 +7,35 @@ Minimal HTTP helpers backed by :mod:`urllib` from the standard library.
 Replaces the ``requests`` package for the few HTTP calls the core
 framework needs (registry API, package downloads, GitHub tag fetches).
 
-<a id="aea.helpers.http_requests._NoRedirectHandler"></a>
+<a id="aea.helpers.http_requests._ConditionalNoRedirectHandler"></a>
 
-## `_`NoRedirectHandler Objects
+## `_`ConditionalNoRedirectHandler Objects
 
 ```python
-class _NoRedirectHandler(urllib.request.HTTPRedirectHandler)
+class _ConditionalNoRedirectHandler(urllib.request.HTTPRedirectHandler)
 ```
 
-Disable automatic redirect following to match requests behaviour.
+Match requests' default redirect behaviour per HTTP method.
 
-<a id="aea.helpers.http_requests._NoRedirectHandler.redirect_request"></a>
+requests.get() follows redirects by default (allow_redirects=True),
+while requests.post()/put()/delete()/patch() do NOT follow redirects
+(allow_redirects=False). urllib.request's default follows everything
+— including silently turning POST→GET on 30x, which is a silent
+behaviour change. This handler suppresses redirects only for unsafe
+methods and lets the default HTTPRedirectHandler follow them for
+safe methods like GET/HEAD.
+
+<a id="aea.helpers.http_requests._ConditionalNoRedirectHandler.redirect_request"></a>
 
 #### redirect`_`request
 
 ```python
 def redirect_request(req: urllib.request.Request, fp: Any, code: int, msg: str,
-                     headers: Any, newurl: str) -> None
+                     headers: Any,
+                     newurl: str) -> Optional[urllib.request.Request]
 ```
 
-Disable redirects.
+Suppress redirects for unsafe methods, follow for safe ones.
 
 **Arguments**:
 
@@ -39,7 +48,7 @@ Disable redirects.
 
 **Returns**:
 
-None (suppresses redirect).
+a new Request to follow, or None to suppress.
 
 <a id="aea.helpers.http_requests.HTTPResponse"></a>
 
@@ -197,6 +206,48 @@ HTTP POST.
 **Returns**:
 
 HTTPResponse.
+
+<a id="aea.helpers.http_requests.head"></a>
+
+#### head
+
+```python
+def head(url: str,
+         timeout: float = DEFAULT_TIMEOUT,
+         **kwargs: Any) -> HTTPResponse
+```
+
+HTTP HEAD.
+
+**Arguments**:
+
+- `url`: the URL.
+- `timeout`: request timeout in seconds.
+- `kwargs`: additional keyword arguments passed to request().
+
+**Returns**:
+
+HTTPResponse.
+
+<a id="aea.helpers.http_requests._ExceptionsShim"></a>
+
+## `_`ExceptionsShim Objects
+
+```python
+class _ExceptionsShim()
+```
+
+Namespace shim exposing the old requests.exceptions.* names.
+
+Provides ConnectionError and RequestException as aliases of our
+ConnectionError for backwards compatibility with code that catches
+``requests.exceptions.ConnectionError`` via the old wrapper.
+
+<a id="aea.helpers.http_requests._ExceptionsShim.ConnectionError"></a>
+
+#### ConnectionError
+
+noqa: A003
 
 <a id="aea.helpers.http_requests.download_to_file"></a>
 

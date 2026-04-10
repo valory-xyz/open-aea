@@ -26,12 +26,12 @@ framework needs (registry API, package downloads, GitHub tag fetches).
 """
 
 import http.client
+import json
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
-from json import loads as json_loads
 from typing import Any, Dict, Optional, Tuple, Union
 
 from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
@@ -40,8 +40,20 @@ DEFAULT_TIMEOUT = NETWORK_REQUEST_DEFAULT_TIMEOUT
 _ALLOWED_SCHEMES = ("http", "https")
 
 
-class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-    """Disable automatic redirect following to match requests behaviour."""
+_UNSAFE_METHODS = frozenset({"POST", "PUT", "DELETE", "PATCH"})
+
+
+class _ConditionalNoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Match requests' default redirect behaviour per HTTP method.
+
+    requests.get() follows redirects by default (allow_redirects=True),
+    while requests.post()/put()/delete()/patch() do NOT follow redirects
+    (allow_redirects=False). urllib.request's default follows everything
+    — including silently turning POST→GET on 30x, which is a silent
+    behaviour change. This handler suppresses redirects only for unsafe
+    methods and lets the default HTTPRedirectHandler follow them for
+    safe methods like GET/HEAD.
+    """
 
     def redirect_request(  # pylint: disable=too-many-positional-arguments
         self,
@@ -51,8 +63,8 @@ class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
         msg: str,
         headers: Any,
         newurl: str,
-    ) -> None:
-        """Disable redirects.
+    ) -> Optional[urllib.request.Request]:
+        """Suppress redirects for unsafe methods, follow for safe ones.
 
         :param req: the original request.
         :param fp: the response file-like object.
@@ -60,12 +72,14 @@ class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
         :param msg: HTTP status message.
         :param headers: response headers.
         :param newurl: the redirect target URL.
-        :return: None (suppresses redirect).
+        :return: a new Request to follow, or None to suppress.
         """
-        return None  # type: ignore[return-value]
+        if req.get_method().upper() in _UNSAFE_METHODS:
+            return None
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-_opener = urllib.request.build_opener(_NoRedirectHandler)
+_opener = urllib.request.build_opener(_ConditionalNoRedirectHandler)
 
 
 class HTTPResponse:
@@ -94,7 +108,7 @@ class HTTPResponse:
 
     def json(self) -> Any:
         """Parse response body as JSON."""
-        return json_loads(self._data)
+        return json.loads(self._data)
 
     def read(self) -> bytes:
         """Read response body (for compatibility with file-like usage)."""
@@ -192,6 +206,42 @@ def post(url: str, timeout: float = DEFAULT_TIMEOUT, **kwargs: Any) -> HTTPRespo
     :return: HTTPResponse.
     """
     return request("POST", url, timeout=timeout, **kwargs)
+
+
+def head(url: str, timeout: float = DEFAULT_TIMEOUT, **kwargs: Any) -> HTTPResponse:
+    """HTTP HEAD.
+
+    :param url: the URL.
+    :param timeout: request timeout in seconds.
+    :param kwargs: additional keyword arguments passed to request().
+    :return: HTTPResponse.
+    """
+    return request("HEAD", url, timeout=timeout, **kwargs)
+
+
+# Backwards-compatibility aliases for downstream consumers that imported
+# `Response`, `exceptions`, or `JSONDecodeError` from the old requests-backed
+# wrapper. These are shims — prefer HTTPResponse/ConnectionError/etc. directly.
+Response = HTTPResponse
+
+
+class _ExceptionsShim:  # pylint: disable=too-few-public-methods
+    """Namespace shim exposing the old requests.exceptions.* names.
+
+    Provides ConnectionError and RequestException as aliases of our
+    ConnectionError for backwards compatibility with code that catches
+    ``requests.exceptions.ConnectionError`` via the old wrapper.
+    """
+
+    ConnectionError = ConnectionError  # noqa: A003
+    RequestException = ConnectionError
+
+
+exceptions = _ExceptionsShim()
+
+# JSONDecodeError was re-exported from the requests wrapper; expose the
+# stdlib equivalent that HTTPResponse.json() actually raises.
+JSONDecodeError = json.JSONDecodeError
 
 
 def download_to_file(

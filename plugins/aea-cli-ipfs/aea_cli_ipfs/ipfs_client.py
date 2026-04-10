@@ -503,7 +503,14 @@ class IPFSHTTPClient:
         req = urllib.request.Request(url, data=b"", method="POST")
 
         try:
-            resp = urllib.request.urlopen(req, timeout=self._timeout)  # nosec
+            # Hold the response in a with-block so the underlying socket is
+            # closed on every exit path (success, error, or exception from
+            # tarfile). Previously the bare assignment leaked the connection
+            # on the success path and any error after urlopen.
+            with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
+                if resp.status != 200:
+                    raise StatusError(f"IPFS API returned status {resp.status}")
+                self._extract_tar_stream(resp, target)
         except urllib.error.HTTPError as e:
             try:
                 body = e.read()
@@ -512,7 +519,7 @@ class IPFSHTTPClient:
             try:
                 err = json.loads(body)
                 if isinstance(err, dict) and "Message" in err:
-                    raise ErrorResponse(err["Message"])
+                    raise ErrorResponse(err["Message"]) from e
             except (ValueError, KeyError):
                 pass
             raise StatusError(f"IPFS API returned status {e.code}") from e
@@ -525,14 +532,17 @@ class IPFSHTTPClient:
         except (http.client.HTTPException, OSError) as e:
             raise CommunicationError(str(e)) from e
 
-        if resp.status != 200:
-            raise StatusError(f"IPFS API returned status {resp.status}")
+    @staticmethod
+    def _extract_tar_stream(stream: Any, target: str) -> None:
+        """Extract a streaming tar archive with path traversal prevention.
 
-        # Stream tar extraction with path traversal prevention (CVE-2007-4559).
+        :param stream: file-like object yielding tar bytes.
+        :param target: directory to extract into.
+        """
         # Cross-platform: tar names use "/" but on Windows os.path treats
         # "\" as separator too, so we check both forms and use os.path.isabs.
         abs_target = os.path.abspath(target)
-        with tarfile.open(fileobj=resp, mode="r|") as tar:
+        with tarfile.open(fileobj=stream, mode="r|") as tar:
             for member in tar:
                 member_path = os.path.normpath(member.name)
                 # Reject absolute paths (POSIX or Windows) and any traversal
@@ -549,8 +559,8 @@ class IPFSHTTPClient:
                     abs_target + os.sep
                 ):
                     continue
-                # filter="data" is the safe default on 3.14+; explicit
-                # here to silence the DeprecationWarning on 3.12/3.13.
-                tar.extract(
+                # filter="data" is the safe default on 3.14+; explicit here
+                # to silence the DeprecationWarning on 3.12/3.13.
+                tar.extract(  # nosec
                     member, path=target, set_attrs=False, filter="data"
-                )  # nosec
+                )
