@@ -59,7 +59,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-On Windows: download <a href="https://raw.githubusercontent.com/valory-xyz/open-aea/main/scripts/install.ps1" target="_blank">https://raw.githubusercontent.com/valory-xyz/open-aea/main/scripts/install.ps1</a>, then run <code>install.ps1</code> with the PowerShell terminal.
+On Windows: download <a href="https://raw.githubusercontent.com/valory-xyz/open-aea/main/scripts/install.ps1" target="_blank">install.ps1</a>, then run <code>install.ps1</code> with the PowerShell terminal.
 
 </details>
 
