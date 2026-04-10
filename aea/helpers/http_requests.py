@@ -194,6 +194,44 @@ def post(url: str, timeout: float = DEFAULT_TIMEOUT, **kwargs: Any) -> HTTPRespo
     return request("POST", url, timeout=timeout, **kwargs)
 
 
+def download_to_file(
+    url: str,
+    filepath: str,
+    timeout: float = DEFAULT_TIMEOUT,
+    chunk_size: int = 262144,
+) -> int:
+    """Stream the response body to a file in fixed-size chunks.
+
+    Avoids buffering large downloads in memory.
+
+    :param url: the URL to download.
+    :param filepath: local file path to write the response body to.
+    :param timeout: request timeout in seconds.
+    :param chunk_size: read chunk size in bytes (default 256KB).
+    :return: HTTP status code.
+    :raises ValueError: if the URL scheme is not http or https.
+    :raises ConnectionError: on connection failure.
+    """
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in _ALLOWED_SCHEMES:
+        raise ValueError(f"Unsupported URL scheme: {parsed.scheme!r}")
+
+    req = urllib.request.Request(url, method="GET")
+    try:
+        with _opener.open(req, timeout=timeout) as resp:  # nosec
+            with open(filepath, "wb") as f:
+                while True:
+                    chunk = resp.read(chunk_size)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+            return resp.status
+    except urllib.error.HTTPError as e:
+        return e.code
+    except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
+        raise ConnectionError(str(e)) from e
+
+
 def _encode_multipart(
     fields: Dict[str, str], files: Dict[str, Any]
 ) -> Tuple[bytes, str]:

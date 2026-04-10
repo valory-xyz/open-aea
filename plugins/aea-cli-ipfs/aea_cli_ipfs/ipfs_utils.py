@@ -41,6 +41,8 @@ from aea_cli_ipfs.exceptions import (
 )
 from aea_cli_ipfs.ipfs_client import IPFSHTTPClient
 
+from aea.helpers.constants import NETWORK_REQUEST_DEFAULT_TIMEOUT
+
 DEFAULT_IPFS_URI_BASE = str(os.environ.get("OPEN_AEA_IPFS_ADDR_BASE", "api/v0"))
 DEFAULT_IPFS_URL = "/dns/registry.autonolas.tech/tcp/443/https"
 DEFAULT_IPFS_URL_LOCAL = "/ip4/127.0.0.1/tcp/5001"
@@ -149,7 +151,9 @@ class IPFSDaemon:
         """Check daemon was started externally."""
         try:
             req = urllib.request.Request(self.api_url, data=b"", method="POST")
-            with urllib.request.urlopen(req, timeout=30) as resp:  # nosec
+            with urllib.request.urlopen(  # nosec
+                req, timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT
+            ) as resp:
                 return resp.status == 200
         except (urllib.error.URLError, OSError):
             return False

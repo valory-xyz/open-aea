@@ -27,7 +27,6 @@ daemon's HTTP API (``/api/v0/*``) using ``urllib``.
 """
 
 import http.client
-import io
 import json
 import mimetypes
 import os
@@ -38,7 +37,7 @@ import urllib.parse
 import urllib.request
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Generator, Iterable, List, Optional, Tuple, Union
 
 # ---------------------------------------------------------------------------
 # Exceptions (mirrors ipfshttpclient.exceptions hierarchy)
@@ -91,15 +90,14 @@ def _guess_content_type(filename: str) -> str:
     return ctype or "application/octet-stream"
 
 
-def _multipart_file_part(
+def _multipart_file_header(
     boundary: str,
     field_name: str,
     filename: str,
-    data: bytes,
     content_type: str = "application/octet-stream",
     abspath: Optional[str] = None,
 ) -> bytes:
-    """Encode a single file part in multipart form-data."""
+    """Encode the header portion of a file part (before the data)."""
     quoted = _quote_filename(filename)
     # Headers sorted alphabetically to match ipfshttpclient behavior
     header = f"--{boundary}\r\n"
@@ -110,7 +108,23 @@ def _multipart_file_part(
         f"Content-Type: {content_type}\r\n"
         f"\r\n"
     )
-    return header.encode() + data + b"\r\n"
+    return header.encode()
+
+
+def _multipart_file_part(
+    boundary: str,
+    field_name: str,
+    filename: str,
+    data: bytes,
+    content_type: str = "application/octet-stream",
+    abspath: Optional[str] = None,
+) -> bytes:
+    """Encode a single file part in multipart form-data (header + data)."""
+    return (
+        _multipart_file_header(boundary, field_name, filename, content_type, abspath)
+        + data
+        + b"\r\n"
+    )
 
 
 def _multipart_dir_part(boundary: str, dirname: str) -> bytes:
@@ -130,22 +144,22 @@ def _multipart_end(boundary: str) -> bytes:
     return f"--{boundary}--\r\n".encode()
 
 
-def _encode_directory(
+def _stream_directory(
     dir_path: str,
     boundary: str,
     recursive: bool = True,
-    wrap_with_directory: bool = True,
-) -> Tuple[bytes, str]:
+) -> Generator[bytes, None, None]:
     """
-    Encode a directory as multipart form-data for IPFS /api/v0/add.
+    Yield multipart form-data chunks for IPFS /api/v0/add.
 
-    :param dir_path: path to directory.
+    Streams file contents in 256KB chunks to avoid loading entire
+    directories into memory.
+
+    :param dir_path: path to directory or file.
     :param boundary: multipart boundary string.
     :param recursive: include subdirectories.
-    :param wrap_with_directory: wrap in parent directory.
-    :return: (body_bytes, content_type).
+    :yield: bytes chunks of multipart body.
     """
-    parts: List[bytes] = []
     root = Path(dir_path)
     base_name = root.name
 
@@ -153,19 +167,15 @@ def _encode_directory(
     abs_root = os.path.abspath(root)
 
     if root.is_file():
-        data = root.read_bytes()
-        filename = base_name
-        ctype = _guess_content_type(filename)
-        parts.append(
-            _multipart_file_part(
-                boundary,
-                "file",
-                filename,
-                data,
-                content_type=ctype,
-                abspath=abs_root,
-            )
-        )
+        ctype = _guess_content_type(base_name)
+        yield _multipart_file_header(boundary, "file", base_name, ctype, abs_root)
+        with open(root, "rb") as f:
+            while True:
+                chunk = f.read(262144)  # 256KB chunks
+                if not chunk:
+                    break
+                yield chunk
+        yield b"\r\n"
     else:
         # Walk directory, emitting subdirs before files at each level
         # to match ipfshttpclient's filescanner ordering
@@ -174,39 +184,30 @@ def _encode_directory(
             rel = dirpath.relative_to(root)
             dir_label = str(Path(base_name) / rel).replace(os.sep, "/")
 
-            # Emit directory entry
-            parts.append(_multipart_dir_part(boundary, dir_label))
+            yield _multipart_dir_part(boundary, dir_label)
 
             if not recursive:
                 dirnames.clear()
             else:
                 dirnames.sort()
 
-            # Emit subdirectory entries before files
-            # (os.walk will recurse into them on next iteration)
-
-            # Emit files
             for fname in sorted(filenames):
                 fpath = dirpath / fname
                 file_label = str(Path(base_name) / rel / fname).replace(os.sep, "/")
                 abs_file = os.path.normpath(os.path.join(abs_root, str(rel), fname))
                 ctype = _guess_content_type(fname)
-                data = fpath.read_bytes()
-                parts.append(
-                    _multipart_file_part(
-                        boundary,
-                        "file",
-                        file_label,
-                        data,
-                        content_type=ctype,
-                        abspath=abs_file,
-                    )
+                yield _multipart_file_header(
+                    boundary, "file", file_label, ctype, abs_file
                 )
+                with open(fpath, "rb") as f:
+                    while True:
+                        chunk = f.read(262144)  # 256KB chunks
+                        if not chunk:
+                            break
+                        yield chunk
+                yield b"\r\n"
 
-    parts.append(_multipart_end(boundary))
-    body = b"".join(parts)
-    content_type = f'multipart/form-data; boundary="{boundary}"'
-    return body, content_type
+    yield _multipart_end(boundary)
 
 
 def _encode_bytes(data: bytes, boundary: str) -> Tuple[bytes, str]:
@@ -315,7 +316,7 @@ class IPFSHTTPClient:
         self,
         endpoint: str,
         params: Optional[Dict[str, str]] = None,
-        data: Optional[bytes] = None,
+        data: Optional[Union[bytes, Iterable[bytes]]] = None,
         headers: Optional[Dict[str, str]] = None,
     ) -> Tuple[int, bytes]:
         """
@@ -323,7 +324,9 @@ class IPFSHTTPClient:
 
         :param endpoint: API endpoint path.
         :param params: optional query parameters.
-        :param data: optional request body.
+        :param data: optional request body. Either bytes (sent with
+            Content-Length) or an iterable of bytes (sent with chunked
+            Transfer-Encoding for streaming uploads).
         :param headers: optional headers.
         :return: tuple of (status_code, body_bytes).
         :raises CommunicationError: on connection failure.
@@ -334,7 +337,10 @@ class IPFSHTTPClient:
             url = url + "?" + urllib.parse.urlencode(params)
 
         req = urllib.request.Request(
-            url, data=data or b"", headers=headers or {}, method="POST"
+            url,
+            data=data if data is not None else b"",
+            headers=headers or {},
+            method="POST",
         )
         try:
             with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
@@ -409,11 +415,11 @@ class IPFSHTTPClient:
         :return: list of dicts with 'Name' and 'Hash' keys.
         """
         boundary = _multipart_boundary()
-        body, content_type = _encode_directory(
+        content_type = f'multipart/form-data; boundary="{boundary}"'
+        body_stream = _stream_directory(
             file_or_dir,
             boundary,
             recursive=recursive,
-            wrap_with_directory=wrap_with_directory,
         )
         params = {
             "pin": str(pin).lower(),
@@ -421,7 +427,10 @@ class IPFSHTTPClient:
             "wrap-with-directory": str(wrap_with_directory).lower(),
         }
         status, resp_body = self._post(
-            "/add", params=params, data=body, headers={"Content-Type": content_type}
+            "/add",
+            params=params,
+            data=body_stream,
+            headers={"Content-Type": content_type},
         )
         text = resp_body.decode("utf-8", errors="replace")
 
@@ -484,23 +493,44 @@ class IPFSHTTPClient:
         :param cid: IPFS CID to download.
         :param target: local directory to extract into.
         """
-        status, resp_body = self._post(
-            "/get", params={"arg": cid, "archive": "true", "compress": "false"}
+        url = (
+            self._base_url
+            + "/get?"
+            + urllib.parse.urlencode(
+                {"arg": cid, "archive": "true", "compress": "false"}
+            )
         )
+        req = urllib.request.Request(url, data=b"", method="POST")
 
-        if status != 200:
+        try:
+            resp = urllib.request.urlopen(req, timeout=self._timeout)  # nosec
+        except urllib.error.HTTPError as e:
             try:
-                err = json.loads(resp_body)
+                body = e.read()
+            except Exception:  # pylint: disable=broad-except
+                body = b""
+            try:
+                err = json.loads(body)
                 if isinstance(err, dict) and "Message" in err:
                     raise ErrorResponse(err["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(f"IPFS API returned status {status}")
+            raise StatusError(f"IPFS API returned status {e.code}") from e
+        except socket.timeout as e:
+            raise TimeoutError(str(e)) from e
+        except urllib.error.URLError as e:
+            if "timed out" in str(e):
+                raise TimeoutError(str(e)) from e
+            raise CommunicationError(str(e)) from e
+        except (http.client.HTTPException, OSError) as e:
+            raise CommunicationError(str(e)) from e
 
-        # Extract tar archive with path traversal prevention (CVE-2007-4559)
+        if resp.status != 200:
+            raise StatusError(f"IPFS API returned status {resp.status}")
+
+        # Stream tar extraction with path traversal prevention (CVE-2007-4559)
         abs_target = os.path.abspath(target)
-        buf = io.BytesIO(resp_body)
-        with tarfile.open(fileobj=buf, mode="r") as tar:
+        with tarfile.open(fileobj=resp, mode="r|") as tar:
             for member in tar:
                 member_path = os.path.normpath(member.name)
                 if member_path.startswith("/") or ".." in member_path.split(os.sep):

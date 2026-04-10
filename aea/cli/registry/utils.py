@@ -189,11 +189,9 @@ def download_file(url: str, cwd: str, timeout: float = FILE_DOWNLOAD_TIMEOUT) ->
     """
     local_filename = url.split("/")[-1]
     filepath = os.path.join(cwd, local_filename)
-    response = http_requests.get(url, timeout=timeout)
-    if response.status_code == 200:
-        with open(filepath, "wb") as f:
-            f.write(response.content)
-    else:
+    # Stream chunks directly to disk to avoid buffering large packages in memory.
+    status = http_requests.download_to_file(url, filepath, timeout=timeout)
+    if status != 200:
         raise click.ClickException(
             "Wrong response from server when downloading package."
         )

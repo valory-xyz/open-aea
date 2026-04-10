@@ -198,3 +198,34 @@ HTTP POST.
 
 HTTPResponse.
 
+<a id="aea.helpers.http_requests.download_to_file"></a>
+
+#### download`_`to`_`file
+
+```python
+def download_to_file(url: str,
+                     filepath: str,
+                     timeout: float = DEFAULT_TIMEOUT,
+                     chunk_size: int = 262144) -> int
+```
+
+Stream the response body to a file in fixed-size chunks.
+
+Avoids buffering large downloads in memory.
+
+**Arguments**:
+
+- `url`: the URL to download.
+- `filepath`: local file path to write the response body to.
+- `timeout`: request timeout in seconds.
+- `chunk_size`: read chunk size in bytes (default 256KB).
+
+**Raises**:
+
+- `ValueError`: if the URL scheme is not http or https.
+- `ConnectionError`: on connection failure.
+
+**Returns**:
+
+HTTP status code.
+

@@ -23,6 +23,7 @@ import http.client
 import io
 import json
 import urllib.error
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -240,3 +241,56 @@ class TestNoRedirect:
         )
         resp = http_requests.post("http://example.com/api")
         assert resp.status_code == 301
+
+
+class TestDownloadToFile:
+    """Tests for download_to_file streaming helper."""
+
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_streams_chunks_to_file(self, mock_open: MagicMock, tmp_path: Path) -> None:
+        """Test response body is streamed to file in chunks."""
+        # Mock urlopen with a response that returns chunks then EOF
+        chunks = [b"chunk1", b"chunk2", b"chunk3", b""]
+        resp = MagicMock()
+        resp.status = 200
+        resp.read = MagicMock(side_effect=chunks)
+        resp.__enter__ = lambda s: s
+        resp.__exit__ = MagicMock(return_value=False)
+        mock_open.return_value = resp
+
+        target = tmp_path / "out.bin"
+        status = http_requests.download_to_file("http://example.com/file", str(target))
+        assert status == 200
+        assert target.read_bytes() == b"chunk1chunk2chunk3"
+
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_http_error_returns_status(
+        self, mock_open: MagicMock, tmp_path: Path
+    ) -> None:
+        """Test HTTP error returns status code without raising."""
+        mock_open.side_effect = urllib.error.HTTPError(
+            url="",
+            code=404,
+            msg="",
+            hdrs=None,  # type: ignore
+            fp=io.BytesIO(b""),
+        )
+        target = tmp_path / "out.bin"
+        status = http_requests.download_to_file(
+            "http://example.com/missing", str(target)
+        )
+        assert status == 404
+
+    def test_rejects_non_http_scheme(self, tmp_path: Path) -> None:
+        """Test non-http scheme is rejected."""
+        with pytest.raises(ValueError, match="Unsupported URL scheme"):
+            http_requests.download_to_file("file:///etc/passwd", str(tmp_path / "out"))
+
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_url_error_raises(self, mock_open: MagicMock, tmp_path: Path) -> None:
+        """Test URLError maps to ConnectionError."""
+        mock_open.side_effect = urllib.error.URLError("refused")
+        with pytest.raises(http_requests.ConnectionError):
+            http_requests.download_to_file(
+                "http://example.com/file", str(tmp_path / "out")
+            )
