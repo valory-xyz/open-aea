@@ -42,6 +42,7 @@ setup(
         "open-aea>=2.0.0, <3.0.0",
         "web3>=7.0.0,<8",
         "eth-account>=0.13.0,<0.14.0",
+        "requests>=2.20.0,<3",
     ],
     tests_require=["pytest"],
     entry_points={

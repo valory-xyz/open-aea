@@ -21,12 +21,12 @@
 
 import os
 import re
+import urllib.error
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
 import pytest
-import requests
 from aea_cli_ipfs import ipfs_client as ipfs_exc
 from aea_cli_ipfs.ipfs_utils import (
     DownloadError,
@@ -122,16 +122,19 @@ def test_daemon_ipfs_not_found() -> None:
 def test_daemon_is_started_externally() -> None:
     """Test IPFSDaemon is started externally."""
     daemon = IPFSDaemon()
-    response_mock = Mock()
-    response_mock.status_code = 200
-    with patch("requests.post", return_value=response_mock):
+
+    mock_resp = Mock()
+    mock_resp.status = 200
+    mock_resp.__enter__ = lambda s: s
+    mock_resp.__exit__ = Mock(return_value=False)
+    with patch("urllib.request.urlopen", return_value=mock_resp):
         assert daemon.is_started_externally()
 
-    response_mock.status_code = 400
-    with patch("requests.post", return_value=response_mock):
+    mock_resp.status = 400
+    with patch("urllib.request.urlopen", return_value=mock_resp):
         assert not daemon.is_started_externally()
 
-    with patch("requests.post", side_effect=requests.exceptions.ConnectionError()):
+    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("refused")):
         assert not daemon.is_started_externally()
 
     assert not daemon.is_started()
@@ -305,5 +308,89 @@ def test_wrap_directory_flag_dir() -> None:
                 dir_path=str(temp_dir), wrap_with_directory=False
             )
             assert file_hash == "QmWVQQhQ5Qxzb1jLk1SW4Etsn6rMWHtjdELTNEmA1J1gRx"
+    finally:
+        tool.daemon.stop()
+
+
+def test_download_file_roundtrip() -> None:
+    """Add a file, download it back, verify content matches.
+
+    Exercises the streaming tar download path against a real IPFS daemon.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as temp_dir:
+            content = b"streaming tar download integration test payload"
+            src = Path(temp_dir, "payload.bin")
+            src.write_bytes(content)
+
+            _, file_hash, _ = tool.add(dir_path=str(src), wrap_with_directory=False)
+            assert file_hash
+
+            with TemporaryDirectory() as download_dir:
+                tool.download(file_hash, download_dir)
+                # download() places a file at <download_dir>/<file_hash>
+                downloaded = Path(download_dir) / file_hash
+                assert downloaded.read_bytes() == content
+    finally:
+        tool.daemon.stop()
+
+
+def test_download_directory_roundtrip() -> None:
+    """Add a nested directory, download it back, verify all files match.
+
+    Exercises the streaming tar download path with a multi-file directory
+    against a real IPFS daemon.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as _temp_dir:
+            src_dir = Path(_temp_dir, "mydata")
+            src_dir.mkdir()
+            (src_dir / "a.txt").write_text("alpha")
+            (src_dir / "b.txt").write_text("beta")
+            sub = src_dir / "sub"
+            sub.mkdir()
+            (sub / "c.txt").write_text("gamma")
+
+            _, dir_hash, _ = tool.add(dir_path=str(src_dir))
+            assert dir_hash
+
+            with TemporaryDirectory() as download_dir:
+                downloaded_path = tool.download(dir_hash, download_dir)
+                downloaded_root = Path(downloaded_path)
+                assert (downloaded_root / "a.txt").read_text() == "alpha"
+                assert (downloaded_root / "b.txt").read_text() == "beta"
+                assert (downloaded_root / "sub" / "c.txt").read_text() == "gamma"
+    finally:
+        tool.daemon.stop()
+
+
+def test_download_large_file_roundtrip() -> None:
+    """Add a >1MB file (multi-chunk), download it back, verify.
+
+    Ensures the 256KB streaming chunk read works for files larger than
+    a single chunk in both upload and download paths.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as temp_dir:
+            # 1MB of pseudo-random bytes (deterministic for test stability)
+            content = (b"open-aea streaming test " * 43691)[: 1024 * 1024]
+            assert len(content) == 1024 * 1024
+            src = Path(temp_dir, "large.bin")
+            src.write_bytes(content)
+
+            _, file_hash, _ = tool.add(dir_path=str(src), wrap_with_directory=False)
+            assert file_hash
+
+            with TemporaryDirectory() as download_dir:
+                tool.download(file_hash, download_dir)
+                downloaded_bytes = (Path(download_dir) / file_hash).read_bytes()
+                assert len(downloaded_bytes) == len(content)
+                assert downloaded_bytes == content
     finally:
         tool.daemon.stop()

@@ -23,19 +23,22 @@
 Lightweight IPFS HTTP API client.
 
 Replaces the ``ipfshttpclient`` package. Talks directly to the IPFS
-daemon's HTTP API (``/api/v0/*``) using ``requests``.
+daemon's HTTP API (``/api/v0/*``) using ``urllib``.
 """
 
+import http.client
+import inspect
 import json
 import mimetypes
 import os
+import socket
 import tarfile
+import urllib.error
 import urllib.parse
+import urllib.request
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
-
-import requests
+from typing import Any, Dict, Generator, Iterable, List, Optional, Tuple, Union
 
 # ---------------------------------------------------------------------------
 # Exceptions (mirrors ipfshttpclient.exceptions hierarchy)
@@ -97,6 +100,7 @@ def _multipart_file_header(
 ) -> bytes:
     """Encode the header portion of a file part (before the data)."""
     quoted = _quote_filename(filename)
+    # Headers sorted alphabetically to match ipfshttpclient behavior
     header = f"--{boundary}\r\n"
     if abspath:
         header += f"Abspath: {abspath}\r\n"
@@ -149,7 +153,8 @@ def _stream_directory(
     """
     Yield multipart form-data chunks for IPFS /api/v0/add.
 
-    Streams file contents to avoid loading entire directories into memory.
+    Streams file contents in 256KB chunks to avoid loading entire
+    directories into memory.
 
     :param dir_path: path to directory or file.
     :param boundary: multipart boundary string.
@@ -158,14 +163,23 @@ def _stream_directory(
     """
     root = Path(dir_path)
     base_name = root.name
+
+    # Use os.path.abspath (not Path.resolve) to avoid macOS /private prefix
     abs_root = os.path.abspath(root)
 
     if root.is_file():
         ctype = _guess_content_type(base_name)
         yield _multipart_file_header(boundary, "file", base_name, ctype, abs_root)
-        yield root.read_bytes()
+        with open(root, "rb") as f:
+            while True:
+                chunk = f.read(262144)  # 256KB chunks
+                if not chunk:
+                    break
+                yield chunk
         yield b"\r\n"
     else:
+        # Walk directory, emitting subdirs before files at each level
+        # to match ipfshttpclient's filescanner ordering
         for dirpath_str, dirnames, filenames in os.walk(root):
             dirpath = Path(dirpath_str)
             rel = dirpath.relative_to(root)
@@ -186,7 +200,6 @@ def _stream_directory(
                 yield _multipart_file_header(
                     boundary, "file", file_label, ctype, abs_file
                 )
-                # Stream file in chunks to avoid loading large files into memory
                 with open(fpath, "rb") as f:
                     while True:
                         chunk = f.read(262144)  # 256KB chunks
@@ -300,6 +313,54 @@ class IPFSHTTPClient:
         self.name = _NameSection(self)
         self.repo = _RepoSection(self)
 
+    def _post(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, str]] = None,
+        data: Optional[Union[bytes, Iterable[bytes]]] = None,
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Tuple[int, bytes]:
+        """
+        POST to the IPFS API and return (status_code, body_bytes).
+
+        :param endpoint: API endpoint path.
+        :param params: optional query parameters.
+        :param data: optional request body. Either bytes (sent with
+            Content-Length) or an iterable of bytes (sent with chunked
+            Transfer-Encoding for streaming uploads).
+        :param headers: optional headers.
+        :return: tuple of (status_code, body_bytes).
+        :raises CommunicationError: on connection failure.
+        :raises TimeoutError: on timeout.
+        """
+        url = self._base_url + endpoint
+        if params:
+            url = url + "?" + urllib.parse.urlencode(params)
+
+        req = urllib.request.Request(
+            url,
+            data=data if data is not None else b"",
+            headers=headers or {},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
+                return resp.status, resp.read()
+        except urllib.error.HTTPError as e:
+            try:
+                body = e.read()
+            except Exception:  # pylint: disable=broad-except
+                body = b""
+            return e.code, body
+        except socket.timeout as e:
+            raise TimeoutError(str(e)) from e
+        except urllib.error.URLError as e:
+            if "timed out" in str(e):
+                raise TimeoutError(str(e)) from e
+            raise CommunicationError(str(e)) from e
+        except (http.client.HTTPException, OSError) as e:
+            raise CommunicationError(str(e)) from e
+
     def _api_post(
         self,
         endpoint: str,
@@ -308,44 +369,28 @@ class IPFSHTTPClient:
         headers: Optional[Dict[str, str]] = None,
         stream: bool = False,
     ) -> Any:
-        """Make a POST request to the IPFS API."""
-        url = self._base_url + endpoint
-        try:
-            resp = requests.post(
-                url,
-                params=params,
-                data=data,
-                headers=headers,
-                timeout=self._timeout,
-                stream=stream,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(str(e)) from e
+        """Make a POST request to the IPFS API, parse JSON response."""
+        status, body = self._post(endpoint, params=params, data=data, headers=headers)
+        text = body.decode("utf-8", errors="replace")
 
-        if resp.status_code != 200:
-            # Try to extract error message from JSON response
+        if status != 200:
             try:
-                body = resp.json()
-                if isinstance(body, dict) and "Message" in body:
-                    raise ErrorResponse(body["Message"])
+                parsed = json.loads(body)
+                if isinstance(parsed, dict) and "Message" in parsed:
+                    raise ErrorResponse(parsed["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
+            raise StatusError(f"IPFS API returned status {status}: {text}")
 
         if stream:
-            # Newline-delimited JSON
             results = []
-            for line in resp.text.strip().split("\n"):
+            for line in text.strip().split("\n"):
                 line = line.strip()
                 if line:
                     results.append(json.loads(line))
             return results
 
-        return resp.json()
+        return json.loads(body)
 
     def id(self, peer: Optional[str] = None) -> Dict:
         """Get node identity info."""
@@ -382,34 +427,26 @@ class IPFSHTTPClient:
             "recursive": str(recursive).lower(),
             "wrap-with-directory": str(wrap_with_directory).lower(),
         }
-        url = self._base_url + "/add"
-        try:
-            resp = requests.post(
-                url,
-                params=params,
-                data=body_stream,
-                headers={"Content-Type": content_type},
-                timeout=self._timeout,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(str(e)) from e
+        status, resp_body = self._post(
+            "/add",
+            params=params,
+            data=body_stream,
+            headers={"Content-Type": content_type},
+        )
+        text = resp_body.decode("utf-8", errors="replace")
 
-        if resp.status_code != 200:
+        if status != 200:
             try:
-                err = resp.json()
+                err = json.loads(resp_body)
                 if isinstance(err, dict) and "Message" in err:
                     raise ErrorResponse(err["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
+            raise StatusError(f"IPFS API returned status {status}: {text}")
 
         # /add returns newline-delimited JSON
         results = []
-        for line in resp.text.strip().split("\n"):
+        for line in text.strip().split("\n"):
             line = line.strip()
             if line:
                 results.append(json.loads(line))
@@ -430,30 +467,20 @@ class IPFSHTTPClient:
         """
         boundary = _multipart_boundary()
         body, content_type = _encode_bytes(data, boundary)
-        url = self._base_url + "/add"
-        try:
-            resp = requests.post(
-                url,
-                data=body,
-                headers={"Content-Type": content_type},
-                timeout=self._timeout,
-            )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(str(e)) from e
+        status, resp_body = self._post(
+            "/add", data=body, headers={"Content-Type": content_type}
+        )
 
-        if resp.status_code != 200:
+        if status != 200:
+            text = resp_body.decode("utf-8", errors="replace")
             try:
-                err = resp.json()
+                err = json.loads(resp_body)
                 if isinstance(err, dict) and "Message" in err:
                     raise ErrorResponse(err["Message"])
             except (ValueError, KeyError):
                 pass
-            raise StatusError(
-                f"IPFS API returned status {resp.status_code}: {resp.text}"
-            )
-        result = resp.json()
+            raise StatusError(f"IPFS API returned status {status}: {text}")
+        result = json.loads(resp_body)
         if "Hash" not in result:
             raise StatusError(f"IPFS API response missing 'Hash' key: {result}")
         return result["Hash"]
@@ -467,42 +494,79 @@ class IPFSHTTPClient:
         :param cid: IPFS CID to download.
         :param target: local directory to extract into.
         """
-        url = self._base_url + "/get"
-        try:
-            resp = requests.post(
-                url,
-                params={"arg": cid, "archive": "true", "compress": "false"},
-                timeout=self._timeout,
-                stream=True,
+        url = (
+            self._base_url
+            + "/get?"
+            + urllib.parse.urlencode(
+                {"arg": cid, "archive": "true", "compress": "false"}
             )
-        except requests.exceptions.ConnectionError as e:
-            raise CommunicationError(str(e)) from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(str(e)) from e
+        )
+        req = urllib.request.Request(url, data=b"", method="POST")
 
-        if resp.status_code != 200:
+        try:
+            # Hold the response in a with-block so the underlying socket is
+            # closed on every exit path (success, error, or exception from
+            # tarfile). Previously the bare assignment leaked the connection
+            # on the success path and any error after urlopen.
+            with urllib.request.urlopen(req, timeout=self._timeout) as resp:  # nosec
+                if resp.status != 200:
+                    raise StatusError(f"IPFS API returned status {resp.status}")
+                self._extract_tar_stream(resp, target)
+        except urllib.error.HTTPError as e:
             try:
-                err = resp.json()
+                body = e.read()
+            except Exception:  # pylint: disable=broad-except
+                body = b""
+            try:
+                err = json.loads(body)
                 if isinstance(err, dict) and "Message" in err:
-                    raise ErrorResponse(err["Message"])
+                    raise ErrorResponse(err["Message"]) from e
             except (ValueError, KeyError):
                 pass
-            raise StatusError(f"IPFS API returned status {resp.status_code}")
+            raise StatusError(f"IPFS API returned status {e.code}") from e
+        except socket.timeout as e:
+            raise TimeoutError(str(e)) from e
+        except urllib.error.URLError as e:
+            if "timed out" in str(e):
+                raise TimeoutError(str(e)) from e
+            raise CommunicationError(str(e)) from e
+        except (http.client.HTTPException, OSError) as e:
+            raise CommunicationError(str(e)) from e
 
-        # Stream tar extraction to avoid buffering entire archive in memory
-        resp.raw.decode_content = True
+    @staticmethod
+    def _extract_tar_stream(stream: Any, target: str) -> None:
+        """Extract a streaming tar archive with path traversal prevention.
+
+        :param stream: file-like object yielding tar bytes.
+        :param target: directory to extract into.
+        """
+        # Cross-platform: tar names use "/" but on Windows os.path treats
+        # "\" as separator too, so we check both forms and use os.path.isabs.
         abs_target = os.path.abspath(target)
-        with tarfile.open(fileobj=resp.raw, mode="r|") as tar:
+        # The ``filter`` kwarg for tarfile.extract() was backported in
+        # 3.9.17 / 3.10.12 / 3.11.4 as a security fix (CVE-2007-4559),
+        # and defaults to "data" on 3.14+. Older patch versions (e.g.
+        # Python 3.10.11 on Windows hosted runners) do not have it —
+        # detect at runtime and fall back to the manual path-traversal
+        # check below, which is defence-in-depth in any case.
+        extract_kwargs: Dict[str, Any] = {"path": target, "set_attrs": False}
+        if "filter" in inspect.signature(tarfile.TarFile.extract).parameters:
+            extract_kwargs["filter"] = "data"
+        with tarfile.open(fileobj=stream, mode="r|") as tar:
             for member in tar:
-                # Prevent path traversal (CVE-2007-4559)
                 member_path = os.path.normpath(member.name)
-                if member_path.startswith("/") or ".." in member_path.split(os.sep):
+                # Reject absolute paths (POSIX or Windows) and any traversal
+                if (
+                    os.path.isabs(member_path)
+                    or member_path.startswith("/")
+                    or member_path.startswith("\\")
+                    or ".." in member_path.replace("\\", "/").split("/")
+                ):
                     continue
                 full_path = os.path.normpath(os.path.join(abs_target, member_path))
-                if not full_path.startswith(abs_target):
+                # Defence-in-depth: ensure the resolved path stays inside target
+                if full_path != abs_target and not full_path.startswith(
+                    abs_target + os.sep
+                ):
                     continue
-                # filter="data" is the safe default on 3.14+; explicit
-                # here to silence the DeprecationWarning on 3.12/3.13.
-                tar.extract(
-                    member, path=target, set_attrs=False, filter="data"
-                )  # nosec
+                tar.extract(member, **extract_kwargs)  # nosec

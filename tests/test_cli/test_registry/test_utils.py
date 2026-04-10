@@ -28,7 +28,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click import ClickException
-from requests.exceptions import ConnectionError
 
 from aea.cli.registry.settings import AUTH_TOKEN_KEY
 from aea.cli.registry.utils import (
@@ -48,6 +47,7 @@ from aea.cli.registry.utils import (
 from aea.cli.utils.exceptions import AEAConfigException
 from aea.configurations.base import PublicId
 from aea.helpers.base import cd
+from aea.helpers.http_requests import ConnectionError
 
 from packages.fetchai.protocols.default import DefaultMessage
 
@@ -70,7 +70,7 @@ def _raise_json_decode_error(*args):
     "aea.cli.registry.utils.get_or_create_cli_config",
     return_value=TEST_IPFS_REGISTRY_CONFIG,
 )
-@mock.patch("aea.cli.registry.utils.requests.request")
+@mock.patch("aea.cli.registry.utils.http_requests.request")
 class RequestAPITestCase(TestCase):
     """Test case for request_api method."""
 
@@ -212,7 +212,7 @@ class RequestAPITestCase(TestCase):
         self.assertEqual(result, expected_result)
 
 
-@mock.patch("aea.cli.registry.utils.requests.request", _raise_connection_error)
+@mock.patch("aea.cli.registry.utils.http_requests.request", _raise_connection_error)
 class RequestAPINoResponseTestCase(TestCase):
     """Test case for request_api method no server response."""
 
@@ -222,41 +222,31 @@ class RequestAPINoResponseTestCase(TestCase):
             request_api("GET", "/path")
 
 
-@mock.patch("aea.cli.registry.utils.requests.get")
+@mock.patch("aea.cli.registry.utils.http_requests.download_to_file")
 class DownloadFileTestCase(TestCase):
     """Test case for download_file method."""
 
-    @mock.patch("builtins.open", mock.mock_open())
-    def test_download_file_positive(self, get_mock):
+    def test_download_file_positive(self, download_mock):
         """Test for download_file method positive result."""
         filename = "filename.tar.gz"
-        url = "url/{}".format(filename)
+        url = "http://example.com/{}".format(filename)
         cwd = "cwd"
         filepath = os.path.join(cwd, filename)
 
-        resp_mock = mock.Mock()
-        raw_mock = mock.Mock()
-        raw_mock.read = lambda: "file content"
-
-        resp_mock.raw = raw_mock
-        resp_mock.status_code = 200
-        get_mock.return_value = resp_mock
+        download_mock.return_value = 200
 
         result = download_file(url, cwd)
-        expected_result = filepath
-        self.assertEqual(result, expected_result)
-        get_mock.assert_called_once_with(
-            url, stream=True, timeout=FILE_DOWNLOAD_TIMEOUT
+        self.assertEqual(result, filepath)
+        download_mock.assert_called_once_with(
+            url, filepath, timeout=FILE_DOWNLOAD_TIMEOUT
         )
 
-    def test_download_file_wrong_response(self, get_mock):
+    def test_download_file_wrong_response(self, download_mock):
         """Test for download_file method wrong response from file server."""
-        resp_mock = mock.Mock()
-        resp_mock.status_code = 404
-        get_mock.return_value = resp_mock
+        download_mock.return_value = 404
 
         with self.assertRaises(ClickException):
-            download_file("url", "cwd")
+            download_file("http://example.com/url", "cwd")
 
 
 class ExtractTestCase(TestCase):

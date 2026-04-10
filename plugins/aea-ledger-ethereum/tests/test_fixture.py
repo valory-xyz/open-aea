@@ -42,7 +42,9 @@ def test_ganache_fixture() -> None:
 
     try:
         response = requests.post(
-            f"{DEFAULT_GANACHE_ADDR}:{DEFAULT_GANACHE_PORT}", json=request
+            f"{DEFAULT_GANACHE_ADDR}:{DEFAULT_GANACHE_PORT}",
+            json=request,
+            timeout=30,
         )
         assert response.status_code == 200
     finally:

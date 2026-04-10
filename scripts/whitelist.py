@@ -352,3 +352,9 @@ batch_size  # unused variable (aea/crypto/base.py:543)
 max_retries  # unused variable (aea/crypto/base.py:544)
 reduce_factor  # unused variable (aea/crypto/base.py:545)
 check_schema  # unused method (aea/helpers/json_schema.py) — called from tests
+post  # aea/helpers/http_requests.py — used by plugins; vulture can't see cross-package usage
+redirect_request  # aea/helpers/http_requests.py — override called by urllib internals
+newurl  # aea/helpers/http_requests.py — required by redirect_request override signature
+http_error_308  # aea/helpers/http_requests.py — 308 backport called by urllib for 3.10
+Response  # aea/helpers/http_requests.py — public compat alias for downstream consumers
+RequestException  # aea/helpers/http_requests.py — public compat alias on exceptions shim
