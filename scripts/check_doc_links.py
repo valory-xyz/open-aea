@@ -22,17 +22,77 @@
 """Script to check that all internal doc links are valid."""
 
 import re
+import ssl
 import sys
+import time
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET  # nosec
 from pathlib import Path
-from typing import Dict, List, Pattern, Set
+from typing import Any, Dict, List, Optional, Pattern, Set
 
-import requests
-import urllib3  # type: ignore
-from requests.adapters import HTTPAdapter  # type: ignore
-from requests.packages.urllib3.util.retry import (  # type: ignore # pylint: disable=import-error
-    Retry,
-)
+
+class _Permanent308RedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Backport 308 redirect handling to Python 3.10.
+
+    Python 3.11+ handles 308 natively in HTTPRedirectHandler. In 3.10
+    both ``http_error_308`` is missing and ``redirect_request`` does
+    not include 308 in its allowed codes, so a 308 response is raised
+    as HTTPError instead of being followed. This subclass adds both.
+    """
+
+    def http_error_308(  # pylint: disable=too-many-positional-arguments
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+    ) -> Optional[Any]:
+        """Treat 308 the same as 301 (permanent redirect).
+
+        :param req: the original request.
+        :param fp: the response file-like object.
+        :param code: HTTP status code (308).
+        :param msg: HTTP status message.
+        :param headers: response headers.
+        :return: redirected response or None.
+        """
+        return self.http_error_301(req, fp, code, msg, headers)
+
+    def redirect_request(  # pylint: disable=too-many-positional-arguments
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+        newurl: str,
+    ) -> Optional[urllib.request.Request]:
+        """Allow 308 in addition to 301/302/303/307 for GET/HEAD.
+
+        :param req: the original request.
+        :param fp: the response file-like object.
+        :param code: HTTP status code.
+        :param msg: HTTP status message.
+        :param headers: response headers.
+        :param newurl: the redirect target URL.
+        :return: a new Request or None.
+        """
+        if code == 308 and req.get_method() in ("GET", "HEAD"):
+            newurl = newurl.replace(" ", "%20")
+            content_headers = ("content-length", "content-type")
+            new_headers = {
+                k: v for k, v in req.headers.items() if k.lower() not in content_headers
+            }
+            return urllib.request.Request(
+                newurl,
+                headers=new_headers,
+                origin_req_host=req.origin_req_host,
+                unverifiable=True,
+            )
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
 
 LINK_PATTERN_MD = re.compile(r"\[([^]]+)]\(\s*([^]]+)\s*\)")
 LINK_PATTERN = re.compile(r'(?<=<a href=")[^"]*')
@@ -53,22 +113,33 @@ URL_SKIPS: List[str] = [
 CUSTOM_TIMEOUTS: Dict[str, int] = {}
 
 DEFAULT_REQUEST_TIMEOUT = 5  # seconds
+RETRY_STATUS_CODES = {404, 429, 500, 502, 503, 504}
+MAX_RETRIES = 3
 
-# Disable insecure request warning (expired SSL certificates)
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# SSL context that does not verify certificates (expired SSL certificates
+# would otherwise make those links fail)
+_ssl_ctx = ssl.create_default_context()
+_ssl_ctx.check_hostname = False
+_ssl_ctx.verify_mode = ssl.CERT_NONE
+_https_handler = urllib.request.HTTPSHandler(context=_ssl_ctx)
+_redirect_opener = urllib.request.build_opener(
+    _Permanent308RedirectHandler, _https_handler
+)
 
-# Configure request retries
-retry_strategy = Retry(
-    total=3,  # number of retries
-    status_forcelist=[404, 429, 500, 502, 503, 504],  # codes to retry on
-)
-# https://stackoverflow.com/questions/18466079/change-the-connection-pool-size-for-pythons-requests-module-when-in-threading
-adapter = HTTPAdapter(
-    max_retries=retry_strategy, pool_connections=100, pool_maxsize=100
-)
-session = requests.Session()
-session.mount("https://", adapter)
-session.mount("http://", adapter)
+
+def _fetch_status(url: str, timeout: float) -> int:
+    """Fetch the status code of a URL using urllib.
+
+    :param url: the URL to fetch.
+    :param timeout: request timeout in seconds.
+    :return: the HTTP status code.
+    """
+    req = urllib.request.Request(url, method="GET")
+    try:
+        with _redirect_opener.open(req, timeout=timeout) as resp:  # nosec
+            return resp.status
+    except urllib.error.HTTPError as e:
+        return e.code
 
 
 def is_url_reachable(url: str) -> bool:
@@ -83,22 +154,22 @@ def is_url_reachable(url: str) -> bool:
     if url in URL_SKIPS:
         return True
 
-    try:
-        # Do not verify requests. Expired SSL certificates would make those links fail
-        status_code = session.get(
-            url,
-            timeout=CUSTOM_TIMEOUTS.get(url, DEFAULT_REQUEST_TIMEOUT),
-            verify=False,
-        ).status_code
-        if status_code not in (200, 403):
+    timeout = CUSTOM_TIMEOUTS.get(url, DEFAULT_REQUEST_TIMEOUT)
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            status_code = _fetch_status(url, timeout)
+        except (urllib.error.URLError, OSError):
+            if attempt < MAX_RETRIES:
+                time.sleep(0.5)
+                continue
             return False
-    except (
-        requests.exceptions.RetryError,
-        requests.exceptions.ConnectionError,
-    ):
+        if status_code in (200, 403):
+            return True
+        if status_code in RETRY_STATUS_CODES and attempt < MAX_RETRIES:
+            time.sleep(0.5)
+            continue
         return False
-
-    return True
+    return False
 
 
 def check_header_in_file(header: str, file: Path) -> None:
