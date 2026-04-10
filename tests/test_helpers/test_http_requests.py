@@ -142,6 +142,28 @@ class TestRequest:
         assert b"file.txt" in req.data
         assert b"/home/user/secret" not in req.data
 
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_multipart_escapes_injection_chars(self, mock_open: MagicMock) -> None:
+        """Multipart field_name/filename with quotes/CRLF are percent-encoded."""
+        mock_open.return_value = _mock_urlopen()
+        f = io.BytesIO(b"x")
+        f.name = 'evil"\r\nX-Injected: 1\r\n\r\n.txt'
+        http_requests.post(
+            "http://example.com",
+            files={'bad"name\r\n': f},
+            data={'k"ey\r\n': "v"},
+        )
+        req = mock_open.call_args[0][0]
+        body = req.data
+        # The injected CRLF + header sequence must not appear verbatim —
+        # if it did, a server would parse "X-Injected: 1" as a real header
+        # inside the Content-Disposition line.
+        assert b"\r\nX-Injected" not in body
+        # Instead, these characters must appear percent-encoded inside
+        # the quoted Content-Disposition values.
+        assert b"%22" in body  # "
+        assert b"%0D%0A" in body  # \r\n
+
 
 class TestErrorHandling:
     """Tests for error handling."""
@@ -288,6 +310,40 @@ class TestRedirectBehaviour:
         )
         assert result is None
 
+    def test_get_follows_308_permanent_redirect(self) -> None:
+        """308 Permanent Redirect is backported for 3.10 — GET should follow."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        req = urllib.request.Request("http://example.com/a", method="GET")
+        result = handler.redirect_request(
+            req,
+            io.BytesIO(b""),
+            308,
+            "Permanent Redirect",
+            {"location": "http://example.com/b"},
+            "http://example.com/b",
+        )
+        assert result is not None
+        assert isinstance(result, urllib.request.Request)
+
+    def test_post_suppresses_308_redirect(self) -> None:
+        """308 on POST should not be followed (matches requests behaviour)."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        req = urllib.request.Request("http://example.com/a", data=b"x", method="POST")
+        result = handler.redirect_request(
+            req,
+            io.BytesIO(b""),
+            308,
+            "Permanent Redirect",
+            {"location": "http://example.com/b"},
+            "http://example.com/b",
+        )
+        assert result is None
+
+    def test_http_error_308_method_exists(self) -> None:
+        """http_error_308 should be defined (backport for Python 3.10)."""
+        handler = http_requests._ConditionalNoRedirectHandler()
+        assert hasattr(handler, "http_error_308")
+
 
 class TestBackwardsCompatShims:
     """Tests for backwards-compatible re-exports."""
@@ -374,3 +430,22 @@ class TestDownloadToFile:
             http_requests.download_to_file(
                 "http://example.com/file", str(tmp_path / "out")
             )
+
+    @patch("aea.helpers.http_requests._opener.open")
+    def test_partial_file_cleaned_up_on_midstream_failure(
+        self, mock_open: MagicMock, tmp_path: Path
+    ) -> None:
+        """If resp.read() fails mid-stream, the partial file is unlinked."""
+        resp = MagicMock()
+        resp.status = 200
+        # First read succeeds, second raises (simulating network drop)
+        resp.read = MagicMock(side_effect=[b"partial", OSError("connection dropped")])
+        resp.__enter__ = lambda s: s
+        resp.__exit__ = MagicMock(return_value=False)
+        mock_open.return_value = resp
+
+        target = tmp_path / "out.bin"
+        with pytest.raises(http_requests.ConnectionError):
+            http_requests.download_to_file("http://example.com/file", str(target))
+        # Partial file should NOT exist after the failure
+        assert not target.exists()

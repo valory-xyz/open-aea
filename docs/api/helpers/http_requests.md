@@ -25,6 +25,13 @@ behaviour change. This handler suppresses redirects only for unsafe
 methods and lets the default HTTPRedirectHandler follow them for
 safe methods like GET/HEAD.
 
+Also backports 308 (Permanent Redirect) handling: Python 3.11+
+handles 308 natively in HTTPRedirectHandler, but 3.10 is missing
+``http_error_308`` AND ``redirect_request`` does not include 308
+in its allowed-codes tuple. Without this backport, a CDN returning
+308 on a GET would surface as ``HTTPResponse(308, ...)`` and break
+downstream callers like ``download_file``.
+
 <a id="aea.helpers.http_requests._ConditionalNoRedirectHandler.redirect_request"></a>
 
 #### redirect`_`request
@@ -49,6 +56,32 @@ Suppress redirects for unsafe methods, follow for safe ones.
 **Returns**:
 
 a new Request to follow, or None to suppress.
+
+<a id="aea.helpers.http_requests._ConditionalNoRedirectHandler.http_error_308"></a>
+
+#### http`_`error`_`308
+
+```python
+def http_error_308(req: urllib.request.Request, fp: Any, code: int, msg: str,
+                   headers: Any) -> Optional[Any]
+```
+
+Treat 308 the same as 301 (permanent redirect).
+
+Python 3.11+ provides this natively; this backport makes 308
+work on 3.10.
+
+**Arguments**:
+
+- `req`: the original request.
+- `fp`: the response file-like object.
+- `code`: HTTP status code (308).
+- `msg`: HTTP status message.
+- `headers`: response headers.
+
+**Returns**:
+
+redirected response or None.
 
 <a id="aea.helpers.http_requests.HTTPResponse"></a>
 

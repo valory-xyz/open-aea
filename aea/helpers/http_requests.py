@@ -53,6 +53,13 @@ class _ConditionalNoRedirectHandler(urllib.request.HTTPRedirectHandler):
     behaviour change. This handler suppresses redirects only for unsafe
     methods and lets the default HTTPRedirectHandler follow them for
     safe methods like GET/HEAD.
+
+    Also backports 308 (Permanent Redirect) handling: Python 3.11+
+    handles 308 natively in HTTPRedirectHandler, but 3.10 is missing
+    ``http_error_308`` AND ``redirect_request`` does not include 308
+    in its allowed-codes tuple. Without this backport, a CDN returning
+    308 on a GET would surface as ``HTTPResponse(308, ...)`` and break
+    downstream callers like ``download_file``.
     """
 
     def redirect_request(  # pylint: disable=too-many-positional-arguments
@@ -76,7 +83,44 @@ class _ConditionalNoRedirectHandler(urllib.request.HTTPRedirectHandler):
         """
         if req.get_method().upper() in _UNSAFE_METHODS:
             return None
+        # Backport 308 for Python 3.10 — the base class does not recognise
+        # it, so build the redirected Request manually with the same shape
+        # as the base class would for 301/302/307.
+        if code == 308 and req.get_method() in ("GET", "HEAD"):
+            newurl = newurl.replace(" ", "%20")
+            content_headers = ("content-length", "content-type")
+            new_headers = {
+                k: v for k, v in req.headers.items() if k.lower() not in content_headers
+            }
+            return urllib.request.Request(
+                newurl,
+                headers=new_headers,
+                origin_req_host=req.origin_req_host,
+                unverifiable=True,
+            )
         return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+    def http_error_308(  # pylint: disable=too-many-positional-arguments
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+    ) -> Optional[Any]:
+        """Treat 308 the same as 301 (permanent redirect).
+
+        Python 3.11+ provides this natively; this backport makes 308
+        work on 3.10.
+
+        :param req: the original request.
+        :param fp: the response file-like object.
+        :param code: HTTP status code (308).
+        :param msg: HTTP status message.
+        :param headers: response headers.
+        :return: redirected response or None.
+        """
+        return self.http_error_301(req, fp, code, msg, headers)
 
 
 _opener = urllib.request.build_opener(_ConditionalNoRedirectHandler)
@@ -279,7 +323,27 @@ def download_to_file(
     except urllib.error.HTTPError as e:
         return e.code
     except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
+        # Best-effort cleanup of the partial file so the caller's retry
+        # doesn't see stale half-downloaded content on disk.
+        try:
+            os.unlink(filepath)
+        except OSError:
+            pass
         raise ConnectionError(str(e)) from e
+
+
+def _quote_multipart(value: str) -> str:
+    """Escape a multipart ``name``/``filename`` header value.
+
+    Mirrors ``requests`` behaviour: percent-encode characters that would
+    otherwise corrupt the ``Content-Disposition`` line (quotes, CR, LF).
+
+    :param value: the raw value.
+    :return: the escaped value.
+    """
+    # urllib.parse.quote with a minimal safe set — keep printable ASCII
+    # but escape the characters that break the multipart envelope.
+    return urllib.parse.quote(value, safe=" !#$%&'()*+,-./:;<=>?@[]^_`{|}~")
 
 
 def _encode_multipart(
@@ -296,17 +360,23 @@ def _encode_multipart(
     parts: list = []
 
     for key, value in fields.items():
+        safe_key = _quote_multipart(key)
         parts.append(f"--{boundary}\r\n".encode())
-        parts.append(f'Content-Disposition: form-data; name="{key}"\r\n\r\n'.encode())
+        parts.append(
+            f'Content-Disposition: form-data; name="{safe_key}"\r\n\r\n'.encode()
+        )
         parts.append(f"{value}\r\n".encode())
 
     for field_name, file_obj in files.items():
-        filename = os.path.basename(getattr(file_obj, "name", field_name))
+        safe_field = _quote_multipart(field_name)
+        safe_filename = _quote_multipart(
+            os.path.basename(getattr(file_obj, "name", field_name))
+        )
         file_data = file_obj.read()
         parts.append(f"--{boundary}\r\n".encode())
         parts.append(
-            f'Content-Disposition: form-data; name="{field_name}"; '
-            f'filename="{filename}"\r\n'.encode()
+            f'Content-Disposition: form-data; name="{safe_field}"; '
+            f'filename="{safe_filename}"\r\n'.encode()
         )
         parts.append(b"Content-Type: application/octet-stream\r\n\r\n")
         parts.append(file_data)

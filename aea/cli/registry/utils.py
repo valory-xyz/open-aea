@@ -19,7 +19,6 @@
 # ------------------------------------------------------------------------------
 """Utils used for operating Registry with CLI."""
 
-import json
 import os
 import tarfile
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
@@ -101,7 +100,7 @@ def request_api(  # pylint: disable=too-many-positional-arguments
         resp_json = resp.json()
     except http_requests.ConnectionError:
         raise click.ClickException("Registry server is not responding.")
-    except (json.JSONDecodeError, ValueError):
+    except ValueError:  # JSONDecodeError is a ValueError subclass
         resp_json = None
 
     if resp.status_code == 200:
