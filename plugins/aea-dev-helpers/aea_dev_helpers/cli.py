@@ -32,7 +32,9 @@ def cli() -> None:
 
 @cli.command("parse-lock-deps")
 @click.argument("pipfile_lock_path", type=click.Path(exists=True))
-@click.option("-o", "--output", type=click.Path(), default=None, help="Output file path.")
+@click.option(
+    "-o", "--output", type=click.Path(), default=None, help="Output file path."
+)
 def parse_lock_deps_cmd(pipfile_lock_path: str, output: Optional[str]) -> None:
     """Parse main dependencies from a Pipfile.lock and print in requirements.txt format."""
     from aea_dev_helpers.parse_lock_deps import parse_lock_deps
@@ -58,7 +60,9 @@ def publish_local_cmd(package_dir: str) -> None:
 @cli.command("update-symlinks")
 def update_symlinks_cmd() -> None:
     """Update symlinks for the project (cross-platform)."""
-    from aea_dev_helpers.update_symlinks import update_symlinks  # pylint: disable=import-outside-toplevel
+    from aea_dev_helpers.update_symlinks import (  # pylint: disable=import-outside-toplevel
+        update_symlinks,
+    )
 
     update_symlinks()
 
@@ -80,7 +84,9 @@ def bump_version_cmd(
     only_check: bool,
 ) -> None:
     """Bump AEA and plugin versions throughout the codebase."""
-    from aea_dev_helpers.bump_version import run_bump  # pylint: disable=import-outside-toplevel
+    from aea_dev_helpers.bump_version import (  # pylint: disable=import-outside-toplevel
+        run_bump,
+    )
 
     plugin_map = {}
     for pnv in plugin_new_version:
@@ -94,7 +100,9 @@ def bump_version_cmd(
 @cli.command("deploy-registry")
 def deploy_registry_cmd() -> None:
     """Push all packages to the registry in dependency order."""
-    from aea_dev_helpers.deploy_registry import main as deploy_main  # pylint: disable=import-outside-toplevel
+    from aea_dev_helpers.deploy_registry import (
+        main as deploy_main,  # pylint: disable=import-outside-toplevel
+    )
 
     deploy_main()
 
@@ -103,7 +111,9 @@ def deploy_registry_cmd() -> None:
 @click.pass_context
 def update_pkg_versions_cmd(ctx: click.Context) -> None:
     """Interactive package version bumping with registry checks."""
-    from aea_dev_helpers.update_pkg_versions import command  # pylint: disable=import-outside-toplevel
+    from aea_dev_helpers.update_pkg_versions import (  # pylint: disable=import-outside-toplevel
+        command,
+    )
 
     # Delegate to the existing click command from the migrated module
     ctx.invoke(command)

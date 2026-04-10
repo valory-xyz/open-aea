@@ -29,9 +29,7 @@ setup(
     description="Development and release helper utilities for AEA-based projects.",
     long_description="Development and release helper utilities for AEA-based projects.",
     long_description_content_type="text/markdown",
-    packages=find_packages(
-        where=".", include=["aea_dev_helpers", "aea_dev_helpers.*"]
-    ),
+    packages=find_packages(where=".", include=["aea_dev_helpers", "aea_dev_helpers.*"]),
     entry_points={
         "console_scripts": [
             "aea-dev=aea_dev_helpers.cli:cli",

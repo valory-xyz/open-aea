@@ -65,6 +65,7 @@ TEST_PROTOCOLS = ["t_protocol", "t_protocol_no_ct"]
 # Lazy AEA imports
 # ---------------------------------------------------------------------------
 
+
 def _get_cli():
     """Lazy import of aea.cli.cli."""
     from aea.cli import cli  # pylint: disable=import-outside-toplevel
@@ -74,35 +75,45 @@ def _get_cli():
 
 def _update_hashes_lazy(**kwargs: Any) -> int:
     """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
-    from aea.cli.ipfs_hash import update_hashes  # pylint: disable=import-outside-toplevel
+    from aea.cli.ipfs_hash import (  # pylint: disable=import-outside-toplevel
+        update_hashes,
+    )
 
     return update_hashes(**kwargs)
 
 
 def _get_package_id_class():
     """Lazy import of PackageId."""
-    from aea.configurations.base import PackageId  # pylint: disable=import-outside-toplevel
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        PackageId,
+    )
 
     return PackageId
 
 
 def _get_package_type_class():
     """Lazy import of PackageType."""
-    from aea.configurations.base import PackageType  # pylint: disable=import-outside-toplevel
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        PackageType,
+    )
 
     return PackageType
 
 
 def _get_public_id_class():
     """Lazy import of PublicId."""
-    from aea.configurations.base import PublicId  # pylint: disable=import-outside-toplevel
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        PublicId,
+    )
 
     return PublicId
 
 
 def _get_config_loader_class():
     """Lazy import of ConfigLoader."""
-    from aea.configurations.loader import ConfigLoader  # pylint: disable=import-outside-toplevel
+    from aea.configurations.loader import (  # pylint: disable=import-outside-toplevel
+        ConfigLoader,
+    )
 
     return ConfigLoader
 
@@ -114,7 +125,10 @@ def _get_protocol_helpers():
         get_protocol_specification_id_from_specification,
     )
 
-    return get_protocol_specification_from_readme, get_protocol_specification_id_from_specification
+    return (
+        get_protocol_specification_from_readme,
+        get_protocol_specification_id_from_specification,
+    )
 
 
 def _types_set():
@@ -132,6 +146,7 @@ def _public_id_regex():
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def get_protocol_specification_header_regex(public_id) -> Pattern:
     """Get the regex to match."""
@@ -318,7 +333,10 @@ def get_all_protocol_spec_ids() -> Set:
     :return: a set of package ids.
     """
     PublicId = _get_public_id_class()
-    get_protocol_specification_from_readme, get_protocol_specification_id_from_specification = _get_protocol_helpers()
+    (
+        get_protocol_specification_from_readme,
+        get_protocol_specification_id_from_specification,
+    ) = _get_protocol_helpers()
     result: Set = set()
     protocol_packages = set(PACKAGES_DIR.rglob("**/**/protocols/**")) - set(
         PACKAGES_DIR.rglob("**/**/protocols")
@@ -553,9 +571,7 @@ def replace_type_and_public_id_occurrences(
     return line
 
 
-def replace_in_yamls(
-    content: str, old_public_id, new_public_id, type_: str
-) -> str:
+def replace_in_yamls(content: str, old_public_id, new_public_id, type_: str) -> str:
     """
     Replace the public id in configuration files (also nested in .md files).
 
@@ -891,6 +907,7 @@ class Updater:
 # ---------------------------------------------------------------------------
 # Click command -- kept here so cli.py can import and register it.
 # ---------------------------------------------------------------------------
+
 
 @click.command(name="update-pkg-versions")
 @click.option(

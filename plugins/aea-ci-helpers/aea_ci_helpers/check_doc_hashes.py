@@ -26,7 +26,6 @@ from typing import Dict, Optional
 
 import yaml
 
-
 CLI_REGEX = r"(?P<cli>aea)"
 # CMD_REGEX should be r"(?P<cmd>(\S+\s(\s--\S+)*)+)",
 # but python implementation differs from others and does not match it properly
@@ -53,7 +52,10 @@ def _ensure_regex_constants() -> None:
     if AEA_COMMAND_REGEX is not None:
         return  # already initialised
 
-    from aea.helpers.base import IPFS_HASH_REGEX, SIMPLE_ID_REGEX  # pylint: disable=import-outside-toplevel
+    from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
+        IPFS_HASH_REGEX,
+        SIMPLE_ID_REGEX,
+    )
 
     VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
     PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
@@ -72,7 +74,9 @@ def read_file(filepath: str) -> str:
 
 def get_packages() -> Dict[str, str]:
     """Get packages."""
-    from aea.cli.packages import get_package_manager  # pylint: disable=import-outside-toplevel
+    from aea.cli.packages import (  # pylint: disable=import-outside-toplevel
+        get_package_manager,
+    )
 
     data = get_package_manager(Path("packages").relative_to(".")).json
     if "dev" in data:
@@ -85,8 +89,12 @@ class Package:  # pylint: disable=too-few-public-methods
 
     def __init__(self, package_id_str: str, package_hash: str) -> None:
         """Constructor"""
-        from aea.configurations.data_types import PackageId  # pylint: disable=import-outside-toplevel
-        from aea.helpers.base import IPFS_HASH_REGEX  # pylint: disable=import-outside-toplevel
+        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
+            PackageId,
+        )
+        from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
+            IPFS_HASH_REGEX,
+        )
 
         self.package_id = PackageId.from_uri_path(package_id_str)
         self.vendor = self.package_id.author
@@ -150,7 +158,9 @@ class PackageHashManager:
         """Constructor"""
         _ensure_regex_constants()
 
-        from aea.helpers.base import IPFS_HASH_REGEX  # pylint: disable=import-outside-toplevel
+        from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
+            IPFS_HASH_REGEX,
+        )
 
         packages = get_packages()
 

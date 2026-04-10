@@ -33,14 +33,15 @@ def cli() -> None:
 @click.command(name="check-ipfs-pushed")
 def check_ipfs_pushed() -> None:
     """Verify all package IPFS hashes from the latest git tag are reachable on the gateway."""
+    import json  # pylint: disable=import-outside-toplevel
+    from concurrent.futures import (  # pylint: disable=import-outside-toplevel
+        ThreadPoolExecutor,
+    )
+
     from aea_ci_helpers.check_ipfs_pushed import (  # pylint: disable=import-outside-toplevel
         check_ipfs_hash_pushed,
         get_file_from_tag,
     )
-    import json  # pylint: disable=import-outside-toplevel
-    from concurrent.futures import (
-        ThreadPoolExecutor,
-    )  # pylint: disable=import-outside-toplevel
 
     packages_json = json.loads(get_file_from_tag("packages/packages.json"))["dev"]
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -75,9 +76,10 @@ def check_pyproject() -> None:
 def check_pkg_versions() -> None:
     """Verify package IDs in documentation match actual package configurations."""
     from pathlib import Path  # pylint: disable=import-outside-toplevel
+
     from aea_ci_helpers.check_pkg_versions import (  # pylint: disable=import-outside-toplevel
-        check_file,
         PackageIdNotFound,
+        check_file,
         handle_package_not_found,
     )
 
@@ -97,9 +99,9 @@ def check_pkg_versions() -> None:
 @click.command(name="check-imports")
 def check_imports() -> None:
     """Verify all imports are declared as dependencies."""
-    from aea_ci_helpers.check_imports import (
+    from aea_ci_helpers.check_imports import (  # pylint: disable=import-outside-toplevel
         CheckTool,
-    )  # pylint: disable=import-outside-toplevel
+    )
 
     CheckTool.run()
 
@@ -114,12 +116,14 @@ def check_imports() -> None:
 def generate_api_docs(check_clean: bool) -> None:
     """Generate API documentation from source."""
     import shutil  # pylint: disable=import-outside-toplevel
+
     from aea_ci_helpers.generate_api_docs import (
-        generate_api_docs as gen_docs,
-    )  # pylint: disable=import-outside-toplevel
-    from aea.helpers.git import (
+        generate_api_docs as gen_docs,  # pylint: disable=import-outside-toplevel
+    )
+
+    from aea.helpers.git import (  # pylint: disable=import-outside-toplevel
         check_working_tree_is_dirty,
-    )  # pylint: disable=import-outside-toplevel
+    )
 
     res = shutil.which("pydoc-markdown")
     if res is None:
@@ -139,9 +143,9 @@ def generate_api_docs(check_clean: bool) -> None:
 @click.command(name="generate-pkg-list")
 def generate_pkg_list() -> None:
     """Generate markdown table of all packages with their IPFS hashes."""
-    from aea_ci_helpers.generate_pkg_list import (
+    from aea_ci_helpers.generate_pkg_list import (  # pylint: disable=import-outside-toplevel
         generate_table,
-    )  # pylint: disable=import-outside-toplevel
+    )
 
     generate_table()
 
@@ -202,12 +206,13 @@ def check_dependencies_cmd(
     """Check dependencies across packages, tox.ini, pyproject.toml and Pipfile."""
     import logging  # pylint: disable=import-outside-toplevel
     from pathlib import Path  # pylint: disable=import-outside-toplevel
+
     from aea_ci_helpers.check_dependencies import (  # pylint: disable=import-outside-toplevel
-        ToxFile,
         Pipfile,
         PyProjectToml,
-        load_packages_dependencies,
+        ToxFile,
         check_dependencies,
+        load_packages_dependencies,
         update_dependencies,
     )
 

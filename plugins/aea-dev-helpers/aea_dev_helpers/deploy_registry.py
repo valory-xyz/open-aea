@@ -350,7 +350,9 @@ def check_and_upload(package_id, runner: CliRunner) -> None:
     :param package_id: the package id
     :param runner: the cli runner
     """
-    from aea.configurations.base import PackageType  # pylint: disable=import-outside-toplevel
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        PackageType,
+    )
 
     cli = _get_cli()
     result = runner.invoke(
@@ -386,7 +388,9 @@ def upload_new_packages(runner: CliRunner, all_package_ids: Set) -> None:
     :param runner: the cli runner
     :param all_package_ids: the set of all package ids to process.
     """
-    from aea.configurations.base import PackageType  # pylint: disable=import-outside-toplevel
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        PackageType,
+    )
 
     print("\nPushing protocols:")
     for package_id in all_package_ids:

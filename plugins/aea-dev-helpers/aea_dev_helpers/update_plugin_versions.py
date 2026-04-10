@@ -53,16 +53,21 @@ IGNORE_DIRS = [Path(".git")]
 # Lazy AEA imports
 # ---------------------------------------------------------------------------
 
+
 def _compute_specifier_from_version_lazy(version: Version, **kwargs: Any) -> str:
     """Lazy wrapper around aea.helpers.base.compute_specifier_from_version."""
-    from aea.helpers.base import compute_specifier_from_version  # pylint: disable=import-outside-toplevel
+    from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
+        compute_specifier_from_version,
+    )
 
     return compute_specifier_from_version(version, **kwargs)
 
 
 def _update_hashes_lazy(**kwargs: Any) -> int:
     """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
-    from aea.cli.ipfs_hash import update_hashes  # pylint: disable=import-outside-toplevel
+    from aea.cli.ipfs_hash import (  # pylint: disable=import-outside-toplevel
+        update_hashes,
+    )
 
     return update_hashes(**kwargs)
 
@@ -70,6 +75,7 @@ def _update_hashes_lazy(**kwargs: Any) -> int:
 # ---------------------------------------------------------------------------
 # Core logic
 # ---------------------------------------------------------------------------
+
 
 def update_plugin_setup(
     plugin_name: str, old_version: Version, new_version: Version
