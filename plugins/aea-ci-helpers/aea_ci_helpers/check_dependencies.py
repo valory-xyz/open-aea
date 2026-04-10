@@ -22,9 +22,6 @@
 Check that repository dependency files (Pipfile, tox.ini, pyproject.toml) are
 consistent with the package-level dependencies declared inside ``packages/``.
 
-All ``aea.*`` imports are lazy (performed inside the functions that need them)
-so that this module can be imported even when the ``aea`` package is not
-installed.
 """
 
 import itertools
@@ -39,6 +36,10 @@ from typing import Tuple, cast
 
 import click
 import toml
+
+from aea.configurations.data_types import Dependency
+from aea.package_manager.base import load_configuration
+from aea.package_manager.v1 import PackageManagerV1
 
 ANY_SPECIFIER = "*"
 
@@ -69,8 +70,8 @@ class Pipfile:
     def __init__(
         self,
         sources: List[str],
-        packages: OrderedDictType[str, Any],
-        dev_packages: OrderedDictType[str, Any],
+        packages: OrderedDictType[str, Dependency],
+        dev_packages: OrderedDictType[str, Dependency],
         file: Path,
     ) -> None:
         """Initialize object."""
@@ -128,12 +129,8 @@ class Pipfile:
     @classmethod
     def parse(
         cls, content: str
-    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, Any]]]:
+    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, Dependency]]]:
         """Parse from string."""
-        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
-            Dependency,
-        )
-
         sources: List[str] = []
         sections: OrderedDictType = OrderedDict()
         lines = content.split("\n")
@@ -255,10 +252,6 @@ class ToxFile:
     @classmethod
     def parse(cls, content: str) -> Dict[str, Dict[str, Any]]:
         """Parse file content."""
-        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
-            Dependency,
-        )
-
         deps: Dict[str, Dict[str, Any]] = {}
         lines = content.split("\n")
         while len(lines) > 0:
@@ -339,7 +332,7 @@ class PyProjectToml:
 
     def __init__(
         self,
-        dependencies: OrderedDictType[str, Any],
+        dependencies: OrderedDictType[str, Dependency],
         config: Dict[str, Dict],
         file: Path,
     ) -> None:
@@ -382,12 +375,8 @@ class PyProjectToml:
     @classmethod
     def load(cls, pyproject_path: Path) -> Optional["PyProjectToml"]:
         """Load pyproject.yaml dependencies."""
-        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
-            Dependency,
-        )
-
         config = toml.load(pyproject_path)
-        dependencies: OrderedDictType[str, Any] = OrderedDict()
+        dependencies: OrderedDictType[str, Dependency] = OrderedDict()
         try:
             config["tool"]["poetry"]["dependencies"]
         except KeyError:
@@ -429,13 +418,6 @@ class PyProjectToml:
 
 def load_packages_dependencies(packages_dir: Path) -> List:
     """Return a list of package dependencies."""
-    from aea.package_manager.base import (  # pylint: disable=import-outside-toplevel
-        load_configuration,
-    )
-    from aea.package_manager.v1 import (  # pylint: disable=import-outside-toplevel
-        PackageManagerV1,
-    )
-
     package_manager = PackageManagerV1.from_dir(packages_dir=packages_dir)
     dependencies: Dict[str, Any] = {}
     for package in package_manager.iter_dependency_tree():
