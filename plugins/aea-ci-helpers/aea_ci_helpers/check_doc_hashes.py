@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -20,7 +19,6 @@
 
 """This module contains the tools for autoupdating ipfs hashes in the documentation."""
 
-import argparse
 import re
 import sys
 from pathlib import Path
@@ -28,27 +26,41 @@ from typing import Dict, Optional
 
 import yaml
 
-from aea.cli.packages import get_package_manager
-from aea.configurations.data_types import PackageId
-from aea.helpers.base import IPFS_HASH_REGEX, SIMPLE_ID_REGEX
 
 CLI_REGEX = r"(?P<cli>aea)"
 # CMD_REGEX should be r"(?P<cmd>(\S+\s(\s--\S+)*)+)",
 # but python implementation differs from others and does not match it properly
 CMD_REGEX = r"(?P<cmd>.*)"
-VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
-PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
+VENDOR_REGEX: Optional[str] = None
+PACKAGE_REGEX: Optional[str] = None
 VERSION_REGEX = r"(?P<version>\d+\.\d+\.\d+)"
 FLAGS_REGEX = r"(?P<flags>(\s--.*)?)"
 PACKAGE_TYPE_REGEX = (
     r"(?P<package_type>(skill|protocol|connection|contract|agent|service))"
 )
 
-AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}){FLAGS_REGEX})"
-FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
-PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
+AEA_COMMAND_REGEX: Optional[str] = None
+FULL_PACKAGE_REGEX: Optional[str] = None
+PACKAGE_TABLE_REGEX: Optional[str] = None
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).parent.parent.parent.parent
+
+
+def _ensure_regex_constants() -> None:
+    """Lazily initialise module-level regex constants that depend on aea helpers."""
+    global VENDOR_REGEX, PACKAGE_REGEX, AEA_COMMAND_REGEX, FULL_PACKAGE_REGEX, PACKAGE_TABLE_REGEX  # noqa: E501
+
+    if AEA_COMMAND_REGEX is not None:
+        return  # already initialised
+
+    from aea.helpers.base import IPFS_HASH_REGEX, SIMPLE_ID_REGEX  # pylint: disable=import-outside-toplevel
+
+    VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
+    PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
+
+    AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}){FLAGS_REGEX})"
+    FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
+    PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
 
 
 def read_file(filepath: str) -> str:
@@ -60,6 +72,8 @@ def read_file(filepath: str) -> str:
 
 def get_packages() -> Dict[str, str]:
     """Get packages."""
+    from aea.cli.packages import get_package_manager  # pylint: disable=import-outside-toplevel
+
     data = get_package_manager(Path("packages").relative_to(".")).json
     if "dev" in data:
         return data["dev"]
@@ -71,6 +85,8 @@ class Package:  # pylint: disable=too-few-public-methods
 
     def __init__(self, package_id_str: str, package_hash: str) -> None:
         """Constructor"""
+        from aea.configurations.data_types import PackageId  # pylint: disable=import-outside-toplevel
+        from aea.helpers.base import IPFS_HASH_REGEX  # pylint: disable=import-outside-toplevel
 
         self.package_id = PackageId.from_uri_path(package_id_str)
         self.vendor = self.package_id.author
@@ -132,6 +148,10 @@ class PackageHashManager:
 
     def __init__(self) -> None:
         """Constructor"""
+        _ensure_regex_constants()
+
+        from aea.helpers.base import IPFS_HASH_REGEX  # pylint: disable=import-outside-toplevel
+
         packages = get_packages()
 
         self.packages = [Package(key, value) for key, value in packages.items()]
@@ -157,10 +177,11 @@ class PackageHashManager:
         self, package_line: str, target_file: str
     ) -> Optional[str]:
         """Get a hash given its package line"""
+        _ensure_regex_constants()
 
         try:
-            m_command = re.match(AEA_COMMAND_REGEX, package_line)
-            m_package = re.match(FULL_PACKAGE_REGEX, package_line)
+            m_command = re.match(AEA_COMMAND_REGEX, package_line)  # type: ignore
+            m_package = re.match(FULL_PACKAGE_REGEX, package_line)  # type: ignore
 
             # No match
             if not m_command and not m_package:
@@ -240,6 +261,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     fix: bool = False,
 ) -> None:
     """Fix ipfs hashes in the docs"""
+    _ensure_regex_constants()
 
     all_md_files_docs = Path("docs").rglob("*.md")
     all_md_files_tests = Path("tests/test_docs/test_bash_yaml/md_files").rglob("*.md")
@@ -257,7 +279,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     # Fix full commands in docs
     for md_file in all_md_files:
         content = read_file(str(md_file))
-        for match in [m.groupdict() for m in re.finditer(AEA_COMMAND_REGEX, content)]:
+        for match in [m.groupdict() for m in re.finditer(AEA_COMMAND_REGEX, content)]:  # type: ignore
             matches += 1
             doc_full_cmd = match["full_cmd"]
             doc_cmd = match["cmd"]
@@ -299,7 +321,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     all_py_files = [Path("aea", "configurations", "constants.py")]
     for py_file in all_py_files:
         content = read_file(str(py_file))
-        for match in [m.groupdict() for m in re.finditer(FULL_PACKAGE_REGEX, content)]:
+        for match in [m.groupdict() for m in re.finditer(FULL_PACKAGE_REGEX, content)]:  # type: ignore
             full_package = match["full_package"]
             py_hash = match["hash"]
             expected_hash = package_manager.get_hash_by_package_line(
@@ -337,7 +359,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     package_list_file = Path(ROOT_DIR, "docs", "package_list.md")
     content = read_file(str(package_list_file))
 
-    for match in [m.groupdict() for m in re.finditer(PACKAGE_TABLE_REGEX, content)]:
+    for match in [m.groupdict() for m in re.finditer(PACKAGE_TABLE_REGEX, content)]:  # type: ignore
         expected_hash = package_manager.get_hash_by_attributes(
             match["package_type"], match["vendor"], match["package"]
         )
@@ -378,10 +400,3 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
         sys.exit(1)
 
     print("OK")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fix", action="store_true")
-    args = parser.parse_args()
-    check_ipfs_hashes(fix=args.fix)

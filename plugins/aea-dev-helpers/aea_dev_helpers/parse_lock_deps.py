@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -19,26 +18,25 @@
 #
 # ------------------------------------------------------------------------------
 
-"""This CLI tool takes the main dependencies of the Pipfile.lock and prints it to stdout in requirements.txt format."""
+"""Parse main dependencies from a Pipfile.lock and output in requirements.txt format."""
 
-import argparse
 import json
+from pathlib import Path
+from typing import Optional
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse CLI arguments."""
-    parser = argparse.ArgumentParser("parse_main_dependencies_from_lock")
-    parser.add_argument(
-        "pipfile_lock_path", type=argparse.FileType("r"), help="Path to Pipfile.lock."
-    )
-    parser.add_argument("-o", "--output", type=argparse.FileType("w"), default=None)
-    return parser.parse_args()
+def parse_lock_deps(pipfile_lock_path: str, output: Optional[str] = None) -> str:
+    """
+    Parse a Pipfile.lock and return requirements in requirements.txt format.
 
+    :param pipfile_lock_path: path to the Pipfile.lock file.
+    :param output: optional path to write the output to. If None, returns the string.
+    :return: the requirements string.
+    """
+    pipfile_lock = Path(pipfile_lock_path)
+    with open(pipfile_lock, "r") as f:
+        pipfile_lock_content = json.load(f)
 
-if __name__ == "__main__":
-    arguments = parse_args()
-
-    pipfile_lock_content = json.load(arguments.pipfile_lock_path)
     requirements = sorted(
         map(
             lambda x: x[0] + x[1]["version"],
@@ -47,7 +45,12 @@ if __name__ == "__main__":
     )
 
     requirements_content = "\n".join(requirements)
-    if arguments.output is None:
-        print(requirements_content)
+
+    if output is not None:
+        output_path = Path(output)
+        with open(output_path, "w") as f:
+            f.write(requirements_content)
     else:
-        arguments.output.write(requirements_content)
+        print(requirements_content)
+
+    return requirements_content

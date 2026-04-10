@@ -146,6 +146,107 @@ def generate_pkg_list() -> None:
     generate_table()
 
 
+@click.command(name="check-doc-hashes")
+@click.option("--fix", is_flag=True, help="Fix hashes instead of checking.")
+def check_doc_hashes(fix: bool) -> None:
+    """Validate and fix IPFS hashes in documentation."""
+    from aea_ci_helpers.check_doc_hashes import (  # pylint: disable=import-outside-toplevel
+        check_ipfs_hashes,
+    )
+
+    check_ipfs_hashes(fix=fix)
+
+
+@click.command(name="check-dependencies")
+@click.option(
+    "--check",
+    "do_check",
+    is_flag=True,
+    help="Perform dependency checks.",
+)
+@click.option(
+    "--packages",
+    "packages_dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    default=None,
+    help="Path of the packages directory.",
+)
+@click.option(
+    "--tox",
+    "tox_path",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    default=None,
+    help="Tox config path.",
+)
+@click.option(
+    "--pipfile",
+    "pipfile_path",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    default=None,
+    help="Pipfile path.",
+)
+@click.option(
+    "--pyproject",
+    "pyproject_path",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    default=None,
+    help="pyproject.toml path.",
+)
+def check_dependencies_cmd(
+    do_check: bool = False,
+    packages_dir: str = None,
+    tox_path: str = None,
+    pipfile_path: str = None,
+    pyproject_path: str = None,
+) -> None:
+    """Check dependencies across packages, tox.ini, pyproject.toml and Pipfile."""
+    import logging  # pylint: disable=import-outside-toplevel
+    from pathlib import Path  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.check_dependencies import (  # pylint: disable=import-outside-toplevel
+        ToxFile,
+        Pipfile,
+        PyProjectToml,
+        load_packages_dependencies,
+        check_dependencies,
+        update_dependencies,
+    )
+
+    logging.basicConfig(format="- %(levelname)s: %(message)s")
+
+    _tox_path = Path(tox_path) if tox_path else Path.cwd() / "tox.ini"
+    tox = ToxFile.load(_tox_path)
+
+    _pipfile_path = Path(pipfile_path) if pipfile_path else Path.cwd() / "Pipfile"
+    pipfile = Pipfile.load(_pipfile_path) if _pipfile_path.exists() else None
+
+    _pyproject_path = (
+        Path(pyproject_path) if pyproject_path else Path.cwd() / "pyproject.toml"
+    )
+    pyproject = (
+        PyProjectToml.load(_pyproject_path) if _pyproject_path.exists() else None
+    )
+
+    _packages_dir = Path(packages_dir) if packages_dir else Path.cwd() / "packages"
+    packages_deps = load_packages_dependencies(packages_dir=_packages_dir)
+
+    if do_check:
+        return check_dependencies(
+            tox=tox,
+            pipfile=pipfile,
+            pyproject=pyproject,
+            packages_dependencies=packages_deps,
+        )
+
+    return update_dependencies(
+        tox=tox,
+        pipfile=pipfile,
+        pyproject=pyproject,
+        packages_dependencies=packages_deps,
+    )
+
+
+cli.add_command(check_dependencies_cmd)
+cli.add_command(check_doc_hashes)
 cli.add_command(check_imports)
 cli.add_command(check_ipfs_pushed)
 cli.add_command(check_pkg_versions)

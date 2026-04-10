@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -17,13 +16,14 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+
 """
-This script checks that the pipfile of the repository meets the requirements.
+Check that repository dependency files (Pipfile, tox.ini, pyproject.toml) are
+consistent with the package-level dependencies declared inside ``packages/``.
 
-In particular:
-- Avoid the usage of "*"
-
-It is assumed the script is run from the repository root.
+All ``aea.*`` imports are lazy (performed inside the functions that need them)
+so that this module can be imported even when the ``aea`` package is not
+installed.
 """
 
 import itertools
@@ -38,10 +38,6 @@ from typing import Tuple, cast
 
 import click
 import toml
-
-from aea.configurations.data_types import Dependency
-from aea.package_manager.base import load_configuration
-from aea.package_manager.v1 import PackageManagerV1
 
 ANY_SPECIFIER = "*"
 
@@ -72,8 +68,8 @@ class Pipfile:
     def __init__(
         self,
         sources: List[str],
-        packages: OrderedDictType[str, Dependency],
-        dev_packages: OrderedDictType[str, Dependency],
+        packages: OrderedDictType[str, Any],
+        dev_packages: OrderedDictType[str, Any],
         file: Path,
     ) -> None:
         """Initialize object."""
@@ -82,8 +78,8 @@ class Pipfile:
         self.dev_packages = dev_packages
         self.file = file
 
-    def __iter__(self) -> Iterator[Dependency]:
-        """Iterate dependencies as from aea.configurations.data_types.Dependency object."""
+    def __iter__(self) -> Iterator:
+        """Iterate dependencies as Dependency objects."""
         for name, dependency in itertools.chain(
             self.packages.items(), self.dev_packages.items()
         ):
@@ -91,8 +87,8 @@ class Pipfile:
                 continue
             yield dependency
 
-    def update(self, dependency: Dependency) -> None:
-        """Update dependency specifier"""
+    def update(self, dependency: Any) -> None:
+        """Update dependency specifier."""
         if dependency.name in self.ignore:
             return
         if dependency.name in self.packages:
@@ -102,8 +98,8 @@ class Pipfile:
         else:
             self.dev_packages[dependency.name] = dependency
 
-    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
-        """Check dependency specifier"""
+    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+        """Check dependency specifier."""
         if dependency.name in self.ignore:
             return None, 0
 
@@ -131,9 +127,13 @@ class Pipfile:
     @classmethod
     def parse(
         cls, content: str
-    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, Dependency]]]:
+    ) -> Tuple[List[str], OrderedDictType[str, OrderedDictType[str, Any]]]:
         """Parse from string."""
-        sources = []
+        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
+            Dependency,
+        )
+
+        sources: List[str] = []
         sections: OrderedDictType = OrderedDict()
         lines = content.split("\n")
         comments = 0
@@ -218,15 +218,15 @@ class ToxFile:
         """Initialize object."""
         self.dependencies = dependencies
         self.file = file
-        self.extra: Dict[str, Dependency] = {}
+        self.extra: Dict[str, Any] = {}
 
-    def __iter__(self) -> Iterator[Dependency]:
+    def __iter__(self) -> Iterator:
         """Iter dependencies."""
         for obj in self.dependencies.values():
             yield obj["dep"]
 
-    def update(self, dependency: Dependency) -> None:
-        """Update dependency specifier"""
+    def update(self, dependency: Any) -> None:
+        """Update dependency specifier."""
         if dependency.name in self.skip:
             return
         if dependency.name in self.dependencies:
@@ -236,8 +236,8 @@ class ToxFile:
             return
         self.extra[dependency.name] = dependency
 
-    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
-        """Check dependency specifier"""
+    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+        """Check dependency specifier."""
         if dependency.name in self.skip:
             return None, 0
 
@@ -254,7 +254,11 @@ class ToxFile:
     @classmethod
     def parse(cls, content: str) -> Dict[str, Dict[str, Any]]:
         """Parse file content."""
-        deps = {}
+        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
+            Dependency,
+        )
+
+        deps: Dict[str, Dict[str, Any]] = {}
         lines = content.split("\n")
         while len(lines) > 0:
             line = lines.pop(0)
@@ -316,7 +320,7 @@ class ToxFile:
         """Dump config."""
         content = self.file.read_text(encoding="utf-8")
         for obj in self.dependencies.values():
-            replace = "    " + cast(Dependency, obj["dep"]).get_pip_install_args()[0]
+            replace = "    " + cast(Any, obj["dep"]).get_pip_install_args()[0]
             content = re.sub(obj["original"], replace, content)
 
         if len(self.extra) > 0:
@@ -334,7 +338,7 @@ class PyProjectToml:
 
     def __init__(
         self,
-        dependencies: OrderedDictType[str, Dependency],
+        dependencies: OrderedDictType[str, Any],
         config: Dict[str, Dict],
         file: Path,
     ) -> None:
@@ -343,22 +347,22 @@ class PyProjectToml:
         self.config = config
         self.file = file
 
-    def __iter__(self) -> Iterator[Dependency]:
-        """Iterate dependencies as from aea.configurations.data_types.Dependency object."""
+    def __iter__(self) -> Iterator:
+        """Iterate dependencies as Dependency objects."""
         for dependency in self.dependencies.values():
             if dependency.name not in self.ignore:
                 yield dependency
 
-    def update(self, dependency: Dependency) -> None:
-        """Update dependency specifier"""
+    def update(self, dependency: Any) -> None:
+        """Update dependency specifier."""
         if dependency.name in self.ignore:
             return
         if dependency.name in self.dependencies and dependency.version == "":
             return
         self.dependencies[dependency.name] = dependency
 
-    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
-        """Check dependency specifier"""
+    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+        """Check dependency specifier."""
         if dependency.name in self.ignore:
             return None, 0
 
@@ -376,9 +380,13 @@ class PyProjectToml:
 
     @classmethod
     def load(cls, pyproject_path: Path) -> Optional["PyProjectToml"]:
-        """Load pyproject.yaml dependencies"""
+        """Load pyproject.yaml dependencies."""
+        from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
+            Dependency,
+        )
+
         config = toml.load(pyproject_path)
-        dependencies = OrderedDict()
+        dependencies: OrderedDictType[str, Any] = OrderedDict()
         try:
             config["tool"]["poetry"]["dependencies"]
         except KeyError:
@@ -418,10 +426,17 @@ class PyProjectToml:
             toml.dump(self.config, fp)
 
 
-def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
-    """Returns a list of package dependencies."""
+def load_packages_dependencies(packages_dir: Path) -> List:
+    """Return a list of package dependencies."""
+    from aea.package_manager.base import (  # pylint: disable=import-outside-toplevel
+        load_configuration,
+    )
+    from aea.package_manager.v1 import (  # pylint: disable=import-outside-toplevel
+        PackageManagerV1,
+    )
+
     package_manager = PackageManagerV1.from_dir(packages_dir=packages_dir)
-    dependencies: Dict[str, Dependency] = {}
+    dependencies: Dict[str, Any] = {}
     for package in package_manager.iter_dependency_tree():
         if package.package_type.value == "service":
             continue
@@ -442,19 +457,20 @@ def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
                 if value == dependencies[key]:
                     continue
                 print(
-                    f"Non-matching dependency versions for {key}: {value} vs {dependencies[key]}"
+                    f"Non-matching dependency versions for {key}: "
+                    f"{value} vs {dependencies[key]}"
                 )
 
     return list(dependencies.values())
 
 
-def _update(
-    packages_dependencies: List[Dependency],
+def update_dependencies(
+    packages_dependencies: List,
     tox: ToxFile,
     pipfile: Optional[Pipfile] = None,
     pyproject: Optional[PyProjectToml] = None,
 ) -> None:
-    """Update dependencies."""
+    """Update dependencies across all config files."""
 
     if pipfile is not None:
         for dependency in packages_dependencies:
@@ -483,13 +499,13 @@ def _update(
     tox.write()
 
 
-def _check(
-    packages_dependencies: List[Dependency],
+def check_dependencies(
+    packages_dependencies: List,
     tox: ToxFile,
     pipfile: Optional[Pipfile] = None,
     pyproject: Optional[PyProjectToml] = None,
 ) -> None:
-    """Update dependencies."""
+    """Check dependencies across all config files."""
 
     fail_check = 0
 
@@ -553,92 +569,3 @@ def _check(
         sys.exit(0)
 
     print("No issues found")
-
-
-@click.command(name="dm")
-@click.option(
-    "--check",
-    is_flag=True,
-    help="Perform dependency checks.",
-)
-@click.option(
-    "--packages",
-    "packages_dir",
-    type=PathArgument(
-        exists=True,
-        file_okay=False,
-        dir_okay=True,
-    ),
-    help="Path of the packages directory.",
-)
-@click.option(
-    "--tox",
-    "tox_path",
-    type=PathArgument(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-    ),
-    help="Tox config path.",
-)
-@click.option(
-    "--pipfile",
-    "pipfile_path",
-    type=PathArgument(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-    ),
-    help="Pipfile path.",
-)
-@click.option(
-    "--pyproject",
-    "pyproject_path",
-    type=PathArgument(
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-    ),
-    help="Pipfile path.",
-)
-def main(
-    check: bool = False,
-    packages_dir: Optional[Path] = None,
-    tox_path: Optional[Path] = None,
-    pipfile_path: Optional[Path] = None,
-    pyproject_path: Optional[Path] = None,
-) -> None:
-    """Check dependencies across packages, tox.ini, pyproject.toml and setup.py"""
-
-    logging.basicConfig(format="- %(levelname)s: %(message)s")
-
-    tox_path = tox_path or Path.cwd() / "tox.ini"
-    tox = ToxFile.load(tox_path)
-
-    pipfile_path = pipfile_path or Path.cwd() / "Pipfile"
-    pipfile = Pipfile.load(pipfile_path) if pipfile_path.exists() else None
-
-    pyproject_path = pyproject_path or Path.cwd() / "pyproject.toml"
-    pyproject = PyProjectToml.load(pyproject_path) if pyproject_path.exists() else None
-
-    packages_dir = packages_dir or Path.cwd() / "packages"
-    packages_dependencies = load_packages_dependencies(packages_dir=packages_dir)
-
-    if check:
-        return _check(
-            tox=tox,
-            pipfile=pipfile,
-            pyproject=pyproject,
-            packages_dependencies=packages_dependencies,
-        )
-
-    return _update(
-        tox=tox,
-        pipfile=pipfile,
-        pyproject=pyproject,
-        packages_dependencies=packages_dependencies,
-    )
-
-
-if __name__ == "__main__":
-    main()

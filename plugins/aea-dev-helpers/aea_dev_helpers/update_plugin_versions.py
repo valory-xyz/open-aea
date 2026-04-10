@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -22,35 +21,55 @@
 """
 Bump the versions of AEA plugins throughout the code base.
 
-    python scripts/update_plugin_versions.py --update "plugin-name,version" [--update ...]
+This module contains the logic originally in ``scripts/update_plugin_versions.py``.
+All ``aea.*`` imports are lazy (imported inside the functions that need them)
+so that the module can be imported without pulling in the full AEA framework
+at import time.
 
-Example of usage:
+Example usage from the CLI wrapper::
 
-    python scripts/update_plugin_versions.py --update "open-aea-ledger-fetchai,0.2.0" --update "open-aea-ledger-ethereum,0.3.0"
-
+    aea-dev update-plugin-versions --update "open-aea-ledger-fetchai,0.2.0" \\
+        --update "open-aea-ledger-ethereum,0.3.0"
 """
 
-import argparse
 import pprint
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
-from aea.cli.ipfs_hash import update_hashes
-from aea.helpers.base import compute_specifier_from_version
-
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).parent.parent.parent.parent
 PLUGINS_DIR = Path("plugins")
 SETUP_PY_NAME_REGEX = re.compile(r"\Wname=\"(.*)\",")
 SETUP_PY_VERSION_REGEX = re.compile(r"\Wversion=\"(.*)\",")
 
-
 IGNORE_DIRS = [Path(".git")]
 
+
+# ---------------------------------------------------------------------------
+# Lazy AEA imports
+# ---------------------------------------------------------------------------
+
+def _compute_specifier_from_version_lazy(version: Version, **kwargs: Any) -> str:
+    """Lazy wrapper around aea.helpers.base.compute_specifier_from_version."""
+    from aea.helpers.base import compute_specifier_from_version  # pylint: disable=import-outside-toplevel
+
+    return compute_specifier_from_version(version, **kwargs)
+
+
+def _update_hashes_lazy(**kwargs: Any) -> int:
+    """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
+    from aea.cli.ipfs_hash import update_hashes  # pylint: disable=import-outside-toplevel
+
+    return update_hashes(**kwargs)
+
+
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
 
 def update_plugin_setup(
     plugin_name: str, old_version: Version, new_version: Version
@@ -102,10 +121,10 @@ def update_plugin_version_specifiers(
     :param new_version: the new version.
     :return: True if the update has been done, False otherwise.
     """
-    old_specifier_set = compute_specifier_from_version(
+    old_specifier_set = _compute_specifier_from_version_lazy(
         old_version, use_version_as_lower=True
     )
-    new_specifier_set = compute_specifier_from_version(
+    new_specifier_set = _compute_specifier_from_version_lazy(
         new_version, use_version_as_lower=True
     )
     print(f"Old version specifier: {old_specifier_set}")
@@ -219,31 +238,24 @@ def name_version_pair(s: str) -> Tuple[str, str]:
         name, version = [part.strip() for part in s.split(",")]
         return name, version
     except Exception:
-        raise argparse.ArgumentTypeError(f"Name-version pair not correct: '{s}'")
+        raise ValueError(f"Name-version pair not correct: '{s}'")
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse arguments."""
-    parser = argparse.ArgumentParser("bump_aea_version")
-    parser.add_argument(
-        "--update",
-        type=name_version_pair,
-        metavar="'NAME,VERSION'",
-        required=True,
-        action="append",
-        help="A comma-separated pair: 'plugin-name, new-version'.",
-    )
-    parser.add_argument("--no-fingerprint", action="store_true")
-    arguments_ = parser.parse_args()
-    return arguments_
+def run_update_plugin_versions(
+    updates: List[Tuple[str, str]],
+    no_fingerprint: bool = False,
+) -> None:
+    """
+    Run the update-plugin-versions workflow.
 
+    This is the main entry point intended to be called from a CLI wrapper.
 
-def main() -> None:
-    """Run the script."""
-    arguments = parse_args()
+    :param updates: list of (plugin-name, new-version) tuples.
+    :param no_fingerprint: if True, skip fingerprint computation.
+    """
     current_versions_by_name: Dict[str, Version] = get_plugin_names_and_versions()
     new_versions_by_name: Dict[str, Version] = dict(
-        (name, Version(version)) for name, version in arguments.update
+        (name, Version(version)) for name, version in updates
     )
 
     print(
@@ -276,17 +288,13 @@ def main() -> None:
         )
 
     return_code = 0
-    if arguments.no_fingerprint:
+    if no_fingerprint:
         print("Not updating fingerprints, since --no-fingerprint was specified.")
     elif not have_updated_specifier_set:
         print("Not updating fingerprints, since no specifier set has been updated.")
     else:
         print("Updating hashes and fingerprints.")
-        return_code = update_hashes(
+        return_code = _update_hashes_lazy(
             packages_dir=ROOT_DIR / "packages",
         )
     exit_with_message("Done!", exit_code=return_code)
-
-
-if __name__ == "__main__":
-    main()

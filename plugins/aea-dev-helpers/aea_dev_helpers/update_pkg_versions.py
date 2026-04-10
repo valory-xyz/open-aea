@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -22,11 +21,16 @@
 """
 Updates package versions relative to last release.
 
-Run this script from the root of the project directory:
-    python scripts/update_package_versions.py
+This module contains the logic originally in ``scripts/update_package_versions.py``.
+All ``aea.*`` imports are lazy (imported inside the functions that need them)
+so that the module can be imported without pulling in the full AEA framework
+at import time.
+
+Run from the root of the project directory::
+
+    aea-dev update-pkg-versions
 """
 
-import argparse
 import operator
 import os
 import re
@@ -42,20 +46,10 @@ import yaml
 from click.testing import CliRunner
 from packaging.version import Version
 
-from aea.cli import cli
-from aea.cli.ipfs_hash import update_hashes
-from aea.configurations.base import PackageId, PackageType, PublicId
-from aea.configurations.loader import ConfigLoader
-from aea.helpers.protocols import (
-    get_protocol_specification_from_readme,
-    get_protocol_specification_id_from_specification,
-)
-
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).parent.parent.parent.parent
 PACKAGES_DIR = ROOT_DIR / "packages"
 DIRECTORIES = ["packages", "aea", "docs", "benchmark", "examples", "tests"]
 CLI_LOG_OPTION = ["-v", "OFF"]
-TYPES = set(map(lambda x: x.to_plural(), PackageType))
 HASHES_CSV = "hashes.csv"
 TYPE_TO_CONFIG_FILE = {
     "connections": "connection.yaml",
@@ -64,11 +58,82 @@ TYPE_TO_CONFIG_FILE = {
     "skills": "skill.yaml",
     "agents": "aea-config.yaml",
 }
-PUBLIC_ID_REGEX = PublicId.PUBLIC_ID_REGEX[1:-1]
 TEST_PROTOCOLS = ["t_protocol", "t_protocol_no_ct"]
 
 
-def get_protocol_specification_header_regex(public_id: PublicId) -> Pattern:
+# ---------------------------------------------------------------------------
+# Lazy AEA imports
+# ---------------------------------------------------------------------------
+
+def _get_cli():
+    """Lazy import of aea.cli.cli."""
+    from aea.cli import cli  # pylint: disable=import-outside-toplevel
+
+    return cli
+
+
+def _update_hashes_lazy(**kwargs: Any) -> int:
+    """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
+    from aea.cli.ipfs_hash import update_hashes  # pylint: disable=import-outside-toplevel
+
+    return update_hashes(**kwargs)
+
+
+def _get_package_id_class():
+    """Lazy import of PackageId."""
+    from aea.configurations.base import PackageId  # pylint: disable=import-outside-toplevel
+
+    return PackageId
+
+
+def _get_package_type_class():
+    """Lazy import of PackageType."""
+    from aea.configurations.base import PackageType  # pylint: disable=import-outside-toplevel
+
+    return PackageType
+
+
+def _get_public_id_class():
+    """Lazy import of PublicId."""
+    from aea.configurations.base import PublicId  # pylint: disable=import-outside-toplevel
+
+    return PublicId
+
+
+def _get_config_loader_class():
+    """Lazy import of ConfigLoader."""
+    from aea.configurations.loader import ConfigLoader  # pylint: disable=import-outside-toplevel
+
+    return ConfigLoader
+
+
+def _get_protocol_helpers():
+    """Lazy import of protocol helpers."""
+    from aea.helpers.protocols import (  # pylint: disable=import-outside-toplevel
+        get_protocol_specification_from_readme,
+        get_protocol_specification_id_from_specification,
+    )
+
+    return get_protocol_specification_from_readme, get_protocol_specification_id_from_specification
+
+
+def _types_set():
+    """Get the set of plural type strings."""
+    PackageType = _get_package_type_class()
+    return set(map(lambda x: x.to_plural(), PackageType))
+
+
+def _public_id_regex():
+    """Get the public-id regex (without anchors)."""
+    PublicId = _get_public_id_class()
+    return PublicId.PUBLIC_ID_REGEX[1:-1]
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def get_protocol_specification_header_regex(public_id) -> Pattern:
     """Get the regex to match."""
     return re.compile(
         rf"(name: {public_id.name}\n"
@@ -85,39 +150,8 @@ def check_positive(value: Any) -> int:
         ivalue = int(value)
         assert ivalue <= 0
     except (AssertionError, ValueError):
-        raise argparse.ArgumentTypeError(f"{value} is an invalid positive int value")
+        raise click.BadParameter(f"{value} is an invalid positive int value")
     return ivalue
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-n",
-        "--no-interactive",
-        action="store_true",
-        default=False,
-        help="Don't ask user confirmation for replacement.",
-    )
-    parser.add_argument(
-        "-C",
-        "--context",
-        type=check_positive,
-        default=3,
-        help="The number of above/below rows to display",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--replace-by-default",
-        action="store_true",
-        default=False,
-        help="If --no-interactive is set, apply the replacement (default: False).",
-    )
-    return parser.parse_args()
-
-
-arguments: Optional[argparse.Namespace] = None
 
 
 def check_if_running_allowed() -> None:
@@ -136,7 +170,7 @@ def check_if_running_allowed() -> None:
 
 def run_hashing() -> None:
     """Run the hashing script."""
-    hashing_call = update_hashes(packages_dir=ROOT_DIR / "packages")
+    hashing_call = _update_hashes_lazy(packages_dir=ROOT_DIR / "packages")
     if hashing_call == 1:
         print("Problem when running IPFS script!")
         sys.exit(1)
@@ -228,13 +262,14 @@ def unified_yaml_load(configuration_file: Path) -> Dict:
         return list(data)[0]
 
 
-def get_public_id_from_yaml(configuration_file_path: Path) -> PublicId:
+def get_public_id_from_yaml(configuration_file_path: Path):
     """
     Get the public id from yaml.
 
     :param configuration_file_path: the path to the config yaml
     :return: public id
     """
+    PublicId = _get_public_id_class()
     data = unified_yaml_load(configuration_file_path)
     author = data["author"]
     # handle the case when it's a package or agent config file.
@@ -243,7 +278,7 @@ def get_public_id_from_yaml(configuration_file_path: Path) -> PublicId:
     return PublicId(author, name, version)
 
 
-def public_id_in_registry(type_: str, name: str) -> PublicId:
+def public_id_in_registry(type_: str, name: str):
     """
     Check if a package id is in the registry.
 
@@ -251,6 +286,8 @@ def public_id_in_registry(type_: str, name: str) -> PublicId:
     :param name: the name of the package
     :return: public id
     """
+    PublicId = _get_public_id_class()
+    cli = _get_cli()
     runner = CliRunner()
     result = runner.invoke(
         cli,
@@ -271,7 +308,7 @@ def public_id_in_registry(type_: str, name: str) -> PublicId:
     return highest
 
 
-def get_all_protocol_spec_ids() -> Set[PublicId]:
+def get_all_protocol_spec_ids() -> Set:
     """
     Get all protocol specification ids.
 
@@ -280,7 +317,9 @@ def get_all_protocol_spec_ids() -> Set[PublicId]:
     they are only used to find clashes with protocol ids.
     :return: a set of package ids.
     """
-    result: Set[PublicId] = set()
+    PublicId = _get_public_id_class()
+    get_protocol_specification_from_readme, get_protocol_specification_id_from_specification = _get_protocol_helpers()
+    result: Set = set()
     protocol_packages = set(PACKAGES_DIR.rglob("**/**/protocols/**")) - set(
         PACKAGES_DIR.rglob("**/**/protocols")
     )
@@ -293,9 +332,11 @@ def get_all_protocol_spec_ids() -> Set[PublicId]:
     return result
 
 
-def get_all_package_ids() -> Set[PackageId]:
+def get_all_package_ids() -> Set:
     """Get all the package ids in the local repository."""
-    result: Set[PackageId] = set()
+    PackageId = _get_package_id_class()
+    PackageType = _get_package_type_class()
+    result: Set = set()
     now = get_hashes_from_current_release()
     now_by_type = split_hashes_by_type(now)
     for type_, name_to_hashes in now_by_type.items():
@@ -309,7 +350,7 @@ def get_all_package_ids() -> Set[PackageId]:
     return result
 
 
-def get_public_ids_to_update() -> Set[PackageId]:
+def get_public_ids_to_update() -> Set:
     """
     Get all the public ids to be updated.
 
@@ -321,7 +362,9 @@ def get_public_ids_to_update() -> Set[PackageId]:
       are already the same.
     :return: set of package ids to update
     """
-    result: Set[PackageId] = set()
+    PackageId = _get_package_id_class()
+    TYPES = _types_set()
+    result: Set = set()
     last = get_hashes_from_last_release()
     now = get_hashes_from_current_release()
     last_by_type = split_hashes_by_type(last)
@@ -365,10 +408,10 @@ def get_public_ids_to_update() -> Set[PackageId]:
     return result
 
 
-def _get_ambiguous_public_ids() -> Set[PublicId]:
+def _get_ambiguous_public_ids() -> Set:
     """Get the public ids that are the public ids of more than one package id."""
     all_package_ids = get_all_package_ids()
-    result: Set[PublicId] = set(
+    result: Set = set(
         map(
             operator.itemgetter(0),
             filter(
@@ -380,7 +423,7 @@ def _get_ambiguous_public_ids() -> Set[PublicId]:
     return result
 
 
-def _sort_in_update_order(package_ids: Set[PackageId]) -> List[PackageId]:
+def _sort_in_update_order(package_ids: Set) -> List:
     """
     Sort the set of package id in the order of update.
 
@@ -406,9 +449,7 @@ def _sort_in_update_order(package_ids: Set[PackageId]) -> List[PackageId]:
     )
 
 
-def minor_version_difference(
-    current_public_id: PublicId, deployed_public_id: PublicId
-) -> int:
+def minor_version_difference(current_public_id, deployed_public_id) -> int:
     """Check the minor version difference."""
     current = Version(current_public_id.version)
     deployed = Version(deployed_public_id.version)
@@ -504,6 +545,7 @@ def replace_type_and_public_id_occurrences(
     line: str, old_string: str, new_string: str, type_: str
 ) -> str:
     """Replace the public id whenever the type and the id occur in the same row, and NOT when other type names occur."""
+    TYPES = _types_set()
     if re.match(f"{type_}.*{old_string}", line) and all(
         _type not in line for _type in TYPES.difference({type_})
     ):
@@ -512,7 +554,7 @@ def replace_type_and_public_id_occurrences(
 
 
 def replace_in_yamls(
-    content: str, old_public_id: PublicId, new_public_id: PublicId, type_: str
+    content: str, old_public_id, new_public_id, type_: str
 ) -> str:
     """
     Replace the public id in configuration files (also nested in .md files).
@@ -547,7 +589,7 @@ def replace_in_yamls(
 
 
 def replace_in_protocol_readme(
-    fp: Path, content: str, old_public_id: PublicId, new_public_id: PublicId, type_: str
+    fp: Path, content: str, old_public_id, new_public_id, type_: str
 ) -> str:
     """
     Replace the version id in the protocol specification in the protcol's README.
@@ -574,7 +616,7 @@ def replace_in_protocol_readme(
     return content
 
 
-def file_should_be_processed(content: str, old_public_id: PublicId) -> bool:
+def file_should_be_processed(content: str, old_public_id) -> bool:
     """Check if the file should be processed."""
     old_string = str(old_public_id)
     return (
@@ -588,6 +630,7 @@ def bump_version_in_yaml(
     configuration_file_path: Path, type_: str, version: str
 ) -> None:
     """Bump the package version in the package yaml."""
+    ConfigLoader = _get_config_loader_class()
     loader = ConfigLoader.from_configuration_type(type_[:-1])
     config = loader.load(configuration_file_path.open())
     config.version = version
@@ -595,7 +638,7 @@ def bump_version_in_yaml(
 
 
 class Updater:
-    """PAckage versions updter tool."""
+    """Package versions updater tool."""
 
     def __init__(  # pylint: disable=too-many-positional-arguments
         self, ask_version, update_version, replace_by_default, no_interactive, context
@@ -617,7 +660,7 @@ class Updater:
     @staticmethod
     def run_hashing():
         """Run hashes update."""
-        hashing_call = update_hashes(packages_dir=ROOT_DIR / "packages")
+        hashing_call = _update_hashes_lazy(packages_dir=ROOT_DIR / "packages")
         if hashing_call == 1:
             raise RuntimeError("Problem when running IPFS script!")
 
@@ -656,8 +699,8 @@ class Updater:
 
     def process_packages(
         self,
-        all_package_ids_to_update: Set[PackageId],
-        ambiguous_public_ids: Set[PublicId],
+        all_package_ids_to_update: Set,
+        ambiguous_public_ids: Set,
     ) -> None:
         """Process the package versions."""
         print("*" * 100)
@@ -683,7 +726,7 @@ class Updater:
             )
             self.process_package(package_id, is_ambiguous)
 
-    def process_package(self, package_id: PackageId, is_ambiguous: bool) -> None:
+    def process_package(self, package_id, is_ambiguous: bool) -> None:
         """Process a package.
 
         - check version in registry
@@ -703,7 +746,7 @@ class Updater:
             current_public_id, configuration_file_path, type_plural, is_ambiguous
         )
 
-    def get_new_package_version(self, current_public_id: PublicId) -> str:
+    def get_new_package_version(self, current_public_id) -> str:
         """Get new package version according to command line options provided."""
 
         ver = Version(current_public_id.version)
@@ -734,7 +777,7 @@ class Updater:
 
     def bump_package_version(
         self,
-        current_public_id: PublicId,
+        current_public_id,
         configuration_file_path: Path,
         type_: str,
         is_ambiguous: bool = False,
@@ -748,6 +791,7 @@ class Updater:
         :param type_: the type of package
         :param is_ambiguous: whether or not the package id is ambiguous
         """
+        PublicId = _get_public_id_class()
         new_version = self.get_new_package_version(current_public_id)
 
         new_public_id = PublicId(
@@ -775,8 +819,8 @@ class Updater:
     def inplace_change(  # pylint: disable=too-many-positional-arguments
         self,
         fp: Path,
-        old_public_id: PublicId,
-        new_public_id: PublicId,
+        old_public_id,
+        new_public_id,
         type_: str,
         is_ambiguous: bool,
     ) -> None:
@@ -844,7 +888,11 @@ class Updater:
         return "".join(lines)
 
 
-@click.command()
+# ---------------------------------------------------------------------------
+# Click command -- kept here so cli.py can import and register it.
+# ---------------------------------------------------------------------------
+
+@click.command(name="update-pkg-versions")
 @click.option(
     "--ask-version",
     "-a",
@@ -877,7 +925,7 @@ class Updater:
     "--context",
     "-C",
     type=int,
-    help="Don't ask user confirmation for replacement.",
+    help="The number of above/below rows to display.",
     default=3,
 )
 @click.option(
@@ -887,13 +935,9 @@ class Updater:
     help="If --no-interactive is set, apply the replacement (default: False).",
 )
 def command(ask_version, update_version, replace_by_default, no_interactive, context):
-    """Run cli command."""
+    """Update package versions relative to last release."""
     if update_version is None:
         update_version = "minor"
     Updater(
         ask_version, update_version, replace_by_default, no_interactive, context
     ).run()
-
-
-if __name__ == "__main__":
-    command()  # pylint: disable=no-value-for-parameter
