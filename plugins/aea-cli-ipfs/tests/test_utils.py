@@ -310,3 +310,87 @@ def test_wrap_directory_flag_dir() -> None:
             assert file_hash == "QmWVQQhQ5Qxzb1jLk1SW4Etsn6rMWHtjdELTNEmA1J1gRx"
     finally:
         tool.daemon.stop()
+
+
+def test_download_file_roundtrip() -> None:
+    """Add a file, download it back, verify content matches.
+
+    Exercises the streaming tar download path against a real IPFS daemon.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as temp_dir:
+            content = b"streaming tar download integration test payload"
+            src = Path(temp_dir, "payload.bin")
+            src.write_bytes(content)
+
+            _, file_hash, _ = tool.add(dir_path=str(src), wrap_with_directory=False)
+            assert file_hash
+
+            with TemporaryDirectory() as download_dir:
+                tool.download(file_hash, download_dir)
+                # download() places a file at <download_dir>/<file_hash>
+                downloaded = Path(download_dir) / file_hash
+                assert downloaded.read_bytes() == content
+    finally:
+        tool.daemon.stop()
+
+
+def test_download_directory_roundtrip() -> None:
+    """Add a nested directory, download it back, verify all files match.
+
+    Exercises the streaming tar download path with a multi-file directory
+    against a real IPFS daemon.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as _temp_dir:
+            src_dir = Path(_temp_dir, "mydata")
+            src_dir.mkdir()
+            (src_dir / "a.txt").write_text("alpha")
+            (src_dir / "b.txt").write_text("beta")
+            sub = src_dir / "sub"
+            sub.mkdir()
+            (sub / "c.txt").write_text("gamma")
+
+            _, dir_hash, _ = tool.add(dir_path=str(src_dir))
+            assert dir_hash
+
+            with TemporaryDirectory() as download_dir:
+                downloaded_path = tool.download(dir_hash, download_dir)
+                downloaded_root = Path(downloaded_path)
+                assert (downloaded_root / "a.txt").read_text() == "alpha"
+                assert (downloaded_root / "b.txt").read_text() == "beta"
+                assert (downloaded_root / "sub" / "c.txt").read_text() == "gamma"
+    finally:
+        tool.daemon.stop()
+
+
+def test_download_large_file_roundtrip() -> None:
+    """Add a >1MB file (multi-chunk), download it back, verify.
+
+    Ensures the 256KB streaming chunk read works for files larger than
+    a single chunk in both upload and download paths.
+    """
+    tool = IPFSTool(DEFAULT_IPFS_URL_LOCAL)
+    tool.daemon.start()
+    try:
+        with TemporaryDirectory() as temp_dir:
+            # 1MB of pseudo-random bytes (deterministic for test stability)
+            content = (b"open-aea streaming test " * 43691)[: 1024 * 1024]
+            assert len(content) == 1024 * 1024
+            src = Path(temp_dir, "large.bin")
+            src.write_bytes(content)
+
+            _, file_hash, _ = tool.add(dir_path=str(src), wrap_with_directory=False)
+            assert file_hash
+
+            with TemporaryDirectory() as download_dir:
+                tool.download(file_hash, download_dir)
+                downloaded_bytes = (Path(download_dir) / file_hash).read_bytes()
+                assert len(downloaded_bytes) == len(content)
+                assert downloaded_bytes == content
+    finally:
+        tool.daemon.stop()
