@@ -22,9 +22,6 @@ r"""
 Bump the versions of AEA plugins throughout the code base.
 
 This module contains the logic originally in ``scripts/update_plugin_versions.py``.
-All ``aea.*`` imports are lazy (imported inside the functions that need them)
-so that the module can be imported without pulling in the full AEA framework
-at import time.
 
 Example usage from the CLI wrapper::
 
@@ -36,40 +33,20 @@ import pprint
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
-ROOT_DIR = Path(__file__).parent.parent.parent.parent
+from aea.cli.ipfs_hash import update_hashes
+from aea.helpers.base import compute_specifier_from_version
+
+ROOT_DIR = Path.cwd()
 PLUGINS_DIR = Path("plugins")
 SETUP_PY_NAME_REGEX = re.compile(r"\Wname=\"(.*)\",")
 SETUP_PY_VERSION_REGEX = re.compile(r"\Wversion=\"(.*)\",")
 
 IGNORE_DIRS = [Path(".git")]
-
-
-# ---------------------------------------------------------------------------
-# Lazy AEA imports
-# ---------------------------------------------------------------------------
-
-
-def _compute_specifier_from_version_lazy(version: Version, **kwargs: Any) -> str:
-    """Lazy wrapper around aea.helpers.base.compute_specifier_from_version."""
-    from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
-        compute_specifier_from_version,
-    )
-
-    return compute_specifier_from_version(version, **kwargs)
-
-
-def _update_hashes_lazy(**kwargs: Any) -> int:
-    """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
-    from aea.cli.ipfs_hash import (  # pylint: disable=import-outside-toplevel
-        update_hashes,
-    )
-
-    return update_hashes(**kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -127,10 +104,10 @@ def update_plugin_version_specifiers(
     :param new_version: the new version.
     :return: True if the update has been done, False otherwise.
     """
-    old_specifier_set = _compute_specifier_from_version_lazy(
+    old_specifier_set = compute_specifier_from_version(
         old_version, use_version_as_lower=True
     )
-    new_specifier_set = _compute_specifier_from_version_lazy(
+    new_specifier_set = compute_specifier_from_version(
         new_version, use_version_as_lower=True
     )
     print(f"Old version specifier: {old_specifier_set}")
@@ -300,7 +277,7 @@ def run_update_plugin_versions(
         print("Not updating fingerprints, since no specifier set has been updated.")
     else:
         print("Updating hashes and fingerprints.")
-        return_code = _update_hashes_lazy(
+        return_code = update_hashes(
             packages_dir=ROOT_DIR / "packages",
         )
     exit_with_message("Done!", exit_code=return_code)

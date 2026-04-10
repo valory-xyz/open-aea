@@ -20,6 +20,7 @@
 """CLI entry point for aea-ci-helpers."""
 
 import sys
+from typing import Optional
 
 import click
 
@@ -198,10 +199,10 @@ def check_doc_hashes(fix: bool) -> None:
 )
 def check_dependencies_cmd(
     do_check: bool = False,
-    packages_dir: str = None,
-    tox_path: str = None,
-    pipfile_path: str = None,
-    pyproject_path: str = None,
+    packages_dir: Optional[str] = None,
+    tox_path: Optional[str] = None,
+    pipfile_path: Optional[str] = None,
+    pyproject_path: Optional[str] = None,
 ) -> None:
     """Check dependencies across packages, tox.ini, pyproject.toml and Pipfile."""
     import logging  # pylint: disable=import-outside-toplevel

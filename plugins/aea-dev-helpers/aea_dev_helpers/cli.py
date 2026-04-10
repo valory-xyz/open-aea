@@ -88,13 +88,11 @@ def bump_version_cmd(
         run_bump,
     )
 
-    plugin_map = {}
+    # Validate format but pass raw strings — parse_plugin_versions handles parsing
     for pnv in plugin_new_version:
-        key, _, value = pnv.partition("=")
-        if not value:
+        if "=" not in pnv:
             raise click.BadParameter(f"Expected KEY=VALUE format, got: {pnv}")
-        plugin_map[key] = value
-    run_bump(new_version, plugin_map, no_fingerprints, only_check)
+    run_bump(new_version, list(plugin_new_version) or None, no_fingerprints, only_check)
 
 
 @cli.command("deploy-registry")

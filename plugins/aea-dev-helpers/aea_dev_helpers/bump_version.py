@@ -22,9 +22,6 @@ r"""
 Bump the AEA version throughout the code base.
 
 This module contains the logic originally in ``scripts/bump_aea_version.py``.
-All ``aea.*`` imports are lazy (imported inside the functions that need them)
-so that the module can be imported without pulling in the full AEA framework
-at import time.
 
 Example usage from the CLI wrapper::
 
@@ -47,6 +44,9 @@ from git import Repo  # pylint: disable=import-error
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
+from aea.cli.ipfs_hash import update_hashes
+from aea.helpers.base import compute_specifier_from_version
+
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s][%(name)s][%(levelname)s] %(message)s"
 )
@@ -56,7 +56,7 @@ logging.basicConfig(
 PatternByPath = Dict[Path, str]
 
 AEA_DIR = Path("aea")
-ROOT_DIR = Path(__file__).parent.parent.parent.parent
+ROOT_DIR = Path.cwd()
 
 PLUGINS_DIR = Path("plugins")
 ALL_PLUGINS = tuple(PLUGINS_DIR.iterdir())
@@ -107,24 +107,6 @@ AEA_PATHS: PatternByPath = {
 }
 
 
-def _compute_specifier_from_version_lazy(version: Version) -> str:
-    """Lazy wrapper around aea.helpers.base.compute_specifier_from_version."""
-    from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
-        compute_specifier_from_version,
-    )
-
-    return compute_specifier_from_version(version)
-
-
-def _update_hashes_lazy(**kwargs: Any) -> int:
-    """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
-    from aea.cli.ipfs_hash import (  # pylint: disable=import-outside-toplevel
-        update_hashes,
-    )
-
-    return update_hashes(**kwargs)
-
-
 def check_executed(func: Callable) -> Callable:
     """Check a functor has been already executed; if yes, raise error."""
 
@@ -149,7 +131,7 @@ def compute_specifier_from_version_custom(version: Version) -> str:
     :param version: the version
     :return: the specifier set according to the version and semantic versioning.
     """
-    specifier_set_str = _compute_specifier_from_version_lazy(version)
+    specifier_set_str = compute_specifier_from_version(version)
     specifiers = SpecifierSet(specifier_set_str)
     upper, lower = sorted(specifiers, key=str)
     return f"{upper},{lower}"
@@ -526,7 +508,7 @@ def bump(
         )
     else:
         logging.info("Updating hashes and fingerprints.")
-        return_code = _update_hashes_lazy(
+        return_code = update_hashes(
             packages_dir=ROOT_DIR / "packages",
         )
     return return_code

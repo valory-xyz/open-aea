@@ -80,7 +80,7 @@ class Pipfile:
         self.dev_packages = dev_packages
         self.file = file
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Dependency]:
         """Iterate dependencies as Dependency objects."""
         for name, dependency in itertools.chain(
             self.packages.items(), self.dev_packages.items()
@@ -89,7 +89,7 @@ class Pipfile:
                 continue
             yield dependency
 
-    def update(self, dependency: Any) -> None:
+    def update(self, dependency: Dependency) -> None:
         """Update dependency specifier."""
         if dependency.name in self.ignore:
             return
@@ -100,7 +100,7 @@ class Pipfile:
         else:
             self.dev_packages[dependency.name] = dependency
 
-    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
         """Check dependency specifier."""
         if dependency.name in self.ignore:
             return None, 0
@@ -218,12 +218,12 @@ class ToxFile:
         self.file = file
         self.extra: Dict[str, Any] = {}
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Dependency]:
         """Iter dependencies."""
         for obj in self.dependencies.values():
             yield obj["dep"]
 
-    def update(self, dependency: Any) -> None:
+    def update(self, dependency: Dependency) -> None:
         """Update dependency specifier."""
         if dependency.name in self.skip:
             return
@@ -234,7 +234,7 @@ class ToxFile:
             return
         self.extra[dependency.name] = dependency
 
-    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
         """Check dependency specifier."""
         if dependency.name in self.skip:
             return None, 0
@@ -341,13 +341,13 @@ class PyProjectToml:
         self.config = config
         self.file = file
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Dependency]:
         """Iterate dependencies as Dependency objects."""
         for dependency in self.dependencies.values():
             if dependency.name not in self.ignore:
                 yield dependency
 
-    def update(self, dependency: Any) -> None:
+    def update(self, dependency: Dependency) -> None:
         """Update dependency specifier."""
         if dependency.name in self.ignore:
             return
@@ -355,7 +355,7 @@ class PyProjectToml:
             return
         self.dependencies[dependency.name] = dependency
 
-    def check(self, dependency: Any) -> Tuple[Optional[str], int]:
+    def check(self, dependency: Dependency) -> Tuple[Optional[str], int]:
         """Check dependency specifier."""
         if dependency.name in self.ignore:
             return None, 0

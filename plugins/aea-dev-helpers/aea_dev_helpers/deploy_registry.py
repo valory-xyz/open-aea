@@ -22,9 +22,6 @@
 Deploy all new packages to registry.
 
 This module contains the logic originally in ``scripts/deploy_to_registry.py``.
-All ``aea.*`` imports are lazy (imported inside the functions that need them)
-so that the module can be imported without pulling in the full AEA framework
-at import time.
 """
 
 import os
@@ -38,67 +35,28 @@ from typing import Dict, Generator, List, Set
 import yaml
 from click.testing import CliRunner
 
+from aea.cli import cli
+from aea.configurations.base import PackageId, PackageType, PublicId
+from aea.configurations.constants import (
+    AGENTS,
+    DEFAULT_AEA_CONFIG_FILE,
+    DEFAULT_CONNECTION_CONFIG_FILE,
+    DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_PROTOCOL_CONFIG_FILE,
+    DEFAULT_SKILL_CONFIG_FILE,
+)
+
 CLI_LOG_OPTION = ["-v", "OFF"]
 
 DEFAULT_CONFIG_FILE_PATHS: List[Path] = []
 
-
-def _get_cli():
-    """Lazy import of aea.cli.cli."""
-    from aea.cli import cli  # pylint: disable=import-outside-toplevel
-
-    return cli
-
-
-def _get_aea_config_types():
-    """Lazy import of AEA configuration base and constant types."""
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PackageId,
-        PackageType,
-        PublicId,
-    )
-    from aea.configurations.constants import (  # pylint: disable=import-outside-toplevel
-        AGENTS,
-        DEFAULT_AEA_CONFIG_FILE,
-        DEFAULT_CONNECTION_CONFIG_FILE,
-        DEFAULT_CONTRACT_CONFIG_FILE,
-        DEFAULT_PROTOCOL_CONFIG_FILE,
-        DEFAULT_SKILL_CONFIG_FILE,
-    )
-
-    return (
-        PackageId,
-        PackageType,
-        PublicId,
-        AGENTS,
-        DEFAULT_AEA_CONFIG_FILE,
-        DEFAULT_CONNECTION_CONFIG_FILE,
-        DEFAULT_CONTRACT_CONFIG_FILE,
-        DEFAULT_PROTOCOL_CONFIG_FILE,
-        DEFAULT_SKILL_CONFIG_FILE,
-    )
-
-
-def _config_file_names() -> List[str]:
-    """Get list of config file names (lazy)."""
-    (
-        _PackageId,
-        _PackageType,
-        _PublicId,
-        _AGENTS,
-        DEFAULT_AEA_CONFIG_FILE,
-        DEFAULT_CONNECTION_CONFIG_FILE,
-        DEFAULT_CONTRACT_CONFIG_FILE,
-        DEFAULT_PROTOCOL_CONFIG_FILE,
-        DEFAULT_SKILL_CONFIG_FILE,
-    ) = _get_aea_config_types()
-    return [
-        DEFAULT_AEA_CONFIG_FILE,
-        DEFAULT_SKILL_CONFIG_FILE,
-        DEFAULT_CONNECTION_CONFIG_FILE,
-        DEFAULT_CONTRACT_CONFIG_FILE,
-        DEFAULT_PROTOCOL_CONFIG_FILE,
-    ]
+CONFIG_FILE_NAMES: List[str] = [
+    DEFAULT_AEA_CONFIG_FILE,
+    DEFAULT_SKILL_CONFIG_FILE,
+    DEFAULT_CONNECTION_CONFIG_FILE,
+    DEFAULT_CONTRACT_CONFIG_FILE,
+    DEFAULT_PROTOCOL_CONFIG_FILE,
+]
 
 
 def default_config_file_paths() -> Generator:
@@ -113,13 +71,6 @@ def unified_yaml_load(configuration_file: Path) -> Dict:
     :param configuration_file: the configuration file path.
     :return: the data.
     """
-    (
-        _PackageId,
-        _PackageType,
-        _PublicId,
-        AGENTS,
-        *_rest,
-    ) = _get_aea_config_types()
     package_type = configuration_file.parent.parent.name
     with configuration_file.open() as fp:
         if package_type != AGENTS:
@@ -138,12 +89,6 @@ def get_public_id_from_yaml(configuration_file: Path):
     :param configuration_file: the path to the config yaml
     :return: public id
     """
-    (
-        _PackageId,
-        _PackageType,
-        PublicId,
-        *_rest,
-    ) = _get_aea_config_types()
     data = unified_yaml_load(configuration_file)
     author = data["author"]
     # handle the case when it's a package or agent config file.
@@ -154,20 +99,12 @@ def get_public_id_from_yaml(configuration_file: Path):
 
 def find_all_packages_ids() -> Set:
     """Find all packages ids."""
-    (
-        PackageId,
-        PackageType,
-        _PublicId,
-        *_rest,
-    ) = _get_aea_config_types()
-    config_file_names = _config_file_names()
-
     package_ids: Set = set()
     packages_dir = Path("packages")
     config_files = [
         path
         for path in packages_dir.glob("*/*/*/*.yaml")
-        if any([file in str(path) for file in config_file_names])
+        if any([file in str(path) for file in CONFIG_FILE_NAMES])
     ]
     for configuration_file in chain(config_files, default_config_file_paths()):
         package_type = PackageType(configuration_file.parts[-3][:-1])
@@ -184,7 +121,6 @@ def check_correct_author(runner: CliRunner) -> None:
 
     :param runner: the cli runner
     """
-    cli = _get_cli()
     result = runner.invoke(
         cli,
         [*CLI_LOG_OPTION, "init"],
@@ -210,7 +146,6 @@ def push_package(package_id, runner: CliRunner) -> None:
     :param package_id: the package id
     :param runner: the cli runner
     """
-    cli = _get_cli()
     print(
         "Trying to push {}: {}".format(
             package_id.package_type.value, str(package_id.public_id)
@@ -292,7 +227,6 @@ def publish_agent(package_id, runner: CliRunner) -> None:
     :param runner: the cli runner
     :return: None
     """
-    cli = _get_cli()
     if os.path.isdir(package_id.public_id.name):
         print(
             f"\n\nFolder with name '{package_id.public_id.name}' already exists. Skipping publication of {str(package_id.public_id)}\n\n"
@@ -350,11 +284,6 @@ def check_and_upload(package_id, runner: CliRunner) -> None:
     :param package_id: the package id
     :param runner: the cli runner
     """
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PackageType,
-    )
-
-    cli = _get_cli()
     result = runner.invoke(
         cli,
         [
@@ -388,10 +317,6 @@ def upload_new_packages(runner: CliRunner, all_package_ids: Set) -> None:
     :param runner: the cli runner
     :param all_package_ids: the set of all package ids to process.
     """
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PackageType,
-    )
-
     print("\nPushing protocols:")
     for package_id in all_package_ids:
         if package_id.package_type != PackageType.PROTOCOL:

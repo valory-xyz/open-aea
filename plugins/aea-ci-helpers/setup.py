@@ -38,6 +38,7 @@ setup(
     install_requires=[
         "click>=8.1.0,<9",
         "packaging",
+        "toml>=0.10,<1",
         "tomli",
     ],
     python_requires=">=3.10",

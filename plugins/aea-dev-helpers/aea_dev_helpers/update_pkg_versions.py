@@ -22,9 +22,6 @@
 Updates package versions relative to last release.
 
 This module contains the logic originally in ``scripts/update_package_versions.py``.
-All ``aea.*`` imports are lazy (imported inside the functions that need them)
-so that the module can be imported without pulling in the full AEA framework
-at import time.
 
 Run from the root of the project directory::
 
@@ -46,7 +43,16 @@ import yaml
 from click.testing import CliRunner
 from packaging.version import Version
 
-ROOT_DIR = Path(__file__).parent.parent.parent.parent
+from aea.cli import cli
+from aea.cli.ipfs_hash import update_hashes
+from aea.configurations.base import PackageId, PackageType, PublicId
+from aea.configurations.loader import ConfigLoader
+from aea.helpers.protocols import (
+    get_protocol_specification_from_readme,
+    get_protocol_specification_id_from_specification,
+)
+
+ROOT_DIR = Path.cwd()
 PACKAGES_DIR = ROOT_DIR / "packages"
 DIRECTORIES = ["packages", "aea", "docs", "benchmark", "examples", "tests"]
 CLI_LOG_OPTION = ["-v", "OFF"]
@@ -61,91 +67,7 @@ TYPE_TO_CONFIG_FILE = {
 TEST_PROTOCOLS = ["t_protocol", "t_protocol_no_ct"]
 
 
-# ---------------------------------------------------------------------------
-# Lazy AEA imports
-# ---------------------------------------------------------------------------
-
-
-def _get_cli():
-    """Lazy import of aea.cli.cli."""
-    from aea.cli import cli  # pylint: disable=import-outside-toplevel
-
-    return cli
-
-
-def _update_hashes_lazy(**kwargs: Any) -> int:
-    """Lazy wrapper around aea.cli.ipfs_hash.update_hashes."""
-    from aea.cli.ipfs_hash import (  # pylint: disable=import-outside-toplevel
-        update_hashes,
-    )
-
-    return update_hashes(**kwargs)
-
-
-def _get_package_id_class():
-    """Lazy import of PackageId."""
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PackageId,
-    )
-
-    return PackageId
-
-
-def _get_package_type_class():
-    """Lazy import of PackageType."""
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PackageType,
-    )
-
-    return PackageType
-
-
-def _get_public_id_class():
-    """Lazy import of PublicId."""
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        PublicId,
-    )
-
-    return PublicId
-
-
-def _get_config_loader_class():
-    """Lazy import of ConfigLoader."""
-    from aea.configurations.loader import (  # pylint: disable=import-outside-toplevel
-        ConfigLoader,
-    )
-
-    return ConfigLoader
-
-
-def _get_protocol_helpers():
-    """Lazy import of protocol helpers."""
-    from aea.helpers.protocols import (  # pylint: disable=import-outside-toplevel
-        get_protocol_specification_from_readme,
-        get_protocol_specification_id_from_specification,
-    )
-
-    return (
-        get_protocol_specification_from_readme,
-        get_protocol_specification_id_from_specification,
-    )
-
-
-def _types_set():
-    """Get the set of plural type strings."""
-    PackageType = _get_package_type_class()
-    return set(map(lambda x: x.to_plural(), PackageType))
-
-
-def _public_id_regex():
-    """Get the public-id regex (without anchors)."""
-    PublicId = _get_public_id_class()
-    return PublicId.PUBLIC_ID_REGEX[1:-1]
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+TYPES_SET: Set[str] = set(map(lambda x: x.to_plural(), PackageType))
 
 
 def get_protocol_specification_header_regex(public_id) -> Pattern:
@@ -185,7 +107,7 @@ def check_if_running_allowed() -> None:
 
 def run_hashing() -> None:
     """Run the hashing script."""
-    hashing_call = _update_hashes_lazy(packages_dir=ROOT_DIR / "packages")
+    hashing_call = update_hashes(packages_dir=ROOT_DIR / "packages")
     if hashing_call == 1:
         print("Problem when running IPFS script!")
         sys.exit(1)
@@ -284,7 +206,6 @@ def get_public_id_from_yaml(configuration_file_path: Path):
     :param configuration_file_path: the path to the config yaml
     :return: public id
     """
-    PublicId = _get_public_id_class()
     data = unified_yaml_load(configuration_file_path)
     author = data["author"]
     # handle the case when it's a package or agent config file.
@@ -301,8 +222,6 @@ def public_id_in_registry(type_: str, name: str):
     :param name: the name of the package
     :return: public id
     """
-    PublicId = _get_public_id_class()
-    cli = _get_cli()
     runner = CliRunner()
     result = runner.invoke(
         cli,
@@ -332,11 +251,6 @@ def get_all_protocol_spec_ids() -> Set:
     they are only used to find clashes with protocol ids.
     :return: a set of package ids.
     """
-    PublicId = _get_public_id_class()
-    (
-        get_protocol_specification_from_readme,
-        get_protocol_specification_id_from_specification,
-    ) = _get_protocol_helpers()
     result: Set = set()
     protocol_packages = set(PACKAGES_DIR.rglob("**/**/protocols/**")) - set(
         PACKAGES_DIR.rglob("**/**/protocols")
@@ -352,8 +266,6 @@ def get_all_protocol_spec_ids() -> Set:
 
 def get_all_package_ids() -> Set:
     """Get all the package ids in the local repository."""
-    PackageId = _get_package_id_class()
-    PackageType = _get_package_type_class()
     result: Set = set()
     now = get_hashes_from_current_release()
     now_by_type = split_hashes_by_type(now)
@@ -380,14 +292,12 @@ def get_public_ids_to_update() -> Set:
       are already the same.
     :return: set of package ids to update
     """
-    PackageId = _get_package_id_class()
-    TYPES = _types_set()
     result: Set = set()
     last = get_hashes_from_last_release()
     now = get_hashes_from_current_release()
     last_by_type = split_hashes_by_type(last)
     now_by_type = split_hashes_by_type(now)
-    for type_ in TYPES:
+    for type_ in TYPES_SET:
         for key, value in last_by_type[type_].items():
             # if the package is a "scaffold" package, skip;
             if key == "scaffold":
@@ -563,9 +473,8 @@ def replace_type_and_public_id_occurrences(
     line: str, old_string: str, new_string: str, type_: str
 ) -> str:
     """Replace the public id whenever the type and the id occur in the same row, and NOT when other type names occur."""
-    TYPES = _types_set()
     if re.match(f"{type_}.*{old_string}", line) and all(
-        _type not in line for _type in TYPES.difference({type_})
+        _type not in line for _type in TYPES_SET.difference({type_})
     ):
         line = line.replace(old_string, new_string)
     return line
@@ -646,7 +555,6 @@ def bump_version_in_yaml(
     configuration_file_path: Path, type_: str, version: str
 ) -> None:
     """Bump the package version in the package yaml."""
-    ConfigLoader = _get_config_loader_class()
     loader = ConfigLoader.from_configuration_type(type_[:-1])
     config = loader.load(configuration_file_path.open())
     config.version = version
@@ -676,7 +584,7 @@ class Updater:
     @staticmethod
     def run_hashing():
         """Run hashes update."""
-        hashing_call = _update_hashes_lazy(packages_dir=ROOT_DIR / "packages")
+        hashing_call = update_hashes(packages_dir=ROOT_DIR / "packages")
         if hashing_call == 1:
             raise RuntimeError("Problem when running IPFS script!")
 
@@ -807,7 +715,6 @@ class Updater:
         :param type_: the type of package
         :param is_ambiguous: whether or not the package id is ambiguous
         """
-        PublicId = _get_public_id_class()
         new_version = self.get_new_package_version(current_public_id)
 
         new_public_id = PublicId(

@@ -28,14 +28,12 @@ import yaml
 
 from aea.cli.packages import get_package_manager
 from aea.configurations.data_types import PackageId
+from aea.helpers.base import IPFS_HASH_REGEX, SIMPLE_ID_REGEX
 
 CLI_REGEX = r"(?P<cli>aea)"
 # CMD_REGEX should be r"(?P<cmd>(\S+\s(\s--\S+)*)+)",
 # but python implementation differs from others and does not match it properly
 CMD_REGEX = r"(?P<cmd>.*)"
-# Hardcoded from aea.helpers.base — these are stable AEA constants
-SIMPLE_ID_REGEX = r"[a-z_][a-z0-9_]{0,127}"
-IPFS_HASH_REGEX = r"((Qm[a-zA-Z0-9]{44})|(ba[a-zA-Z0-9]{57}))"
 VENDOR_REGEX = rf"(?P<vendor>{SIMPLE_ID_REGEX})"
 PACKAGE_REGEX = rf"(?P<package>{SIMPLE_ID_REGEX})"
 VERSION_REGEX = r"(?P<version>\d+\.\d+\.\d+)"
@@ -47,8 +45,6 @@ PACKAGE_TYPE_REGEX = (
 AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}){FLAGS_REGEX})"
 FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
 PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
-
-ROOT_DIR = Path.cwd()
 
 
 def read_file(filepath: str) -> str:
@@ -95,7 +91,7 @@ class Package:  # pylint: disable=too-few-public-methods
 
         self.last_version = None
         yaml_file_path = Path(
-            ROOT_DIR,
+            Path.cwd(),
             "packages",
             self.vendor,
             self.type + "s",
@@ -332,7 +328,8 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
                 )
 
     # Fix hashes in package list
-    package_list_file = Path(ROOT_DIR, "docs", "package_list.md")
+    root_dir = Path.cwd()
+    package_list_file = Path(root_dir, "docs", "package_list.md")
     content = read_file(str(package_list_file))
 
     for match in [m.groupdict() for m in re.finditer(PACKAGE_TABLE_REGEX, content)]:  # type: ignore
