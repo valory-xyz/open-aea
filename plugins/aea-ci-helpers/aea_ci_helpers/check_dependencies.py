@@ -17,7 +17,8 @@
 #
 # ------------------------------------------------------------------------------
 
-"""
+"""Check repository dependency consistency.
+
 Check that repository dependency files (Pipfile, tox.ini, pyproject.toml) are
 consistent with the package-level dependencies declared inside ``packages/``.
 

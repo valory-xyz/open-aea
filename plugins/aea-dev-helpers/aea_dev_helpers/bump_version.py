@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 
-"""
+r"""
 Bump the AEA version throughout the code base.
 
 This module contains the logic originally in ``scripts/bump_aea_version.py``.

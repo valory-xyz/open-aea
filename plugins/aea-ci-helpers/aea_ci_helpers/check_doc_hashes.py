@@ -75,9 +75,6 @@ class Package:  # pylint: disable=too-few-public-methods
         from aea.configurations.data_types import (  # pylint: disable=import-outside-toplevel
             PackageId,
         )
-        from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
-            IPFS_HASH_REGEX,
-        )
 
         self.package_id = PackageId.from_uri_path(package_id_str)
         self.vendor = self.package_id.author
@@ -139,12 +136,6 @@ class PackageHashManager:
 
     def __init__(self) -> None:
         """Constructor"""
-        _ensure_regex_constants()
-
-        from aea.helpers.base import (  # pylint: disable=import-outside-toplevel
-            IPFS_HASH_REGEX,
-        )
-
         packages = get_packages()
 
         self.packages = [Package(key, value) for key, value in packages.items()]
@@ -170,7 +161,6 @@ class PackageHashManager:
         self, package_line: str, target_file: str
     ) -> Optional[str]:
         """Get a hash given its package line"""
-        _ensure_regex_constants()
 
         try:
             m_command = re.match(AEA_COMMAND_REGEX, package_line)  # type: ignore
@@ -254,8 +244,6 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     fix: bool = False,
 ) -> None:
     """Fix ipfs hashes in the docs"""
-    _ensure_regex_constants()
-
     all_md_files_docs = Path("docs").rglob("*.md")
     all_md_files_tests = Path("tests/test_docs/test_bash_yaml/md_files").rglob("*.md")
     all_md_files = [

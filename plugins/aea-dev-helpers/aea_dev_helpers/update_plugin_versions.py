@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------------
 
-"""
+r"""
 Bump the versions of AEA plugins throughout the code base.
 
 This module contains the logic originally in ``scripts/update_plugin_versions.py``.
@@ -28,7 +28,7 @@ at import time.
 
 Example usage from the CLI wrapper::
 
-    aea-dev update-plugin-versions --update "open-aea-ledger-fetchai,0.2.0" \\
+    aea-dev update-plugin-versions --update "open-aea-ledger-fetchai,0.2.0" \
         --update "open-aea-ledger-ethereum,0.3.0"
 """
 

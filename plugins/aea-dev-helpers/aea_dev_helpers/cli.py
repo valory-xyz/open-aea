@@ -19,7 +19,7 @@
 
 """CLI entry point for aea-dev-helpers."""
 
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import click
 
