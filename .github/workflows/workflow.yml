@@ -246,7 +246,7 @@ jobs:
           pip install tomte[tox]==0.6.1
       - name: Check pyproject.toml and tox.ini consistency
         run: |
-          pip install --no-deps ./plugins/aea-ci-helpers
+          pip install ./plugins/aea-ci-helpers
           aea-ci check-pyproject
       - name: Install current aea
         run: |

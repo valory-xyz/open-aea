@@ -43,6 +43,8 @@ DEFAULT_PACKAGES = {
 }
 
 IGNORE_NAMES = {r"^__init__\.py$", r"^__version__\.py$", r"^py\.typed$", r"^.*_pb2.py$"}
+# Plugins that should not have API docs generated (CI tooling, not framework API)
+IGNORE_PLUGINS = {"aea-ci-helpers"}
 IGNORE_PREFIXES = {
     Path("aea", "cli"),
     Path("aea", "connections", "scaffold"),
@@ -137,6 +139,8 @@ def _generate_apidocs_plugins() -> None:
     """Generate API docs for cyrpto plugins."""
     for plugin in PLUGIN_DIR.iterdir():
         plugin_name = plugin.name
+        if plugin_name in IGNORE_PLUGINS:
+            continue
         plugin_module_name = plugin_name.replace("-", "_")
         python_package_root = plugin / plugin_module_name
         for module_path in python_package_root.rglob("*.py"):

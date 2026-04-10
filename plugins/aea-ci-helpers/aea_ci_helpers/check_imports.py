@@ -54,6 +54,7 @@ def _ensure_lazy_imports() -> None:
     global search_packages_info, crypto_registry  # pylint: disable=global-statement
     if search_packages_info is None:
         from pip._internal.commands.show import search_packages_info as _spi  # type: ignore  # pylint: disable=import-outside-toplevel
+
         search_packages_info = _spi
     if crypto_registry is None:
         # Add the repo root to sys.path so aea can be found from source
@@ -61,7 +62,10 @@ def _ensure_lazy_imports() -> None:
         repo_root = str(Path.cwd())
         if repo_root not in sys.path:
             sys.path.insert(0, repo_root)
-        from aea.crypto.registries import crypto_registry as _cr  # pylint: disable=import-outside-toplevel
+        from aea.crypto.registries import (
+            crypto_registry as _cr,
+        )  # pylint: disable=import-outside-toplevel
+
         crypto_registry = _cr
 
 

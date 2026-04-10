@@ -38,7 +38,9 @@ def check_ipfs_pushed() -> None:
         get_file_from_tag,
     )
     import json  # pylint: disable=import-outside-toplevel
-    from concurrent.futures import ThreadPoolExecutor  # pylint: disable=import-outside-toplevel
+    from concurrent.futures import (
+        ThreadPoolExecutor,
+    )  # pylint: disable=import-outside-toplevel
 
     packages_json = json.loads(get_file_from_tag("packages/packages.json"))["dev"]
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -50,7 +52,9 @@ def check_ipfs_pushed() -> None:
         future_results = [future.result() for future in futures]
         errors = [r[0] for r in future_results if not r[1]]
         if errors:
-            click.echo(f"The following hashes were not found in IPFS registry: {errors}")
+            click.echo(
+                f"The following hashes were not found in IPFS registry: {errors}"
+            )
             sys.exit(1)
         click.echo("OK")
 
@@ -93,22 +97,35 @@ def check_pkg_versions() -> None:
 @click.command(name="check-imports")
 def check_imports() -> None:
     """Verify all imports are declared as dependencies."""
-    from aea_ci_helpers.check_imports import CheckTool  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.check_imports import (
+        CheckTool,
+    )  # pylint: disable=import-outside-toplevel
 
     CheckTool.run()
 
 
 @click.command(name="generate-api-docs")
-@click.option("--check", "check_clean", is_flag=True, help="Check docs are up to date without generating.")
+@click.option(
+    "--check",
+    "check_clean",
+    is_flag=True,
+    help="Check docs are up to date without generating.",
+)
 def generate_api_docs(check_clean: bool) -> None:
     """Generate API documentation from source."""
     import shutil  # pylint: disable=import-outside-toplevel
-    from aea_ci_helpers.generate_api_docs import generate_api_docs as gen_docs  # pylint: disable=import-outside-toplevel
-    from aea.helpers.git import check_working_tree_is_dirty  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.generate_api_docs import (
+        generate_api_docs as gen_docs,
+    )  # pylint: disable=import-outside-toplevel
+    from aea.helpers.git import (
+        check_working_tree_is_dirty,
+    )  # pylint: disable=import-outside-toplevel
 
     res = shutil.which("pydoc-markdown")
     if res is None:
-        click.echo("pydoc-markdown not found. Install it: pip install pydoc-markdown==3.3.0")
+        click.echo(
+            "pydoc-markdown not found. Install it: pip install pydoc-markdown==3.3.0"
+        )
         sys.exit(1)
 
     gen_docs()
@@ -122,7 +139,9 @@ def generate_api_docs(check_clean: bool) -> None:
 @click.command(name="generate-pkg-list")
 def generate_pkg_list() -> None:
     """Generate markdown table of all packages with their IPFS hashes."""
-    from aea_ci_helpers.generate_pkg_list import generate_table  # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.generate_pkg_list import (
+        generate_table,
+    )  # pylint: disable=import-outside-toplevel
 
     generate_table()
 
