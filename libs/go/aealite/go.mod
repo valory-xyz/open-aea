@@ -1,21 +1,27 @@
 module aealite
 
-go 1.14
+go 1.24.0
 
 require (
-	github.com/btcsuite/btcd v0.21.0-beta
-	github.com/btcsuite/btcutil v1.0.2
-	github.com/ethereum/go-ethereum v1.9.25
-	github.com/golang/protobuf v1.5.2
-	github.com/ipfs/go-cid v0.0.7
-	github.com/joho/godotenv v1.3.0
-	github.com/libp2p/go-libp2p-core v0.8.5
-	github.com/libp2p/go-libp2p-kad-dht v0.11.1
-	github.com/multiformats/go-multiaddr v0.3.1
-	github.com/multiformats/go-multihash v0.0.14
-	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.20.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	google.golang.org/protobuf v1.28.1
+	github.com/btcsuite/btcd/btcec/v2 v2.3.4
+	github.com/btcsuite/btcd/btcutil v1.1.5
+	github.com/ethereum/go-ethereum v1.17.2
+	github.com/golang/protobuf v1.5.4
+	github.com/joho/godotenv v1.5.1
+	github.com/libp2p/go-libp2p v0.33.2
+	github.com/rs/zerolog v1.32.0
+	golang.org/x/crypto v0.45.0
+	google.golang.org/protobuf v1.36.11
 	gotest.tools v2.2.0+incompatible
+)
+
+require (
+	github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608-1fe7b43fc4d6 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/holiman/uint256 v1.3.2 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/sys v0.40.0 // indirect
 )
