@@ -41,9 +41,9 @@ setup(
         "click>=8.1.0,<8.4.0",
     ],
     extras_require={
-        "test_tools": ["pytest"],
+        "test_tools": ["pytest>=7.0,<10"],
     },
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",

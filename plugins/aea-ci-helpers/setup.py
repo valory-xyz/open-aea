@@ -36,9 +36,9 @@ setup(
         ],
     },
     install_requires=[
-        "click>=8.1.0,<9",
-        "packaging",
-        "pyyaml>=6.0,<7",
+        "click>=8.1.0,<8.4.0",
+        "packaging>=22.0,<27",
+        "pyyaml>=6.0.1,<7",
         # `tomli` is the 3.10 back-compat shim for stdlib `tomllib` (3.11+).
         'tomli; python_version < "3.11"',
         "tomli-w",

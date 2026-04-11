@@ -44,7 +44,7 @@ setup(
         "ledgerwallet==0.1.3",
         "construct<=2.10.61",
     ],
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": ["ethereum_hwi = aea_ledger_ethereum_hwi:EthereumHWICrypto"],
         "aea.ledger_apis": ["ethereum_hwi = aea_ledger_ethereum_hwi:EthereumHWIApi"],

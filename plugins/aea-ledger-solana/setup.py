@@ -40,7 +40,7 @@ setup(
         "solana>=0.29.0",
         "anchorpy>=0.17.0,<0.19.0",
     ],
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": ["solana = aea_ledger_solana:SolanaCrypto"],
         "aea.ledger_apis": ["solana = aea_ledger_solana:SolanaApi"],
