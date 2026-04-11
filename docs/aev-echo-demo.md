@@ -87,7 +87,7 @@ The AEA will then start a web server as so:
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 5000.
@@ -114,7 +114,7 @@ aea run --aev
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 8081.

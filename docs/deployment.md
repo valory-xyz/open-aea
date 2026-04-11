@@ -9,7 +9,9 @@ For deployment, we recommend you use <a href="https://www.docker.com/" target="_
 
 First, we fetch a directory containing a Dockerfile and some dependencies:
 ``` bash
-svn export https://github.com/valory-xyz/open-aea/branches/main/deploy-image
+git clone --depth 1 --filter=blob:none --sparse https://github.com/valory-xyz/open-aea.git
+cd open-aea
+git sparse-checkout set deploy-image
 cd deploy-image
 ```
 
