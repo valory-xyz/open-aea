@@ -85,11 +85,11 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 3. **`ecdsa>=0.19.2` pin bump** for `aea-ledger-cosmos` (see the "ecdsa" section under "Dependabot alerts requiring action"). API compat verified locally; blocked on confirming downstream consumer compatibility before flipping the pin in 4 files.
 
-4. **`requests` dev-group dep bump/drop** to close alert #159 (see that section).
+4. **`requests` dev-group dep bump** to close alert #159. Recommendation: **bump, don't drop** — `requests` is a real runtime dep for `aea-ledger-{cosmos,ethereum,fetchai}` (already pinned in their own `setup.py`) and imported directly by tests. Dropping the dev-group entry would break `poetry install` without closing the alert. Bump the floor to `>=2.32.4,<3` (fix version for the `extract_zipped_paths` temp-file issue) in 4 places: `pyproject.toml:30`, `plugins/aea-ledger-cosmos/setup.py:47`, `plugins/aea-ledger-fetchai/setup.py:47`, `plugins/aea-ledger-ethereum/setup.py:46`. Deferred pending downstream-consumer compat check.
 
 5. ~~**Plugin `install_requires` hygiene fixes**~~ ✓ done — added missing runtime deps to `aea-ci-helpers` (`pyyaml`), `aea-cli-benchmark` (`click`, `cosmpy`, `docker`), `aea-cli-ipfs` (`click`), and `aea-dev-helpers` (`gitpython`, `packaging`, `open-aea-cli-ipfs`). Category A only; B/C/D still open.
 
-6. **Docs quickstart pipenv → poetry migration** (see the "docs/ and examples/ cleanup" section, item A1) — first-run experience is currently broken for new users.
+6. ~~**Docs quickstart pipenv → poetry migration**~~ ✓ done — replaced `pipenv`/`Pipfile` instructions with `python -m venv` across `docs/quickstart.md`, `docs/raspberry-set-up.md`, `docs/http-echo-demo.md`, `docs/aev-echo-demo.md`. Chose `venv` over `poetry` for user-facing docs because (a) the rest of the quickstart is pip-based, (b) zero extra prerequisites, and (c) poetry is the contributor tool, not the user tool. `docs/upgrading.md:77` intentionally left untouched as a historic record.
 
 7. **`benchmark/` vs `plugins/aea-cli-benchmark/` consolidation** (see "Likely removable" below) — my recommendation is option 2 from that section.
 

@@ -104,18 +104,10 @@ mkdir my_aea_projects/ && cd my_aea_projects/
 
 Unless you are using the docker image, we highly recommend using a virtual environment to ensure consistency across dependencies.
 
-Check that you have <a href="https://github.com/pypa/pipenv" target="_blank">`pipenv`</a>.
+Create a new virtual environment and activate it (here we use Python 3.10 but the AEA framework supports any Python >= 3.10).
 
 ``` bash
-which pipenv
-```
-
-If you don't have it, install it. Instructions are <a href="https://pypi.org/project/pipenv/" target="_blank">here</a>.
-
-Once installed, create a new environment and open it (here we use Python 3.10 but the AEA framework supports any Python >= 3.10).
-
-``` bash
-touch Pipfile && pipenv --python 3.10 && pipenv shell
+python3.10 -m venv .venv && source .venv/bin/activate
 ```
 
 
@@ -412,7 +404,7 @@ Place the above code into a file <code>test.py</code> in your AEA project direct
 To run, execute the following:
 
 ``` bash
-pipenv run pytest test.py
+pytest test.py
 ```
 
 </details>

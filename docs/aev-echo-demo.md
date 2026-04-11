@@ -8,7 +8,7 @@ It is highly recommended that developers begin by following the quick start!
 
 After you have followed the quick start, create a <a href="../http-echo-demo/">HTTP Echo Agent blueprint</a>. 
 
-It is assumed that developers are within a pipenv virtual environment.
+It is assumed that developers are within an activated Python virtual environment (see the <a href="../quickstart/">quickstart</a>).
 
 Notice, that the configuration of the AEA is as so;
 

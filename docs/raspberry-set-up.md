@@ -34,16 +34,10 @@ sudo apt-get dist-upgrade
 
 ## Install the AEA Framework
 
-First, install pipenv: 
+Create and activate a clean virtual environment with Python 3.10:
 
 ``` bash
-sudo apt-get install pipenv
-```
-
-Once installed, create and launch a clean virtual environment with Python 3.10:
-
-``` bash
-pipenv --python 3.10 && pipenv shell
+python3.10 -m venv .venv && source .venv/bin/activate
 ```
 
 Finally, install the AEA framework from PyPI:
