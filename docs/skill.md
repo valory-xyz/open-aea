@@ -23,6 +23,8 @@ Skills are `horizontally layered`, that is they run independently of each other.
 
 Two skills can communicate with each other in two ways. The skill context provides access via `self.context.shared_state` to a key-value store which allows skills to share state. A skill can also define as a callback another skill in <a href="../decision-maker-transaction">a message to the decision maker</a>.
 
+The framework does not guarantee the order in which `setup` and `teardown` are invoked across skills, nor the order in which `act` is called across behaviours. Skills must therefore be designed to work independently of each other, and any use of `shared_state` to exchange information between skills must be done in a way that tolerates arbitrary ordering.
+
 ## Context
 
 The skill has a <a href="../api/skills/base#skillcontext-objects">`SkillContext`</a> object which is shared by all `Handler`, `Behaviour`, and `Model` objects. The skill context also has a link to the `AgentContext`. The `AgentContext` provides read access to AEA specific information like the public key and address of the AEA, its preferences and ownership state. It also provides access to the `OutBox`.

@@ -244,23 +244,19 @@ Audit of the `docs/` tree (75 markdown files) and `examples/` tree (5 subdirs). 
    - `docs/upgrading.md`, `docs/aev-echo-demo.md`, `docs/http-echo-demo.md` — 1-2 mentions each
    - **Fix:** replace with Poetry (`poetry install --with dev; poetry shell`) or a plain `python -m venv` equivalent.
 
-2. **`docs/release-process.md` references three deleted scripts.** The 9-step release checklist at `docs/release-process.md:6,8,16` invokes:
-   - `python scripts/bump_aea_version.py` → moved to `aea-dev-helpers` plugin as `aea-dev bump-version`
-   - `python scripts/update_plugin_versions.py` → moved to `aea-dev-helpers` as `aea-dev update-plugin-versions`
-   - `./scripts/spell-check.sh` → deleted in `6e2397e6c`
-   - **Fix:** swap each invocation for its plugin equivalent; drop the spell-check step or replace with an equivalent pylint spelling invocation.
+2. ~~**`docs/release-process.md` references three deleted scripts.**~~ ✓ done — `bump_aea_version.py`/`update_plugin_versions.py` invocations now use `aea-dev bump-version`/`aea-dev update-plugin-versions` from the `open-aea-dev-helpers` plugin; the `spell-check.sh` wrapper call was dropped and the existing `pylint --disable all --enable spelling` invocation retained (it was the real check).
 
-3. **`docs/release-process.md` is orphaned from the nav.** Exists on disk, not in `mkdocs.yml`. The release process is non-trivial and should either be in the published nav (under "Development – Advanced" or similar) or linked prominently from `CONTRIBUTING.md`. Currently invisible to anyone who reads the docs.
+3. **`docs/release-process.md` nav status** — intentionally left orphaned from the published `mkdocs.yml`. This is repo-maintainer documentation, not framework user documentation, so it shouldn't appear in the AEA docs site. A short pointer from `CONTRIBUTING.md` would make it findable by maintainers without exposing it to framework users.
 
 ### B. Dead or near-dead files — candidates for deletion
 
-1. **`examples/ml_ex/`** — one 6-year-old `model.json` (last commit 2019-12-02). Zero references anywhere: not in any docs file, not in any code, not in CI. Pure dead weight. **Delete.**
+1. ~~**`examples/ml_ex/`**~~ ✓ done — deleted the stale Keras `model.json` and the `--scan-path examples/ml_ex` entries from `tox.ini` tomte copyright scanners. No other references in the repo.
 
 2. **`examples/aealite_go/`** — tied to `libs/go/aealite`. Since `libs/go/` is now being actively maintained (deps bumped, CI tests wired, Dependabot covered), this example is also kept. Has a minimal README; a follow-up could expand it into a working tutorial that exercises the updated `aealite` API.
 
-3. **`docs/known-limits.md`** — 11-line 2020 stub with 3 bullets. Superseded by the 260-line `docs/limits.md` (2025, comprehensive). Both are currently in the nav under different titles ("Known limitations" vs "Limitations of v1"), which is confusing. **Delete** `known-limits.md` (or merge its 3 bullets into `limits.md` and delete the stub), then pick one nav title.
+3. ~~**`docs/known-limits.md`**~~ ✓ done — stub deleted and nav entry removed. The 3 bullets were redistributed to their natural homes rather than merged into `limits.md` (which is organized around design decisions, not runtime caveats): the two AEABuilder consistency caveats moved into the `AEABuilder` class docstring in `aea/aea_builder.py`; the skill lifecycle ordering note moved into `docs/skill.md` under the "Independence of skills" section.
 
-4. **`docs/notes.md`** — 5-line developer memo about threading. Orphaned from the nav (not in `mkdocs.yml`). **Delete** or move the content into `CONTRIBUTING.md` / `docs/known-limits.md` (whichever survives the merge above).
+4. ~~**`docs/notes.md`**~~ ✓ done — deleted outright. 4-line threading trivia, already orphaned from the nav.
 
 ### C. Medium priority — staleness audit of the ~30 docs untouched since 2020–2023
 
