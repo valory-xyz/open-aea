@@ -4,9 +4,9 @@ Audit of items that could be removed or simplified to reduce repo surface area.
 
 ## Completed in this cleanup pass
 
-### `scripts/check_pipfile_and_toxini.py` ✓ removed
+### `scripts/check_pipfile_and_toxini.py` — already rolled into PR #871
 
-Referenced a non-existent `Pipfile` (project migrated to Poetry/pyproject.toml). Replaced by `scripts/check_pyproject_and_toxini.py`. Only referenced from this doc and `HISTORY.md`.
+Originally flagged as dead code referencing a non-existent `Pipfile`. PR #871 (merged) renamed and modernised this logic into `plugins/aea-ci-helpers/aea_ci_helpers/check_pyproject.py`, which reads `pyproject.toml` and is wired into the `aea-ci check-pyproject` command. The filesystem-level deletion landed as part of that PR; nothing further required. The original `scripts/check_pyproject_and_toxini.py` (an earlier replacement) was also removed in PR #871.
 
 ### Stale `tox.ini` envlist entries ✓ pruned
 
