@@ -91,7 +91,7 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 6. ~~**Docs quickstart pipenv → poetry migration**~~ ✓ done — replaced `pipenv`/`Pipfile` instructions with `python -m venv` across `docs/quickstart.md`, `docs/raspberry-set-up.md`, `docs/http-echo-demo.md`, `docs/aev-echo-demo.md`. Chose `venv` over `poetry` for user-facing docs because (a) the rest of the quickstart is pip-based, (b) zero extra prerequisites, and (c) poetry is the contributor tool, not the user tool. `docs/upgrading.md:77` intentionally left untouched as a historic record.
 
-7. **`benchmark/` vs `plugins/aea-cli-benchmark/` consolidation** (see "Likely removable" below) — my recommendation is option 2 from that section.
+7. ~~**`benchmark/` vs `plugins/aea-cli-benchmark/` consolidation**~~ ✓ done (variant of option 2). Deleted `benchmark/checks/` entirely (9 duplicated `check_*.py`, `run_benchmark.sh`, `run_benchmark_messages_mem.sh`, `utils.py`, `data/`) and `benchmark/run_mem_check_in_cloud.sh` (dead fetchai gcr image + pipenv). **Kept and fixed** `run_from_branch.sh` (venv + `aea benchmark reactive/proactive/multiagent_message_exchange`), `Dockerfile` (bookworm base, plain pip install, no pipenv/Pipfile wget), and `benchmark-deployment.yaml` (image bumped from EOL `python:3.10-buster` to `python:3.10-bookworm`). `benchmark/framework/` + `benchmark/cases/cpu_burn.py` preserved as teaching material for `docs/performance-benchmark.md`. Updated `benchmark/README.md` accordingly.
 
 8. **Long-running docs staleness audit** for the ~30 2020-2023 files flagged in the docs/ section (C). Needs subject-matter context, not mechanical edits.
 
