@@ -138,6 +138,62 @@ Priority low — no user has reported hitting this, but it would surface in any 
 - **`aea-ci-helpers/check_imports.py`** imports `from pip._internal.commands.show import ...` (guarded by try/except). pip's private API is brittle across pip versions. Stdlib `importlib.metadata.distribution(name).requires` returns equivalent information without touching pip internals. Swap is ~10 LOC.
 - **`aea-ci-helpers`** declares both `toml>=0.10,<1` and `tomli`. `toml` is used in `check_dependencies.py`, `tomli` in `check_pyproject.py`. Since Python 3.11+ ships `tomllib` in stdlib and `tomli` is the 3.10 back-compat shim, the right shape is a single `tomli`/`tomllib` conditional import — and `toml` (the older library) can be dropped entirely. Cosmetic.
 
+## `docs/` and `examples/` cleanup
+
+Audit of the `docs/` tree (75 markdown files) and `examples/` tree (5 subdirs). Findings grouped by priority.
+
+### A. High priority — user-facing regressions from the Poetry migration
+
+1. **Pipfile / pipenv references in user-facing tutorials.** The quickstart and demo docs still tell new users to `pipenv --python 3.10 && pipenv shell`, but the repo migrated to Poetry and the Pipfile is gone. This breaks the first-run experience.
+   - `docs/quickstart.md:107-118,415` — mentions `pipenv` 5 times
+   - `docs/raspberry-set-up.md:37-46` — 3 mentions
+   - `docs/upgrading.md`, `docs/aev-echo-demo.md`, `docs/http-echo-demo.md` — 1-2 mentions each
+   - **Fix:** replace with Poetry (`poetry install --with dev; poetry shell`) or a plain `python -m venv` equivalent.
+
+2. **`docs/release-process.md` references three deleted scripts.** The 9-step release checklist at `docs/release-process.md:6,8,16` invokes:
+   - `python scripts/bump_aea_version.py` → moved to `aea-dev-helpers` plugin as `aea-dev bump-version`
+   - `python scripts/update_plugin_versions.py` → moved to `aea-dev-helpers` as `aea-dev update-plugin-versions`
+   - `./scripts/spell-check.sh` → deleted in `6e2397e6c`
+   - **Fix:** swap each invocation for its plugin equivalent; drop the spell-check step or replace with an equivalent pylint spelling invocation.
+
+3. **`docs/release-process.md` is orphaned from the nav.** Exists on disk, not in `mkdocs.yml`. The release process is non-trivial and should either be in the published nav (under "Development – Advanced" or similar) or linked prominently from `CONTRIBUTING.md`. Currently invisible to anyone who reads the docs.
+
+### B. Dead or near-dead files — candidates for deletion
+
+1. **`examples/ml_ex/`** — one 6-year-old `model.json` (last commit 2019-12-02). Zero references anywhere: not in any docs file, not in any code, not in CI. Pure dead weight. **Delete.**
+
+2. **`examples/aealite_go/`** — tied to `libs/go/`; dead if `libs/go/` is removed (already flagged under "Likely removable" above). No independent doc references.
+
+3. **`docs/known-limits.md`** — 11-line 2020 stub with 3 bullets. Superseded by the 260-line `docs/limits.md` (2025, comprehensive). Both are currently in the nav under different titles ("Known limitations" vs "Limitations of v1"), which is confusing. **Delete** `known-limits.md` (or merge its 3 bullets into `limits.md` and delete the stub), then pick one nav title.
+
+4. **`docs/notes.md`** — 5-line developer memo about threading. Orphaned from the nav (not in `mkdocs.yml`). **Delete** or move the content into `CONTRIBUTING.md` / `docs/known-limits.md` (whichever survives the merge above).
+
+### C. Medium priority — staleness audit of the ~30 docs untouched since 2020–2023
+
+The following docs haven't been meaningfully edited since the Fetch.AI era and may describe obsolete behaviour. They are still published in the nav, so user-facing. Needs a subject-matter review rather than mechanical fixes:
+
+- CLI: `cli-how-to.md` (2020), `cli-commands.md` (2022), `wealth.md` (2022)
+- Framework concepts: `modes.md` (2021), `scaffolding.md` (2021 — also hardcodes `--author "fetchai"`), `message-routing.md` (2021), `design-principles.md` (2021), `logging.md` (2021)
+- Identity / trust: `identity.md` (2022), `trust.md` (2022), `por.md` (2023), `language-agnostic-definition.md` (2023)
+- Skills & connections: `skill.md` (2022), `acn.md` (2022)
+- Meta: `known-limits.md` (2020 — see B3), `faq.md` (2022), `vision.md` (2022), `app-areas.md` (2022), `demos.md` (2022), `security.md` (2022)
+
+Not every one of these is stale — `vision.md`, `design-principles.md`, and `language-agnostic-definition.md` are largely evergreen. But the CLI and scaffolding docs in particular risk describing commands and patterns that have evolved. A pass from someone with current framework context would be more valuable than mechanical edits.
+
+### D. Minor cosmetic items
+
+1. **`docs/scaffolding.md`** uses `aea create my_aea --author "fetchai"` as the example. `fetchai` is a vendor name, not a recommended author handle for users. Replace with a generic placeholder like `"my_author"` or `"<your-name>"`.
+
+2. **Fetchai-weighted tutorial doc set** (`quickstart.md`, `echo_demo.md`, `http-echo-demo.md`, `aev-echo-demo.md`) — each has 1-11 `fetchai` mentions. `fetchai` is still a supported ledger plugin but is no longer the primary use case in the Olas-era open-aea. Worth discussing whether first-touch tutorials should be rebased on `ethereum` or chain-agnostic examples. Not urgent.
+
+### Recommended order of operations
+
+1. Pipenv fixes in `quickstart.md` and friends (A1) — highest impact, first-run experience.
+2. `release-process.md` script migration + add to nav (A2, A3) — unblocks maintainer workflow.
+3. Delete `examples/ml_ex/`, `docs/known-limits.md`, `docs/notes.md` (B1, B3, B4) — pure cleanup, no behaviour change.
+4. Separate pass for C (staleness audit) — needs subject-matter context, can be opportunistic rather than planned.
+5. D is paint-the-shed; pick it up alongside any of the above if convenient.
+
 ## Dependabot alerts requiring action
 
 ### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` — 4 remaining
