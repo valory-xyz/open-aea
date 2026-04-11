@@ -22,17 +22,20 @@ package wallet
 
 import (
 	"crypto/sha256"
+	"encoding/asn1"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/big"
 
-	"github.com/libp2p/go-libp2p-core/crypto"
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"golang.org/x/crypto/ripemd160" // nolint:staticcheck
 	"golang.org/x/crypto/sha3"
 
-	btcec "github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcutil/bech32"
+	"github.com/btcsuite/btcd/btcec/v2"
+	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
+	"github.com/btcsuite/btcd/btcutil/bech32"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
@@ -90,7 +93,7 @@ func BTCPubKeyFromFetchAIPublicKey(publicKey string) (*btcec.PublicKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	pbk, err := btcec.ParsePubKey(pbkBytes, btcec.S256())
+	pbk, err := btcec.ParsePubKey(pbkBytes)
 	return pbk, err
 }
 
@@ -110,17 +113,30 @@ func ConvertStrEncodedSignatureToDER(signature []byte) ([]byte, error) {
 	}
 	rb := signature[:len(signature)/2]
 	sb := signature[len(signature)/2:]
-	length := 6 + len(rb) + len(sb)
-	sigDER := make([]byte, length)
-	sigDER[0] = 0x30
-	sigDER[1] = byte(length - 2)
-	sigDER[2] = 0x02
-	sigDER[3] = byte(len(rb))
-	offset := copy(sigDER[4:], rb) + 4
-	sigDER[offset] = 0x02
-	sigDER[offset+1] = byte(len(sb))
-	copy(sigDER[offset+2:], sb)
-	return sigDER, nil
+	r := new(big.Int).SetBytes(rb)
+	s := new(big.Int).SetBytes(sb)
+	// Use encoding/asn1 to marshal an ECDSA-Sig-Value DER sequence,
+	// which correctly handles leading-zero padding for integers whose
+	// most significant bit is set.
+	der, err := asn1.Marshal(struct {
+		R, S *big.Int
+	}{R: r, S: s})
+	if err != nil {
+		// This should never happen for well-formed big.Ints; fall back to
+		// a manual encoding to preserve previous behavior.
+		length := 6 + len(rb) + len(sb)
+		sigDER := make([]byte, length)
+		sigDER[0] = 0x30
+		sigDER[1] = byte(length - 2)
+		sigDER[2] = 0x02
+		sigDER[3] = byte(len(rb))
+		offset := copy(sigDER[4:], rb) + 4
+		sigDER[offset] = 0x02
+		sigDER[offset+1] = byte(len(sb))
+		copy(sigDER[offset+2:], sb)
+		return sigDER, nil
+	}
+	return der, nil
 }
 
 // ConvertDEREncodedSignatureToStr
@@ -128,15 +144,21 @@ func ConvertStrEncodedSignatureToDER(signature []byte) ([]byte, error) {
 //  - https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L258
 //  - https://github.com/btcsuite/btcd/blob/master/btcec/signature.go#L47
 func ConvertDEREncodedSignatureToStr(signature []byte) ([]byte, error) {
-	sig, err := btcec.ParseDERSignature(signature, btcec.S256())
+	// Parse DER-encoded signature manually to extract raw R and S bytes,
+	// since btcec/v2 Signature does not expose R/S accessors.
+	type ecdsaSig struct {
+		R, S *big.Int
+	}
+	var parsed ecdsaSig
+	_, err := asn1.Unmarshal(signature, &parsed)
 	if err != nil {
 		return []byte{}, err
 	}
-	return append(sig.R.Bytes(), sig.S.Bytes()...), nil
+	return append(parsed.R.Bytes(), parsed.S.Bytes()...), nil
 }
 
 // ParseFetchAISignature create btcec Signature from base64 formated, string (not DER) encoded RFC6979 signature
-func ParseFetchAISignature(signature string) (*btcec.Signature, error) {
+func ParseFetchAISignature(signature string) (*btcecdsa.Signature, error) {
 	// First convert the signature into a DER one
 	sigBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
@@ -147,7 +169,7 @@ func ParseFetchAISignature(signature string) (*btcec.Signature, error) {
 		return nil, err
 	}
 	// Parse
-	sigBTC, err := btcec.ParseSignature(sigDER, btcec.S256())
+	sigBTC, err := btcecdsa.ParseDERSignature(sigDER)
 	return sigBTC, err
 }
 
@@ -286,7 +308,7 @@ func KeyPairFromFetchAIKey(key string) (crypto.PrivKey, crypto.PubKey, error) {
 		return nil, nil, err
 	}
 
-	btcPrivateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
+	btcPrivateKey, _ := btcec.PrivKeyFromBytes(pkBytes)
 	prvKey, pubKey, err := crypto.KeyPairFromStdKey(btcPrivateKey)
 	if err != nil {
 		return nil, nil, err
@@ -388,11 +410,12 @@ func BTCPubKeyFromUncompressedHex(publicKey string) (*btcec.PublicKey, error) {
 		return nil, err
 	}
 
-	pubBytes := make([]byte, 0, btcec.PubKeyBytesLenUncompressed)
-	pubBytes = append(pubBytes, 0x4) // btcec.pubkeyUncompressed
+	// Uncompressed secp256k1 pubkey is 1 byte prefix + 32 byte X + 32 byte Y = 65 bytes.
+	pubBytes := make([]byte, 0, 65)
+	pubBytes = append(pubBytes, 0x4) // uncompressed pubkey prefix
 	pubBytes = append(pubBytes, b...)
 
-	return btcec.ParsePubKey(pubBytes, btcec.S256())
+	return btcec.ParsePubKey(pubBytes)
 }
 
 func FetchAIPublicKeyFromPrivateKey(privateKey string) (string, error) {
@@ -400,7 +423,7 @@ func FetchAIPublicKeyFromPrivateKey(privateKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, btcPublicKey := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
+	_, btcPublicKey := btcec.PrivKeyFromBytes(pkBytes)
 
 	return hex.EncodeToString(btcPublicKey.SerializeCompressed()), nil
 }

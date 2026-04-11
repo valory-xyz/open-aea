@@ -574,7 +574,7 @@ jobs:
           fail_ci_if_error: false
 
   golang_checks:
-    continue-on-error: True
+    continue-on-error: False
     needs:
       - common_checks_1
       - common_checks_2
@@ -597,4 +597,30 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
+      - name: libp2p_node build/vet/test
+        shell: bash
+        working-directory: packages/valory/connections/p2p_libp2p/libp2p_node
+        run: |
+          go build ./...
+          go vet ./...
+          go test ./...
+      - name: aealite build/vet/test
+        shell: bash
+        working-directory: libs/go/aealite
+        run: |
+          go build ./...
+          go vet ./...
+          go test ./...
+      - name: aea_end2end build/vet
+        shell: bash
+        working-directory: libs/go/aea_end2end
+        run: |
+          go build ./...
+          go vet ./...
+      - name: aealite_agent_example build/vet
+        shell: bash
+        working-directory: libs/go/aealite_agent_example
+        run: |
+          go build ./...
+          go vet ./...

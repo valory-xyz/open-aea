@@ -1,11 +1,43 @@
 version: 2
 updates:
-
-  # Maintain dependencies for Pip
-  - package-ecosystem: "pip"
-    directory: "."
+  - package-ecosystem: "gomod"
+    directory: "/packages/valory/connections/p2p_libp2p/libp2p_node"
     schedule:
       interval: "weekly"
-    target-branch: "develop"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "gomod"
+    directory: "/libs/go/aealite"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "gomod"
+    directory: "/libs/go/aea_end2end"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "gomod"
+    directory: "/libs/go/aealite_agent_example"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
     labels:
       - "dependencies"

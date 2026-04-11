@@ -40,8 +40,24 @@ type TCPSocketChannel struct {
 
 func (sock *TCPSocketChannel) Connect() error {
 	var err error
+	// ACN handshake: TLS is used for confidentiality, but peer identity is
+	// NOT established via the X.509 chain. The peer presents a self-signed
+	// certificate whose CA chain has no meaning for us. Instead, immediately
+	// after the TLS handshake we read a signature from the wire and verify
+	// that the peer signed its own TLS public key bytes using the
+	// pre-shared `peerPublicKey` (see the Verify() call below). This
+	// application-level signature check is what authenticates the peer.
+	//
+	// This mirrors the Python implementation in
+	// packages/valory/connections/p2p_libp2p_client/connection.py and is
+	// the correct pattern for the ACN protocol. Do NOT "fix" this by
+	// setting InsecureSkipVerify to false without also wiring up a real
+	// CA — that would break the protocol.
+	//
+	// #nosec G402 -- intentional: see comment above.
 	conf := &tls.Config{
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: true, //nolint:gosec // G402 intentional, see comment above
+		MinVersion:         tls.VersionTLS12,
 	}
 
 	sock.conn, err = tls.Dial("tcp", sock.address+":"+strconv.FormatInt(int64(sock.port), 10), conf)
