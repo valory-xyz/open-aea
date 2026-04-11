@@ -17,7 +17,7 @@
 | `generate protocol [protocol_spec_path]`    | Generate a protocol from the specification.                                  |
 | `generate-all-protocols`                    | Generate all protocols. |
 | `generate-key [ledger_id]`                  | Generate private keys. The AEA uses a private key to derive the associated public key and address. |
-| `generate-wealth [ledger_id]`               | Generate wealth for address on test network.                                 |
+| `generate-wealth [ledger_id] [url]`         | Generate wealth for address on a test network via the given faucet URL.      |
 | `get-address [ledger_id]`                   | Get the address associated with the private key.                             |
 | `get-multiaddress [ledger_id]...`           | Get the multiaddress associated with a private key or connection.            |
 | `get-public-key [ledger_id]...`             | Get the public key associated with a private key of the agent.               |
@@ -40,7 +40,7 @@
 | `remove [package_type] [name]`              | Remove connection, protocol, or skill, called `name`, from AEA.            |
 | `remove-key [ledger_id] [name]`             | Remove a private key registered with id `ledger_id`.	                             |
 | `reset_password EMAIL`                      | Reset the password of the registry account.	                                 |
-| `run {using [connections, ...]}`            | Run the AEA on the Fetch.ai network with default or specified connections.   |
+| `run {using [connections, ...]}`            | Run the agent with default or specified connections.                         |
 | `scaffold [package_type] [name]`            | Scaffold a new connection, protocol, or skill called `name`.               |
 | `search [package_type]`                     | Search for components in the registry. `search --local [package_type] [--query searching_query]` to search in local `packages` directory. |
 | `test [package_type] [name]`                | Execute test suite of an AEA project, or a specific AEA package.                                                                                     |

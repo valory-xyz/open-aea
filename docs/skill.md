@@ -248,9 +248,11 @@ It also details the protocol types used in the skill and points to shared module
 
 ``` yaml
 name: echo
-authors: fetchai
-version: 0.1.0
+author: fetchai
+version: 0.19.0
+type: skill
 license: Apache-2.0
+aea_version: '>=2.0.0, <3.0.0'
 behaviours:
   echo:
     class_name: EchoBehaviour

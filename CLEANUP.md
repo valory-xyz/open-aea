@@ -279,17 +279,29 @@ Audit of the `docs/` tree (75 markdown files) and `examples/` tree (5 subdirs). 
 
 4. ~~**`docs/notes.md`**~~ ✓ done — deleted outright. 4-line threading trivia, already orphaned from the nav.
 
-### C. Medium priority — staleness audit of the ~30 docs untouched since 2020–2023
+### C. Staleness audit — ~19 docs untouched since 2020–2023 ✓ done
 
-The following docs haven't been meaningfully edited since the Fetch.AI era and may describe obsolete behaviour. They are still published in the nav, so user-facing. Needs a subject-matter review rather than mechanical fixes:
+Walked all 19 files and made targeted fixes where ground truth was out of sync with the current framework. Evergreen files confirmed left untouched.
 
-- CLI: `cli-how-to.md` (2020), `cli-commands.md` (2022), `wealth.md` (2022)
-- Framework concepts: `modes.md` (2021), `scaffolding.md` (2021 — also hardcodes `--author "fetchai"`), `message-routing.md` (2021), `design-principles.md` (2021), `logging.md` (2021)
-- Identity / trust: `identity.md` (2022), `trust.md` (2022), `por.md` (2023), `language-agnostic-definition.md` (2023)
-- Skills & connections: `skill.md` (2022), `acn.md` (2022)
-- Meta: `known-limits.md` (2020 — see B3), `faq.md` (2022), `vision.md` (2022), `app-areas.md` (2022), `demos.md` (2022), `security.md` (2022)
+**CLI bucket — fixed:**
+- `cli-how-to.md`: `pip install aea[cli]`/`aea[all]` → `open-aea[cli]`/`open-aea[all]` throughout (the old PyPI name hasn't worked in years; this was actively breaking first-run installs).
+- `cli-commands.md`: `run` description dropped "on the Fetch.ai network"; `generate-wealth` signature updated from `[ledger_id]` to `[ledger_id] [url]` to match the real CLI which requires a URL.
+- `wealth.md`: rewrote to drop the dead `faucet.dimensions.network` Fetch.AI-era link and the misleading "Simply generate wealth via the CLI" claim. Now directs users to choose a testnet faucet for their target network and shows the real `aea generate-wealth <type> <url>` signature.
+- `scaffolding.md`: already done in the D1 commit (`b6f82d9fd`).
 
-Not every one of these is stale — `vision.md`, `design-principles.md`, and `language-agnostic-definition.md` are largely evergreen. But the CLI and scaffolding docs in particular risk describing commands and patterns that have evolved. A pass from someone with current framework context would be more valuable than mechanical edits.
+**Framework concepts bucket — fixed:**
+- `logging.md`: replaced the entire stale `aea-config.yaml` example (`author: fetchai`, `aea_version: 0.6.0`, `default_ledger: fetchai`, `fetchai/stub`, `fetchai/error`) with a real one captured from `aea create my_aea` in a clean env (`author: your_author_handle`, `aea_version: '>=2.0.0, <3.0.0'`, `default_ledger: ethereum`, empty connections/skills/contracts, `open-aea-ledger-ethereum` dep).
+- `skill.md`: skill.yaml example updated to match the real `packages/fetchai/skills/echo/skill.yaml` shape — fixed `authors` → `author`, added the missing `type: skill` and `aea_version` fields, bumped the shown version to the actual `0.19.0`.
+- `acn.md`: removed the "p2p_libp2p_mailbox connection is not available yet" note — that connection has existed at `packages/valory/connections/p2p_libp2p_mailbox/` for a while — and added it to the trust/security connection list.
+- `modes.md`, `message-routing.md`: confirmed accurate against current runtime behavior; left untouched.
+
+**Identity / trust bucket — fixed:**
+- `por.md`: swapped `fetchai/p2p_libp2p*` → `valory/p2p_libp2p*`; replaced the `cert_requests` example (stale fetchai ledger, 2023/2024 dates in the past) with the literal block from `packages/valory/connections/p2p_libp2p/connection.yaml` (`ledger_id: ethereum`, `public_key: cosmos`, `not_before: '2026-01-01'`, `not_after: '2027-01-01'`); updated the explanatory narrative to match.
+- `identity.md`, `trust.md`, `language-agnostic-definition.md`: confirmed evergreen; left untouched. `language-agnostic-definition.md` is deliberately the interop spec for third-party AEA implementations, and the protobuf schemas shown still match the real `envelope.proto`.
+
+**Meta bucket — fixed:**
+- `faq.md`: "native support for three different networks: Fetch.ai, Ethereum and Cosmos" → updated to reflect the real current plugin set (Ethereum incl. Flashbots/HWI, Cosmos, Fetch.ai, Solana). Reworded the "private keys stored in .txt files. This is temporary and will be improved soon" entry, since that has been the behavior for years — pointer added to the `-p`/`--password` flag and the security notes.
+- `vision.md`, `app-areas.md`, `demos.md`, `security.md`, `design-principles.md`: confirmed accurate / evergreen; left untouched.
 
 ### D. Minor cosmetic items
 

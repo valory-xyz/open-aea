@@ -5,22 +5,22 @@ The command line interface is the easiest way to build an AEA.
 The following installs the AEA CLI package.
 
 ``` bash
-pip install aea[cli]
+pip install open-aea[cli]
 ```
 
 The following installs the entire AEA package including the CLI.
 
 ``` bash
-pip install aea[all]
+pip install open-aea[all]
 ```
 
-If you are using `zsh` rather than `bash` type 
+If you are using `zsh` rather than `bash` type
 ``` zsh
-pip install 'aea[cli]'
+pip install 'open-aea[cli]'
 ```
 and
 ``` zsh
-pip install 'aea[all]'
+pip install 'open-aea[all]'
 ```
 respectively.
 
@@ -35,19 +35,19 @@ as a script:
 ``` bash
 python -m aea.cli
 ```
-which is just an alternative entry-point to the CLI tool. 
+which is just an alternative entry-point to the CLI tool.
 
 ## Troubleshooting
 
 To ensure no cache is used run.
 
 ``` bash
-pip install aea[all] --force --no-cache-dir
+pip install open-aea[all] --force --no-cache-dir
 ```
 
 And for `zsh` run:
 ``` zsh
-pip install 'aea[all]' --force --no-cache-dir
+pip install 'open-aea[all]' --force --no-cache-dir
 ```
 
 <br />

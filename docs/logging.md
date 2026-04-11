@@ -10,32 +10,34 @@ aea create my_aea
 cd my_aea
 ```
 
-The `aea-config.yaml` file should look like this.
+The `aea-config.yaml` file should look similar to this (the defaults may evolve between releases):
 
 ``` yaml
 agent_name: my_aea
-author: fetchai
+author: your_author_handle
 version: 0.1.0
-description: ''
 license: Apache-2.0
-aea_version: 0.6.0
+description: ''
+aea_version: '>=2.0.0, <3.0.0'
 fingerprint: {}
 fingerprint_ignore_patterns: []
-connections:
-- fetchai/stub:0.21.0
+connections: []
 contracts: []
 protocols:
-- fetchai/default:1.0.0
-skills:
-- fetchai/error:0.17.0
-default_connection: fetchai/stub:0.21.0
-default_ledger: fetchai
+- open_aea/signing:1.0.0
+skills: []
+default_connection: null
+default_ledger: ethereum
 required_ledgers:
-- fetchai
+- ethereum
+default_routing: {}
+connection_private_key_paths: {}
+private_key_paths: {}
 logging_config:
   disable_existing_loggers: false
   version: 1
-private_key_paths: {}
+dependencies:
+  open-aea-ledger-ethereum: {}
 ```
 
 By updating the `logging_config` section, you can configure the loggers of your application.
