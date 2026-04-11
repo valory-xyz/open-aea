@@ -147,7 +147,7 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 3. **`ecdsa>=0.19.2` pin bump** for `aea-ledger-cosmos` (see the "ecdsa" section under "Dependabot alerts requiring action"). API compat verified locally; blocked on confirming downstream consumer compatibility before flipping the pin in 4 files.
 
-4. **`requests` dev-group dep bump** to close alert #159. Recommendation: **bump, don't drop** — `requests` is a real runtime dep for `aea-ledger-{cosmos,ethereum,fetchai}` (already pinned in their own `setup.py`) and imported directly by tests. Dropping the dev-group entry would break `poetry install` without closing the alert. Bump the floor to `>=2.32.4,<3` (fix version for the `extract_zipped_paths` temp-file issue) in 4 places: `pyproject.toml:30`, `plugins/aea-ledger-cosmos/setup.py:47`, `plugins/aea-ledger-fetchai/setup.py:47`, `plugins/aea-ledger-ethereum/setup.py:46`. Deferred pending downstream-consumer compat check.
+4. ~~**`requests` dev-group dep bump**~~ ✓ done — bumped to `>=2.32.5,<3` across all 4 locations (`pyproject.toml:30`, `plugins/aea-ledger-cosmos/setup.py:47`, `plugins/aea-ledger-fetchai/setup.py:47`, `plugins/aea-ledger-ethereum/setup.py:46`) as part of commit `58b38d144` ("chore: align Python dependency version pins across pyproject/tox/plugins"). Closes alert #159 (`extract_zipped_paths` temp-file reuse). Kept as a real dep rather than dropped since the three ledger plugins use it at runtime and tests import it directly.
 
 5. ~~**Plugin `install_requires` hygiene fixes**~~ ✓ done — all four categories:
    - **A:** added missing runtime deps to `aea-ci-helpers` (`pyyaml`), `aea-cli-benchmark` (`click`, `cosmpy`, `docker`), `aea-cli-ipfs` (`click`), and `aea-dev-helpers` (`gitpython`, `packaging`, `open-aea-cli-ipfs`).
@@ -320,9 +320,9 @@ Current state on this branch: pinned `ecdsa>=0.15,<0.17.0` (resolving to `0.16.1
 - [ ] Confirm downstream consumers (Valory agents, olas-protocol-resolver, etc.) are compatible with a cosmos plugin that requires `ecdsa>=0.19.2` before flipping the pin.
 - [ ] Bump pins in 4 locations: `plugins/aea-ledger-cosmos/setup.py:42`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`.
 
-### Python: `requests` (1 alert)
+### Python: `requests` (1 alert) ✓ closed
 
-- #159 (medium): Insecure temp file reuse in `extract_zipped_paths()`. PR #867 ("chore: remove requests from base deps") **merged 2026-04-10**, removing `requests` from the core install requirements. The alert is still open because `requests = ">=2.20.0,<3"` remains as a **dev dependency** in `pyproject.toml:30` and therefore shows up in `poetry.lock`. The alert will close only when either the dev-group pin is bumped to a fixed version, or `requests` is dropped from the dev group entirely.
+- #159 (medium): Insecure temp file reuse in `extract_zipped_paths()`. PR #867 ("chore: remove requests from base deps") **merged 2026-04-10**, removing `requests` from the core install requirements. The dev-group pin was subsequently bumped to `>=2.32.5,<3` in commit `58b38d144` across `pyproject.toml:30`, `plugins/aea-ledger-cosmos/setup.py:47`, `plugins/aea-ledger-fetchai/setup.py:47`, and `plugins/aea-ledger-ethereum/setup.py:46`. Alert #159 is addressed on the `requests` side; `poetry.lock` now resolves to a fixed version.
 
 ## Confirmed keep
 
