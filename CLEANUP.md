@@ -70,12 +70,30 @@ Active package with outdated Go dependencies. Needs dependency bumps for:
 - `github.com/libp2p/go-libp2p-kad-dht` — 1 alert (medium): content censorship via DHT abuse
 - `google.golang.org/protobuf` — 1 alert (medium): infinite loop in protojson.Unmarshal
 
-### Python: `plugins/aea-ledger-cosmos/setup.py` (2 alerts)
+### Python: `plugins/aea-ledger-cosmos/setup.py` — one open `ecdsa` alert
 
-`ecdsa` is a runtime dependency of the cosmos ledger plugin:
+Current state on this branch: pinned `ecdsa>=0.15,<0.17.0` (resolving to `0.16.1`). Dependabot alerts against `ecdsa`:
 
-- #122 (high): Minerva timing attack on P-256
-- #147 (medium): DoS via improper DER length validation
+| # | GHSA | State | Severity | Fixed in |
+|---|---|---|---|---|
+| #147 | `GHSA-9f5j-8jwj-x28g` — DoS via improper DER length validation | **open** | medium | **`0.19.2`** |
+| #146 | same | fixed | medium | `0.19.2` |
+| #160 | same | dismissed | medium | `0.19.2` |
+| #156 | `GHSA-wj6h-64fc-37mp` — Minerva timing attack on P-256 | dismissed | high | **none** — the `ecdsa` project explicitly states side-channel resistance is out of scope |
+
+**Only #147 is actionable**, and a pin bump to `ecdsa>=0.19.2` fixes it.
+
+**Why not switch to `coincurve`:** initially considered, but the ROI is poor:
+- `coincurve` is **not** transitively present via `web3 → eth-account → eth-keys` — modern `eth-keys` made `coincurve` optional and ships a pure-Python fallback. So switching would add a new explicit binary dep.
+- The only unfixable alert (#156 Minerva) would remain dismissed either way; side-channel risk is orthogonal to library choice.
+- The call sites are non-trivial: cosmos uses `sign_deterministic(sigencode=sigencode_string_canonize)` + `VerifyingKey.from_public_key_recovery`; `p2p_libp2p_{client,mailbox}` use `from_der` + DER-signature verify; `scripts/acn/run_acn_node_standalone.py` uses `SigningKey.from_string` for config validation. Each would need per-site rewrite with byte-level compat testing for cosmos on-chain signatures.
+- A plain pin bump is mechanically trivial, closes the only actionable alert, and preserves all signature byte formats.
+
+**Action — pin bump to `ecdsa>=0.19.2,<0.20`**, gated on downstream compatibility:
+
+- [x] API compatibility verified locally (`sign_deterministic`, `sigencode_string_canonize`, `VerifyingKey.from_public_key_recovery`, `from_der`, `verify(sigdecode=sigdecode_der)` all byte-compatible between `0.16.1` and `0.19.2`; 64-byte sig + 2 recovered keys match).
+- [ ] Confirm downstream consumers (Valory agents, olas-protocol-resolver, etc.) are compatible with a cosmos plugin that requires `ecdsa>=0.19.2` before flipping the pin.
+- [ ] Bump pins in 4 locations: `plugins/aea-ledger-cosmos/setup.py:42`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`.
 
 ### Python: `requests` in core (1 alert)
 
