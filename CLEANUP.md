@@ -63,6 +63,49 @@ Contains tool configurations for flake8, isort, mypy, darglint, and bdist_wheel.
 
 End-user install scripts that install from PyPI. Referenced in `bump_aea_version.py` for version string updates. Hardcode version 2.1.0 — questionable ongoing maintenance value.
 
+## Plugin `install_requires` hygiene
+
+Audit of plugin `setup.py` `install_requires` versus actual source imports. Three categories, in priority order.
+
+### A. Undeclared runtime deps — real install-breakage risk
+
+These plugins import packages that are **not** in their own `install_requires`. They only work today because developers install them into an environment that already has `open-aea[cli]` (for `click`) or a dev shell with pyyaml/cosmpy/docker/gitpython/etc. present. A clean `pip install <plugin>` into an empty venv will `ImportError` on first use.
+
+| Plugin | Missing | Used in |
+|---|---|---|
+| `aea-ci-helpers` | `pyyaml` | `check_pkg_versions.py`, `check_doc_hashes.py` (`import yaml`) |
+| `aea-cli-benchmark` | `click`, `cosmpy`, `docker` | `click` in ~18 files; `cosmpy` + `docker` in `case_tx_generate/ledger_utils.py` and `case_tx_generate/docker_image.py` |
+| `aea-cli-ipfs` | `click` | `core.py` — the entry point for every `aea ipfs` subcommand |
+| `aea-dev-helpers` | `gitpython`, `packaging`, `open-aea-cli-ipfs` | `bump_version.py` → `from git import Repo` + `from packaging...`; `publish_local.py` → `aea_cli_ipfs.core` + `aea_cli_ipfs.ipfs_utils` |
+
+**Fix:** add the missing declarations to each plugin's `install_requires`. Trivial change, high priority (real bug).
+
+Note on `click`: core `open-aea` only declares `click` in the `[cli]` extra, not in base deps. Plugins that import `click` must declare it themselves — relying on `open-aea[cli]` being installed is not a contract.
+
+### B. Redundant declared deps — can be removed
+
+| Plugin | Remove | Rationale |
+|---|---|---|
+| `aea-ledger-ethereum-hwi` | `web3>=7.0.0,<8`, `protobuf>=5,<7` | Grep finds zero `import web3` / `google.protobuf` in the plugin source. `protobuf` already comes via core `open-aea`. `eth-account` (still declared) transitively pulls in everything the HWI source actually touches (`eth_keys`, `eth_rlp`, `eth_typing`, `eth_utils`, `rlp`, `cytoolz`, `construct`, `hexbytes`). |
+
+Effort trivial, no behaviour change.
+
+### C. Test-only deps leaking into production packages
+
+`aea-ledger-ethereum`, `aea-ledger-fetchai`, and `aea-cli-ipfs` each ship a `test_tools/` subpackage as part of `install_requires`. These subpackages `import pytest` (and sometimes `import docker`) at module top level, but neither is declared in `install_requires`. A consumer who imports anything from `plugin.test_tools.*` — or who runs type-checking across the whole installed package — will `ImportError`.
+
+Two fix options:
+
+1. **Declare an extras group** — `extras_require={"test_tools": ["pytest", "docker"]}`, documented in each plugin's README. Clean but changes install semantics.
+2. **Lazy-import** — move `import pytest` / `import docker` inside the functions that use them, or guard with `try/except ImportError`. `aea-ledger-ethereum/test_tools/fixture_helpers.py:61` already does this for `docker`; extending it to `pytest` is mechanical.
+
+Priority low — no user has reported hitting this, but it would surface in any environment running `pip check` or static analysis.
+
+### D. Antipatterns worth flagging (no forced action)
+
+- **`aea-ci-helpers/check_imports.py`** imports `from pip._internal.commands.show import ...` (guarded by try/except). pip's private API is brittle across pip versions. Stdlib `importlib.metadata.distribution(name).requires` returns equivalent information without touching pip internals. Swap is ~10 LOC.
+- **`aea-ci-helpers`** declares both `toml>=0.10,<1` and `tomli`. `toml` is used in `check_dependencies.py`, `tomli` in `check_pyproject.py`. Since Python 3.11+ ships `tomllib` in stdlib and `tomli` is the 3.10 back-compat shim, the right shape is a single `tomli`/`tomllib` conditional import — and `toml` (the older library) can be dropped entirely. Cosmetic.
+
 ## Dependabot alerts requiring action
 
 ### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` — 4 remaining
