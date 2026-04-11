@@ -46,20 +46,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/btcsuite/btcd/btcec"
 	"github.com/pkg/errors"
 
 	"github.com/rs/zerolog"
 	"google.golang.org/protobuf/proto"
 
 	libp2p "github.com/libp2p/go-libp2p"
-	p2pCrypto "github.com/libp2p/go-libp2p-core/crypto"
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/libp2p/go-libp2p-core/peerstore"
+	p2pCrypto "github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/peerstore"
 	multiaddr "github.com/multiformats/go-multiaddr"
 
-	circuit "github.com/libp2p/go-libp2p-circuit"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
 	routedhost "github.com/libp2p/go-libp2p/p2p/host/routed"
 
@@ -268,11 +266,13 @@ func New(opts ...Option) (*DHTPeer, error) {
 		libp2p.DefaultSecurity,
 		libp2p.NATPortMap(),
 		libp2p.EnableNATService(),
-		libp2p.EnableRelay(circuit.OptHop),
+		libp2p.EnableRelay(),
+		libp2p.EnableRelayService(),
+		libp2p.ForceReachabilityPublic(),
 	}
 
 	// create a basic host
-	basicHost, err := libp2p.New(ctx, libp2pOpts...)
+	basicHost, err := libp2p.New(libp2pOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func New(opts ...Option) (*DHTPeer, error) {
 	if dhtPeer.persistentStoragePath == defaultPersistentStoragePath {
 		myPeerID, err := peer.IDFromPublicKey(dhtPeer.publicKey)
 		ignore(err)
-		dhtPeer.persistentStoragePath += "_" + myPeerID.Pretty()
+		dhtPeer.persistentStoragePath += "_" + myPeerID.String()
 	}
 	nbr, err := dhtPeer.initAgentRecordPersistentStorage()
 	if err != nil {
@@ -500,7 +500,7 @@ func (dhtPeer *DHTPeer) initAgentRecordPersistentStorage() (int, error) {
 		if err != nil {
 			return 0, errors.Wrap(err, "While loading agent records")
 		}
-		dhtPeer.dhtAddresses[record.Address] = relayPeerID.Pretty()
+		dhtPeer.dhtAddresses[record.Address] = relayPeerID.String()
 		counter++
 	}
 
@@ -584,13 +584,13 @@ func (dhtPeer *DHTPeer) setupLogger() {
 		"package": "DHTPeer",
 	}
 	if dhtPeer.routedHost != nil {
-		fields["peerid"] = dhtPeer.routedHost.ID().Pretty()
+		fields["peerid"] = dhtPeer.routedHost.ID().String()
 	}
 	dhtPeer.logger = utils.NewDefaultLoggerWithFields(fields)
 }
 
 func (dhtPeer *DHTPeer) PeerID() string {
-	return dhtPeer.routedHost.ID().Pretty()
+	return dhtPeer.routedHost.ID().String()
 }
 
 func (dhtPeer *DHTPeer) GetLoggers() (func(error) *zerolog.Event, func() *zerolog.Event, func() *zerolog.Event, func() *zerolog.Event) {
@@ -671,11 +671,10 @@ func (dhtPeer *DHTPeer) Close() []error {
 // So we generate a new one and send session public key signature made with peer private key
 // snd client can validate it with peer public key/address
 func generate_x509_cert() (*tls.Certificate, error) {
-	privBtcKey, err := btcec.NewPrivateKey(elliptic.P256())
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return nil, errors.Wrap(err, "while creating new private key")
 	}
-	privKey := privBtcKey.ToECDSA()
 	pubKey := &privKey.PublicKey
 
 	ca := &x509.Certificate{
@@ -1017,7 +1016,7 @@ func (dhtPeer *DHTPeer) ProcessEnvelope(fn func(*aea.Envelope) error) {
 // MultiAddr libp2p multiaddr of the peer
 func (dhtPeer *DHTPeer) MultiAddr() string {
 	multiAddr, _ := multiaddr.NewMultiaddr(
-		fmt.Sprintf("/p2p/%s", dhtPeer.routedHost.ID().Pretty()))
+		fmt.Sprintf("/p2p/%s", dhtPeer.routedHost.ID().String()))
 	addrs := dhtPeer.routedHost.Addrs()
 	if len(addrs) == 0 {
 		return ""
@@ -1245,10 +1244,10 @@ func (dhtPeer *DHTPeer) _routeEnvelopeWithNewStream(
 	envelRec *acn.AgentRecord,
 ) error {
 	//linfo().Str("op", "route").Str("addr", target).
-	//	Msgf("got peer id '%s' for agent address", peerID.Pretty())
+	//	Msgf("got peer id '%s' for agent address", peerID.String())
 
 	//linfo().Str("op", "route").Str("addr", target).
-	//	Msgf("opening stream to target %s...", peerID.Pretty())
+	//	Msgf("opening stream to target %s...", peerID.String())
 	lerror, _, linfo, _ := dhtPeer.GetLoggers()
 
 	routeCount, _ := dhtPeer.monitor.GetGauge(metricOpRouteCount)
@@ -1263,7 +1262,7 @@ func (dhtPeer *DHTPeer) _routeEnvelopeWithNewStream(
 	stream, err := dhtPeer.routedHost.NewStream(ctx, peerID, dhtnode.AeaEnvelopeStream)
 	if err != nil {
 		lerror(err).Str("op", "route").Str("addr", target).
-			Msgf("timeout, couldn't open stream to target %s", peerID.Pretty())
+			Msgf("timeout, couldn't open stream to target %s", peerID.String())
 		routeCount.Dec()
 		return err
 	}
@@ -1272,7 +1271,7 @@ func (dhtPeer *DHTPeer) _routeEnvelopeWithNewStream(
 	opLatencyRoute.Observe(float64(duration.Microseconds()))
 
 	linfo().Str("op", "route").Str("addr", target).
-		Msgf("sending envelope to target peer %s...", peerID.Pretty())
+		Msgf("sending envelope to target peer %s...", peerID.String())
 
 	envelBytes, err := proto.Marshal(envel)
 	if err != nil {
@@ -1301,7 +1300,7 @@ func (dhtPeer *DHTPeer) _routeEnvelopeWithNewStream(
 
 	// wait for response
 	linfo().Str("op", "route").Str("addr", target).
-		Msgf("waiting fro envelope delivery confirmation from target peer %s...", peerID.Pretty())
+		Msgf("waiting fro envelope delivery confirmation from target peer %s...", peerID.String())
 
 	statusBody, err := acn.ReadAcnStatus(streamPipe)
 
@@ -1562,7 +1561,7 @@ func (dhtPeer *DHTPeer) HandleAeaAddressRequest(
 			lerror(err).Str("op", "resolve").Str("addr", reqAddress).
 				Msgf("CRITICAL could not get peer ID from public key %s", dhtPeer.publicKey)
 		} else {
-			sPeerID = peerID.Pretty()
+			sPeerID = peerID.String()
 			sRecord = dhtPeer.myAgentRecord
 		}
 	} else if existsRelay {
@@ -1581,7 +1580,7 @@ func (dhtPeer *DHTPeer) HandleAeaAddressRequest(
 			lerror(err).Str("op", "resolve").Str("addr", reqAddress).
 				Msgf("CRITICAL could not get peer ID from public key %s", dhtPeer.publicKey)
 		} else {
-			sPeerID = peerID.Pretty()
+			sPeerID = peerID.String()
 			sRecord = localRec
 		}
 	} else {
@@ -1592,7 +1591,7 @@ func (dhtPeer *DHTPeer) HandleAeaAddressRequest(
 		if err == nil {
 			linfo().Str("op", "resolve").Str("addr", reqAddress).
 				Msg("found address on the DHT")
-			sPeerID = peerID.Pretty()
+			sPeerID = peerID.String()
 			sRecord = peerRecord
 		} else {
 			lerror(err).Str("op", "resolve").Str("addr", reqAddress).
@@ -1623,7 +1622,7 @@ func (dhtPeer *DHTPeer) handleAeaNotifStream(stream network.Stream) {
 	lerror, _, _, ldebug := dhtPeer.GetLoggers()
 
 	ldebug().Str("op", "notif").
-		Msgf("Got a new notif stream. peerid: %s", stream.Conn().RemotePeer().Pretty())
+		Msgf("Got a new notif stream. peerid: %s", stream.Conn().RemotePeer().String())
 	opLatencyRegister, _ := dhtPeer.monitor.GetHistogram(metricOpLatencyRegister)
 	timer := dhtPeer.monitor.Timer()
 	start := timer.NewTimer()
@@ -1645,7 +1644,7 @@ func (dhtPeer *DHTPeer) handleAeaNotifStream(stream network.Stream) {
 		case <-ctx.Done():
 			lerror(nil).
 				Msgf("timeout: notifying peer %s haven't been added to DHT routing table",
-					stream.Conn().RemotePeer().Pretty())
+					stream.Conn().RemotePeer().String())
 			return
 		case <-time.After(time.Millisecond * 5):
 		}
@@ -1687,7 +1686,7 @@ func (dhtPeer *DHTPeer) handleAeaNotifStream(stream network.Stream) {
 	}
 	duration := timer.GetTimer(start)
 	opLatencyRegister.Observe(float64(duration.Microseconds()))
-	ldebug().Msgf("Address was announced: peerid: %s", stream.Conn().RemotePeer().Pretty())
+	ldebug().Msgf("Address was announced: peerid: %s", stream.Conn().RemotePeer().String())
 	// got a connection to a peer, so now we can allow address announcements
 	dhtPeer.enableAddressAnnouncementLock.Lock()
 	dhtPeer.enableAddressAnnouncement = true
@@ -1733,7 +1732,7 @@ func (dhtPeer *DHTPeer) handleAeaRegisterStream(stream network.Stream) {
 	clientAddr := record.Address
 
 	//linfo().Msgf("connection from %s established for Address %s",
-	//	stream.Conn().RemotePeer().Pretty(), clientAddr)
+	//	stream.Conn().RemotePeer().String(), clientAddr)
 
 	// check if the PoR is valid
 	clientPubKey, err := utils.FetchAIPublicKeyFromPubKey(stream.Conn().RemotePublicKey())
@@ -1761,7 +1760,7 @@ func (dhtPeer *DHTPeer) handleAeaRegisterStream(stream network.Stream) {
 	//linfo().Str("op", "register").
 	//	Str("addr", string(clientAddr)).
 	//	Msgf("Received address registration request for peer id %s", string(clientPeerID))
-	clientPeerID := stream.Conn().RemotePeer().Pretty()
+	clientPeerID := stream.Conn().RemotePeer().String()
 
 	dhtPeer.agentRecordsLock.Lock()
 	dhtPeer.agentRecords[clientAddr] = record
