@@ -33,7 +33,7 @@ import (
 
 	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/peer"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
 	kbucket "github.com/libp2p/go-libp2p-kbucket"
 	multiaddr "github.com/multiformats/go-multiaddr"

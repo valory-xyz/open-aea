@@ -24,7 +24,7 @@
 package dhtpeer
 
 import (
-	"github.com/libp2p/go-libp2p-core/network"
+	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/rs/zerolog"
 )
@@ -44,7 +44,7 @@ func (notifee *Notifee) ListenClose(network.Network, multiaddr.Multiaddr) {}
 func (notifee *Notifee) Connected(net network.Network, conn network.Conn) {
 	notifee.logger.Info().Msgf(
 		"Connected to peer %s",
-		conn.RemotePeer().Pretty(),
+		conn.RemotePeer().String(),
 	)
 
 }
@@ -54,7 +54,7 @@ func (notifee *Notifee) Connected(net network.Network, conn network.Conn) {
 func (notifee *Notifee) Disconnected(net network.Network, conn network.Conn) {
 	notifee.logger.Info().Msgf(
 		"Disconnected from peer %s",
-		conn.RemotePeer().Pretty(),
+		conn.RemotePeer().String(),
 	)
 }
 

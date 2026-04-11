@@ -36,14 +36,15 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	libp2p "github.com/libp2p/go-libp2p"
-	p2pCrypto "github.com/libp2p/go-libp2p-core/crypto"
-	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/libp2p/go-libp2p-core/protocol"
+	p2pCrypto "github.com/libp2p/go-libp2p/core/crypto"
+	circuitclient "github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/client"
+	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	multiaddr "github.com/multiformats/go-multiaddr"
 
-	"github.com/libp2p/go-libp2p-core/peerstore"
+	"github.com/libp2p/go-libp2p/core/peerstore"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
 	routedhost "github.com/libp2p/go-libp2p/p2p/host/routed"
 
@@ -87,7 +88,7 @@ func (notifee *Notifee) ListenClose(network.Network, multiaddr.Multiaddr) {}
 func (notifee *Notifee) Connected(net network.Network, conn network.Conn) {
 	notifee.logger.Info().Msgf(
 		"Connected to peer %s",
-		conn.RemotePeer().Pretty(),
+		conn.RemotePeer().String(),
 	)
 
 }
@@ -98,10 +99,10 @@ func (notifee *Notifee) Disconnected(net network.Network, conn network.Conn) {
 
 	notifee.logger.Info().Msgf(
 		"Disconnected from peer %s",
-		conn.RemotePeer().Pretty(),
+		conn.RemotePeer().String(),
 	)
 	pinfo := notifee.myRelayPeer
-	if conn.RemotePeer().Pretty() != pinfo.ID.Pretty() {
+	if conn.RemotePeer().String() != pinfo.ID.String() {
 		return
 	}
 
@@ -116,7 +117,7 @@ func (notifee *Notifee) Disconnected(net network.Network, conn network.Conn) {
 		default:
 			notifee.logger.Warn().Msgf(
 				"Lost connection to relay peer %s, reconnecting...",
-				pinfo.ID.Pretty(),
+				pinfo.ID.String(),
 			)
 			ctx, cancel := context.WithTimeout(context.Background(), reconnectTimeout)
 			defer cancel()
@@ -130,7 +131,7 @@ func (notifee *Notifee) Disconnected(net network.Network, conn network.Conn) {
 			break
 		}
 	}
-	notifee.logger.Info().Msgf("Connection to relay peer %s reestablished", pinfo.ID.Pretty())
+	notifee.logger.Info().Msgf("Connection to relay peer %s reestablished", pinfo.ID.String())
 }
 
 // OpenedStream called when a stream opened
@@ -237,7 +238,7 @@ func New(opts ...Option) (*DHTClient, error) {
 	}
 
 	// create a basic host
-	basicHost, err := libp2p.New(ctx, libp2pOpts...)
+	basicHost, err := libp2p.New(libp2pOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -264,6 +265,15 @@ func New(opts ...Option) (*DHTClient, error) {
 	if err != nil {
 		dhtClient.Close()
 		return nil, err
+	}
+
+	// reserve a slot with each bootstrap peer acting as a circuit v2 relay,
+	// so this client can be reached via them by other peers
+	for _, bp := range dhtClient.bootstrapPeers {
+		_, rerr := circuitclient.Reserve(ctx, dhtClient.routedHost, bp)
+		if rerr != nil {
+			dhtClient.logger.Warn().Err(rerr).Msgf("failed to reserve relay slot with %s", bp.ID)
+		}
 	}
 
 	// register my address to relay peer
@@ -344,7 +354,7 @@ func (dhtClient *DHTClient) newStreamLoopUntilTimeout(
 		disconnected = true
 		lerror(err).
 			Str("op", "route").
-			Msgf("couldn't open stream to peer %s, retrying in %s", peerID.Pretty(), sleepTime)
+			Msgf("couldn't open stream to peer %s, retrying in %s", peerID.String(), sleepTime)
 		select {
 		default:
 			time.Sleep(sleepTime)
@@ -368,10 +378,10 @@ func (dhtClient *DHTClient) newStreamLoopUntilTimeout(
 func (dhtClient *DHTClient) setupLogger() {
 	fields := map[string]string{
 		"package": "DHTClient",
-		"relayid": dhtClient.relayPeer.Pretty(),
+		"relayid": dhtClient.relayPeer.String(),
 	}
 	if dhtClient.routedHost != nil {
-		fields["peerid"] = dhtClient.routedHost.ID().Pretty()
+		fields["peerid"] = dhtClient.routedHost.ID().String()
 	}
 	dhtClient.logger = utils.NewDefaultLoggerWithFields(fields)
 }
@@ -422,7 +432,7 @@ func (dhtClient *DHTClient) MultiAddr() string {
 }
 
 func (dhtClient *DHTClient) PeerID() string {
-	return dhtClient.routedHost.ID().Pretty()
+	return dhtClient.routedHost.ID().String()
 }
 
 // RouteEnvelope routes the provided envelope to its destination contact peer
@@ -520,11 +530,11 @@ func (dhtClient *DHTClient) RouteEnvelope(envel *aea.Envelope) error {
 	ldebug().
 		Str("op", "route").
 		Str("target", target).
-		Msgf("got peer ID %s for agent Address", peerID.Pretty())
+		Msgf("got peer ID %s for agent Address", peerID.String())
 
 	// TODO(LR): test if representative peer is relay peer, and skip the Connect if it is the case
 	// TODO(DM): extract below multi-address creation for reuse and consistency
-	multiAddr := "/p2p/" + dhtClient.relayPeer.Pretty() + "/p2p-circuit/p2p/" + peerID.Pretty()
+	multiAddr := "/p2p/" + dhtClient.relayPeer.String() + "/p2p-circuit/p2p/" + peerID.String()
 	relayMultiaddr, err := multiaddr.NewMultiaddr(multiAddr)
 	if err != nil {
 		lerror(err).
