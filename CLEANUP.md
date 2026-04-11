@@ -24,6 +24,21 @@ Verified nothing in `.github/`, `Makefile`, or `docs/` referenced any of these n
 
 Earlier audit claimed PyNaCl was declared but never imported — that was wrong: the plugin source never imports it, but `tests/test_solana.py` used `nacl.signing.VerifyKey` 3× for Ed25519 signature verification in `test_sign_message`. Rewrote those call sites to use `cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey` (already a direct dep) and switched the bad-signature assertions from an exception-message string match to `pytest.raises(InvalidSignature)`. This also fixed a latent bug in the original test: the old `try: ... except Exception as e: assert ...` pattern would silently pass if the bad signature happened to verify.
 
+### Unused scripts in `scripts/` ✓ all removed
+
+All five scripts previously flagged (`deploy_to_registry.py`, `log_parser.py`, `parse_main_dependencies_from_lock.py`, `publish_packages_to_local_registry.py`, `spell-check.sh`) have been deleted. The first four moved into the new `aea-dev-helpers` plugin in `546de82c0` ("feat: create aea-dev-helpers plugin, migrate all scripts to plugins"); `log_parser.py` and `spell-check.sh` were deleted outright in `6e2397e6c` ("chore: migrate scripts to aea-ci-helpers, delete obsolete scripts").
+
+### `libp2p_node` Go dependency bumps ✓ partially landed
+
+The Go `go.mod` in `packages/valory/connections/p2p_libp2p/libp2p_node/` was carrying 15 Dependabot alerts. Two commits on this branch closed most of them:
+
+- `9a653ba72` — chore(libp2p_node): bump Go deps to close Dependabot security alerts
+- `b5aeb6be3` — chore(libp2p_node): bump go-ethereum v1.14.11 → v1.17.2
+
+Resolved: all `golang.org/x/crypto`, `btcsuite/btcd`, `libp2p/go-libp2p-kad-dht`, and `google.golang.org/protobuf` alerts. Current `go.mod` is on `go 1.24.0`, `golang.org/x/crypto v0.45.0`, `btcd/btcec v2.3.4`, `libp2p-kad-dht v0.25.2`, `protobuf v1.36.11`.
+
+**Remaining**: 4 open `github.com/ethereum/go-ethereum` alerts (#130, #139, #140, #141) even after the v1.14.11 → v1.17.2 bump. Dependabot may not have reassessed yet, or these alerts have fix versions ahead of v1.17.2; needs a manual check of each alert's fixed-version metadata.
+
 ## Likely removable
 
 ### `libs/go/`
@@ -33,16 +48,6 @@ Go implementation of aealite. The `golang_checks` CI job exists but has **no act
 ### `examples/aealite_go/`
 
 Tiny Go example (53-byte README). Dead if `libs/go/` is removed.
-
-### Unused scripts in `scripts/`
-
-These scripts are not referenced in CI, Makefile, or tox.ini:
-
-- `deploy_to_registry.py` — manual package deployment utility
-- `log_parser.py` — test log parsing utility
-- `parse_main_dependencies_from_lock.py` — lock file parsing utility
-- `publish_packages_to_local_registry.py` — manual local registry deployment
-- `spell-check.sh` — spell checking (never invoked)
 
 ## Partially removable (incomplete Poetry migration)
 
@@ -60,15 +65,9 @@ End-user install scripts that install from PyPI. Referenced in `bump_aea_version
 
 ## Dependabot alerts requiring action
 
-### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` (15 alerts)
+### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` — 4 remaining
 
-Active package with outdated Go dependencies. Needs dependency bumps for:
-
-- `github.com/ethereum/go-ethereum` — 5 alerts (high+medium): DoS via malicious p2p messages, ECIES public key validation
-- `golang.org/x/crypto` — 4 alerts (critical+high+medium): SSH auth bypass, DoS, unbounded memory, Terrapin attack
-- `github.com/btcsuite/btcd` — 2 alerts (high+medium): FindAndDelete bug, consensus failures
-- `github.com/libp2p/go-libp2p-kad-dht` — 1 alert (medium): content censorship via DHT abuse
-- `google.golang.org/protobuf` — 1 alert (medium): infinite loop in protojson.Unmarshal
+Down from 15 alerts. The bulk were resolved by the two Go-dep bump commits on this branch (see the "Completed in this cleanup pass" section above). **Still open:** 4 `github.com/ethereum/go-ethereum` alerts (#130, #139, #140, #141) that remain after the v1.14.11 → v1.17.2 bump. Either Dependabot has not rescanned yet, or the fix versions are ahead of v1.17.2 — needs per-alert verification against the GHSA advisories.
 
 ### Python: `plugins/aea-ledger-cosmos/setup.py` — one open `ecdsa` alert
 
@@ -95,9 +94,9 @@ Current state on this branch: pinned `ecdsa>=0.15,<0.17.0` (resolving to `0.16.1
 - [ ] Confirm downstream consumers (Valory agents, olas-protocol-resolver, etc.) are compatible with a cosmos plugin that requires `ecdsa>=0.19.2` before flipping the pin.
 - [ ] Bump pins in 4 locations: `plugins/aea-ledger-cosmos/setup.py:42`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`.
 
-### Python: `requests` in core (1 alert)
+### Python: `requests` (1 alert)
 
-- #159 (medium): Insecure temp file reuse in extract_zipped_paths(). Goes away when PR #867 (remove requests from core) merges.
+- #159 (medium): Insecure temp file reuse in `extract_zipped_paths()`. PR #867 ("chore: remove requests from base deps") **merged 2026-04-10**, removing `requests` from the core install requirements. The alert is still open because `requests = ">=2.20.0,<3"` remains as a **dev dependency** in `pyproject.toml:30` and therefore shows up in `poetry.lock`. The alert will close only when either the dev-group pin is bumped to a fixed version, or `requests` is dropped from the dev group entirely.
 
 ## Confirmed keep
 
@@ -282,11 +281,11 @@ The ledger plugins (`aea-ledger-cosmos`, `aea-ledger-ethereum`, `aea-ledger-ethe
 
 | Plugin | Direct crypto/crypto-adjacent deps | Notes |
 |--------|-----------------------------------|-------|
-| `cosmos` | `ecdsa>=0.15,<0.17`, `bech32`, `pycryptodome`, `cosmpy`, `requests` | 2 open Dependabot alerts on `ecdsa` (Minerva timing attack #122 high, DER DoS #147 medium) |
+| `cosmos` | `ecdsa>=0.15,<0.17`, `bech32`, `pycryptodome`, `cosmpy`, `requests` | 1 open alert on `ecdsa`: #147 (DER DoS, medium, fixed in 0.19.2). #156 (Minerva timing attack, high) is dismissed upstream — side-channel resistance is explicitly out of scope for the `ecdsa` project. See the "ecdsa pin-bump plan" section below. |
 | `ethereum` | `web3>=7.0.0,<8`, `eth-account>=0.13.0,<0.14`, `requests` | web3 is heavy but canonical |
 | `fetchai` | inherits `cosmos`, plus `requests` | same alerts propagate |
 | `ethereum-hwi` | inherits `ethereum`, plus `ledgerwallet`, `construct`, `protobuf` | hardware wallet niche |
-| `solana` | `cryptography`, `PyNaCl>=1.5.0,<2`, `solders`, `solana`, `anchorpy` | **`PyNaCl` is declared but never imported** (dead dep) |
+| `solana` | `cryptography`, `solders`, `solana`, `anchorpy` | `PyNaCl` removed — see "Completed" section above |
 | `ethereum-flashbots` | inherits `ethereum`, plus `open-aea-flashbots` | — |
 
 ### Is there a single "unified" crypto library?
@@ -327,7 +326,7 @@ Note that **if you install `aea-ledger-ethereum`, you already transitively get b
 | # | Action | Effort | Impact | Risk | Recommendation |
 |---|--------|--------|--------|------|----------------|
 | 1 | ~~Remove `PyNaCl` from `plugins/aea-ledger-solana/setup.py`~~ | — | — | — | ✓ **Done** (see "Completed" section — required rewriting `test_solana.py::test_sign_message` from `nacl.VerifyKey` to `cryptography.Ed25519PublicKey`) |
-| 2 | Replace `ecdsa` with `coincurve` in `plugins/aea-ledger-cosmos/aea_ledger_cosmos/cosmos.py` and `packages/valory/connections/p2p_libp2p_client/connection.py`, `packages/valory/connections/p2p_libp2p_mailbox/connection.py` | medium (~50 LOC per site + real-chain testing) | closes 2 Dependabot alerts (#122 Minerva high, #147 DER DoS medium), faster sign/verify (C vs pure Python), aligns with ethereum's transitive stack | medium — signature format compatibility must be preserved exactly (canonical DER for ACN, sigencode_string_canonize for cosmos) or nodes reject transactions | **Worth doing** — directly addresses open security alerts |
+| 2 | Replace `ecdsa` with `coincurve` in `plugins/aea-ledger-cosmos/aea_ledger_cosmos/cosmos.py` and `packages/valory/connections/p2p_libp2p_client/connection.py`, `packages/valory/connections/p2p_libp2p_mailbox/connection.py` | medium (~50 LOC per site + real-chain testing) | closes the one actionable alert (#147 DER DoS, medium), faster sign/verify (C vs pure Python), aligns with ethereum's transitive stack. Minerva (#156) is dismissed and would remain dismissed under `coincurve` too (side-channel risk is orthogonal to library choice). | medium — signature format compatibility must be preserved exactly (canonical DER for ACN, sigencode_string_canonize for cosmos) or nodes reject transactions | **Superseded by pin bump** — the `ecdsa>=0.19.2,<0.20` plan in the ecdsa pin-bump section closes #147 with a one-line change and preserves byte formats. Only revisit if a second actionable alert surfaces. |
 | 3 | ~~Create `aea.helpers.keyfile_crypto` shared module~~ | — | — | — | **Rejected — see note below** |
 | 4 | Migrate solana from `cryptography.fernet` to `pycryptodome`; drop `cryptography` from solana's direct deps | small code change (~30 LOC) | solana drops `cryptography` direct dep | **high — breaks existing encrypted solana keyfiles without a migration path** | **Defer** until a broader keyfile migration is planned |
 | 5 | Investigate replacing `anchorpy` with inlined helpers (two narrow use sites: `ACCOUNT_DISCRIMINATOR_SIZE` constant + `_decode_idl_account` function) | medium | solana drops `anchorpy` dep | medium — need to verify edge cases in IDL decoding | **Worth investigating separately** |
