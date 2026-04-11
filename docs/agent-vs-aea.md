@@ -46,7 +46,7 @@ However, we need to implement 4 abstract methods:
 - `teardown()`
 
 
-When we run an agent instance, `start()` calls `setup()` and then the main agent loop. The main agent loop calls `act()`, `react()` and `update()` on each tick. When the agent instance is stopped via `stop()` then `teardown()` is called.
+When we run an agent instance, `start()` calls `setup()` and then the main agent loop. The main agent loop calls `act()` on each tick and dispatches incoming envelopes to `handle_envelope()`. When the agent instance is stopped via `stop()` then `teardown()` is called.
 
 Such a lightweight agent can be used to implement simple logic.
 
