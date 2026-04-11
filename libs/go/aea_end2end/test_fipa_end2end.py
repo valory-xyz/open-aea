@@ -41,12 +41,12 @@ from aea.skills.behaviours import TickerBehaviour
 from aea.test_tools.test_cases import AEATestCaseEmpty
 from libs.go.aea_end2end.pexpect_popen import PexpectWrapper
 
-from packages.fetchai.connections.p2p_libp2p.connection import P2PLibp2pConnection
+from packages.valory.connections.p2p_libp2p.connection import P2PLibp2pConnection
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue, FipaDialogues
 from packages.fetchai.protocols.fipa.message import FipaMessage
 
+from packages.valory.connections.test_libp2p.tests.base import _make_libp2p_connection
 from tests.common.utils import run_in_thread, wait_for_condition
-from tests.conftest import _make_libp2p_connection
 
 
 class BuyerDialogues(FipaDialogues):
@@ -152,17 +152,19 @@ class BuyerHandler(Handler):
 class Base(AEATestCaseEmpty):
     """Base class for test case."""
 
-    package_registry_src_rel = Path(os.path.abspath("../../../packages"))
+    package_registry_src_rel = Path(__file__).resolve().parent.parent.parent.parent / "packages"
 
     @classmethod
     def setup_class(cls) -> None:
         """Setup agent."""
         super(Base, cls).setup_class()
-        cls.add_item("connection", "fetchai/p2p_libp2p:0.21.0")
+        cls.add_item("connection", "valory/p2p_libp2p:0.1.0")
         cls.add_item("protocol", "fetchai/fipa:1.0.0")
         cls.generate_private_key()
         cls.add_private_key()
-        cls.add_private_key(connection=True)
+        # p2p_libp2p now requires a cosmos key for the ACN connection identity
+        cls.generate_private_key("cosmos", "cosmos_private_key.txt")
+        cls.add_private_key("cosmos", "cosmos_private_key.txt", connection=True)
         cls.run_cli_command("build", cwd=cls._get_cwd())
         cls.run_cli_command("issue-certificates", cwd=cls._get_cwd())
 
