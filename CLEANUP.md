@@ -2,23 +2,27 @@
 
 Audit of items that could be removed or simplified to reduce repo surface area.
 
-## Definitely removable
+## Completed in this cleanup pass
 
-### `scripts/check_pipfile_and_toxini.py`
+### `scripts/check_pipfile_and_toxini.py` ✓ removed
 
-References non-existent `Pipfile` (project migrated to Poetry/pyproject.toml). Replaced by `scripts/check_pyproject_and_toxini.py`. Not referenced in Makefile, tox.ini, or CI.
+Referenced a non-existent `Pipfile` (project migrated to Poetry/pyproject.toml). Replaced by `scripts/check_pyproject_and_toxini.py`. Only referenced from this doc and `HISTORY.md`.
 
-### `mints/`
+### Stale `tox.ini` envlist entries ✓ pruned
 
-Contains a single `whitelist.txt` listing component names to skip during minting. Not referenced in any code, CI workflow, Makefile, or script. Vestigial from an on-chain component-minting workflow that no longer runs from this repo.
+The envlist used `{plugins-,}py{3.10,3.10-cov,3.11,3.12,3.13,3.14,3.15}` plus a standalone `plugins_deps` entry. The expansion generated these entries which had no corresponding `[testenv:*]` sections:
 
-### Stale tox.ini envlist entries
-
-The following environments are declared in the `envlist` but have no corresponding `[testenv:xxx]` sections:
-
-- `py3.10-cov`, `plugins-py3.10-cov`, `packages-py3.10-cov`
-- `py3.15`, `plugins-py3.15`, `packages-py3.15`
+- `py3.10-cov`, `plugins-py3.10-cov`
+- `py3.15`, `plugins-py3.15`
 - `plugins_deps`
+
+(Earlier drafts of this doc incorrectly listed `packages-py*` entries — the envlist brace expansion was `{plugins-,}`, not `{packages-,}`.)
+
+Verified nothing in `.github/`, `Makefile`, or `docs/` referenced any of these names before removal. The `packages-py3.10`…`packages-py3.14` sections exist but are intentionally not in `envlist` — they are invoked directly by CI via `tox -e packages-py3.10`, which remains valid.
+
+### `PyNaCl` from `plugins/aea-ledger-solana/setup.py` ✓ removed
+
+Earlier audit claimed PyNaCl was declared but never imported — that was wrong: the plugin source never imports it, but `tests/test_solana.py` used `nacl.signing.VerifyKey` 3× for Ed25519 signature verification in `test_sign_message`. Rewrote those call sites to use `cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PublicKey` (already a direct dep) and switched the bad-signature assertions from an exception-message string match to `pytest.raises(InvalidSignature)`. This also fixed a latent bug in the original test: the old `try: ... except Exception as e: assert ...` pattern would silently pass if the bad signature happened to verify.
 
 ## Likely removable
 
@@ -304,7 +308,7 @@ Note that **if you install `aea-ledger-ethereum`, you already transitively get b
 
 | # | Action | Effort | Impact | Risk | Recommendation |
 |---|--------|--------|--------|------|----------------|
-| 1 | Remove unused `PyNaCl` from `plugins/aea-ledger-solana/setup.py` | trivial | dead dep removed | zero — grep confirms zero `import nacl`/`from nacl` in the plugin source | **Do immediately** |
+| 1 | ~~Remove `PyNaCl` from `plugins/aea-ledger-solana/setup.py`~~ | — | — | — | ✓ **Done** (see "Completed" section — required rewriting `test_solana.py::test_sign_message` from `nacl.VerifyKey` to `cryptography.Ed25519PublicKey`) |
 | 2 | Replace `ecdsa` with `coincurve` in `plugins/aea-ledger-cosmos/aea_ledger_cosmos/cosmos.py` and `packages/valory/connections/p2p_libp2p_client/connection.py`, `packages/valory/connections/p2p_libp2p_mailbox/connection.py` | medium (~50 LOC per site + real-chain testing) | closes 2 Dependabot alerts (#122 Minerva high, #147 DER DoS medium), faster sign/verify (C vs pure Python), aligns with ethereum's transitive stack | medium — signature format compatibility must be preserved exactly (canonical DER for ACN, sigencode_string_canonize for cosmos) or nodes reject transactions | **Worth doing** — directly addresses open security alerts |
 | 3 | ~~Create `aea.helpers.keyfile_crypto` shared module~~ | — | — | — | **Rejected — see note below** |
 | 4 | Migrate solana from `cryptography.fernet` to `pycryptodome`; drop `cryptography` from solana's direct deps | small code change (~30 LOC) | solana drops `cryptography` direct dep | **high — breaks existing encrypted solana keyfiles without a migration path** | **Defer** until a broader keyfile migration is planned |

@@ -25,13 +25,14 @@ from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import pytest
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from solders.signature import Signature
 
 if platform.system() != "Linux":
     pytest.skip("Runs only on linux", allow_module_level=True)
 
 from aea_ledger_solana import LAMPORTS_PER_SOL, SolanaApi, SolanaCrypto, SolanaFaucetApi
-from nacl.signing import VerifyKey
 from solders.system_program import ID as SYS_PROGRAM_ID
 
 from aea.common import JSONLike
@@ -197,22 +198,21 @@ def test_sign_message():
 
     signature = Signature.from_string(sig)
 
-    try:
-        verification_key = VerifyKey(bytes(wallet.entity.pubkey()))
-        verification_key.verify(smessage=msg2, signature=bytes(signature))
-    except Exception as e:
-        assert e.args[0] == "Signature was forged or corrupt"
+    # Wrong message against right pubkey: must fail verification.
+    verification_key = Ed25519PublicKey.from_public_bytes(bytes(wallet.entity.pubkey()))
+    with pytest.raises(InvalidSignature):
+        verification_key.verify(bytes(signature), msg2)
 
-    try:
-        verification_key = VerifyKey(bytes(wallet2.entity.pubkey()))
-        verification_key.verify(smessage=msg, signature=bytes(signature))
-    except Exception as e:
-        assert e.args[0] == "Signature was forged or corrupt"
+    # Right message against wrong pubkey: must fail verification.
+    verification_key = Ed25519PublicKey.from_public_bytes(
+        bytes(wallet2.entity.pubkey())
+    )
+    with pytest.raises(InvalidSignature):
+        verification_key.verify(bytes(signature), msg)
 
-    verification_key = VerifyKey(bytes(wallet.entity.pubkey()))
-    result = verification_key.verify(smessage=msg, signature=bytes(signature))
-
-    assert result == msg, "Failed to sign message"
+    # Right message + right pubkey: verifies without raising.
+    verification_key = Ed25519PublicKey.from_public_bytes(bytes(wallet.entity.pubkey()))
+    verification_key.verify(bytes(signature), msg)
 
 
 @pytest.mark.flaky(reruns=MAX_FLAKY_RERUNS)
