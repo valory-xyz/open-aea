@@ -5,7 +5,7 @@ The scaffold generator builds out the directory structure required when adding n
 For example, create a new AEA project (add the author flag using your own author handle if this is your first project using the `aea` package).
 
 ``` bash
-aea create my_aea --author "fetchai"
+aea create my_aea --author "your_author_handle"
 cd my_aea
 ```
 

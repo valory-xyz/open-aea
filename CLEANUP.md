@@ -267,7 +267,7 @@ Audit of the `docs/` tree (75 markdown files) and `examples/` tree (5 subdirs). 
 
 2. ~~**`docs/release-process.md` references three deleted scripts.**~~ ✓ done — `bump_aea_version.py`/`update_plugin_versions.py` invocations now use `aea-dev bump-version`/`aea-dev update-plugin-versions` from the `open-aea-dev-helpers` plugin; the `spell-check.sh` wrapper call was dropped and the existing `pylint --disable all --enable spelling` invocation retained (it was the real check).
 
-3. **`docs/release-process.md` nav status** — intentionally left orphaned from the published `mkdocs.yml`. This is repo-maintainer documentation, not framework user documentation, so it shouldn't appear in the AEA docs site. A short pointer from `CONTRIBUTING.md` would make it findable by maintainers without exposing it to framework users.
+3. ~~**`docs/release-process.md` nav status**~~ ✓ done — intentionally kept out of `mkdocs.yml` (maintainer workflow, not framework user documentation). `CONTRIBUTING.md` now has a short "Cutting a release" section linking to `docs/release-process.md` so maintainers can find it. While editing `CONTRIBUTING.md`, also swapped the stale `pipenv shell` reference for `poetry shell` to match the actual `make new_env` flow.
 
 ### B. Dead or near-dead files — candidates for deletion
 
@@ -293,9 +293,9 @@ Not every one of these is stale — `vision.md`, `design-principles.md`, and `la
 
 ### D. Minor cosmetic items
 
-1. **`docs/scaffolding.md`** uses `aea create my_aea --author "fetchai"` as the example. `fetchai` is a vendor name, not a recommended author handle for users. Replace with a generic placeholder like `"my_author"` or `"<your-name>"`.
+1. ~~**`docs/scaffolding.md`**~~ ✓ done — `aea create my_aea --author "fetchai"` replaced with `"your_author_handle"`. Safe because this flag sets the user's own author handle; it is not a reference to any published package.
 
-2. **Fetchai-weighted tutorial doc set** (`quickstart.md`, `echo_demo.md`, `http-echo-demo.md`, `aev-echo-demo.md`) — each has 1-11 `fetchai` mentions. `fetchai` is still a supported ledger plugin but is no longer the primary use case in the Olas-era open-aea. Worth discussing whether first-touch tutorials should be rebased on `ethereum` or chain-agnostic examples. Not urgent.
+2. **Fetchai-weighted tutorial doc set** (`quickstart.md`, `echo_demo.md`, `http-echo-demo.md`, `aev-echo-demo.md`) — **deferred, not cleanup scope**. Every `fetchai/*` identifier in these docs is the functional public_id of a real package living on disk under `packages/fetchai/` (e.g. `fetchai/echo:0.19.0`, `fetchai/http_echo:0.20.0`, `fetchai/stub:0.21.0`, `fetchai/default:1.0.0` protocol). The author field is fixed at publish time and baked into the IPFS hashes users download. Rebasing these onto a `valory/*` or `open_aea/*` vendor would require moving 4+ packages on disk, regenerating every fingerprint and hash, re-publishing to the public IPFS registry (breaking existing downstream hashes cached by users), and parallel updating every test and config reference. That is a strategic registry migration, not a tutorial cleanup. Left as-is.
 
 ### Recommended order of operations
 

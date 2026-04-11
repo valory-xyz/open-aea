@@ -45,10 +45,10 @@ If you want to contribute, start working through the codebase, navigate to the G
 
 First, setup your environment by either using the `develop-image` or by following these steps:
 
-- The simplest way to get setup for development on the framework is to install Python `>=3.10` and `pipenv`, then run the following:
+- The simplest way to get setup for development on the framework is to install Python `>=3.10` and [Poetry](https://python-poetry.org/), then run the following:
 
       make new_env
-      pipenv shell
+      poetry shell
 
 - The project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) compiler for message serialization. A guide on how to install it is found [here](https://fetchai.github.io/oef-sdk-python/user/install.html#protobuf-compiler).
 
@@ -106,3 +106,7 @@ We have various commands which are helpful during development.
 - We use [`golines`](https://github.com/segmentio/golines) and [`golangci-lint`](https://golangci-lint.run) for linting.
 
 - To run tests, use `go test -p 1 -timeout 0 -count 1 -v ./...` from the root directory of the package. If you experience installation or build issues run `go clean -modcache`.
+
+## Cutting a release
+
+Maintainers cutting a new release should follow the step-by-step checklist in [`docs/release-process.md`](docs/release-process.md). That document is intentionally not published to the AEA docs site because it is a maintainer workflow, not framework user documentation.
