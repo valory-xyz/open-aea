@@ -141,7 +141,7 @@ Dorado is our stable, public testnet for the Fetch Ledger v2. As such, most deve
 | Version        | v0.8.x                                                                     |
 | RPC Endpoint   | https://rpc-dorado.fetch.ai:443                                     |
 | REST Endpoint  | https://rest-dorado.fetch.ai:443                                    |
-| Block Explorer | <a href="https://explore-dorado.fetch.ai" target="_blank">https://explore-dorado.fetch.ai</a> |
+| Block Explorer | <a href="https://explore-dorado.fetch.ai" target="_blank">Dorado Explorer</a> |
 | Token Faucet   | Use block explorer                                                         |
 
 

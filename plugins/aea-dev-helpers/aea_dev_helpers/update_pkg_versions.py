@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -22,11 +21,13 @@
 """
 Updates package versions relative to last release.
 
-Run this script from the root of the project directory:
-    python scripts/update_package_versions.py
+This module contains the logic originally in ``scripts/update_package_versions.py``.
+
+Run from the root of the project directory::
+
+    aea-dev update-pkg-versions
 """
 
-import argparse
 import operator
 import os
 import re
@@ -51,11 +52,10 @@ from aea.helpers.protocols import (
     get_protocol_specification_id_from_specification,
 )
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path.cwd()
 PACKAGES_DIR = ROOT_DIR / "packages"
 DIRECTORIES = ["packages", "aea", "docs", "benchmark", "examples", "tests"]
 CLI_LOG_OPTION = ["-v", "OFF"]
-TYPES = set(map(lambda x: x.to_plural(), PackageType))
 HASHES_CSV = "hashes.csv"
 TYPE_TO_CONFIG_FILE = {
     "connections": "connection.yaml",
@@ -64,11 +64,13 @@ TYPE_TO_CONFIG_FILE = {
     "skills": "skill.yaml",
     "agents": "aea-config.yaml",
 }
-PUBLIC_ID_REGEX = PublicId.PUBLIC_ID_REGEX[1:-1]
 TEST_PROTOCOLS = ["t_protocol", "t_protocol_no_ct"]
 
 
-def get_protocol_specification_header_regex(public_id: PublicId) -> Pattern:
+TYPES_SET: Set[str] = set(map(lambda x: x.to_plural(), PackageType))
+
+
+def get_protocol_specification_header_regex(public_id) -> Pattern:
     """Get the regex to match."""
     return re.compile(
         rf"(name: {public_id.name}\n"
@@ -85,39 +87,8 @@ def check_positive(value: Any) -> int:
         ivalue = int(value)
         assert ivalue <= 0
     except (AssertionError, ValueError):
-        raise argparse.ArgumentTypeError(f"{value} is an invalid positive int value")
+        raise click.BadParameter(f"{value} is an invalid positive int value")
     return ivalue
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-n",
-        "--no-interactive",
-        action="store_true",
-        default=False,
-        help="Don't ask user confirmation for replacement.",
-    )
-    parser.add_argument(
-        "-C",
-        "--context",
-        type=check_positive,
-        default=3,
-        help="The number of above/below rows to display",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--replace-by-default",
-        action="store_true",
-        default=False,
-        help="If --no-interactive is set, apply the replacement (default: False).",
-    )
-    return parser.parse_args()
-
-
-arguments: Optional[argparse.Namespace] = None
 
 
 def check_if_running_allowed() -> None:
@@ -228,7 +199,7 @@ def unified_yaml_load(configuration_file: Path) -> Dict:
         return list(data)[0]
 
 
-def get_public_id_from_yaml(configuration_file_path: Path) -> PublicId:
+def get_public_id_from_yaml(configuration_file_path: Path):
     """
     Get the public id from yaml.
 
@@ -243,7 +214,7 @@ def get_public_id_from_yaml(configuration_file_path: Path) -> PublicId:
     return PublicId(author, name, version)
 
 
-def public_id_in_registry(type_: str, name: str) -> PublicId:
+def public_id_in_registry(type_: str, name: str):
     """
     Check if a package id is in the registry.
 
@@ -326,7 +297,7 @@ def get_public_ids_to_update() -> Set[PackageId]:
     now = get_hashes_from_current_release()
     last_by_type = split_hashes_by_type(last)
     now_by_type = split_hashes_by_type(now)
-    for type_ in TYPES:
+    for type_ in TYPES_SET:
         for key, value in last_by_type[type_].items():
             # if the package is a "scaffold" package, skip;
             if key == "scaffold":
@@ -406,9 +377,7 @@ def _sort_in_update_order(package_ids: Set[PackageId]) -> List[PackageId]:
     )
 
 
-def minor_version_difference(
-    current_public_id: PublicId, deployed_public_id: PublicId
-) -> int:
+def minor_version_difference(current_public_id, deployed_public_id) -> int:
     """Check the minor version difference."""
     current = Version(current_public_id.version)
     deployed = Version(deployed_public_id.version)
@@ -505,15 +474,13 @@ def replace_type_and_public_id_occurrences(
 ) -> str:
     """Replace the public id whenever the type and the id occur in the same row, and NOT when other type names occur."""
     if re.match(f"{type_}.*{old_string}", line) and all(
-        _type not in line for _type in TYPES.difference({type_})
+        _type not in line for _type in TYPES_SET.difference({type_})
     ):
         line = line.replace(old_string, new_string)
     return line
 
 
-def replace_in_yamls(
-    content: str, old_public_id: PublicId, new_public_id: PublicId, type_: str
-) -> str:
+def replace_in_yamls(content: str, old_public_id, new_public_id, type_: str) -> str:
     """
     Replace the public id in configuration files (also nested in .md files).
 
@@ -547,7 +514,7 @@ def replace_in_yamls(
 
 
 def replace_in_protocol_readme(
-    fp: Path, content: str, old_public_id: PublicId, new_public_id: PublicId, type_: str
+    fp: Path, content: str, old_public_id, new_public_id, type_: str
 ) -> str:
     """
     Replace the version id in the protocol specification in the protcol's README.
@@ -574,7 +541,7 @@ def replace_in_protocol_readme(
     return content
 
 
-def file_should_be_processed(content: str, old_public_id: PublicId) -> bool:
+def file_should_be_processed(content: str, old_public_id) -> bool:
     """Check if the file should be processed."""
     old_string = str(old_public_id)
     return (
@@ -595,7 +562,7 @@ def bump_version_in_yaml(
 
 
 class Updater:
-    """PAckage versions updter tool."""
+    """Package versions updater tool."""
 
     def __init__(  # pylint: disable=too-many-positional-arguments
         self, ask_version, update_version, replace_by_default, no_interactive, context
@@ -683,7 +650,7 @@ class Updater:
             )
             self.process_package(package_id, is_ambiguous)
 
-    def process_package(self, package_id: PackageId, is_ambiguous: bool) -> None:
+    def process_package(self, package_id, is_ambiguous: bool) -> None:
         """Process a package.
 
         - check version in registry
@@ -703,7 +670,7 @@ class Updater:
             current_public_id, configuration_file_path, type_plural, is_ambiguous
         )
 
-    def get_new_package_version(self, current_public_id: PublicId) -> str:
+    def get_new_package_version(self, current_public_id) -> str:
         """Get new package version according to command line options provided."""
 
         ver = Version(current_public_id.version)
@@ -734,7 +701,7 @@ class Updater:
 
     def bump_package_version(
         self,
-        current_public_id: PublicId,
+        current_public_id,
         configuration_file_path: Path,
         type_: str,
         is_ambiguous: bool = False,
@@ -775,8 +742,8 @@ class Updater:
     def inplace_change(  # pylint: disable=too-many-positional-arguments
         self,
         fp: Path,
-        old_public_id: PublicId,
-        new_public_id: PublicId,
+        old_public_id,
+        new_public_id,
         type_: str,
         is_ambiguous: bool,
     ) -> None:
@@ -844,7 +811,12 @@ class Updater:
         return "".join(lines)
 
 
-@click.command()
+# ---------------------------------------------------------------------------
+# Click command -- kept here so cli.py can import and register it.
+# ---------------------------------------------------------------------------
+
+
+@click.command(name="update-pkg-versions")
 @click.option(
     "--ask-version",
     "-a",
@@ -877,7 +849,7 @@ class Updater:
     "--context",
     "-C",
     type=int,
-    help="Don't ask user confirmation for replacement.",
+    help="The number of above/below rows to display.",
     default=3,
 )
 @click.option(
@@ -887,13 +859,9 @@ class Updater:
     help="If --no-interactive is set, apply the replacement (default: False).",
 )
 def command(ask_version, update_version, replace_by_default, no_interactive, context):
-    """Run cli command."""
+    """Update package versions relative to last release."""
     if update_version is None:
         update_version = "minor"
     Updater(
         ask_version, update_version, replace_by_default, no_interactive, context
     ).run()
-
-
-if __name__ == "__main__":
-    command()  # pylint: disable=no-value-for-parameter

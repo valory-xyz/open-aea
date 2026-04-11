@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -19,31 +18,20 @@
 #
 # ------------------------------------------------------------------------------
 
-"""
+r"""
 Bump the AEA version throughout the code base.
 
-usage: bump_aea_version [-h] [--new-version NEW_VERSION]
-                        [-p KEY=VALUE [KEY=VALUE ...]] [--no-fingerprints]
-                        [--only-check]
+This module contains the logic originally in ``scripts/bump_aea_version.py``.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --new-version NEW_VERSION
-                        The new AEA version.
-  -p KEY=VALUE [KEY=VALUE ...], --plugin-new-version KEY=VALUE [KEY=VALUE ...]
-                        Set a number of key-value pairs plugin-name=new-
-                        plugin-version
-  --no-fingerprints     Skip the computation of fingerprints.
-  --only-check          Only check the need of upgrade.
+Example usage from the CLI wrapper::
 
+    bump_aea_version --new-version 1.1.0 \\
+        -p open-aea-ledger-fetchai=2.0.0 \\
+        -p open-aea-ledger-ethereum=3.0.0
 
-Example of usage:
-
-python scripts/bump_aea_version.py --new-version 1.1.0 -p open-aea-ledger-fetchai=2.0.0 -p open-aea-ledger-ethereum=3.0.0
-python scripts/bump_aea_version.py --only-check
+    bump_aea_version --only-check
 """
 
-import argparse
 import logging
 import operator
 import re
@@ -68,7 +56,7 @@ logging.basicConfig(
 PatternByPath = Dict[Path, str]
 
 AEA_DIR = Path("aea")
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path.cwd()
 
 PLUGINS_DIR = Path("plugins")
 ALL_PLUGINS = tuple(PLUGINS_DIR.iterdir())
@@ -382,33 +370,6 @@ class PythonPackageVersionBumper:
         return diff != ""
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse arguments."""
-
-    parser = argparse.ArgumentParser("bump_aea_version")
-    parser.add_argument(
-        "--new-version", type=str, required=False, help="The new AEA version."
-    )
-    parser.add_argument(
-        "-p",
-        "--plugin-new-version",
-        metavar="KEY=VALUE",
-        nargs="+",
-        help="Set a number of key-value pairs plugin-name=new-plugin-version",
-        default={},
-    )
-    parser.add_argument(
-        "--no-fingerprints",
-        action="store_true",
-        help="Skip the computation of fingerprints.",
-    )
-    parser.add_argument(
-        "--only-check", action="store_true", help="Only check the need of upgrade."
-    )
-    arguments_ = parser.parse_args()
-    return arguments_
-
-
 def make_aea_bumper(new_aea_version: Version) -> PythonPackageVersionBumper:
     """Build the AEA Python package version bumper."""
     aea_version_bumper = PythonPackageVersionBumper(
@@ -505,20 +466,26 @@ def only_check_bump_needed() -> int:
     return 0
 
 
-def bump(arguments: argparse.Namespace) -> int:
+def bump(
+    new_version: Optional[str],
+    plugin_new_version: List[str],
+    no_fingerprints: bool,
+) -> int:
     """
     Bump versions.
 
-    :param arguments: arguments from argparse
+    :param new_version: the new AEA version string (or None to skip AEA bump).
+    :param plugin_new_version: list of ``plugin-name=version`` strings.
+    :param no_fingerprints: if True, skip fingerprint computation.
     :return: the return code
     """
-    new_plugin_versions = parse_plugin_versions(arguments.plugin_new_version)
-    logging.info(f"Parsed arguments: {arguments}")
+    new_plugin_versions = parse_plugin_versions(plugin_new_version)
+    logging.info(f"New version: {new_version}")
     logging.info(f"Parsed plugin versions: {new_plugin_versions}")
 
     have_updated_specifier_set = False
-    if arguments.new_version is not None:
-        new_aea_version = Version(arguments.new_version)
+    if new_version is not None:
+        new_aea_version = Version(new_version)
         aea_version_bumper = make_aea_bumper(new_aea_version)
         aea_version_bumper.run()
         have_updated_specifier_set = aea_version_bumper.result
@@ -531,7 +498,7 @@ def bump(arguments: argparse.Namespace) -> int:
 
     logging.info("OK")
     return_code = 0
-    if arguments.no_fingerprints:
+    if no_fingerprints:
         logging.info(
             "Not updating fingerprints, since --no-fingerprints was specified."
         )
@@ -547,8 +514,25 @@ def bump(arguments: argparse.Namespace) -> int:
     return return_code
 
 
-def main() -> None:
-    """Run the script."""
+def run_bump(
+    new_version: Optional[str] = None,
+    plugin_new_version: Optional[List[str]] = None,
+    no_fingerprints: bool = False,
+    only_check: bool = False,
+) -> None:
+    """
+    Run the bump-aea-version workflow.
+
+    This is the main entry point intended to be called from a CLI wrapper.
+
+    :param new_version: the new AEA version string (or None).
+    :param plugin_new_version: list of ``plugin-name=version`` strings.
+    :param no_fingerprints: if True, skip fingerprint computation.
+    :param only_check: if True, only check whether a bump is needed.
+    """
+    if plugin_new_version is None:
+        plugin_new_version = []
+
     repo = Repo(str(ROOT_DIR))
     if repo.is_dirty():
         logging.info(
@@ -556,13 +540,8 @@ def main() -> None:
         )
         sys.exit(1)
 
-    arguments = parse_args()
-    if arguments.only_check:
+    if only_check:
         sys.exit(only_check_bump_needed())
 
-    return_code = bump(arguments)
+    return_code = bump(new_version, plugin_new_version, no_fingerprints)
     sys.exit(return_code)
-
-
-if __name__ == "__main__":
-    main()

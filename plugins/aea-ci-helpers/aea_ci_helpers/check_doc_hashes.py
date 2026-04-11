@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -20,7 +19,6 @@
 
 """This module contains the tools for autoupdating ipfs hashes in the documentation."""
 
-import argparse
 import re
 import sys
 from pathlib import Path
@@ -48,8 +46,6 @@ AEA_COMMAND_REGEX = rf"(?P<full_cmd>{CLI_REGEX} {CMD_REGEX} (?:{VENDOR_REGEX}\/{
 FULL_PACKAGE_REGEX = rf"(?P<full_package>(?:{VENDOR_REGEX}\/{PACKAGE_REGEX}:{VERSION_REGEX}?:?)?(?P<hash>{IPFS_HASH_REGEX}))"
 PACKAGE_TABLE_REGEX = rf"\| {PACKAGE_TYPE_REGEX}\/{VENDOR_REGEX}\/{PACKAGE_REGEX}\/{VERSION_REGEX}(\s|\|)*(?P<hash>{IPFS_HASH_REGEX})\s*\|"
 
-ROOT_DIR = Path(__file__).parent.parent
-
 
 def read_file(filepath: str) -> str:
     """Loads a file into a string"""
@@ -71,7 +67,6 @@ class Package:  # pylint: disable=too-few-public-methods
 
     def __init__(self, package_id_str: str, package_hash: str) -> None:
         """Constructor"""
-
         self.package_id = PackageId.from_uri_path(package_id_str)
         self.vendor = self.package_id.author
         self.type = self.package_id.package_type.to_plural()
@@ -96,7 +91,7 @@ class Package:  # pylint: disable=too-few-public-methods
 
         self.last_version = None
         yaml_file_path = Path(
-            ROOT_DIR,
+            Path.cwd(),
             "packages",
             self.vendor,
             self.type + "s",
@@ -159,8 +154,8 @@ class PackageHashManager:
         """Get a hash given its package line"""
 
         try:
-            m_command = re.match(AEA_COMMAND_REGEX, package_line)
-            m_package = re.match(FULL_PACKAGE_REGEX, package_line)
+            m_command = re.match(AEA_COMMAND_REGEX, package_line)  # type: ignore
+            m_package = re.match(FULL_PACKAGE_REGEX, package_line)  # type: ignore
 
             # No match
             if not m_command and not m_package:
@@ -240,7 +235,6 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     fix: bool = False,
 ) -> None:
     """Fix ipfs hashes in the docs"""
-
     all_md_files_docs = Path("docs").rglob("*.md")
     all_md_files_tests = Path("tests/test_docs/test_bash_yaml/md_files").rglob("*.md")
     all_md_files = [
@@ -257,7 +251,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     # Fix full commands in docs
     for md_file in all_md_files:
         content = read_file(str(md_file))
-        for match in [m.groupdict() for m in re.finditer(AEA_COMMAND_REGEX, content)]:
+        for match in [m.groupdict() for m in re.finditer(AEA_COMMAND_REGEX, content)]:  # type: ignore
             matches += 1
             doc_full_cmd = match["full_cmd"]
             doc_cmd = match["cmd"]
@@ -299,7 +293,7 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
     all_py_files = [Path("aea", "configurations", "constants.py")]
     for py_file in all_py_files:
         content = read_file(str(py_file))
-        for match in [m.groupdict() for m in re.finditer(FULL_PACKAGE_REGEX, content)]:
+        for match in [m.groupdict() for m in re.finditer(FULL_PACKAGE_REGEX, content)]:  # type: ignore
             full_package = match["full_package"]
             py_hash = match["hash"]
             expected_hash = package_manager.get_hash_by_package_line(
@@ -334,10 +328,11 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
                 )
 
     # Fix hashes in package list
-    package_list_file = Path(ROOT_DIR, "docs", "package_list.md")
+    root_dir = Path.cwd()
+    package_list_file = Path(root_dir, "docs", "package_list.md")
     content = read_file(str(package_list_file))
 
-    for match in [m.groupdict() for m in re.finditer(PACKAGE_TABLE_REGEX, content)]:
+    for match in [m.groupdict() for m in re.finditer(PACKAGE_TABLE_REGEX, content)]:  # type: ignore
         expected_hash = package_manager.get_hash_by_attributes(
             match["package_type"], match["vendor"], match["package"]
         )
@@ -378,10 +373,3 @@ def check_ipfs_hashes(  # pylint: disable=too-many-locals,too-many-statements
         sys.exit(1)
 
     print("OK")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fix", action="store_true")
-    args = parser.parse_args()
-    check_ipfs_hashes(fix=args.fix)

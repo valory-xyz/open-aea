@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2021-2022 Valory AG
+#   Copyright 2021-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,28 +17,20 @@
 #
 # ------------------------------------------------------------------------------
 
-"""This CLI tool publishes the local packages to an IPFS node."""
+"""Publish local packages to an IPFS node."""
 
-from argparse import ArgumentParser, Namespace
 from glob import glob
 from pathlib import Path
 from typing import List, Union
 
-from aea_cli_ipfs.core import register_package  # type: ignore
-from aea_cli_ipfs.ipfs_utils import IPFSDaemon, IPFSTool  # type: ignore
-
-
-def get_arguments() -> Namespace:
-    """Returns cli arguments."""
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--package-dir", "-pd", type=str, default="./packages", required=False
-    )
-    return parser.parse_args()
-
 
 def get_package_list(packages_dir: Union[str, Path]) -> List[Path]:
-    """Returns a list of package directories."""
+    """
+    Return a list of package directories.
+
+    :param packages_dir: path to the packages directory.
+    :return: list of package directory paths.
+    """
     packages_dir = Path(packages_dir).absolute() / "*" / "*" / "*"
     return [
         Path(package_path)
@@ -48,10 +39,16 @@ def get_package_list(packages_dir: Union[str, Path]) -> List[Path]:
     ]
 
 
-def main() -> None:
-    """Main function."""
-    args = get_arguments()
-    packages = get_package_list(args.package_dir)
+def publish_local(package_dir: str = "./packages") -> None:
+    """
+    Publish local packages to an IPFS node.
+
+    :param package_dir: path to the packages directory.
+    """
+    from aea_cli_ipfs.core import register_package  # type: ignore
+    from aea_cli_ipfs.ipfs_utils import IPFSDaemon, IPFSTool  # type: ignore
+
+    packages = get_package_list(package_dir)
     ipfs_tool = IPFSTool(addr="/ip4/127.0.0.1/tcp/5001/http")
     with IPFSDaemon():
         for package_path in packages:
@@ -59,7 +56,3 @@ def main() -> None:
                 ipfs_tool=ipfs_tool, dir_path=str(package_path), no_pin=False
             )
     print("Done!")
-
-
-if __name__ == "__main__":
-    main()
