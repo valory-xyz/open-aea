@@ -122,7 +122,28 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 1. ~~**Finish libp2p_node circuit v2 migration.**~~ ✓ done — see "Circuit v2 relay routing parity ✓ restored" above. Both relay tests now pass on v0.33; full v0.8 routing parity is preserved (with the upstream wire-protocol break documented in the connection's README).
 
-2. **`libs/go/aea_end2end` Python↔Go harness modernization.** The `test_fipa_end2end.py` test harness predates the `fetchai → valory` namespace move and predates the cosmos-key-only p2p_libp2p API. Partial fixes landed in `d8559e768` (import paths, `package_registry_src_rel`, cosmos connection key) but the internal buyer/seller flow still mixes fetchai and cosmos key usage in ways the modern `valory/p2p_libp2p:0.1.0` rejects. Full run still fails at agent startup. Fixing it would give us a real Python↔Go wire-compat test. In the meantime, wire compat is validated indirectly via (a) the `aealite/wallet/wallet_test.go` round-trip, (b) the `aealite/protocols` unit tests, and (c) the fact that the Python framework successfully loads the updated connection package with its new fingerprints.
+2. ~~**`libs/go/aea_end2end` Python↔Go harness modernization.**~~ ✓ done — `test_fipa_end2end.py` now passes end-to-end (`1 passed in 10.11s`), giving us a real Python AEA ↔ Go aealite wire-compat check running over a live libp2p ACN network. Together with the `dht/dhtpeer/` relay routing tests, this is the strongest validation we have for the libp2p_node bump.
+
+   The harness was written against pre-bump `fetchai/p2p_libp2p:0.21.0`, when `fetchai` was the framework's `DEFAULT_LEDGER` and the connection only needed a single fetchai key for both the agent identity and the connection identity. Three breaking upstream changes had to be threaded through:
+
+   1. **Package layout move**: `packages/fetchai/connections/p2p_libp2p` → `packages/valory/connections/p2p_libp2p`. The `_make_libp2p_connection` helper also relocated from `tests/conftest.py` to `packages/valory/connections/test_libp2p/tests/base.py`.
+   2. **`DEFAULT_LEDGER` flipped**: `fetchai` → `ethereum`. So `cls.generate_private_key()` (no args) now creates `ethereum_private_key.txt`, and `aea get-address fetchai` fails because the buyer no longer has a fetchai key.
+   3. **Multi-ledger connection requirements**: `valory/p2p_libp2p:0.1.0` now needs three keys: the main agent key (default ethereum), a `cosmos` key for the ACN node identity (`connection.yaml: ledger_id: cosmos`), and an `ethereum` key for the cert request (`cert_requests[0].ledger_id: ethereum`) — the latter two both added with `connection=True` so `aea issue-certificates` finds them.
+
+   Fixes landed in `test_fipa_end2end.py`:
+   - Import path migrations: `packages.fetchai.connections.p2p_libp2p` → `packages.valory.connections.p2p_libp2p`; `_make_libp2p_connection` from the new test_libp2p location.
+   - `package_registry_src_rel` rebound to `Path(__file__).resolve().parent.parent.parent.parent / "packages"` so it doesn't resolve to `/Users/packages` when pytest is run from the repo root.
+   - Connection public-id updated to `valory/p2p_libp2p:0.1.0` everywhere (including the `get-multiaddress` `-i` argument).
+   - Three-key setup wired in: default-ledger key as agent identity AND cert signer (via `add_private_key(connection=True)`), plus a cosmos key for the ACN node identity (`add_private_key("cosmos", ..., connection=True)`).
+   - `get-multiaddress` switched to `cosmos` ledger, `get-address` switched to `ethereum`.
+   - Buyer's libp2p `local_uri` / `public_uri` / `delegate_uri` pinned to `127.0.0.1:9000` / `9000` / `11000` via `set_config` so they don't drift onto a port the seller-side connection_node will also try to bind.
+   - Seller-side `_make_libp2p_connection` given explicit `port=12234, delegate_port=12235` (rather than the default `next(ports)` allocator that picks `10234`/`10235`, which can collide with leftover libp2p_node subprocesses from previous failed test runs).
+   - `ENV_TEMPLATE`'s `AEA_P2P_DELEGATE_PORT` aligned to `12235` so the Go seller binary connects to the seller-side connection_node's delegate at the same port the connection_node is exposing.
+   - Teardown's hardcoded `libp2p_node_10234.log` filename updated to `12234` and gated behind `if exists()` so a previous-run failure path doesn't mask the real test result on subsequent runs.
+
+   **What the harness now exercises end-to-end**: Python AEA buyer (with libp2p_node binary on port 9000) → ACN routing → seller-side Python connection_node (libp2p_node binary on port 12234) → Go aealite seller binary (delegate-client to 12235) → FIPA dialogue (cfp / propose / accept / match_accept / inform) → end-of-protocol confirmation.
+
+   **Currently runs locally only.** Wiring the test into CI as a Python integration job (alongside `golang_checks`, which currently only builds `aea_end2end` but doesn't run the Python harness) is a small follow-up.
 
 3. **`ecdsa>=0.19.2` pin bump** for `aea-ledger-cosmos` (see the "ecdsa" section under "Dependabot alerts requiring action"). API compat verified locally; blocked on confirming downstream consumer compatibility before flipping the pin in 4 files.
 

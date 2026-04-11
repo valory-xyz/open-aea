@@ -160,10 +160,31 @@ class Base(AEATestCaseEmpty):
         super(Base, cls).setup_class()
         cls.add_item("connection", "valory/p2p_libp2p:0.1.0")
         cls.add_item("protocol", "fetchai/fipa:1.0.0")
+        # Pin the buyer's libp2p ports to a unique range so they don't
+        # collide with the seller-side _make_libp2p_connection (which
+        # picks ports starting at 10234 from the shared `ports` counter)
+        # or with the seller-side Go binary's delegate listener.
+        cls.set_config(
+            "vendor.valory.connections.p2p_libp2p.config.local_uri",
+            "127.0.0.1:9000",
+        )
+        cls.set_config(
+            "vendor.valory.connections.p2p_libp2p.config.public_uri",
+            "127.0.0.1:9000",
+        )
+        cls.set_config(
+            "vendor.valory.connections.p2p_libp2p.config.delegate_uri",
+            "127.0.0.1:11000",
+        )
+        # Main agent ledger (DEFAULT_LEDGER, currently ethereum). This same
+        # key doubles as the cert-request signer for the libp2p connection
+        # because connection.yaml says `cert_requests[0].ledger_id: ethereum`.
         cls.generate_private_key()
         cls.add_private_key()
-        # p2p_libp2p now requires a cosmos key for the ACN connection identity
-        cls.generate_private_key("cosmos", "cosmos_private_key.txt")
+        cls.add_private_key(connection=True)
+        # valory/p2p_libp2p:0.1.0 also needs a cosmos key for the ACN node
+        # identity (`ledger_id: cosmos` in connection.yaml).
+        cls.generate_private_key("cosmos")
         cls.add_private_key("cosmos", "cosmos_private_key.txt", connection=True)
         cls.run_cli_command("build", cwd=cls._get_cwd())
         cls.run_cli_command("issue-certificates", cwd=cls._get_cwd())
@@ -182,8 +203,8 @@ export AEA_P2P_POR_SERVICE_ID="acn"
 export AEA_P2P_POR_LEDGER_ID="fetchai"
 export AEA_P2P_POR_PEER_PUBKEY="{peer_pubkey}"
 export AEA_P2P_POR_SIGNATURE="{signature}"
-export AEA_P2P_DELEGATE_HOST="localhost"
-export AEA_P2P_DELEGATE_PORT=11234
+export AEA_P2P_DELEGATE_HOST="127.0.0.1"
+export AEA_P2P_DELEGATE_PORT=12235
 """
 
 
@@ -203,8 +224,15 @@ class FipaSellerAgent:
         cls.loop = asyncio.new_event_loop()
         cls.temp_dir = TemporaryDirectory()
 
+        # Pin the seller-side connection_node to a port range that doesn't
+        # overlap with the buyer (9000/11000) or the Go seller binary's
+        # delegate-client target (12235 from ENV_TEMPLATE).
         cls.connection_node = _make_libp2p_connection(
-            data_dir=cls.temp_dir.name, delegate=True, entry_peers=[str(multi_addr)]
+            data_dir=cls.temp_dir.name,
+            delegate=True,
+            entry_peers=[str(multi_addr)],
+            port=12234,
+            delegate_port=12235,
         )
 
         cls.loop.run_until_complete(cls.connection_node.node.start())
@@ -258,8 +286,9 @@ class FipaSellerAgent:
     @classmethod
     def stop(cls):
         """Stop agent and tear down."""
-        node_log = Path(cls.temp_dir.name) / "libp2p_node_10234.log"
-        print(node_log.read_text())
+        node_log = Path(cls.temp_dir.name) / "libp2p_node_12234.log"
+        if node_log.exists():
+            print(node_log.read_text())
         cls.loop.run_until_complete(cls.connection_node.node.stop())
         cls.proc.terminate()
         if exec_filename.exists():
@@ -272,18 +301,26 @@ class TestFipaEnd2End(Base):
 
     def test_run(self):
         """Run the echo skill sequence."""
+        # Connection identity is cosmos (LIBP2P_LEDGER), and the connection
+        # public-id moved into the valory namespace as part of the package
+        # reorganisation.
         result = self.invoke(
             "get-multiaddress",
-            "fetchai",
+            "cosmos",
             "-c",
             "-i",
-            "fetchai/p2p_libp2p:0.21.0",
+            "valory/p2p_libp2p:0.1.0",
             "-u",
             "public_uri",
         )
         assert result.exit_code == 0
         multi_addr = result.stdout.strip()
-        result = self.invoke("get-address", "fetchai",)
+        # Buyer's main address is on the default ledger (currently ethereum).
+        # The seller never sends back to the buyer's address; the
+        # FipaDialogues helper only needs *some* unique address to keep
+        # dialogue state, so the ledger choice here doesn't have to match
+        # the seller's hardcoded fetchai identity.
+        result = self.invoke("get-address", "ethereum",)
         assert result.exit_code == 0
         my_addr = result.stdout.strip()
         builder = AEABuilder.from_aea_project(self._get_cwd())
