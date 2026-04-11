@@ -76,6 +76,16 @@ jobs:
           pipenv run python setup.py sdist bdist_wheel
           cd ../..
 
+          echo Processing aea-ci-helpers
+          cd plugins/aea-ci-helpers
+          pipenv run python setup.py sdist bdist_wheel
+          cd ../..
+
+          echo Processing aea-dev-helpers
+          cd plugins/aea-dev-helpers
+          pipenv run python setup.py sdist bdist_wheel
+          cd ../..
+
       - name: Publish open-aea Framework to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -147,6 +157,22 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
           skip-existing: true
           packages-dir: plugins/aea-ledger-fetchai/dist/
+
+      - name: Publish open-aea-ci-helpers Plugin to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+          packages-dir: plugins/aea-ci-helpers/dist/
+
+      - name: Publish open-aea-dev-helpers Plugin to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+          packages-dir: plugins/aea-dev-helpers/dist/
 
   publish-aea-packages:
     name: Push Open AEA Packages

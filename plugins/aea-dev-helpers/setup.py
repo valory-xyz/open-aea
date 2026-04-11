@@ -23,7 +23,7 @@ from setuptools import find_packages, setup  # type: ignore
 
 setup(
     name="open-aea-dev-helpers",
-    version="0.1.0",
+    version="2.1.0",
     author="Valory AG",
     license="Apache-2.0",
     description="Development and release helper utilities for AEA-based projects.",
