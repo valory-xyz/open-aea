@@ -239,7 +239,7 @@ class PackagesSource(click.ParamType):
         """Return the metavar default for this param if it provides one."""
         return "SOURCE"  # pragma: no cover
 
-    def convert(self, value: str, param: Any, ctx: click.Context) -> str:
+    def convert(self, value: str, param: Any, ctx: Optional[click.Context]) -> str:
         """Convert the value."""
         if PACKAGE_SOURCE_RE.match(value) is None:
             raise click.ClickException(
@@ -255,7 +255,9 @@ class PyPiDependency(click.ParamType):
         """Return the metavar default for this param if it provides one."""
         return "DEPENDENCY"  # pragma: no cover
 
-    def convert(self, value: str, param: Any, ctx: click.Context) -> Dependency:
+    def convert(
+        self, value: str, param: Any, ctx: Optional[click.Context]
+    ) -> Dependency:
         """Convert the value."""
         try:
             return Dependency.from_string(value)

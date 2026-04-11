@@ -161,7 +161,7 @@ class PackageVersion:
         if self.is_any or other.is_any or self.is_latest or other.is_latest:
             error_msg = "Comparison not supported between"
             raise TypeError(f"{error_msg} {self._version} and {other._version}")
-        return self._version < other._version
+        return Version(str(self._version)) < Version(str(other._version))
 
 
 class PackageType(Enum):

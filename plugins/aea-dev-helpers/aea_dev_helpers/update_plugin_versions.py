@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -19,18 +18,17 @@
 #
 # ------------------------------------------------------------------------------
 
-"""
+r"""
 Bump the versions of AEA plugins throughout the code base.
 
-    python scripts/update_plugin_versions.py --update "plugin-name,version" [--update ...]
+This module contains the logic originally in ``scripts/update_plugin_versions.py``.
 
-Example of usage:
+Example usage from the CLI wrapper::
 
-    python scripts/update_plugin_versions.py --update "open-aea-ledger-fetchai,0.2.0" --update "open-aea-ledger-ethereum,0.3.0"
-
+    aea-dev update-plugin-versions --update "open-aea-ledger-fetchai,0.2.0" \
+        --update "open-aea-ledger-ethereum,0.3.0"
 """
 
-import argparse
 import pprint
 import re
 import sys
@@ -43,13 +41,17 @@ from packaging.version import Version
 from aea.cli.ipfs_hash import update_hashes
 from aea.helpers.base import compute_specifier_from_version
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path.cwd()
 PLUGINS_DIR = Path("plugins")
 SETUP_PY_NAME_REGEX = re.compile(r"\Wname=\"(.*)\",")
 SETUP_PY_VERSION_REGEX = re.compile(r"\Wversion=\"(.*)\",")
 
-
 IGNORE_DIRS = [Path(".git")]
+
+
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
 
 
 def update_plugin_setup(
@@ -219,31 +221,24 @@ def name_version_pair(s: str) -> Tuple[str, str]:
         name, version = [part.strip() for part in s.split(",")]
         return name, version
     except Exception:
-        raise argparse.ArgumentTypeError(f"Name-version pair not correct: '{s}'")
+        raise ValueError(f"Name-version pair not correct: '{s}'")
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse arguments."""
-    parser = argparse.ArgumentParser("bump_aea_version")
-    parser.add_argument(
-        "--update",
-        type=name_version_pair,
-        metavar="'NAME,VERSION'",
-        required=True,
-        action="append",
-        help="A comma-separated pair: 'plugin-name, new-version'.",
-    )
-    parser.add_argument("--no-fingerprint", action="store_true")
-    arguments_ = parser.parse_args()
-    return arguments_
+def run_update_plugin_versions(
+    updates: List[Tuple[str, str]],
+    no_fingerprint: bool = False,
+) -> None:
+    """
+    Run the update-plugin-versions workflow.
 
+    This is the main entry point intended to be called from a CLI wrapper.
 
-def main() -> None:
-    """Run the script."""
-    arguments = parse_args()
+    :param updates: list of (plugin-name, new-version) tuples.
+    :param no_fingerprint: if True, skip fingerprint computation.
+    """
     current_versions_by_name: Dict[str, Version] = get_plugin_names_and_versions()
     new_versions_by_name: Dict[str, Version] = dict(
-        (name, Version(version)) for name, version in arguments.update
+        (name, Version(version)) for name, version in updates
     )
 
     print(
@@ -276,7 +271,7 @@ def main() -> None:
         )
 
     return_code = 0
-    if arguments.no_fingerprint:
+    if no_fingerprint:
         print("Not updating fingerprints, since --no-fingerprint was specified.")
     elif not have_updated_specifier_set:
         print("Not updating fingerprints, since no specifier set has been updated.")
@@ -286,7 +281,3 @@ def main() -> None:
             packages_dir=ROOT_DIR / "packages",
         )
     exit_with_message("Done!", exit_code=return_code)
-
-
-if __name__ == "__main__":
-    main()

@@ -88,7 +88,7 @@ class CliRunner(ClickCliRunner):
                 )
             cm = nullcontext()
         else:
-            cm = self.isolation(input=input, env=env, color=color)
+            cm = self.isolation(input=input, env=env, color=color)  # type: ignore[assignment]
 
         with cast(ContextManager, cm) as outstreams:
             if isinstance(args, str):
@@ -138,7 +138,7 @@ class CliRunner(ClickCliRunner):
             stdout_bytes=stdout,
             stderr_bytes=stderr,  # type: ignore
             output_bytes=stdout + stderr,
-            exit_code=exit_code,
+            exit_code=int(exit_code) if exit_code is not None else 0,
             exception=exception,
             exc_info=exc_info,  # type: ignore
             return_value=None,

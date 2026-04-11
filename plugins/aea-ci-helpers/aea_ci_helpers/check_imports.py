@@ -42,16 +42,36 @@ from typing import (
     cast,
 )
 
-from pip._internal.commands.show import search_packages_info  # type: ignore
+# Lazy imports — these are deferred because:
+# - pip._internal may not be installed in all environments
+# - aea may be uninstalled at runtime (dependencies-check uninstalls it)
+search_packages_info = None  # type: ignore
+crypto_registry = None  # type: ignore
 
-AEA_ROOT_DIR = Path(__file__).parent.parent
 
-sys.path.append(str(AEA_ROOT_DIR))
+def _ensure_lazy_imports() -> None:
+    """Import pip and aea lazily, adding source tree to sys.path if needed."""
+    global search_packages_info, crypto_registry  # pylint: disable=global-statement
+    if search_packages_info is None:
+        from pip._internal.commands.show import (
+            search_packages_info as _spi,  # type: ignore  # pylint: disable=import-outside-toplevel
+        )
 
-from aea.crypto.registries import (  # noqa # pylint: disable=wrong-import-position
-    crypto_registry,
-)
+        search_packages_info = _spi
+    if crypto_registry is None:
+        # Add the repo root to sys.path so aea can be found from source
+        # even when it's not pip-installed
+        repo_root = str(Path.cwd())
+        if repo_root not in sys.path:
+            sys.path.insert(0, repo_root)
+        from aea.crypto.registries import (
+            crypto_registry as _cr,  # pylint: disable=import-outside-toplevel
+        )
 
+        crypto_registry = _cr
+
+
+AEA_ROOT_DIR = Path.cwd()
 IGNORE: Set[str] = {"pkg_resources", "pip._internal.commands.show"}
 DEP_NAME_RE = re.compile(r"(^[^=><\[]+)", re.I)  # type: ignore
 
@@ -210,6 +230,7 @@ class CheckTool:
     @classmethod
     def run(cls) -> None:
         """Run dependency check."""
+        _ensure_lazy_imports()
         print("Dependencies check report:")
         print("==========================")
         files_and_modules = ImportsTool.list_all_pyfiles_with_3rdpart_imports(

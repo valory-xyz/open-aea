@@ -6,7 +6,7 @@ description: dummy_connection connection description.
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  __init__.py: bafybeighbhf7rl7z2tprbqfokhtmuai574pr7za3msbjyzeihplrxmyh2a
+  __init__.py: bafybeibw3svthabjxjok2lwfswme4ijycszzp25d7rofzzabbonj2bbwaq
   connection.py: bafybeicpgncdlkq5nu3ixxm2ma4hq7gbecvzxef4vvtwff44gtecz5wae4
 fingerprint_ignore_patterns: []
 build_entrypoint: path/to/script.py

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -20,60 +19,65 @@
 # ------------------------------------------------------------------------------
 # pylint: disable=cyclic-import
 
-"""This script will update the symlinks of the project, cross-platform compatible."""
+"""Update symlinks for the project, cross-platform compatible."""
 
 import contextlib
-import inspect
 import os
 import sys
 import traceback
 from functools import reduce
 from pathlib import Path
-from typing import Generator, List, Tuple, Union
+from typing import Generator, List, Optional, Tuple, Union
 
-SCRIPTS_PATH = Path(os.path.dirname(inspect.getfile(inspect.currentframe())))  # type: ignore
-ROOT_PATH = SCRIPTS_PATH.parent.absolute()
-TEST_DATA = ROOT_PATH / "tests" / "data"
-TEST_DUMMY_AEA_DIR = TEST_DATA / "dummy_aea"
-FETCHAI_PACKAGES = ROOT_PATH / "packages" / "fetchai"
-OPEN_AEA_PACKAGES = ROOT_PATH / "packages" / "open_aea"
 
-SYMLINKS: List[Tuple[Path, Path]] = [
-    (TEST_DUMMY_AEA_DIR / "skills" / "dummy", TEST_DATA / "dummy_skill"),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "protocols" / "default",
-        FETCHAI_PACKAGES / "protocols" / "default",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "open_aea" / "protocols" / "signing",
-        OPEN_AEA_PACKAGES / "protocols" / "signing",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "protocols" / "state_update",
-        FETCHAI_PACKAGES / "protocols" / "state_update",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "protocols" / "fipa",
-        FETCHAI_PACKAGES / "protocols" / "fipa",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "protocols" / "oef_search",
-        FETCHAI_PACKAGES / "protocols" / "oef_search",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "connections" / "local",
-        FETCHAI_PACKAGES / "connections" / "local",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "contracts" / "erc1155",
-        FETCHAI_PACKAGES / "contracts" / "erc1155",
-    ),
-    (
-        TEST_DUMMY_AEA_DIR / "vendor" / "fetchai" / "skills" / "error",
-        FETCHAI_PACKAGES / "skills" / "error",
-    ),
-]
-"""A list of pairs: (link_path, target_path)"""
+def _get_symlinks(root_path: Path) -> List[Tuple[Path, Path]]:
+    """
+    Build the list of (link_path, target_path) pairs relative to the given root.
+
+    :param root_path: the repository root path.
+    :return: list of (link_path, target_path) tuples.
+    """
+    test_data = root_path / "tests" / "data"
+    test_dummy_aea_dir = test_data / "dummy_aea"
+    fetchai_packages = root_path / "packages" / "fetchai"
+    open_aea_packages = root_path / "packages" / "open_aea"
+
+    symlinks: List[Tuple[Path, Path]] = [
+        (test_dummy_aea_dir / "skills" / "dummy", test_data / "dummy_skill"),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "protocols" / "default",
+            fetchai_packages / "protocols" / "default",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "open_aea" / "protocols" / "signing",
+            open_aea_packages / "protocols" / "signing",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "protocols" / "state_update",
+            fetchai_packages / "protocols" / "state_update",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "protocols" / "fipa",
+            fetchai_packages / "protocols" / "fipa",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "protocols" / "oef_search",
+            fetchai_packages / "protocols" / "oef_search",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "connections" / "local",
+            fetchai_packages / "connections" / "local",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "contracts" / "erc1155",
+            fetchai_packages / "contracts" / "erc1155",
+        ),
+        (
+            test_dummy_aea_dir / "vendor" / "fetchai" / "skills" / "error",
+            fetchai_packages / "skills" / "error",
+        ),
+    ]
+    return symlinks
 
 
 def make_symlink(link_name: str, target: str) -> None:
@@ -109,7 +113,7 @@ def create_symlink(link_path: Path, target_path: Path, root_path: Path) -> int:
 
     The working directory must be the parent of the symbolic link name
     when executing 'create_symlink_crossplatform.sh'. Hence, we
-    need to translate target_path into the relatve path from the
+    need to translate target_path into the relative path from the
     symbolic link directory to the target directory.
 
     So:
@@ -117,7 +121,6 @@ def create_symlink(link_path: Path, target_path: Path, root_path: Path) -> int:
       in order to reach the repository root directory, and chain many "../" paths.
     2) from target_path, compute the relative path to the root
     3) relative_target_path is just the concatenation of the results from step (1) and (2).
-
 
     For instance, given
     - link_path: './directory_1//symbolic_link
@@ -150,17 +153,33 @@ def create_symlink(link_path: Path, target_path: Path, root_path: Path) -> int:
     return 0
 
 
-def main() -> None:
-    """Run main script."""
+def update_symlinks(root_path: Optional[Path] = None) -> None:
+    """
+    Update all symlinks in the project.
+
+    :param root_path: the repository root path. If None, auto-detect.
+    """
+    if root_path is None:
+        # Try to find the repository root by looking for a known marker
+        candidate = Path.cwd()
+        while candidate != candidate.parent:
+            if (candidate / "packages").is_dir() and (candidate / "tests").is_dir():
+                root_path = candidate
+                break
+            candidate = candidate.parent
+        if root_path is None:
+            root_path = Path.cwd()
+
+    symlinks = _get_symlinks(root_path)
     failed = False
-    for link_name, target in SYMLINKS:
+    for link_name, target in symlinks:
         print("Linking {} to {}".format(link_name, target))
         try:
             link_name.unlink()
         except FileNotFoundError:
             pass
         try:
-            return_code = create_symlink(link_name, target, ROOT_PATH)
+            return_code = create_symlink(link_name, target, root_path)
         except Exception as e:  # pylint: disable=broad-except
             exception = e
             return_code = 1
@@ -172,8 +191,5 @@ def main() -> None:
             )
             failed = True
 
-    sys.exit(1 if failed else 0)
-
-
-if __name__ == "__main__":
-    main()
+    if failed:
+        sys.exit(1)

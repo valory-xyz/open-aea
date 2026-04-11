@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
@@ -19,7 +18,11 @@
 #
 # ------------------------------------------------------------------------------
 
-"""This script deploys all new packages to registry."""
+"""
+Deploy all new packages to registry.
+
+This module contains the logic originally in ``scripts/deploy_to_registry.py``.
+"""
 
 import os
 import shutil
@@ -43,6 +46,10 @@ from aea.configurations.constants import (
     DEFAULT_SKILL_CONFIG_FILE,
 )
 
+CLI_LOG_OPTION = ["-v", "OFF"]
+
+DEFAULT_CONFIG_FILE_PATHS: List[Path] = []
+
 CONFIG_FILE_NAMES: List[str] = [
     DEFAULT_AEA_CONFIG_FILE,
     DEFAULT_SKILL_CONFIG_FILE,
@@ -50,10 +57,6 @@ CONFIG_FILE_NAMES: List[str] = [
     DEFAULT_CONTRACT_CONFIG_FILE,
     DEFAULT_PROTOCOL_CONFIG_FILE,
 ]
-
-CLI_LOG_OPTION = ["-v", "OFF"]
-
-DEFAULT_CONFIG_FILE_PATHS: List[Path] = []
 
 
 def default_config_file_paths() -> Generator:
@@ -79,7 +82,7 @@ def unified_yaml_load(configuration_file: Path) -> Dict:
         return list(data)[0]
 
 
-def get_public_id_from_yaml(configuration_file: Path) -> PublicId:
+def get_public_id_from_yaml(configuration_file: Path):
     """
     Get the public id from yaml.
 
@@ -112,9 +115,6 @@ def find_all_packages_ids() -> Set[PackageId]:
     return package_ids
 
 
-ALL_PACKAGE_IDS: Set[PackageId] = find_all_packages_ids()
-
-
 def check_correct_author(runner: CliRunner) -> None:
     """
     Check whether the correct author is locally configured.
@@ -133,7 +133,7 @@ def check_correct_author(runner: CliRunner) -> None:
         print("Logged in with fetchai credentials. Continuing...")
 
 
-def push_package(package_id: PackageId, runner: CliRunner) -> None:
+def push_package(package_id, runner: CliRunner) -> None:
     """
     Pushes a package (protocol/contract/connection/skill) to registry.
 
@@ -215,7 +215,7 @@ def push_package(package_id: PackageId, runner: CliRunner) -> None:
     )
 
 
-def publish_agent(package_id: PackageId, runner: CliRunner) -> None:
+def publish_agent(package_id, runner: CliRunner) -> None:
     """
     Publishes an agent to registry.
 
@@ -275,7 +275,7 @@ def publish_agent(package_id: PackageId, runner: CliRunner) -> None:
     time.sleep(1.0)
 
 
-def check_and_upload(package_id: PackageId, runner: CliRunner) -> None:
+def check_and_upload(package_id, runner: CliRunner) -> None:
     """
     Check and upload.
 
@@ -308,21 +308,22 @@ def check_and_upload(package_id: PackageId, runner: CliRunner) -> None:
         )
 
 
-def upload_new_packages(runner: CliRunner) -> None:
+def upload_new_packages(runner: CliRunner, all_package_ids: Set[PackageId]) -> None:
     """
     Upload new packages.
 
     Checks whether packages are missing from registry in the dependency order.
 
     :param runner: the cli runner
+    :param all_package_ids: the set of all package ids to process.
     """
     print("\nPushing protocols:")
-    for package_id in ALL_PACKAGE_IDS:
+    for package_id in all_package_ids:
         if package_id.package_type != PackageType.PROTOCOL:
             continue
         check_and_upload(package_id, runner)
     print("\nPushing connections and contracts:")
-    for package_id in ALL_PACKAGE_IDS:
+    for package_id in all_package_ids:
         if package_id.package_type not in {
             PackageType.CONNECTION,
             PackageType.CONTRACT,
@@ -330,20 +331,26 @@ def upload_new_packages(runner: CliRunner) -> None:
             continue
         check_and_upload(package_id, runner)
     print("\nPushing skills:")
-    for package_id in ALL_PACKAGE_IDS:
+    for package_id in all_package_ids:
         if package_id.package_type != PackageType.SKILL:
             continue
         check_and_upload(package_id, runner)
     print("\nPublishing agents:")
-    for package_id in ALL_PACKAGE_IDS:
+    for package_id in all_package_ids:
         if package_id.package_type != PackageType.AGENT:
             continue
         check_and_upload(package_id, runner)
 
 
-if __name__ == "__main__":
-    runner_ = CliRunner()
-    check_correct_author(runner_)
-    upload_new_packages(runner_)
+def main() -> None:
+    """
+    Run the deploy-to-registry workflow.
+
+    This is the main entry point intended to be called from a CLI wrapper.
+    """
+    all_package_ids = find_all_packages_ids()
+    runner = CliRunner()
+    check_correct_author(runner)
+    upload_new_packages(runner, all_package_ids)
     print("Done!")
     sys.exit(0)

@@ -23,7 +23,7 @@ fingerprint_ignore_patterns: []
 connections:
 - valory/ledger:0.19.0:bafybeid5uwx4uqxkiibw6kazr7my5mk5kcqg2dx2owtcf7kcpbs2jrns2e
 contracts:
-- fetchai/erc1155:0.22.0:bafybeidejj3rt3agmwrcncff7jrbpv6obknhpwi24wr7qq2ufi2b2gswoy
+- fetchai/erc1155:0.22.0:bafybeicmo3rzgvp2s7xrxlksumnmkrprvwttbouvfq7owibl7uvgivygqq
 protocols:
 - fetchai/default:1.0.0:bafybeih4zgjm7ifmovpzuwdobwb2kotvvr4gx3suwbn5j5z3pau4sioaou
 - fetchai/fipa:1.0.0:bafybeiexw4ccraawqjsl6arrahkhuzo7fuhtqtkgal5v4mo7mmhzj7j76q

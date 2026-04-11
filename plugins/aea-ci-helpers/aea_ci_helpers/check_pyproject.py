@@ -50,6 +50,8 @@ WHITELIST = {
     "types-requests",
     "urllib3",
     "certifi",
+    # Used in tox envs for pip install of local plugins, not a project dep
+    "pip",
 }
 
 

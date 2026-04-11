@@ -7,7 +7,7 @@ license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
   README.md: bafybeigbif52kdfcgx4h2f57xtcwuxkt6hlbyrsceyqoxnoh4pd24pxuxi
-  __init__.py: bafybeidlszdrxy5blev2tyvajau443hsh4v2y65rsey2gsfet3c7syggqa
+  __init__.py: bafybeigt5mze66v5gkpetv7zfzqfmorgpa6kcpg6dedyyn66vvuenqgwcq
   build/Migrations.json: bafybeih3i7gw7wekpsw7eylufug26dqphxara7acclv45mgkwy2bsookye
   build/erc1155.json: bafybeifopttvhbk7gsi3iqwewwfhtytrld6o4ooeb7xjmlons3v6m25zna
   build/erc1155.wasm: bafybeicabhxaz2syhzmoobrmbi5gt47txtvhkavs5mum2fxcgo2nb2vxl4
