@@ -49,6 +49,38 @@ Go implementation of aealite. The `golang_checks` CI job exists but has **no act
 
 Tiny Go example (53-byte README). Dead if `libs/go/` is removed.
 
+### `benchmark/` — legacy predecessor of `plugins/aea-cli-benchmark/`
+
+`benchmark/` is the pre-Poetry standalone benchmark harness. The newer, supported path is `plugins/aea-cli-benchmark/`, which is PyPI-installable and hooks into the `aea` CLI as `aea benchmark <case>`. The two trees overlap heavily and the shell-based runners are now broken.
+
+**Overlap.** All 9 of the `benchmark/checks/check_*.py` scripts have a near-identical sibling in `plugins/aea-cli-benchmark/aea_cli_benchmark/case_*/case.py` — line-by-line, the plugin version is a lightly cleaned descendant of the old script (different reporting helpers, `click` wrapper, dropped the in-house `BenchmarkControl` framework). The plugin also ships 3 cases the old tree doesn't: `case_acn_communication`, `case_acn_startup`, `case_tx_generate`.
+
+**State of each artefact:**
+
+| Artefact | Status |
+|---|---|
+| `benchmark/framework/*.py` — in-house `BenchmarkControl` + executor + report_printer | imports cleanly; referenced only by `benchmark/cases/cpu_burn.py` and by the docs example |
+| `benchmark/checks/check_*.py` | imports cleanly (needs `psutil`, a dev dep); functionally duplicated by the plugin |
+| `benchmark/checks/run_benchmark.sh` | still runnable inside a `poetry install --with dev` shell |
+| `benchmark/run_from_branch.sh` | **broken** — calls `pip install pipenv; pipenv install --dev --skip-lock`, but Pipfile was deleted during the Pipenv → Poetry migration |
+| `benchmark/benchmark-deployment.yaml` | **broken** — the k8s init container invokes `run_from_branch.sh` |
+| `benchmark/cases/cpu_burn.py` | teaching example for `BenchmarkControl`, referenced in `docs/performance-benchmark.md` |
+
+**Why it hasn't been deleted yet:**
+
+1. It's linted across 7 tox targets (black, isort, flake8, mypy, pylint, darglint, bandit), so it silently gates CI on code style.
+2. `docs/performance-benchmark.md` still teaches benchmark authoring against the in-house `BenchmarkControl` framework (which doesn't exist in the plugin) and references `benchmark/cases/cpu_burn.py`.
+3. No one has committed to removing it.
+
+**Removal options, from least to most aggressive:**
+
+1. **Delete `benchmark/` entirely.** Update `docs/performance-benchmark.md` to teach benchmark authoring against the plugin's `case_<name>/case.py` shape instead of `BenchmarkControl`. Drop `benchmark` from the 7 tox linter target paths. Net: ~25 files removed, ~300 LOC of drift-prone duplication gone, stale Pipenv/k8s runners gone. Loses the teaching example (can be rewritten against the plugin).
+2. **Keep `benchmark/framework/` + `benchmark/cases/cpu_burn.py`, delete `benchmark/checks/` and the broken runners (`run_benchmark.sh`, `run_from_branch.sh`, `benchmark-deployment.yaml`, `Dockerfile`).** Preserves the docs example and the in-house framework; drops the duplicated checks and the Pipenv/k8s artefacts. Lowest-risk middle ground.
+3. **Fix the broken runners** — port `run_from_branch.sh` to Poetry, verify the k8s deployment still works. Moderate effort for low value; the plugin already provides a supported runner path.
+4. **Leave as-is.** Documented here so the next person who touches it knows what they are looking at.
+
+**Recommendation: option 2.** It removes the Pipenv/k8s ghosts and the code duplication with the plugin, keeps the `BenchmarkControl` teaching framework that `docs/performance-benchmark.md` depends on, and is a low-risk bounded change. Option 1 is cleaner long-term but forces a docs rewrite at the same time. Option 3 spends effort maintaining two runners that do the same thing.
+
 ## Partially removable (incomplete Poetry migration)
 
 ### `setup.py`
@@ -147,13 +179,9 @@ Current state on this branch: pinned `ecdsa>=0.15,<0.17.0` (resolving to `0.16.1
 
 All four are published to Docker Hub via `release.yml`. Actively maintained.
 
-### `benchmark/`
-
-Linted across all tox linter targets. Internal performance testing framework documented in `docs/performance-benchmark.md`.
-
 ### `plugins/aea-cli-benchmark/`
 
-Published to PyPI on every release. Provides the user-facing `aea benchmark` CLI command.
+Published to PyPI on every release. Provides the user-facing `aea benchmark` CLI command. This is the supported, modern path.
 
 ### `examples/tac_deploy/`, `examples/http_ex/`, `examples/protocol_specification_ex/`
 
