@@ -8,11 +8,10 @@ The HTTP server connection allows you to run a server inside the connection itse
 
 ## HTTP Client
 
-The `fetchai/simple_data_request:0.13.0` skill demonstrates a simple use case of the HTTP Client connection.
+A skill that wants to call an external HTTP endpoint routes its requests through the `valory/http_client:0.23.0` connection. The pattern is:
 
-The `HttpRequestBehaviour` in `behaviours.py` periodically sends HTTP envelops to the HTTP client connection. Its `act()` method, periodically called, simply calls `_generate_http_request` which contains the logic for enqueueing an HTTP request envelop.
-
-The `HttpHandler` in `handler.py` is a basic handler for dealing with HTTP response envelops received from the HTTP client connection. In the `handle()` method, the responses are dealt with by the private `_handle_response` method which essentially logs the response and adds the body of the response into the skill's shared state.
+- A proactive `Behaviour` whose `act()` method periodically constructs an `HttpMessage` with the `REQUEST` performative and drops it onto the outbox. The connection translates each envelope into an HTTP request and sends it to the configured external server.
+- A reactive `Handler` that receives the corresponding `RESPONSE` envelope when the external server replies, logs the response, and updates the skill state.
 
 ## HTTP Server
 
@@ -48,7 +47,7 @@ aea config set agent.default_connection valory/http_server:0.22.0
 Modify the `api_spec_path`:
 
 ``` bash
-aea config set vendor.fetchai.connections.http_server.config.api_spec_path "../examples/http_ex/petstore.yaml"
+aea config set vendor.valory.connections.http_server.config.api_spec_path "../examples/http_ex/petstore.yaml"
 ```
 
 Ensure the file exists under the specified path!
@@ -336,7 +335,7 @@ In our case, this is the `http_echo` that you have just scaffolded.
 Its public id will be `<your-author-name>/http_echo:0.1.0`.
 
 ``` bash
-aea config set vendor.fetchai.connections.http_server.config.target_skill_id "$(aea config get agent.author)/http_echo:0.1.0"
+aea config set vendor.valory.connections.http_server.config.target_skill_id "$(aea config get agent.author)/http_echo:0.1.0"
 ```
 
 You can now run the AEA:

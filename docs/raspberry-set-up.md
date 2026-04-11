@@ -43,6 +43,6 @@ python3.10 -m venv .venv && source .venv/bin/activate
 Finally, install the AEA framework from PyPI:
 
 ``` bash
-pip install aea[all]
+pip install open-aea[all]
 ```
 

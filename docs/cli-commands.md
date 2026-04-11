@@ -48,12 +48,6 @@
 | `upgrade [package_type] [public_id]`        | Upgrade the packages of the agent.                               |
 | `-v DEBUG run`                              | Run with debugging.                                                          |
 
-<!--
-Command  | Description
----------| -----------------------------------------------------------------
-`deploy {using [connection, ...]}`  | Deploy the AEA to a server and run it on the Fetch.ai network with default or specified connections.
- -->
-
 <div class="admonition tip">
   <p class="admonition-title">Tip</p>
   <p>You can also disable a resource without deleting it by removing the entry from the configuration but leaving the package in the skills namespace.</p>
