@@ -28,6 +28,7 @@ import sys
 from collections import defaultdict
 from functools import wraps
 from importlib.machinery import ModuleSpec
+from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
 from typing import (
     Any,
@@ -42,22 +43,13 @@ from typing import (
     cast,
 )
 
-# Lazy imports — these are deferred because:
-# - pip._internal may not be installed in all environments
-# - aea may be uninstalled at runtime (dependencies-check uninstalls it)
-search_packages_info = None  # type: ignore
+# aea is imported lazily because dependencies-check uninstalls it at runtime.
 crypto_registry = None  # type: ignore
 
 
 def _ensure_lazy_imports() -> None:
-    """Import pip and aea lazily, adding source tree to sys.path if needed."""
-    global search_packages_info, crypto_registry  # pylint: disable=global-statement
-    if search_packages_info is None:
-        from pip._internal.commands.show import (
-            search_packages_info as _spi,  # type: ignore  # pylint: disable=import-outside-toplevel
-        )
-
-        search_packages_info = _spi
+    """Import aea lazily, adding source tree to sys.path if needed."""
+    global crypto_registry  # pylint: disable=global-statement
     if crypto_registry is None:
         # Add the repo root to sys.path so aea can be found from source
         # even when it's not pip-installed
@@ -72,7 +64,7 @@ def _ensure_lazy_imports() -> None:
 
 
 AEA_ROOT_DIR = Path.cwd()
-IGNORE: Set[str] = {"pkg_resources", "pip._internal.commands.show"}
+IGNORE: Set[str] = {"pkg_resources"}
 DEP_NAME_RE = re.compile(r"(^[^=><\[]+)", re.I)  # type: ignore
 
 
@@ -92,16 +84,12 @@ class DependenciesTool:
     @staticmethod
     def get_package_files(package_name: str) -> List[Path]:
         """Get package files list."""
-        packages_info = list(search_packages_info([package_name]))
-        if len(packages_info) == 0:
-            raise ValueError(f"package {package_name} not found")
-        if isinstance(packages_info[0], dict):
-            files = packages_info[0]["files"]
-            location = packages_info[0]["location"]
-        else:
-            files = packages_info[0].files  # type: ignore
-            location = packages_info[0].location  # type: ignore
-        return [Path(location) / i for i in files]  # type: ignore
+        try:
+            dist = distribution(package_name)
+        except PackageNotFoundError as e:
+            raise ValueError(f"package {package_name} not found") from e
+        files = dist.files or []
+        return [Path(str(dist.locate_file(f))) for f in files]
 
     @staticmethod
     def clean_dependency_name(dependecy_specification: str) -> str:

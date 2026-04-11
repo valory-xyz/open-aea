@@ -25,7 +25,10 @@ import configparser
 import sys
 from typing import Set, Tuple
 
-import tomli
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # pragma: no cover
+    import tomli as tomllib  # type: ignore[no-redef]
 from packaging.requirements import Requirement as BaseRequirement
 
 TOX_INI = "tox.ini"
@@ -91,7 +94,7 @@ def _parse_poetry_deps(deps: dict) -> list:
 def load_pyproject(filename: str = PYPROJECT_TOML) -> Set[Requirement]:
     """Load pyproject.toml dev dependencies."""
     with open(filename, "rb") as f:
-        pyproject_data = tomli.load(f)
+        pyproject_data = tomllib.load(f)
 
     poetry = pyproject_data.get("tool", {}).get("poetry", {})
 

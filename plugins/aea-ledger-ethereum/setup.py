@@ -45,6 +45,9 @@ setup(
         "eth-account>=0.13.0,<0.14.0",
         "requests>=2.20.0,<3",
     ],
+    extras_require={
+        "test_tools": ["pytest", "docker==7.1.0"],
+    },
     tests_require=["pytest"],
     entry_points={
         "aea.cryptos": ["ethereum = aea_ledger_ethereum:EthereumCrypto"],

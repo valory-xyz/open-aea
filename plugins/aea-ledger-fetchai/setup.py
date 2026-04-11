@@ -45,6 +45,9 @@ setup(
     },
     python_requires=">=3.10,<3.15",
     install_requires=["open-aea-ledger-cosmos~=2.1.0", "requests>=2.20.0,<3"],
+    extras_require={
+        "test_tools": ["pytest", "docker==7.1.0"],
+    },
     tests_require=["pytest"],
     entry_points={
         "aea.cryptos": ["fetchai = aea_ledger_fetchai:FetchAICrypto"],

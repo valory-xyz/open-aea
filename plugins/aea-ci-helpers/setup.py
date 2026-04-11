@@ -39,8 +39,9 @@ setup(
         "click>=8.1.0,<9",
         "packaging",
         "pyyaml>=6.0,<7",
-        "toml>=0.10,<1",
-        "tomli",
+        # `tomli` is the 3.10 back-compat shim for stdlib `tomllib` (3.11+).
+        'tomli; python_version < "3.11"',
+        "tomli-w",
     ],
     python_requires=">=3.10,<3.15",
     classifiers=[

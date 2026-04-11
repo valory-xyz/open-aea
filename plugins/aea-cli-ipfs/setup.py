@@ -40,6 +40,9 @@ setup(
         "open-aea>=2.0.0, <3.0.0",
         "click>=8.1.0,<8.4.0",
     ],
+    extras_require={
+        "test_tools": ["pytest"],
+    },
     tests_require=["pytest"],
     classifiers=[
         "Environment :: Console",
