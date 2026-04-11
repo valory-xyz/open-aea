@@ -191,9 +191,11 @@ Still needed because `release.yml` uses `python setup.py sdist bdist_wheel` to b
 
 Contains tool configurations for flake8, isort, mypy, darglint, and bdist_wheel. These could be consolidated into `pyproject.toml` `[tool.xxx]` sections, allowing removal of this file.
 
-### `scripts/install.sh` and `scripts/install.ps1`
+### `scripts/install.sh` and `scripts/install.ps1` ✓ kept, freshened
 
-End-user install scripts that install from PyPI. Referenced in `bump_aea_version.py` for version string updates. Hardcode version 2.1.0 — questionable ongoing maintenance value.
+Decision: **keep.** These are the one-shot bootstrap installers linked from install docs; `aea-dev bump-version` already auto-updates the hardcoded `open-aea[all]==<version>` string on every release (see `plugins/aea-dev-helpers/aea_dev_helpers/bump_version.py:97-98`), so the version isn't drift-prone.
+
+One real staleness fix landed alongside the keep decision: both scripts' Python version checks only accepted `3.10`/`3.11`, so users with `python3.12`/`3.13`/`3.14` (all supported by `pyproject.toml: python = ">=3.10,<3.15"`) would be rejected by their own install script. Bumped the regex in `install.sh:30` and `install.ps1:60` to accept the full `3.10–3.14` range and updated the user-facing error message in `install.sh:32`. The bootstrap-installer branch (when the user has no Python at all) still installs 3.10, which is fine — 3.10 is supported and keeping the target conservative avoids pinning a more recent patch URL I can't verify.
 
 ## Plugin `install_requires` hygiene ✓ done
 

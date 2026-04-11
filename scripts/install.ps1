@@ -57,7 +57,7 @@ function refresh-path {
 
 function check_python {
 	try{
-	    if (((python -V)|Out-String) -match "Python 3\.1[01]\.") {
+	    if (((python -V)|Out-String) -match "Python 3\.(1[0-4])\.") {
 	        echo "Python installed and supported!"
 	    }else{
 	        install_python
