@@ -34,7 +34,13 @@ setup(
     package_data={"aea_cli_benchmark": ["py.typed"]},
     entry_points={"aea.cli": ["benchmark = aea_cli_benchmark.core:benchmark"]},
     python_requires=">=3.10,<3.15",
-    install_requires=["open-aea>=2.0.0, <3.0.0", "psutil>=5.7.0, <6.0.0"],
+    install_requires=[
+        "open-aea>=2.0.0, <3.0.0",
+        "psutil>=5.7.0, <6.0.0",
+        "click>=8.1.0,<8.4.0",
+        "cosmpy>=0.11.0,<0.12",
+        "docker==7.1.0",
+    ],
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",

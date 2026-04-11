@@ -38,6 +38,7 @@ setup(
     python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
+        "click>=8.1.0,<8.4.0",
     ],
     tests_require=["pytest"],
     classifiers=[

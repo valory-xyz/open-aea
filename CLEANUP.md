@@ -87,7 +87,7 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 4. **`requests` dev-group dep bump/drop** to close alert #159 (see that section).
 
-5. **Plugin `install_requires` hygiene fixes** (see that section — four plugins have undeclared runtime deps that break clean installs).
+5. ~~**Plugin `install_requires` hygiene fixes**~~ ✓ done — added missing runtime deps to `aea-ci-helpers` (`pyyaml`), `aea-cli-benchmark` (`click`, `cosmpy`, `docker`), `aea-cli-ipfs` (`click`), and `aea-dev-helpers` (`gitpython`, `packaging`, `open-aea-cli-ipfs`). Category A only; B/C/D still open.
 
 6. **Docs quickstart pipenv → poetry migration** (see the "docs/ and examples/ cleanup" section, item A1) — first-run experience is currently broken for new users.
 

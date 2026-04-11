@@ -37,6 +37,9 @@ setup(
     },
     install_requires=[
         "click>=8.1.0,<9",
+        "gitpython>=3.1.37,<4",
+        "open-aea-cli-ipfs>=2.0.0,<3.0.0",
+        "packaging",
         "pyyaml>=6.0,<7",
         "toml>=0.10,<1",
     ],
