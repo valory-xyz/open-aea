@@ -532,15 +532,6 @@ func TestRoutingDHTClientToDHTPeerIndirect(t *testing.T) {
 
 // TestRoutingDHTClientToDHTClient dht client to dht client connected to the same peer
 func TestRoutingDHTClientToDHTClient(t *testing.T) {
-	// TODO: circuit v2 relay migration is incomplete after the libp2p v0.33 bump.
-	// The reservation is now established (EnableRelayService / ForceReachabilityPublic
-	// / circuitclient.Reserve were added) but end-to-end envelope delivery via a relay
-	// still hangs — likely needs proper reservation lifecycle + /p2p-circuit address
-	// announcement on the client side (libp2p.EnableAutoRelayWithStaticRelays or
-	// peer-source form). Set RUN_CIRCUIT_V2_RELAY_TESTS=1 to run locally once fixed.
-	if os.Getenv("RUN_CIRCUIT_V2_RELAY_TESTS") == "" {
-		t.Skip("circuit v2 relay migration incomplete; set RUN_CIRCUIT_V2_RELAY_TESTS=1 to run")
-	}
 	peer, peerCleanup, err := SetupLocalDHTPeer(
 		FetchAITestKeys[0], AgentsTestKeys[0], DefaultLocalPort, DefaultDelegatePort,
 		[]string{},
@@ -597,10 +588,6 @@ func TestRoutingDHTClientToDHTClient(t *testing.T) {
 
 // TestRoutingDHTClientToDHTClientIndirect dht client to dht client connected to a different peer
 func TestRoutingDHTClientToDHTClientIndirect(t *testing.T) {
-	// TODO: circuit v2 relay migration incomplete — see TestRoutingDHTClientToDHTClient.
-	if os.Getenv("RUN_CIRCUIT_V2_RELAY_TESTS") == "" {
-		t.Skip("circuit v2 relay migration incomplete; set RUN_CIRCUIT_V2_RELAY_TESTS=1 to run")
-	}
 	peer1, peerCleanup1, err := SetupLocalDHTPeer(
 		FetchAITestKeys[0], "", DefaultLocalPort, DefaultDelegatePort,
 		[]string{},

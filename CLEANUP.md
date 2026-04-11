@@ -69,17 +69,58 @@ The libp2p_node source changes invalidated the embedded fingerprints in two conn
 
 Only these two packages needed regen — `p2p_libp2p_client` and `p2p_libp2p_mailbox` don't embed libp2p_node source and were unchanged.
 
-### Circuit v2 relay tests skipped pending migration
+### Circuit v2 relay routing parity ✓ restored
 
-Two DHT tests (`TestRoutingDHTClientToDHTClient`, `TestRoutingDHTClientToDHTClientIndirect`) hang in the new libp2p v0.33 env even after adding `libp2p.EnableRelayService`, `ForceReachabilityPublic`, and `circuitclient.Reserve`. The partial circuit v2 migration gets past "NO_RESERVATION" errors but end-to-end envelope delivery via a relay still stalls — likely needs proper reservation lifecycle management + `/p2p-circuit` address announcement on the client side (probably `libp2p.EnableAutoRelayWithStaticRelays` or peer-source form).
+Both DHT relay tests (`TestRoutingDHTClientToDHTClient` and
+`TestRoutingDHTClientToDHTClientIndirect`) now pass end-to-end on
+libp2p v0.33, restoring full behavioural parity with the pre-bump v0.8
+binary. Earlier in the session both were gated behind
+`os.Getenv("RUN_CIRCUIT_V2_RELAY_TESTS")` while the migration was
+incomplete; that gate has now been removed. Test runtimes after the
+fix: direct topology 1.06s, indirect topology ~11s. Full
+`dht/dhtpeer/` suite (excluding the long stress/ordering tests) is
+green in 42s.
 
-Gated both tests behind `os.Getenv("RUN_CIRCUIT_V2_RELAY_TESTS")` with a detailed TODO in `2f3190519`. All other DHT tests pass. The new `golang_checks` CI job runs unaffected.
+The migration required spelling out, on the v0.33 side, what
+`libp2p.EnableRelay()` did implicitly in v0.8. Briefly:
+
+- **dhtpeer.go (relay-side)**: `EnableRelayService()` +
+  `ForceReachabilityPublic()` — the v2 relay only advertises the
+  `/libp2p/circuit/relay/0.2.0/hop` protocol once AutoNAT confirms
+  public reachability; forcing it skips the wait.
+- **dhtclient.go (client-side)**: `EnableRelay()` +
+  `ForceReachabilityPrivate()` +
+  `EnableAutoRelayWithStaticRelays(bootstrapPeers)`. Without forcing
+  private reachability auto-relay never starts (no listen addresses
+  → AutoNAT can't determine reachability).
+- **dhtclient.go::SetupDHTClient**: synchronous `waitForCircuitAddress`
+  helper after bootstrap so the client doesn't expose itself to peers
+  before its circuit address is in the host's address list.
+- **dhtclient.go::newStreamLoopUntilTimeout**:
+  `network.WithUseTransient(ctx, "circuit-relay routing")` — circuit-v2
+  connections are tagged "transient" and `NewStream` refuses to use
+  them by default in v0.33. Pre-bump this concept did not exist.
+- **dhtclient.go::RouteEnvelope**: two-step Connect — try the
+  source-relay path with a 5s timeout (fast same-relay path), then
+  fall back to a peer-ID-only Connect so DHT-based peer routing can
+  discover the target's actual `/p2p-circuit` address (announced by
+  `EnableAutoRelayWithStaticRelays` and gossiped via Identify) and
+  dial via the correct relay.
+
+Every change has an inline comment explaining the v0.8 → v0.33 gap it
+compensates for. The README in
+`packages/valory/connections/p2p_libp2p/` carries the per-call-site
+migration notes plus a wire-compat scenario matrix for mixed-version
+deployments (the circuit-relay protocol IDs themselves changed
+between v0.8 and v0.21 upstream, so a new node and an old node
+cannot use each other as relays — direct peer-to-peer and delegate
+paths are unaffected).
 
 ## Deferred / still open after this pass
 
 Tracked here so the next person knows exactly what's left without re-walking the audit:
 
-1. **Finish libp2p_node circuit v2 migration.** Unskip the 2 relay tests by finishing the client-side circuit v2 wiring — probably `libp2p.EnableAutoRelayWithStaticRelays(...)` and `/p2p-circuit` address announcement. Needs real iterative Go debugging against a 3-peer test topology. Medium effort.
+1. ~~**Finish libp2p_node circuit v2 migration.**~~ ✓ done — see "Circuit v2 relay routing parity ✓ restored" above. Both relay tests now pass on v0.33; full v0.8 routing parity is preserved (with the upstream wire-protocol break documented in the connection's README).
 
 2. **`libs/go/aea_end2end` Python↔Go harness modernization.** The `test_fipa_end2end.py` test harness predates the `fetchai → valory` namespace move and predates the cosmos-key-only p2p_libp2p API. Partial fixes landed in `d8559e768` (import paths, `package_registry_src_rel`, cosmos connection key) but the internal buyer/seller flow still mixes fetchai and cosmos key usage in ways the modern `valory/p2p_libp2p:0.1.0` rejects. Full run still fails at agent startup. Fixing it would give us a real Python↔Go wire-compat test. In the meantime, wire compat is validated indirectly via (a) the `aealite/wallet/wallet_test.go` round-trip, (b) the `aealite/protocols` unit tests, and (c) the fact that the Python framework successfully loads the updated connection package with its new fingerprints.
 

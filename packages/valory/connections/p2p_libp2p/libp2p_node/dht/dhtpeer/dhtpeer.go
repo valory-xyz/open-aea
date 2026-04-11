@@ -266,7 +266,14 @@ func New(opts ...Option) (*DHTPeer, error) {
 		libp2p.DefaultSecurity,
 		libp2p.NATPortMap(),
 		libp2p.EnableNATService(),
-		libp2p.EnableRelay(),
+		// EnableRelayService replaces the libp2p v1 EnableRelay(circuit.OptHop)
+		// pattern. ForceReachabilityPublic is required because libp2p v0.33's
+		// relay service only advertises the /libp2p/circuit/relay/0.2.0/hop
+		// protocol once it has confirmed public reachability via AutoNAT;
+		// otherwise dial attempts get "protocols not supported [hop]".
+		// Forcing public reachability skips the AutoNAT wait and matches the
+		// pre-bump v0.8 behaviour (which exposed hop unconditionally via
+		// EnableRelay(circuit.OptHop)).
 		libp2p.EnableRelayService(),
 		libp2p.ForceReachabilityPublic(),
 	}
@@ -671,6 +678,12 @@ func (dhtPeer *DHTPeer) Close() []error {
 // So we generate a new one and send session public key signature made with peer private key
 // snd client can validate it with peer public key/address
 func generate_x509_cert() (*tls.Certificate, error) {
+	// Pre-bump used `btcec.NewPrivateKey(elliptic.P256())` then `.ToECDSA()`.
+	// `btcec/v2.NewPrivateKey` no longer accepts a curve parameter (the v2
+	// package is secp256k1-only) and the certificate explicitly wants P-256,
+	// so call `crypto/ecdsa.GenerateKey` directly. Functionally equivalent to
+	// the original code, just without the btcec round-trip that was never
+	// using btcec's secp256k1 functionality in the first place.
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return nil, errors.Wrap(err, "while creating new private key")

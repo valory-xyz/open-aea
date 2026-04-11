@@ -273,32 +273,18 @@ func BTCPubKeyFromEthereumPublicKey(publicKey string) (*btcec.PublicKey, error) 
 // References:
 //  - https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L258
 //  - https://github.com/btcsuite/btcd/blob/master/btcec/signature.go#L47
+//
+// Pre-bump this function did manual byte assembly. That produced invalid
+// DER when either r or s had its high bit set (because DER integers need a
+// leading zero byte for sign disambiguation in that case). btcec v1's
+// ParseSignature was lenient about it; btcec/v2's ParseDERSignature is not,
+// so we now use encoding/asn1 to marshal a proper ECDSA-Sig-Value sequence.
 func ConvertStrEncodedSignatureToDER(signature []byte) []byte {
 	rb := signature[:len(signature)/2]
 	sb := signature[len(signature)/2:]
-	r := new(big.Int).SetBytes(rb)
-	s := new(big.Int).SetBytes(sb)
-	// Use encoding/asn1 to marshal an ECDSA-Sig-Value DER sequence,
-	// which correctly handles leading-zero padding for integers whose
-	// most significant bit is set.
-	der, err := asn1.Marshal(struct {
+	der, _ := asn1.Marshal(struct {
 		R, S *big.Int
-	}{R: r, S: s})
-	if err != nil {
-		// This should never happen for well-formed big.Ints; fall back to
-		// a manual encoding to preserve previous behavior.
-		length := 6 + len(rb) + len(sb)
-		sigDER := make([]byte, length)
-		sigDER[0] = 0x30
-		sigDER[1] = byte(length - 2)
-		sigDER[2] = 0x02
-		sigDER[3] = byte(len(rb))
-		offset := copy(sigDER[4:], rb) + 4
-		sigDER[offset] = 0x02
-		sigDER[offset+1] = byte(len(sb))
-		copy(sigDER[offset+2:], sb)
-		return sigDER
-	}
+	}{R: new(big.Int).SetBytes(rb), S: new(big.Int).SetBytes(sb)})
 	return der
 }
 

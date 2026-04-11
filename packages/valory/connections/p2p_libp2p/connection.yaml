@@ -8,7 +8,7 @@ description: The p2p libp2p connection implements an interface to standalone gol
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
 fingerprint:
-  README.md: bafybeiabkdibf7iv3y33xkaemvuwiuhrjedrlvuklgjgty3gzggkgr5d5q
+  README.md: bafybeidb6fohib3o4qhlkozonnxgfrp4e3tvru4jb7niabq4nvoca6bi6y
   __init__.py: bafybeibtknmpggpj77fflwndllcqvvbolpds7doymdp4fjd277metq6oxy
   check_dependencies.py: bafybeidj4eoku3mxg3qxvnkfqsr7nmspcz7rh4wmmmipfeylivi2ljh6vy
   connection.py: bafybeigpoylde3hbd6gfsm7bdscwiwfrvuwzduhmx32lqtwtmbwjtoadmu
@@ -23,15 +23,15 @@ fingerprint:
   libp2p_node/aea/utils.go: bafybeic76r6eymbeg5a5wet3hyc2g5olxxxe3ubaibhblvusamcdkgvb6m
   libp2p_node/common/common.go: bafybeihmyggp45opu6scnojnre24az45ovbulde3gcnmupyvt5grddl424
   libp2p_node/dht/common/handlers.go: bafybeid6os5awfboi4vytxlntigc3gkf2gdlupi3ai73ybqfvudcvrarpu
-  libp2p_node/dht/dhtclient/dhtclient.go: bafybeigbwdycizdxmk7wy5almywfdqrkmwta5gpa5sa72yo5ywp6blmk4y
+  libp2p_node/dht/dhtclient/dhtclient.go: bafybeieiji2w4ywb5lctkdhat4sqvmm3rza7m5c2hra7zwqk6twryiokyq
   libp2p_node/dht/dhtclient/dhtclient_test.go: bafybeibcrgm7e5xr6gdnl3jqdwz6d4p3ddolljxd2b7nawdqxp2o4g4ng4
   libp2p_node/dht/dhtclient/options.go: bafybeifjtkrqpyfac3vtrke5ad6wb2ktxyurv2ha24k6rmkcow7yejpfoe
   libp2p_node/dht/dhtnode/dhtnode.go: bafybeih7xu6rpzgvqf5l4wr3vwapbumjb7wzsjgr6gyoqet2yyjdhbhllm
   libp2p_node/dht/dhtnode/streams.go: bafybeiglkbzmp7imgcg544cb3kr4xq3hopoockqoaxbgveeszclvtq4pni
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
-  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeihs4bouceezohevend4osa7w7gujeaqmwvst3snleuk4y56qmrxqm
-  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeidjkfsiep5pny7ezwzjqdtmogf7qifg7dfgexln7qdxl25fiaufha
+  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeidbnn2csaq7ww54ru7iykfhuxtv7fj3z7u6dlrrzjly3scrb77u34
+  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeichnpczexoov7frcwoa33fdc5mgcym7fnb3rggk6wgcps43unvb5a
   libp2p_node/dht/dhtpeer/mailbox.go: bafybeic5lng7ozhxw6cwibwh5s3lqcyyhurovsl2qy77om6ctir6qctnuy
   libp2p_node/dht/dhtpeer/notifee.go: bafybeidzcmhfgh3efwp4t4kph5gdy4jps4useusmclwxe4pgdvhz5cnche
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy
@@ -52,7 +52,7 @@ fingerprint:
   libp2p_node/protocols/acn/v1_0_0/acn.pb.go: bafybeibhoxaaq6mnc654gaguljypkj2qwhd3epi6d3zc4t5x24bdvfnvdy
   libp2p_node/protocols/acn/v1_0_0/acn.proto: bafybeigvgpfuxg67fymghnd5pfi7lvjf7ntkagkl2tlr3dzbwhxb5ekkjm
   libp2p_node/protocols/acn/v1_0_0/acn.yaml: bafybeiaciincxvcb4imlzpdiju62tzafm6hodxvthhz67xeqjfaamg3upa
-  libp2p_node/utils/utils.go: bafybeibedwnqmizzrtiueobli2vexsldjfkloisdjt4uatavg3capvziki
+  libp2p_node/utils/utils.go: bafybeiatrqnnuhxjynoabalwnjzh6vsqnyyxlqsio6vkulsxtqexlagwhu
   libp2p_node/utils/utils_test.go: bafybeie5mct66cq3onpfnm5y2hnywschjnjxgoviqsrpx5i3ada2xwht7m
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e
   tests/base.py: bafybeiduqhd4t62fj7tsj6se3pokgtrizrna37b6vw5nj7ul4xdawc7vii

@@ -37,7 +37,6 @@ import (
 
 	libp2p "github.com/libp2p/go-libp2p"
 	p2pCrypto "github.com/libp2p/go-libp2p/core/crypto"
-	circuitclient "github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/client"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -225,7 +224,21 @@ func New(opts ...Option) (*DHTClient, error) {
 	/* setup libp2p node */
 	ctx := context.Background()
 
-	// libp2p options
+	// libp2p options.
+	//
+	// Pre-bump (libp2p v0.8) `libp2p.EnableRelay()` did three things:
+	// (1) the circuit-v1 transport, (2) the auto-relay reservation lifecycle,
+	// and (3) advertising the resulting `/p2p-circuit` address via Identify.
+	// In v0.33 those got split: `EnableRelay()` only does (1), and (2)+(3) live
+	// in `EnableAutoRelay*`. We use the static-relays form because the bootstrap
+	// peers are exactly the relays this client is allowed to use.
+	//
+	// `ForceReachabilityPrivate()` is needed because auto-relay only kicks in
+	// once AutoNAT has declared the host "private". With `libp2p.ListenAddrs()`
+	// (no listen addresses) AutoNAT cannot determine reachability, so the
+	// reservation never starts. Forcing reachability private skips that wait
+	// and matches the v0.8 implicit "I'm a relay client, reserve immediately"
+	// behaviour.
 	libp2pOpts := []libp2p.Option{
 		libp2p.ListenAddrs(),
 		libp2p.Identity(dhtClient.key),
@@ -235,6 +248,8 @@ func New(opts ...Option) (*DHTClient, error) {
 		libp2p.NATPortMap(),
 		libp2p.EnableNATService(),
 		libp2p.EnableRelay(),
+		libp2p.ForceReachabilityPrivate(),
+		libp2p.EnableAutoRelayWithStaticRelays(dhtClient.bootstrapPeers),
 	}
 
 	// create a basic host
@@ -267,13 +282,18 @@ func New(opts ...Option) (*DHTClient, error) {
 		return nil, err
 	}
 
-	// reserve a slot with each bootstrap peer acting as a circuit v2 relay,
-	// so this client can be reached via them by other peers
-	for _, bp := range dhtClient.bootstrapPeers {
-		_, rerr := circuitclient.Reserve(ctx, dhtClient.routedHost, bp)
-		if rerr != nil {
-			dhtClient.logger.Warn().Err(rerr).Msgf("failed to reserve relay slot with %s", bp.ID)
-		}
+	// EnableAutoRelayWithStaticRelays runs asynchronously in a background
+	// goroutine: it negotiates a circuit-v2 reservation with one of the
+	// bootstrap relays, then adds the resulting /p2p-circuit address to
+	// this host's address list and kicks off an Identify push so other
+	// peers learn about the circuit address. We must wait until that
+	// has happened before declaring the client ready, otherwise other
+	// peers that look us up immediately after setup either get
+	// NO_RESERVATION (if they hardcode this client's relayPeer) or
+	// don't see any reachable address at all.
+	if err = waitForCircuitAddress(ctx, dhtClient.routedHost, 10*time.Second); err != nil {
+		dhtClient.Close()
+		return nil, errors.Wrap(err, "auto-relay reservation never completed")
 	}
 
 	// register my address to relay peer
@@ -303,6 +323,30 @@ func New(opts ...Option) (*DHTClient, error) {
 		dhtClient.handleAeaEnvelopeStream)
 
 	return dhtClient, nil
+}
+
+// waitForCircuitAddress polls the host's listen addresses until at least
+// one /p2p-circuit address is present, indicating that the auto-relay
+// machinery has successfully reserved a slot with one of the static relays
+// and announced the corresponding circuit address. Times out if no circuit
+// address materialises within `timeout`.
+func waitForCircuitAddress(ctx context.Context, h host.Host, timeout time.Duration) error {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		for _, a := range h.Addrs() {
+			for _, p := range a.Protocols() {
+				if p.Code == multiaddr.P_CIRCUIT {
+					return nil
+				}
+			}
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(50 * time.Millisecond):
+		}
+	}
+	return errors.New("timed out waiting for /p2p-circuit address from auto-relay")
 }
 
 // bootstrapLoopUntilTimeout loops until connection to bootstrap peers established or timeout reached
@@ -347,6 +391,13 @@ func (dhtClient *DHTClient) newStreamLoopUntilTimeout(
 	lerror, _, _, _ := dhtClient.GetLoggers()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+	// libp2p v0.33: circuit-relay v2 connections are tagged as "transient"
+	// and NewStream refuses to use them unless we opt in via WithUseTransient.
+	// Pre-bump (v0.8) this concept did not exist; the relayed connection was
+	// treated identically to a direct connection. Without this opt-in,
+	// NewStream silently blocks waiting for a non-transient connection that
+	// never appears, causing the relay routing tests to hang.
+	ctx = network.WithUseTransient(ctx, "circuit-relay routing")
 	stream, err := dhtClient.routedHost.NewStream(ctx, peerID, streamType)
 	sleepTime := sleepTimeDefaultDuration
 	disconnected := false
@@ -532,8 +583,22 @@ func (dhtClient *DHTClient) RouteEnvelope(envel *aea.Envelope) error {
 		Str("target", target).
 		Msgf("got peer ID %s for agent Address", peerID.String())
 
-	// TODO(LR): test if representative peer is relay peer, and skip the Connect if it is the case
-	// TODO(DM): extract below multi-address creation for reuse and consistency
+	// Two-step connect:
+	//
+	//   1. Optimistic: dial via the source's own relay. This is correct and
+	//      fast for the same-relay topology
+	//      (TestRoutingDHTClientToDHTClient and the dominant real-world
+	//      case where every client uses the same ACN bootstrap relay).
+	//
+	//   2. Fallback: if step 1 fails (e.g. the target is reserved with a
+	//      different relay — TestRoutingDHTClientToDHTClientIndirect), call
+	//      Connect with no addresses so routedhost's DHT-based peer routing
+	//      can discover the target's actual /p2p-circuit address (added by
+	//      EnableAutoRelayWithStaticRelays and gossiped via Identify) and
+	//      dial via the correct relay.
+	//
+	// Pre-bump (libp2p v0.8) this entire fan-out happened transparently
+	// inside auto-relay; in v0.33 we have to spell it out.
 	multiAddr := "/p2p/" + dhtClient.relayPeer.String() + "/p2p-circuit/p2p/" + peerID.String()
 	relayMultiaddr, err := multiaddr.NewMultiaddr(multiAddr)
 	if err != nil {
@@ -553,12 +618,30 @@ func (dhtClient *DHTClient) RouteEnvelope(envel *aea.Envelope) error {
 		Str("target", target).
 		Msgf("connecting to target through relay %s", relayMultiaddr)
 
-	if err = dhtClient.routedHost.Connect(context.Background(), peerRelayInfo); err != nil {
-		lerror(err).
+	// 5 second cap on the optimistic source-relay attempt — if the target
+	// is on a different relay, libp2p's internal dial machinery would
+	// otherwise sit on a NO_RESERVATION error for the full DialPeerTimeout
+	// (default 60s). The fallback below uses DHT discovery, which on
+	// localhost completes in well under a second.
+	connectCtx, connectCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	err = dhtClient.routedHost.Connect(connectCtx, peerRelayInfo)
+	connectCancel()
+	if err != nil {
+		ldebug().
 			Str("op", "route").
 			Str("target", target).
-			Msgf("couldn't connect to target %s", peerID)
-		return err
+			Err(err).
+			Msgf("source-relay path failed for %s, falling back to DHT discovery", peerID)
+		// Drop the wrong-hint address so it doesn't poison the next dial
+		// attempt and the eventual NewStream call.
+		dhtClient.routedHost.Peerstore().ClearAddrs(peerID)
+		if err = dhtClient.routedHost.Connect(context.Background(), peer.AddrInfo{ID: peerID}); err != nil {
+			lerror(err).
+				Str("op", "route").
+				Str("target", target).
+				Msgf("couldn't connect to target %s via DHT discovery", peerID)
+			return err
+		}
 	}
 
 	ldebug().
