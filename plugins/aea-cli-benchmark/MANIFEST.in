@@ -1,4 +1,4 @@
-include README.md LICENSE HISTORY.md
+include README.md LICENSE
 
 recursive-include aea_cli_benchmark
 recursive-include tests *

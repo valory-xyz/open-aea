@@ -38,7 +38,7 @@ setup(
             "py.typed",
         ]
     },
-    python_requires=">=3.10,<4.0",
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea-ledger-ethereum~=2.1.0",
         "open-aea-flashbots~=2.1.0",

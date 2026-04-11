@@ -25,13 +25,14 @@ from setuptools import find_packages, setup
 setup(
     name="open-aea-ledger-solana",
     version="2.1.0",
-    author="dassy23",
+    author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of solana.",
     long_description="Python package wrapping the public and private key cryptography and ledger api of solana.",
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ledger_solana*"]),
     package_data={"aea_ledger_solana": ["py.typed"]},
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "cryptography",

@@ -29,7 +29,7 @@ setup(
     description="CI helper utilities for AEA-based projects.",
     long_description="CI helper utilities for AEA-based projects.",
     long_description_content_type="text/markdown",
-    packages=find_packages(where=".", include=["aea_ci_helpers", "aea_ci_helpers.*"]),
+    packages=find_packages(include=["aea_ci_helpers*"]),
     entry_points={
         "console_scripts": [
             "aea-ci=aea_ci_helpers.cli:cli",
@@ -41,7 +41,7 @@ setup(
         "toml>=0.10,<1",
         "tomli",
     ],
-    python_requires=">=3.10",
+    python_requires=">=3.10,<3.15",
     classifiers=[
         "Environment :: Console",
         "License :: OSI Approved :: Apache Software License",

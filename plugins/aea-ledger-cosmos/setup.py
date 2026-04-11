@@ -37,6 +37,7 @@ setup(
             "py.typed",
         ]
     },
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "ecdsa>=0.15,<0.17.0",

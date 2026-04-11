@@ -1,59 +1,39 @@
-# AEA CLI IPFS Plug-in
+# AEA CLI Benchmark Plug-in
 
-IPFS command to publish and download directories.
+CLI extension for benchmarking the AEA framework. Adds an `aea benchmark` command group that runs performance benchmark cases covering agent construction, message throughput, memory usage, decision maker, ACN, and related scenarios.
 
 ## Installation and usage
 
 Make sure you have `aea` installed.
 
 Then, install the plug-in:
-``` bash
-pip install aea-cli-ipfs
+```bash
+pip install open-aea-cli-benchmark
 ```
 
-Now you should be able to run `aea ipfs`.
+Now you should be able to run `aea benchmark`:
 
-``` bash
-Usage: aea ipfs [OPTIONS] COMMAND [ARGS]...
+```bash
+Usage: aea benchmark [OPTIONS] COMMAND [ARGS]...
 
-  IPFS Commands
+  Run one of performance benchmark.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  add       Add directory to ipfs, if not directory specified the current...
-  download  Download directory by it's hash, if not target directory...
-  remove    Remove a directory from ipfs by it's hash.
-
-
-
-Usage: aea ipfs add [OPTIONS] [DIR_PATH]
-
-  Add directory to ipfs, if not directory specified the current one will be
-  added.
-
-Options:
-  -p, --publish
-  --help         Show this message and exit.
-
-
-
-Usage: aea ipfs remove [OPTIONS] hash_id
-
-  Remove a directory from ipfs by it's hash.
-
-Options:
-  --help  Show this message and exit.
-
-
-
-Usage: aea ipfs download [OPTIONS] hash_id [TARGET_DIR]
-
-  Download directory by it's hash, if not target directory specified will
-  use current one.
-
-Options:
-  --help  Show this message and exit.
-
+  acn-communication             ACN end-to-end message throughput
+  acn-startup                   ACN node startup time
+  agent-construction-time       Time to construct an AEA instance
+  decision-maker                Decision maker throughput
+  dialogues-memory-usage        Memory footprint of dialogue state
+  mem-usage                     Agent memory usage under load
+  messages-memory-usage         Memory footprint of messages
+  multiagent                    Multi-agent throughput
+  multiagent-http-dialogues     Multi-agent HTTP dialogue throughput
+  proactive                     Proactive skill behaviour benchmark
+  reactive                      Reactive skill handler benchmark
+  tx-generate                   Transaction generation throughput
 ```
+
+Run any command with `--help` for per-case options.

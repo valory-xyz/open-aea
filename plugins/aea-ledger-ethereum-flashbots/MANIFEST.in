@@ -1,4 +1,4 @@
-include README.md LICENSE HISTORY.md
+include README.md LICENSE
 
 recursive-include aea_ledger_ethereum_flashbots
 recursive-include tests *
