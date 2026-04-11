@@ -160,41 +160,26 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 7. ~~**`benchmark/` vs `plugins/aea-cli-benchmark/` consolidation**~~ ✓ done (variant of option 2). Deleted `benchmark/checks/` entirely (9 duplicated `check_*.py`, `run_benchmark.sh`, `run_benchmark_messages_mem.sh`, `utils.py`, `data/`) and `benchmark/run_mem_check_in_cloud.sh` (dead fetchai gcr image + pipenv). **Kept and fixed** `run_from_branch.sh` (venv + `aea benchmark reactive/proactive/multiagent_message_exchange`), `Dockerfile` (bookworm base, plain pip install, no pipenv/Pipfile wget), and `benchmark-deployment.yaml` (image bumped from EOL `python:3.10-buster` to `python:3.10-bookworm`). `benchmark/framework/` + `benchmark/cases/cpu_burn.py` preserved as teaching material for `docs/performance-benchmark.md`. Updated `benchmark/README.md` accordingly.
 
-8. **Long-running docs staleness audit** for the ~30 2020-2023 files flagged in the docs/ section (C). Needs subject-matter context, not mechanical edits.
+8. ~~**Docs staleness audit**~~ ✓ done — walked all 19 files flagged in the docs/ section (C). Fixed 9 with ground-truth-verified edits (CLI install names, command signatures, dead faucet link, stale `aea-config.yaml` / `skill.yaml` examples, `fetchai/p2p_libp2p*` → `valory/p2p_libp2p*`, `cert_requests` example from real connection.yaml, ledger-plugin list in `faq.md`); confirmed 10 evergreen and left untouched. See the expanded "C. Staleness audit" subsection below for the per-file breakdown.
 
 ## Likely removable
 
-### `benchmark/` — legacy predecessor of `plugins/aea-cli-benchmark/`
+### `benchmark/` vs `plugins/aea-cli-benchmark/` ✓ consolidated
 
-`benchmark/` is the pre-Poetry standalone benchmark harness. The newer, supported path is `plugins/aea-cli-benchmark/`, which is PyPI-installable and hooks into the `aea` CLI as `aea benchmark <case>`. The two trees overlap heavily and the shell-based runners are now broken.
+Done in commit `7593cce05` (variant of option 2, with the runners modernized instead of deleted). Summary:
 
-**Overlap.** All 9 of the `benchmark/checks/check_*.py` scripts have a near-identical sibling in `plugins/aea-cli-benchmark/aea_cli_benchmark/case_*/case.py` — line-by-line, the plugin version is a lightly cleaned descendant of the old script (different reporting helpers, `click` wrapper, dropped the in-house `BenchmarkControl` framework). The plugin also ships 3 cases the old tree doesn't: `case_acn_communication`, `case_acn_startup`, `case_tx_generate`.
+**Deleted** (~2500 LOC of dead duplication + pipenv/fetchai-gcr ghosts):
+- `benchmark/checks/` entirely (9 duplicated `check_*.py` mirroring the plugin's `case_*/case.py`, plus `utils.py`, `run_benchmark.sh`, `run_benchmark_messages_mem.sh`, `data/`).
+- `benchmark/run_mem_check_in_cloud.sh` — referenced a dead `gcr.io/fetch-ai-sandbox` image + pipenv + the deleted `checks/` scripts.
 
-**State of each artefact:**
+**Rewritten for modern Poetry / plugin CLI:**
+- `benchmark/run_from_branch.sh` — now creates a venv, installs `open-aea[all]` + `aea-cli-benchmark` + the 3 ledger plugins from source, and invokes `aea benchmark reactive/proactive/multiagent_message_exchange` directly. No more pipenv, no more nested shell runner.
+- `benchmark/Dockerfile` — `python:3.10-bookworm` base, plain pip install, dropped the fetchai Pipfile wget and the alpine + gfortran + openblas pile.
+- `benchmark/benchmark-deployment.yaml` — initContainer image bumped from EOL `python:3.10-buster` to `python:3.10-bookworm`.
+- `benchmark/README.md` — invocation instructions reflect the new single-script flow.
 
-| Artefact | Status |
-|---|---|
-| `benchmark/framework/*.py` — in-house `BenchmarkControl` + executor + report_printer | imports cleanly; referenced only by `benchmark/cases/cpu_burn.py` and by the docs example |
-| `benchmark/checks/check_*.py` | imports cleanly (needs `psutil`, a dev dep); functionally duplicated by the plugin |
-| `benchmark/checks/run_benchmark.sh` | still runnable inside a `poetry install --with dev` shell |
-| `benchmark/run_from_branch.sh` | **broken** — calls `pip install pipenv; pipenv install --dev --skip-lock`, but Pipfile was deleted during the Pipenv → Poetry migration |
-| `benchmark/benchmark-deployment.yaml` | **broken** — the k8s init container invokes `run_from_branch.sh` |
-| `benchmark/cases/cpu_burn.py` | teaching example for `BenchmarkControl`, referenced in `docs/performance-benchmark.md` |
-
-**Why it hasn't been deleted yet:**
-
-1. It's linted across 7 tox targets (black, isort, flake8, mypy, pylint, darglint, bandit), so it silently gates CI on code style.
-2. `docs/performance-benchmark.md` still teaches benchmark authoring against the in-house `BenchmarkControl` framework (which doesn't exist in the plugin) and references `benchmark/cases/cpu_burn.py`.
-3. No one has committed to removing it.
-
-**Removal options, from least to most aggressive:**
-
-1. **Delete `benchmark/` entirely.** Update `docs/performance-benchmark.md` to teach benchmark authoring against the plugin's `case_<name>/case.py` shape instead of `BenchmarkControl`. Drop `benchmark` from the 7 tox linter target paths. Net: ~25 files removed, ~300 LOC of drift-prone duplication gone, stale Pipenv/k8s runners gone. Loses the teaching example (can be rewritten against the plugin).
-2. **Keep `benchmark/framework/` + `benchmark/cases/cpu_burn.py`, delete `benchmark/checks/` and the broken runners (`run_benchmark.sh`, `run_from_branch.sh`, `benchmark-deployment.yaml`, `Dockerfile`).** Preserves the docs example and the in-house framework; drops the duplicated checks and the Pipenv/k8s artefacts. Lowest-risk middle ground.
-3. **Fix the broken runners** — port `run_from_branch.sh` to Poetry, verify the k8s deployment still works. Moderate effort for low value; the plugin already provides a supported runner path.
-4. **Leave as-is.** Documented here so the next person who touches it knows what they are looking at.
-
-**Recommendation: option 2.** It removes the Pipenv/k8s ghosts and the code duplication with the plugin, keeps the `BenchmarkControl` teaching framework that `docs/performance-benchmark.md` depends on, and is a low-risk bounded change. Option 1 is cleaner long-term but forces a docs rewrite at the same time. Option 3 spends effort maintaining two runners that do the same thing.
+**Kept as-is:**
+- `benchmark/framework/` + `benchmark/cases/cpu_burn.py` — teaching material for `docs/performance-benchmark.md` against the in-house `BenchmarkControl` framework. No duplication with the plugin.
 
 ## Partially removable (incomplete Poetry migration)
 
@@ -210,48 +195,37 @@ Contains tool configurations for flake8, isort, mypy, darglint, and bdist_wheel.
 
 End-user install scripts that install from PyPI. Referenced in `bump_aea_version.py` for version string updates. Hardcode version 2.1.0 — questionable ongoing maintenance value.
 
-## Plugin `install_requires` hygiene
+## Plugin `install_requires` hygiene ✓ done
 
-Audit of plugin `setup.py` `install_requires` versus actual source imports. Three categories, in priority order.
+All four categories completed in commits `901736ce0` (A) and `4e2d5b246` (B/C/D). Historical audit preserved below for context.
 
-### A. Undeclared runtime deps — real install-breakage risk
+### A. Undeclared runtime deps — real install-breakage risk ✓ fixed
 
-These plugins import packages that are **not** in their own `install_requires`. They only work today because developers install them into an environment that already has `open-aea[cli]` (for `click`) or a dev shell with pyyaml/cosmpy/docker/gitpython/etc. present. A clean `pip install <plugin>` into an empty venv will `ImportError` on first use.
+Plugins that imported packages not declared in their own `install_requires`, so a clean `pip install <plugin>` into an empty venv would `ImportError`:
 
-| Plugin | Missing | Used in |
+| Plugin | Was missing | Fix |
 |---|---|---|
-| `aea-ci-helpers` | `pyyaml` | `check_pkg_versions.py`, `check_doc_hashes.py` (`import yaml`) |
-| `aea-cli-benchmark` | `click`, `cosmpy`, `docker` | `click` in ~18 files; `cosmpy` + `docker` in `case_tx_generate/ledger_utils.py` and `case_tx_generate/docker_image.py` |
-| `aea-cli-ipfs` | `click` | `core.py` — the entry point for every `aea ipfs` subcommand |
-| `aea-dev-helpers` | `gitpython`, `packaging`, `open-aea-cli-ipfs` | `bump_version.py` → `from git import Repo` + `from packaging...`; `publish_local.py` → `aea_cli_ipfs.core` + `aea_cli_ipfs.ipfs_utils` |
+| `aea-ci-helpers` | `pyyaml` | added `pyyaml>=6.0,<7` |
+| `aea-cli-benchmark` | `click`, `cosmpy`, `docker` | added `click>=8.1.0,<8.4.0`, `cosmpy>=0.11.0,<0.12`, `docker==7.1.0` |
+| `aea-cli-ipfs` | `click` | added `click>=8.1.0,<8.4.0` |
+| `aea-dev-helpers` | `gitpython`, `packaging`, `open-aea-cli-ipfs` | added `gitpython>=3.1.37,<4`, `packaging`, `open-aea-cli-ipfs>=2.0.0,<3.0.0` |
 
-**Fix:** add the missing declarations to each plugin's `install_requires`. Trivial change, high priority (real bug).
+Note on `click`: core `open-aea` only declares `click` in the `[cli]` extra, so plugins that import `click` must declare it themselves.
 
-Note on `click`: core `open-aea` only declares `click` in the `[cli]` extra, not in base deps. Plugins that import `click` must declare it themselves — relying on `open-aea[cli]` being installed is not a contract.
+### B. Redundant declared deps ✓ removed
 
-### B. Redundant declared deps — can be removed
+`aea-ledger-ethereum-hwi/setup.py` dropped `web3>=7.0.0,<8` and `protobuf>=5,<7`. Neither is imported by the plugin source; `eth-account` (still declared) transitively pulls in everything the HWI source actually touches (`eth_keys`, `eth_rlp`, `eth_typing`, `eth_utils`, `rlp`, `cytoolz`, `construct`, `hexbytes`).
 
-| Plugin | Remove | Rationale |
-|---|---|---|
-| `aea-ledger-ethereum-hwi` | `web3>=7.0.0,<8`, `protobuf>=5,<7` | Grep finds zero `import web3` / `google.protobuf` in the plugin source. `protobuf` already comes via core `open-aea`. `eth-account` (still declared) transitively pulls in everything the HWI source actually touches (`eth_keys`, `eth_rlp`, `eth_typing`, `eth_utils`, `rlp`, `cytoolz`, `construct`, `hexbytes`). |
+### C. Test-only deps leaking into production packages ✓ fixed
 
-Effort trivial, no behaviour change.
+`aea-ledger-ethereum`, `aea-ledger-fetchai`, and `aea-cli-ipfs` ship a `test_tools/` subpackage with top-level `import pytest`. Moved to `extras_require={"test_tools": ["pytest", "docker==7.1.0"]}` (the ipfs variant omits `docker`). Consumers who want the test helpers now `pip install plugin[test_tools]` and get a clean install path instead of a silent `ImportError` at module load.
 
-### C. Test-only deps leaking into production packages
+Chose option 1 (extras_require) over lazy-import because `@pytest.fixture` decorators run at module import time — they cannot be moved inside function bodies.
 
-`aea-ledger-ethereum`, `aea-ledger-fetchai`, and `aea-cli-ipfs` each ship a `test_tools/` subpackage as part of `install_requires`. These subpackages `import pytest` (and sometimes `import docker`) at module top level, but neither is declared in `install_requires`. A consumer who imports anything from `plugin.test_tools.*` — or who runs type-checking across the whole installed package — will `ImportError`.
+### D. Antipatterns ✓ both fixed
 
-Two fix options:
-
-1. **Declare an extras group** — `extras_require={"test_tools": ["pytest", "docker"]}`, documented in each plugin's README. Clean but changes install semantics.
-2. **Lazy-import** — move `import pytest` / `import docker` inside the functions that use them, or guard with `try/except ImportError`. `aea-ledger-ethereum/test_tools/fixture_helpers.py:61` already does this for `docker`; extending it to `pytest` is mechanical.
-
-Priority low — no user has reported hitting this, but it would surface in any environment running `pip check` or static analysis.
-
-### D. Antipatterns worth flagging (no forced action)
-
-- **`aea-ci-helpers/check_imports.py`** imports `from pip._internal.commands.show import ...` (guarded by try/except). pip's private API is brittle across pip versions. Stdlib `importlib.metadata.distribution(name).requires` returns equivalent information without touching pip internals. Swap is ~10 LOC.
-- **`aea-ci-helpers`** declares both `toml>=0.10,<1` and `tomli`. `toml` is used in `check_dependencies.py`, `tomli` in `check_pyproject.py`. Since Python 3.11+ ships `tomllib` in stdlib and `tomli` is the 3.10 back-compat shim, the right shape is a single `tomli`/`tomllib` conditional import — and `toml` (the older library) can be dropped entirely. Cosmetic.
+- **D1:** `aea-ci-helpers/check_imports.py` — swapped `from pip._internal.commands.show import search_packages_info` for stdlib `importlib.metadata.distribution(name)`. No more pip private-API fragility across pip versions.
+- **D2:** Dropped `toml` entirely. `check_pyproject.py` and `check_dependencies.py` now use a conditional `tomllib` (stdlib 3.11+) / `tomli` (3.10 back-compat shim) pattern for reads, and `tomli-w` for writes. `aea-ci-helpers/setup.py install_requires` declares `tomli; python_version < "3.11"` and `tomli-w`. Dead `toml==0.10.2` pins also removed from `pyproject.toml` dev group and the `update-dependencies` + `check-dependencies` tox envs. Verified end-to-end via `aea-ci check-pyproject` and `aea-ci check-dependencies --check`.
 
 ## `docs/` and `examples/` cleanup
 
@@ -309,13 +283,9 @@ Walked all 19 files and made targeted fixes where ground truth was out of sync w
 
 2. **Fetchai-weighted tutorial doc set** (`quickstart.md`, `echo_demo.md`, `http-echo-demo.md`, `aev-echo-demo.md`) — **deferred, not cleanup scope**. Every `fetchai/*` identifier in these docs is the functional public_id of a real package living on disk under `packages/fetchai/` (e.g. `fetchai/echo:0.19.0`, `fetchai/http_echo:0.20.0`, `fetchai/stub:0.21.0`, `fetchai/default:1.0.0` protocol). The author field is fixed at publish time and baked into the IPFS hashes users download. Rebasing these onto a `valory/*` or `open_aea/*` vendor would require moving 4+ packages on disk, regenerating every fingerprint and hash, re-publishing to the public IPFS registry (breaking existing downstream hashes cached by users), and parallel updating every test and config reference. That is a strategic registry migration, not a tutorial cleanup. Left as-is.
 
-### Recommended order of operations
+### Order of operations ✓ executed
 
-1. Pipenv fixes in `quickstart.md` and friends (A1) — highest impact, first-run experience.
-2. `release-process.md` script migration + add to nav (A2, A3) — unblocks maintainer workflow.
-3. Delete `examples/ml_ex/`, `docs/known-limits.md`, `docs/notes.md` (B1, B3, B4) — pure cleanup, no behaviour change.
-4. Separate pass for C (staleness audit) — needs subject-matter context, can be opportunistic rather than planned.
-5. D is paint-the-shed; pick it up alongside any of the above if convenient.
+All docs/examples cleanup items landed across commits `710805517` (A1 pipenv → venv), `d11044e56` (A2 release-process + B1/B3/B4 deletions + known-limits bullets redistributed), `b6f82d9fd` (A3 CONTRIBUTING.md link + D1 scaffolding author placeholder), and `08886f8f1` (C staleness audit). D2 documented as deferred (strategic registry migration, not cleanup scope).
 
 ## Dependabot alerts requiring action
 
