@@ -20,7 +20,7 @@ import (
 	peerstore "github.com/libp2p/go-libp2p/core/peerstore"
 	protocol "github.com/libp2p/go-libp2p/core/protocol"
 	multiaddr "github.com/multiformats/go-multiaddr"
-	gomock "go.uber.org/mock/gomock"
+	"github.com/golang/mock/gomock"
 )
 
 // MockHost is a mock of Host interface.

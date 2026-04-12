@@ -18,7 +18,7 @@ import (
 	peer "github.com/libp2p/go-libp2p/core/peer"
 	protocol "github.com/libp2p/go-libp2p/core/protocol"
 	multiaddr "github.com/multiformats/go-multiaddr"
-	gomock "go.uber.org/mock/gomock"
+	"github.com/golang/mock/gomock"
 )
 
 // MockPeerstore is a mock of Peerstore interface.
