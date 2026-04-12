@@ -64,6 +64,8 @@ def generate_table(check: bool = False) -> None:
     existing `docs/package_list.md` and exit non-zero on mismatch instead
     of overwriting it. This lets CI verify the file is in sync without
     having the fix path accidentally clobber unrelated changes.
+
+    :param check: if True, verify the file is in sync instead of writing it.
     """
     content = _render_table()
 
