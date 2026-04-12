@@ -145,7 +145,7 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
    **Currently runs locally only.** Wiring the test into CI as a Python integration job (alongside `golang_checks`, which currently only builds `aea_end2end` but doesn't run the Python harness) is a small follow-up.
 
-3. **`ecdsa>=0.19.2` pin bump** for `aea-ledger-cosmos` (see the "ecdsa" section under "Dependabot alerts requiring action"). API compat verified locally; blocked on confirming downstream consumer compatibility before flipping the pin in 4 files.
+3. ~~**`ecdsa>=0.19.2` pin bump**~~ ✓ done — bumped from `>=0.15,<0.17.0` to `>=0.19.2,<0.20` across all 4 locations (`plugins/aea-ledger-cosmos/setup.py:43`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`). Downstream compat verified: `open-autonomy` declares `ecdsa >= 0.15` (no upper bound, no direct imports) so the tighter floor resolves cleanly. Closes Dependabot alert #147 (DER DoS).
 
 4. ~~**`requests` dev-group dep bump**~~ ✓ done — bumped to `>=2.32.5,<3` across all 4 locations (`pyproject.toml:30`, `plugins/aea-ledger-cosmos/setup.py:47`, `plugins/aea-ledger-fetchai/setup.py:47`, `plugins/aea-ledger-ethereum/setup.py:46`) as part of commit `58b38d144` ("chore: align Python dependency version pins across pyproject/tox/plugins"). Closes alert #159 (`extract_zipped_paths` temp-file reuse). Kept as a real dep rather than dropped since the three ledger plugins use it at runtime and tests import it directly.
 

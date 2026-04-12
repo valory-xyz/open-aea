@@ -52,7 +52,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.17.7'
+          go-version: '1.24.0'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -112,7 +112,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -222,7 +222,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - run: |
           wget https://github.com/zricethezav/gitleaks/releases/download/v8.10.1/gitleaks_8.10.1_linux_x64.tar.gz && \
           tar -xzf gitleaks_8.10.1_linux_x64.tar.gz && \
@@ -306,7 +306,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - name: Install protolint (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -337,7 +337,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -377,7 +377,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -456,7 +456,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.20.0'
+          go-version: '1.24.0'
       - if: matrix.os == 'ubuntu-latest'
         name: Install dependencies (ubuntu-latest)
         run: |
