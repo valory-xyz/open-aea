@@ -181,15 +181,15 @@ Done in commit `7593cce05` (variant of option 2, with the runners modernized ins
 **Kept as-is:**
 - `benchmark/framework/` + `benchmark/cases/cpu_burn.py` — teaching material for `docs/performance-benchmark.md` against the in-house `BenchmarkControl` framework. No duplication with the plugin.
 
-## Partially removable (incomplete Poetry migration)
+## Poetry migration — decided: keep `setup.py` and `setup.cfg`
 
-### `setup.py`
+### `setup.py` — keep
 
-Still needed because `release.yml` uses `python setup.py sdist bdist_wheel` to build distributions. Could be removed if the release workflow were migrated to use `python -m build` (which reads `pyproject.toml`).
+Decision: **keep.** `release.yml` uses `python setup.py sdist bdist_wheel` for both core and all 10 plugins. Migrating to `python -m build` would produce functionally identical output but introduces release-infrastructure risk (PyPI metadata differences from the dynamic `parse_readme()`, CI environment changes) for zero user-facing benefit. The duplication between `setup.py` and `pyproject.toml` doesn't drift because `aea-dev bump-version` updates both. Not worth the release risk.
 
-### `setup.cfg`
+### `setup.cfg` — keep
 
-Contains tool configurations for flake8, isort, mypy, darglint, and bdist_wheel. These could be consolidated into `pyproject.toml` `[tool.xxx]` sections, allowing removal of this file.
+Decision: **keep.** Contains tool configurations for flake8 (which doesn't natively support `pyproject.toml`), isort, mypy (~80 per-module override sections), darglint, and bdist_wheel. Full consolidation into `pyproject.toml` would require either adding a flake8 plugin dep or switching to ruff, plus mechanical-but-verbose mypy override porting. No functional benefit.
 
 ### `scripts/install.sh` and `scripts/install.ps1` ✓ kept, freshened
 
