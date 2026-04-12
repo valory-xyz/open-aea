@@ -26,10 +26,7 @@ cd my_aea_projects/
 mkdir my_aea_projects/ && cd my_aea_projects/
 ```
 ``` bash
-which pipenv
-```
-``` bash
-touch Pipfile && pipenv --python 3.10 && pipenv shell
+python3.10 -m venv .venv && source .venv/bin/activate
 ```
 ``` bash
 svn export https://github.com/valory-xyz/open-aea.git/trunk/examples
@@ -67,7 +64,7 @@ Confirm password:
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.7.0
+v2.1.0
 
 AEA configurations successfully initialized: {'author': 'fetchai'}
 ```
@@ -108,7 +105,7 @@ aea run
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.7.0
+v2.1.0
 
 Starting AEA 'my_first_aea' in 'async' mode ...
 info: Echo Handler: setup method called.
@@ -144,7 +141,7 @@ info: Echo Handler: teardown method called.
 info: Echo Behaviour: teardown method called.
 ```
 ``` bash
-pipenv run pytest test.py
+pytest test.py
 ```
 ``` bash
 aea delete my_first_aea
