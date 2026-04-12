@@ -31,7 +31,7 @@ fingerprint:
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
   libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeidbnn2csaq7ww54ru7iykfhuxtv7fj3z7u6dlrrzjly3scrb77u34
-  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeifbqiumqzxx5lnzkptczcqqpksccuxiaj2mmixwbuyms6sjrm7ebe
+  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeig2ekrl4byexzj7nu4q62uesnkhmhb7mgu5yfgnwiyk2ylyruxloe
   libp2p_node/dht/dhtpeer/mailbox.go: bafybeic5lng7ozhxw6cwibwh5s3lqcyyhurovsl2qy77om6ctir6qctnuy
   libp2p_node/dht/dhtpeer/notifee.go: bafybeidzcmhfgh3efwp4t4kph5gdy4jps4useusmclwxe4pgdvhz5cnche
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy

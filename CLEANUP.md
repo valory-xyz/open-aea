@@ -164,6 +164,28 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
 8. ~~**Docs staleness audit**~~ ✓ done — walked all 19 files flagged in the docs/ section (C). Fixed 9 with ground-truth-verified edits (CLI install names, command signatures, dead faucet link, stale `aea-config.yaml` / `skill.yaml` examples, `fetchai/p2p_libp2p*` → `valory/p2p_libp2p*`, `cert_requests` example from real connection.yaml, ledger-plugin list in `faq.md`); confirmed 10 evergreen and left untouched. See the expanded "C. Staleness audit" subsection below for the per-file breakdown.
 
+9. **ACN total-ordering guarantee not honored by `libp2p_node` slow-queue path** (pre-existing, not a bump regression).
+
+   The [open-acn README](https://github.com/valory-xyz/open-acn/blob/main/README.md) explicitly states:
+
+   > ACN should guarantee total ordering of messages for all agent pairs, independent of the type of connection and ACN messaging pattern used.
+
+   The implementation in `packages/valory/connections/p2p_libp2p/libp2p_node/dht/dhtpeer/dhtpeer.go` (byte-identical to the open-acn upstream) does not actually honor this guarantee on any multi-hop forwarding path. The bug:
+
+   1. The per-pair serializer `syncMessages[pair]` wraps calls to `RouteEnvelope(e)` in one goroutine per `(sender, recipient)` pair, which LOOKS like it preserves per-pair ordering.
+   2. But inside `RouteEnvelope`, when a destination address lookup misses the local DHT cache, the envelope is pushed to the **global** `slow_queue` (a single shared `chan *aea.Envelope` drained by exactly one `slowEnvelopeSendLoop` goroutine) and `RouteEnvelope` **returns immediately**.
+   3. The per-pair goroutine then processes envelope N+1, which may hit the cache (now populated by N's lookup side effects) and take the fast direct-delivery path. Envelope N+1 is delivered before envelope N — per-pair ordering is violated.
+
+   This is caught by `TestMessageOrderingWithDelegateClientTwoHops` in `dht/dhtpeer/dhtpeer_test.go`, which fails with errors like `Expected counter 87 received counter 85`. The test has been skipped with `t.Skip` on this branch (commit `33bb1121d`, updated in a follow-up to reference this section). The single-hop variant `TestMessageOrderingWithDelegateClient` passes consistently because there is no slow-queue fallback on the single-hop delegate path.
+
+   **Fix options, in increasing scope:**
+
+   - **Option A (current state): skip the test, document the bug.** Cheapest. No behaviour change. Ships a documented gap between the aspirational ACN README guarantee and the implementation. Current state of this branch.
+   - **Option B: minimal production fix — do the DHT lookup retry loop inline in the per-pair goroutine.** Instead of pushing to the global `slow_queue` and returning from `RouteEnvelope`, run the retry loop synchronously inside the per-pair goroutine's body so envelope N+1 isn't dequeued until N has either succeeded or exhausted its retries. Drops the global slow-queue path entirely for pairs with in-flight envelopes. Preserves ordering. **Risk**: changes throughput characteristics in degraded-DHT scenarios — a pair with one slow lookup now blocks that pair's subsequent envelopes instead of draining them optimistically via the fast path. Other pairs are unaffected because they have their own goroutines. Estimated: 30–60 minutes + test re-enable + CI verification.
+   - **Option C: clean production fix — make the slow queue per-pair instead of a global shared channel.** Each `syncMessages[pair]` gets its own dedicated slow-retry worker that fires only when a fast-path lookup misses. Preserves ordering by construction, doesn't change the throughput profile because slow deliveries for different pairs still proceed in parallel. More invasive: introduces a new goroutine per pair (memory cost scales with number of active conversations) and requires care in the pair-cleanup path. Estimated: 2 hours + careful testing.
+
+   **Recommendation**: option B as the next step. Option C is nicer but the memory-per-pair trade-off needs a real workload decision. Option A is acceptable for this cleanup PR because the bug is pre-existing and fixing it is a production behaviour change.
+
 ## Likely removable
 
 ### `benchmark/` vs `plugins/aea-cli-benchmark/` ✓ consolidated

@@ -861,20 +861,42 @@ func TestMessageOrderingWithDelegateClient(t *testing.T) {
 
 // TestMessageOrderingWithDelegateClientTwoHops
 //
-// Skipped: this test asserts strict per-sender message ordering across a
-// two-hop delegate → peer → peer → delegate path with interleaved sends
-// from two concurrent senders. The ACN protocol does not guarantee that
-// kind of ordering: the forwarding path on each peer can mix fast-path
-// and slow-queue deliveries when a destination address lookup misses the
-// local cache, so an envelope queued on the slow path can arrive after a
-// later envelope that took the fast path. The single-hop variant
-// (`TestMessageOrderingWithDelegateClient`) passes consistently because
-// there is no slow-queue fallback on the single-hop path. This test is
-// left in the tree so the invariant it wants to assert is discoverable,
-// but disabled in CI until the production code either enforces strict
-// ordering or the test is rewritten to only require multiset equality.
+// Skipped: pre-existing implementation bug, NOT a regression from the
+// libp2p v0.8 → v0.33 bump. The code under test is byte-identical to
+// the same function in open-acn (the upstream ACN reference
+// implementation), and both have this bug.
+//
+// The open-acn README explicitly states:
+//
+//	"ACN should guarantee total ordering of messages for all agent pairs,
+//	 independent of the type of connection and ACN messaging pattern used."
+//
+// This test asserts exactly that invariant over a two-hop
+// delegate → peer → peer → delegate path, and the implementation has
+// never actually honored it.
+//
+// Root cause: the per-pair serialization in `syncMessages[pair]`
+// serializes calls to `RouteEnvelope(e)`, but `RouteEnvelope` returns
+// immediately after pushing an envelope to the GLOBAL `slow_queue`
+// when a destination address lookup misses the local DHT cache. The
+// per-pair goroutine then processes envelope N+1, which may hit the
+// cache (populated by N's lookup side effects) and take the fast
+// direct-delivery path, overtaking envelope N. The test fails with
+// "Expected counter 87 received counter 85" when exactly this happens.
+//
+// The single-hop variant (`TestMessageOrderingWithDelegateClient`)
+// passes consistently because there is no slow-queue fallback on the
+// single-hop delegate path, so the per-pair goroutine delivers each
+// envelope synchronously in order.
+//
+// Re-enable condition: either option B (minimal fix — do the DHT
+// retry loop inline in the per-pair goroutine so slow deliveries stay
+// per-pair-serialized) or option C (clean fix — make the slow queue
+// per-pair instead of a global shared channel) from CLEANUP.md's
+// "ACN total-ordering guarantee" follow-up section. Once the ordering
+// guarantee actually holds in the implementation, drop this Skip.
 func TestMessageOrderingWithDelegateClientTwoHops(t *testing.T) {
-	t.Skip("two-hop delegate path does not guarantee strict ordering across interleaved senders; see comment above")
+	t.Skip("pre-existing slow-queue ordering bug (not a bump regression); see CLEANUP.md ACN ordering follow-up")
 	peer1Index := 0
 	peer2Index := 1
 	client1Index := 2

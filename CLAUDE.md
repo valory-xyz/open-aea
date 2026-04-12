@@ -149,15 +149,31 @@ tox -e check-doc-links-hashes  # only if docs/ touched
 ```
 
 Notes:
-- `darglint` scans `plugins/**/build/` artifacts if they exist. If you
-  see a darglint error in a `build/lib/...` path, run `rm -rf
-  plugins/*/build` and re-run — those are stale setuptools build
-  outputs, not real source.
+- `tox -e darglint` also scans stale setuptools build artifacts under
+  the plugins directory. If you see an error in a `build/lib/...`
+  path, run `rm -rf plugins/*/build` and re-run.
 - For Go changes under `libs/go/aealite` or
   `packages/valory/connections/p2p_libp2p/libp2p_node`, also run
   `go build ./... && go vet ./... && go test ./...` in each module,
-  plus `golangci-lint run --timeout=5m` on aealite (libp2p_node is
-  not covered by golangci-lint yet — see CLEANUP.md).
+  plus `golangci-lint run --timeout=5m` on aealite. The libp2p_node
+  module is not yet covered by golangci (see CLEANUP.md).
 - `make code-checks` bundles most of the Python tox envs above but
   runs them in parallel; if it fails, re-run the failing ones
   individually to see which one reported what.
+
+### If a check fails — fix modes
+
+Check-mode envs above are read-only. When they fail, run the matching
+fix-mode env (or manual step), then re-run the check until clean:
+
+- `tox -e hash-check` fails → `tox -e lock-packages` regenerates
+  `packages/packages.json` hashes + `docs/package_list.md`. Commit the
+  regenerated files.
+- `tox -e spell-check` fails → add legitimate project terms to
+  `.spelling` (global section, before the first ` - filename`
+  override). Do not guess at flagged tokens — read the surrounding
+  markdown to identify the actual word.
+- `tox -e check-doc-links-hashes` fails → `tox -e fix-doc-hashes`.
+- `tox -e check-copyright` fails → `tox -e fix-copyright`.
+- `tox -e black-check` / `tox -e isort-check` fail →
+  `make formatters`.
