@@ -23,7 +23,6 @@ package connections
 import (
 	wallet "aealite/wallet"
 	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/binary"
@@ -74,7 +73,11 @@ func (sock *TCPSocketChannel) Connect() error {
 	}
 
 	pub := cert.PublicKey.(*ecdsa.PublicKey)
-	publicKeyBytes := elliptic.Marshal(pub.Curve, pub.X, pub.Y)
+	ecdhPub, err := pub.ECDH()
+	if err != nil {
+		return err
+	}
+	publicKeyBytes := ecdhPub.Bytes()
 
 	signature, err := sock.Read()
 	logger.Debug().Msgf("got signature %d bytes", len(signature))
