@@ -52,7 +52,7 @@ fingerprint:
   libp2p_node/protocols/acn/v1_0_0/acn.pb.go: bafybeibhoxaaq6mnc654gaguljypkj2qwhd3epi6d3zc4t5x24bdvfnvdy
   libp2p_node/protocols/acn/v1_0_0/acn.proto: bafybeigvgpfuxg67fymghnd5pfi7lvjf7ntkagkl2tlr3dzbwhxb5ekkjm
   libp2p_node/protocols/acn/v1_0_0/acn.yaml: bafybeiaciincxvcb4imlzpdiju62tzafm6hodxvthhz67xeqjfaamg3upa
-  libp2p_node/utils/utils.go: bafybeiatrqnnuhxjynoabalwnjzh6vsqnyyxlqsio6vkulsxtqexlagwhu
+  libp2p_node/utils/utils.go: bafybeidruyrxejxtcdcgfph5fh3gg7l5qub27p74s2nl6mwfgqkjslubfi
   libp2p_node/utils/utils_test.go: bafybeie5mct66cq3onpfnm5y2hnywschjnjxgoviqsrpx5i3ada2xwht7m
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e
   tests/base.py: bafybeiduqhd4t62fj7tsj6se3pokgtrizrna37b6vw5nj7ul4xdawc7vii

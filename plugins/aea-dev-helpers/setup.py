@@ -41,7 +41,6 @@ setup(
         "open-aea-cli-ipfs>=2.0.0,<3.0.0",
         "packaging>=22.0,<27",
         "pyyaml>=6.0.1,<7",
-        "toml>=0.10,<1",
     ],
     python_requires=">=3.10,<3.15",
     classifiers=[

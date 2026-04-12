@@ -16,7 +16,7 @@ Now you should be able to run `aea benchmark`:
 ```bash
 Usage: aea benchmark [OPTIONS] COMMAND [ARGS]...
 
-  Run one of performance benchmark.
+  Run one of the performance benchmarks.
 
 Options:
   --help  Show this message and exit.

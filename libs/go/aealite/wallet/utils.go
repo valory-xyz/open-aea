@@ -107,12 +107,42 @@ func BTCPubKeyFromEthereumPublicKey(publicKey string) (*btcec.PublicKey, error) 
 // References:
 //  - https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L258
 //  - https://github.com/btcsuite/btcd/blob/master/btcec/signature.go#L47
+// secp256k1SignatureComponentSize is the fixed byte length of each of the
+// R and S components of a secp256k1 ECDSA signature. ConvertStrEncodedSignatureToDER
+// and ConvertDEREncodedSignatureToStr use this so that `str(sig)` is a
+// deterministic 64-byte R||S encoding that round-trips losslessly — earlier
+// versions used `big.Int.Bytes()` which strips leading zero bytes and
+// produced variable-width output, breaking round-trip when only one of
+// R/S had a leading zero that needed preserving.
+const secp256k1SignatureComponentSize = 32
+
+// padToLeft left-pads `b` with zero bytes to exactly `size` bytes. Panics
+// if `len(b) > size`; callers must ensure R and S from a secp256k1
+// signature fit in 32 bytes (which they always do).
+func padToLeft(b []byte, size int) []byte {
+	if len(b) >= size {
+		return b
+	}
+	padded := make([]byte, size)
+	copy(padded[size-len(b):], b)
+	return padded
+}
+
 func ConvertStrEncodedSignatureToDER(signature []byte) ([]byte, error) {
 	if signature == nil {
 		return []byte{}, errors.New("No signature provided.")
 	}
-	rb := signature[:len(signature)/2]
-	sb := signature[len(signature)/2:]
+	if len(signature) != 2*secp256k1SignatureComponentSize {
+		return []byte{}, fmt.Errorf(
+			"invalid secp256k1 signature length: got %d, want %d (%d-byte R || %d-byte S)",
+			len(signature),
+			2*secp256k1SignatureComponentSize,
+			secp256k1SignatureComponentSize,
+			secp256k1SignatureComponentSize,
+		)
+	}
+	rb := signature[:secp256k1SignatureComponentSize]
+	sb := signature[secp256k1SignatureComponentSize:]
 	r := new(big.Int).SetBytes(rb)
 	s := new(big.Int).SetBytes(sb)
 	// Use encoding/asn1 to marshal an ECDSA-Sig-Value DER sequence,
@@ -154,7 +184,14 @@ func ConvertDEREncodedSignatureToStr(signature []byte) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	return append(parsed.R.Bytes(), parsed.S.Bytes()...), nil
+	// Left-pad to 32 bytes each so the output is always a fixed 64 bytes
+	// and round-trips losslessly through ConvertStrEncodedSignatureToDER.
+	// big.Int.Bytes() strips leading zeros, which would otherwise produce
+	// variable-length output and break the round-trip.
+	out := make([]byte, 2*secp256k1SignatureComponentSize)
+	copy(out, padToLeft(parsed.R.Bytes(), secp256k1SignatureComponentSize))
+	copy(out[secp256k1SignatureComponentSize:], padToLeft(parsed.S.Bytes(), secp256k1SignatureComponentSize))
+	return out, nil
 }
 
 // ParseFetchAISignature create btcec Signature from base64 formated, string (not DER) encoded RFC6979 signature
