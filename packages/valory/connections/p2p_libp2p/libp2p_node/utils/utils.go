@@ -128,6 +128,15 @@ func NewDefaultLoggerWithFields(fields map[string]string) zerolog.Logger {
 	Helpers
 */
 
+// dhtFindPeer wraps `dht.RoutingTable().Find(id)` behind a package-level
+// function variable so that tests can inject a fake routing-table lookup
+// without depending on monkey patching (bou.ke/monkey relies on Go
+// runtime internals that were removed in Go 1.21+ and no longer works
+// on modern toolchains).
+var dhtFindPeer = func(dht *kaddht.IpfsDHT, id peer.ID) peer.ID {
+	return dht.RoutingTable().Find(id)
+}
+
 // BootstrapConnect connect to `peers` at bootstrap
 // This code is borrowed from the go-ipfs bootstrap process
 func BootstrapConnect(
@@ -188,7 +197,7 @@ func BootstrapConnect(
 	for _, peer := range peers {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		for dht.RoutingTable().Find(peer.ID) == "" {
+		for dhtFindPeer(dht, peer.ID) == "" {
 			select {
 			case <-ctx.Done():
 				return errors.New(

@@ -27,15 +27,11 @@ import (
 	"errors"
 	"libp2p_node/aea"
 	"libp2p_node/mocks"
-	"net"
-	"reflect"
 	"testing"
 
-	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
 	"github.com/libp2p/go-libp2p/core/peer"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
-	kbucket "github.com/libp2p/go-libp2p-kbucket"
 	multiaddr "github.com/multiformats/go-multiaddr"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -195,33 +191,58 @@ func TestWriteBytesConn(t *testing.T) {
 func TestReadWriteEnvelopeFromConnection(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	defer monkey.UnpatchAll()
 	address := "0xb8d8c62d4a1999b7aea0aebBD5020244a4a9bAD8"
-	buffer := bytes.NewBuffer([]byte{})
 	mockConn := mocks.NewMockConn(mockCtrl)
 
+	// The test captures whatever WriteEnvelopeConn writes to the "wire"
+	// into this buffer, then replays the same bytes back via Read so that
+	// ReadEnvelopeConn can decode them. This mocks at the net.Conn
+	// boundary using standard gomock expectations — no monkey patching.
+	var wire bytes.Buffer
+
 	t.Run("TestWriteEnvelope", func(t *testing.T) {
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(mockConn),
-			"Write",
-			func(_ *mocks.MockConn, b []byte) (int, error) {
-				buffer.Write(b)
-				return 0, nil
-			},
-		)
+		mockConn.EXPECT().
+			Write(gomock.Any()).
+			DoAndReturn(func(b []byte) (int, error) {
+				return wire.Write(b)
+			}).
+			AnyTimes()
 
 		err := WriteEnvelopeConn(mockConn, &aea.Envelope{
 			To:     address,
 			Sender: address,
 		})
 		assert.Equal(t, nil, err)
-		assert.NotEqual(t, 0, buffer)
+		assert.NotEqual(t, 0, wire.Len())
 	})
 
 	t.Run("TestReadEnvelope", func(t *testing.T) {
-		monkey.Patch(ReadBytesConn, func(conn net.Conn) ([]byte, error) {
-			return buffer.Bytes()[4:], nil
-		})
+		// ReadBytesConn does two Reads: first a 4-byte big-endian length
+		// header, then `size` payload bytes. WriteBytesConn emits exactly
+		// that shape, so we feed the captured bytes back the same way.
+		captured := wire.Bytes()
+		require := func(ok bool) {
+			if !ok {
+				t.Fatalf("expected captured wire bytes to contain at least a 4-byte header, got %d", len(captured))
+			}
+		}
+		require(len(captured) >= 4)
+		header := captured[:4]
+		payload := captured[4:]
+
+		gomock.InOrder(
+			mockConn.EXPECT().
+				Read(gomock.Any()).
+				DoAndReturn(func(b []byte) (int, error) {
+					return copy(b, header), nil
+				}),
+			mockConn.EXPECT().
+				Read(gomock.Any()).
+				DoAndReturn(func(b []byte) (int, error) {
+					return copy(b, payload), nil
+				}),
+		)
+
 		env, err := ReadEnvelopeConn(mockConn)
 		assert.Equal(t, nil, err)
 		assert.Equal(t, address, env.To)
@@ -327,9 +348,15 @@ func TestBootstrapConnect(t *testing.T) {
 	ctx := context.Background()
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	defer monkey.UnpatchAll()
-	var ipfsdht *kaddht.IpfsDHT
-	var routingTable *kbucket.RoutingTable
+
+	// BootstrapConnect internally calls `dht.RoutingTable().Find(peerID)`.
+	// Rather than patching the concrete *kaddht.IpfsDHT and
+	// *kbucket.RoutingTable types via monkey (incompatible with Go 1.21+),
+	// the production code now routes that lookup through the package-level
+	// function variable `dhtFindPeer`. Each sub-test swaps it for the
+	// duration of the case.
+	origDHTFindPeer := dhtFindPeer
+	defer func() { dhtFindPeer = origDHTFindPeer }()
 
 	mockPeerstore := mocks.NewMockPeerstore(mockCtrl)
 	peers := make([]peer.AddrInfo, 2)
@@ -345,22 +372,11 @@ func TestBootstrapConnect(t *testing.T) {
 	mockPeerstore.EXPECT().AddAddrs(gomock.Any(), gomock.Any(), gomock.Any()).Return().Times(2)
 
 	t.Run("TestOk", func(t *testing.T) {
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(routingTable),
-			"Find",
-			func(_ *kbucket.RoutingTable, _ peer.ID) peer.ID {
-				return peer.ID("som peer")
-			},
-		)
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(ipfsdht),
-			"RoutingTable",
-			func(_ *kaddht.IpfsDHT) *kbucket.RoutingTable {
-				return routingTable
-			},
-		)
+		dhtFindPeer = func(_ *kaddht.IpfsDHT, _ peer.ID) peer.ID {
+			return peer.ID("some peer")
+		}
 
-		err := BootstrapConnect(ctx, mockHost, ipfsdht, peers)
+		err := BootstrapConnect(ctx, mockHost, nil, peers)
 		assert.Equal(t, nil, err)
 	})
 
@@ -372,22 +388,11 @@ func TestBootstrapConnect(t *testing.T) {
 	mockPeerstore.EXPECT().AddAddrs(gomock.Any(), gomock.Any(), gomock.Any()).Return().Times(2)
 
 	t.Run("Test_PeersNotAdded", func(t *testing.T) {
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(routingTable),
-			"Find",
-			func(_ *kbucket.RoutingTable, _ peer.ID) peer.ID {
-				return peer.ID("")
-			},
-		)
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(ipfsdht),
-			"RoutingTable",
-			func(_ *kaddht.IpfsDHT) *kbucket.RoutingTable {
-				return routingTable
-			},
-		)
+		dhtFindPeer = func(_ *kaddht.IpfsDHT, _ peer.ID) peer.ID {
+			return peer.ID("")
+		}
 
-		err := BootstrapConnect(ctx, mockHost, ipfsdht, peers)
+		err := BootstrapConnect(ctx, mockHost, nil, peers)
 		assert.NotEqual(t, nil, err)
 		assert.Contains(t, err.Error(), "timeout: entry peer haven't been added to DHT")
 	})
@@ -400,24 +405,14 @@ func TestBootstrapConnect(t *testing.T) {
 	mockPeerstore.EXPECT().AddAddrs(gomock.Any(), gomock.Any(), gomock.Any()).Return().Times(2)
 
 	t.Run("Test_PeersNotConnected", func(t *testing.T) {
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(routingTable),
-			"Find",
-			func(_ *kbucket.RoutingTable, _ peer.ID) peer.ID {
-				return peer.ID("")
-			},
-		)
-		monkey.PatchInstanceMethod(
-			reflect.TypeOf(ipfsdht),
-			"RoutingTable",
-			func(_ *kaddht.IpfsDHT) *kbucket.RoutingTable {
-				return routingTable
-			},
-		)
+		// dhtFindPeer should never be reached in this case because
+		// Connect fails for every peer, but we still stub it safely.
+		dhtFindPeer = func(_ *kaddht.IpfsDHT, _ peer.ID) peer.ID {
+			return peer.ID("")
+		}
 
-		err := BootstrapConnect(ctx, mockHost, ipfsdht, peers)
+		err := BootstrapConnect(ctx, mockHost, nil, peers)
 		assert.NotEqual(t, nil, err)
 		assert.Equal(t, "failed to bootstrap: some error", err.Error())
 	})
-
 }
