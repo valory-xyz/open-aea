@@ -166,6 +166,7 @@ SCAFFOLD_PACKAGES = [
     AEA_DIR / "connections" / "scaffold",
     AEA_DIR / "contracts" / "scaffold",
     AEA_DIR / "skills" / "scaffold",
+    AEA_DIR / "customs" / "scaffold",
 ]
 PYCACHE = "__pycache__"
 AEA_TEST_DIRNAME = "tests"

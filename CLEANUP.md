@@ -143,7 +143,7 @@ Tracked here so the next person knows exactly what's left without re-walking the
 
    **What the harness now exercises end-to-end**: Python AEA buyer (with libp2p_node binary on port 9000) → ACN routing → seller-side Python connection_node (libp2p_node binary on port 12234) → Go aealite seller binary (delegate-client to 12235) → FIPA dialogue (cfp / propose / accept / match_accept / inform) → end-of-protocol confirmation.
 
-   **Currently runs locally only.** Wiring the test into CI as a Python integration job (alongside `golang_checks`, which currently only builds `aea_end2end` but doesn't run the Python harness) is a small follow-up.
+   ~~**Currently runs locally only.**~~ ✓ wired into CI as part of the `golang_checks` ubuntu-latest job: after the Go build/vet step, the workflow now installs `open-aea[all]` + the three ledger plugins + `aea-cli-ipfs` and runs `pytest libs/go/aea_end2end/test_fipa_end2end.py`.
 
 3. ~~**`ecdsa>=0.19.2` pin bump**~~ ✓ done — bumped from `>=0.15,<0.17.0` to `>=0.19.2,<0.20` across all 4 locations (`plugins/aea-ledger-cosmos/setup.py:43`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`). Downstream compat verified: `open-autonomy` declares `ecdsa >= 0.15` (no upper bound, no direct imports) so the tighter floor resolves cleanly. Closes Dependabot alert #147 (DER DoS).
 
@@ -249,7 +249,7 @@ Audit of the `docs/` tree (75 markdown files) and `examples/` tree (5 subdirs). 
 
 1. ~~**`examples/ml_ex/`**~~ ✓ done — deleted the stale Keras `model.json` and the `--scan-path examples/ml_ex` entries from `tox.ini` tomte copyright scanners. No other references in the repo.
 
-2. **`examples/aealite_go/`** — tied to `libs/go/aealite`. Since `libs/go/` is now being actively maintained (deps bumped, CI tests wired, Dependabot covered), this example is also kept. Has a minimal README; a follow-up could expand it into a working tutorial that exercises the updated `aealite` API.
+2. ~~**`examples/aealite_go/`**~~ ✓ README expanded to point at the runnable example at `libs/go/aealite_agent_example/` and at the Python↔Go FIPA harness at `libs/go/aea_end2end/`. Kept short.
 
 3. ~~**`docs/known-limits.md`**~~ ✓ done — stub deleted and nav entry removed. The 3 bullets were redistributed to their natural homes rather than merged into `limits.md` (which is organized around design decisions, not runtime caveats): the two AEABuilder consistency caveats moved into the `AEABuilder` class docstring in `aea/aea_builder.py`; the skill lifecycle ordering note moved into `docs/skill.md` under the "Independence of skills" section.
 

@@ -416,6 +416,9 @@ ForceReachabilityPrivate
 ForceReachabilityPublic
 EnableAutoRelayWithStaticRelays
 ListenAddrs
+aealite
+runnable
+env
  - docs/language-agnostic-definition.md
 fetchai
 protocol_id

@@ -75,11 +75,9 @@ jobs:
       - name: Static type check
         run: tox -e mypy
       - name: Golang code style check (aealite)
-        uses: golangci/golangci-lint-action@v3.1.0
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.45.2
+          version: v1.64.5
           args: --version
           working-directory: libs/go/aealite
 
@@ -618,6 +616,18 @@ jobs:
         run: |
           go build ./...
           go vet ./...
+          go build -o seller_agent
+      - if: matrix.os == 'ubuntu-latest'
+        name: aea_end2end Python<->Go FIPA harness
+        shell: bash
+        run: |
+          pip install tomte[tests]==0.6.5
+          pip install -e .[all]
+          pip install -e plugins/aea-ledger-ethereum
+          pip install -e plugins/aea-ledger-cosmos
+          pip install -e plugins/aea-ledger-fetchai
+          pip install -e plugins/aea-cli-ipfs
+          pytest -v libs/go/aea_end2end/test_fipa_end2end.py
       - name: aealite_agent_example build/vet
         shell: bash
         working-directory: libs/go/aealite_agent_example
