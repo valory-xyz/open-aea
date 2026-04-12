@@ -6,11 +6,11 @@ LEDGER_ID_REGEX: "^[^\\d\\W]\\w*\\Z"
 ```
 ``` yaml
 agent_name: my_agent                            # Name of the AEA project (must satisfy PACKAGE_REGEX)
-author: fetchai                                 # Author handle of the project's author (must satisfy AUTHOR_REGEX)
+author: your_author_handle                      # Author handle of the project's author (must satisfy AUTHOR_REGEX)
 version: 0.1.0                                  # Version of the AEA project (a version in MAJOR.MINOR.PATCH format, see PEP 440)
 description: A demo project                     # Description of the AEA project
 license: Apache-2.0                             # License of the AEA project
-aea_version: '>=2.0.0, <3.0.0'               # AEA framework version(s) compatible with the AEA project (a version number that matches PEP 440 version schemes, or a comma-separated list of PEP 440 version specifiers, see https://www.python.org/dev/peps/pep-0440/#version-specifiers)
+aea_version: '>=2.0.0, <3.0.0'                  # AEA framework version(s) compatible with the AEA project (a version number that matches PEP 440 version schemes, or a comma-separated list of PEP 440 version specifiers, see https://www.python.org/dev/peps/pep-0440/#version-specifiers)
 fingerprint: {}                                 # Fingerprint of AEA project components.
 fingerprint_ignore_patterns: []                 # Ignore pattern for the fingerprinting tool.
 connections:                                    # The list of connection public ids the AEA project depends on (each public id must satisfy PUBLIC_ID_REGEX)
@@ -20,14 +20,14 @@ protocols:                                      # The list of protocol public id
 - fetchai/default:1.0.0
 skills:                                         # The list of skill public ids the AEA project depends on (each public id must satisfy PUBLIC_ID_REGEX).
 - fetchai/error:0.17.0
-default_connection: fetchai/p2p_libp2p:0.25.0   # The default connection used for envelopes sent by the AEA (must satisfy PUBLIC_ID_REGEX).
-default_ledger: fetchai                         # The default ledger identifier the AEA project uses (must satisfy LEDGER_ID_REGEX)
-required_ledgers: [fetchai]                            # the list of identifiers of ledgers that the AEA project requires key pairs for (each item must satisfy LEDGER_ID_REGEX)
+default_connection: valory/p2p_libp2p:0.1.0     # The default connection used for envelopes sent by the AEA (must satisfy PUBLIC_ID_REGEX).
+default_ledger: ethereum                        # The default ledger identifier the AEA project uses (must satisfy LEDGER_ID_REGEX)
+required_ledgers: [ethereum]                    # the list of identifiers of ledgers that the AEA project requires key pairs for (each item must satisfy LEDGER_ID_REGEX)
 default_routing: {}                             # The default routing scheme applied to envelopes sent by the AEA, it maps from protocol public ids to connection public ids (both keys and values must satisfy PUBLIC_ID_REGEX)
 connection_private_key_paths:                   # The private key paths the AEA project uses for its connections (keys must satisfy LEDGER_ID_REGEX, values must be file paths)
-  fetchai: fetchai_private_key.txt
+  ethereum: ethereum_private_key.txt
 private_key_paths:                              # The private key paths the AEA project uses (keys must satisfy LEDGER_ID_REGEX, values must be file paths)
-  fetchai: fetchai_private_key.txt
+  ethereum: ethereum_private_key.txt
 logging_config:                                 # The logging configurations the AEA project uses
   disable_existing_loggers: false
   version: 1

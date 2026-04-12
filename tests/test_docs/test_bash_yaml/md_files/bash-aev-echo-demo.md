@@ -37,21 +37,17 @@ config:
   port: ${PORT:int:5000}
   target_skill_id: ${TARGET_SKILL:str:fetchai/http_echo:0.20.0}
 ```
-
 ``` yaml
 host: ${HOST:str:localhost}
 port: ${PORT:int:5000}
 target_skill_id: ${TARGET_SKILL:str:fetchai/http_echo:0.20.0}
 ```
-
 ``` yaml
 ${ENVIRONMENT_VALUE:PYTHON_TYPE:DEFAULT_VALUE}
 ```
-
 ``` bash
 aea run --aev
 ```
-
 ``` bash
     _     _____     _
    / \   | ____|   / \
@@ -59,18 +55,16 @@ aea run --aev
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 5000.
 info: [http_echo] Start processing messages...
 ```
-
 ``` bash
 curl localhost:5000
 {"tom": {"type": "cat", "age": 10}}
 ```
-
 ``` bash
 export PORT=8081
 aea run --aev
@@ -80,18 +74,16 @@ aea run --aev
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 8081.
 info: [http_echo] Start processing messages...
 ```
-
 ``` bash
 curl localhost:8081
 {"tom": {"type": "cat", "age": 10}}
 ```
-
 ``` bash
 aea delete http_echo
 ```

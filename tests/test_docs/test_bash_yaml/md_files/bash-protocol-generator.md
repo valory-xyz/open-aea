@@ -4,13 +4,6 @@ aea generate protocol <path-to-protocol-specification>
 ``` bash
 aea generate protocol --l <language> <path-to-protocol-specification>
 ```
-``` bash
-aea create my_aea
-cd my_aea
-```
-``` bash
-aea generate protocol ../examples/protocol_specification_ex/sample.yaml
-```
 ``` yaml
 ---
 name: two_party_negotiation
@@ -19,6 +12,7 @@ version: 0.1.0
 description: An example of a protocol specification that describes a protocol for bilateral negotiation.
 license: Apache-2.0
 aea_version: '>=2.0.0, <3.0.0'
+protocol_specification_id: fetchai/two_party_negotiation:1.0.0
 speech_acts:
   cfp:
     query: ct:Query
@@ -46,4 +40,11 @@ roles: {buyer, seller}
 end_states: [agreement_reached, agreement_unreached]
 keep_terminal_state_dialogues: true
 ...
+```
+``` bash
+aea create my_aea
+cd my_aea
+```
+``` bash
+aea generate protocol ../examples/protocol_specification_ex/sample.yaml
 ```

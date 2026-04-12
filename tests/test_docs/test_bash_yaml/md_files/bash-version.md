@@ -1,3 +1,1 @@
-``` bash
-aea --version
-```
+
