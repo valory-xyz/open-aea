@@ -78,7 +78,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.5
-          args: --version
+          args: --timeout=5m
           working-directory: libs/go/aealite
 
   common_checks_3:
