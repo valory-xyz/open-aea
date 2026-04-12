@@ -126,3 +126,38 @@ Pytest with custom markers: `integration` (requires external services), `ledger`
 4. `make security`
 5. If `packages/` modified: `make generators` then `make common-checks-1` and `make common-checks-2`
 6. If `packages/` not modified: `make check-copyright`
+
+## Before every commit — always run these
+
+Do NOT commit until every check below passes locally. Do not cherry-pick
+a subset; each one has caught real regressions. When linters report no
+findings you are much better off than inferring from the output of a
+partial run.
+
+The full set (per tox env):
+
+```bash
+tox -e black-check
+tox -e isort-check
+tox -e flake8
+tox -e check-copyright
+tox -e spell-check
+tox -e darglint        # catches missing :param: / :return: lines
+tox -e dependencies-check
+tox -e hash-check      # only if packages/ or aea/ scaffolds touched
+tox -e check-doc-links-hashes  # only if docs/ touched
+```
+
+Notes:
+- `darglint` scans `plugins/**/build/` artifacts if they exist. If you
+  see a darglint error in a `build/lib/...` path, run `rm -rf
+  plugins/*/build` and re-run — those are stale setuptools build
+  outputs, not real source.
+- For Go changes under `libs/go/aealite` or
+  `packages/valory/connections/p2p_libp2p/libp2p_node`, also run
+  `go build ./... && go vet ./... && go test ./...` in each module,
+  plus `golangci-lint run --timeout=5m` on aealite (libp2p_node is
+  not covered by golangci-lint yet — see CLEANUP.md).
+- `make code-checks` bundles most of the Python tox envs above but
+  runs them in parallel; if it fails, re-run the failing ones
+  individually to see which one reported what.
