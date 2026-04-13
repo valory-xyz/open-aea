@@ -41,6 +41,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
+	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	multiaddr "github.com/multiformats/go-multiaddr"
 
 	"github.com/libp2p/go-libp2p/core/peerstore"
@@ -249,7 +250,19 @@ func New(opts ...Option) (*DHTClient, error) {
 		libp2p.EnableNATService(),
 		libp2p.EnableRelay(),
 		libp2p.ForceReachabilityPrivate(),
-		libp2p.EnableAutoRelayWithStaticRelays(dhtClient.bootstrapPeers),
+		// libp2p v0.33 autorelay defaults to a 1-hour per-peer backoff
+		// before retrying a failed reservation (see `autorelay.DefaultConfig`
+		// in libp2p v0.33.2). That is correct for wide-area NAT traversal
+		// but breaks the ACN relay-restart path: when the relay peer
+		// restarts, clients need to re-reserve almost immediately so that
+		// incoming circuit-v2 dials succeed again. Override the backoff
+		// and minimum reservation interval to 1 second so a restarted
+		// relay becomes usable again within the 20-second test timeout.
+		libp2p.EnableAutoRelayWithStaticRelays(
+			dhtClient.bootstrapPeers,
+			autorelay.WithBackoff(1*time.Second),
+			autorelay.WithMinInterval(1*time.Second),
+		),
 	}
 
 	// create a basic host
