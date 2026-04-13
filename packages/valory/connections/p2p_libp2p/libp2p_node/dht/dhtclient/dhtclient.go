@@ -42,6 +42,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
+	tcp "github.com/libp2p/go-libp2p/p2p/transport/tcp"
 	multiaddr "github.com/multiformats/go-multiaddr"
 
 	"github.com/libp2p/go-libp2p/core/peerstore"
@@ -243,7 +244,12 @@ func New(opts ...Option) (*DHTClient, error) {
 	libp2pOpts := []libp2p.Option{
 		libp2p.ListenAddrs(),
 		libp2p.Identity(dhtClient.key),
-		libp2p.DefaultTransports,
+		// TCP-only by design — see the matching comment in dhtpeer.go for
+		// the full justification. Closes Dependabot alerts #163-#168
+		// (quic-go + webtransport-go) by removing those transports from
+		// the dependency graph entirely.
+		libp2p.NoTransports,
+		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.DefaultMuxers,
 		libp2p.DefaultSecurity,
 		libp2p.NATPortMap(),

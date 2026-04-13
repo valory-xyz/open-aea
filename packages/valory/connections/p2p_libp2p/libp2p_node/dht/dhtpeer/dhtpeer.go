@@ -56,6 +56,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/peerstore"
+	tcp "github.com/libp2p/go-libp2p/p2p/transport/tcp"
 	multiaddr "github.com/multiformats/go-multiaddr"
 
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
@@ -261,7 +262,16 @@ func New(opts ...Option) (*DHTPeer, error) {
 		libp2p.ListenAddrs(dhtPeer.localMultiaddr),
 		libp2p.AddrsFactory(addressFactory),
 		libp2p.Identity(dhtPeer.key),
-		libp2p.DefaultTransports,
+		// ACN is TCP-only by design: every multiaddr produced anywhere
+		// in the codebase (Python MultiAddr.format(), Go LocalURI/PublicURI,
+		// the /p2p-circuit fallback, the bootstrap peers fed from Python)
+		// is /ip4|/dns4 + /tcp. We never bind UDP / QUIC / WebTransport /
+		// WebSocket and we never dial any of those either. Registering
+		// only the TCP transport closes the entire QUIC + WebTransport +
+		// HTTP/3 attack surface (Dependabot alerts #163-#168) and shrinks
+		// the binary, with zero behaviour change.
+		libp2p.NoTransports,
+		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.DefaultMuxers,
 		libp2p.DefaultSecurity,
 		libp2p.NATPortMap(),
