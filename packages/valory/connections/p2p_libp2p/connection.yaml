@@ -40,8 +40,8 @@ fingerprint:
   libp2p_node/dht/monitoring/file.go: bafybeifmj5vvaacy4potovdkiqvektaymntsbun6i4niaehj5af3nhu64e
   libp2p_node/dht/monitoring/prometheus.go: bafybeibgmu5h7hl2ygzfw3lvg4eaihzrnyqacc4zvjxzpk2b6xb7c3yrrq
   libp2p_node/dht/monitoring/service.go: bafybeicgbzqxi4jpae3w4es4owhdt63rd4limt4o46gbdanaia2buxddhy
-  libp2p_node/go.mod: bafybeihrpet7tj35np2g2bulxzmlkrfzqac2prl7txolcbj44sjj7chtge
-  libp2p_node/go.sum: bafybeibcg5ty6iqgsqxffphjiiapvipp37zttilwdyv5utbvqeaqwxpjku
+  libp2p_node/go.mod: bafybeie6x2sohodeymuuyurvf3jzwqs632he4bpblr6ncqcu4nb5543zxu
+  libp2p_node/go.sum: bafybeib2kp6qbdgqd2gxo3kcjal22bimwk7gxxsbhidqpuq23tsu64auka
   libp2p_node/libp2p_node: bafybeigywp2ajrrl5knupteqbyncflk4chxemsptjly2gesj3p3k5wz3vm
   libp2p_node/libp2p_node.go: bafybeidlrp77xdocjddey6mbnqpsvdtughhvi7wq3dbducbe4cetkoze2q
   libp2p_node/link: bafybeifuo6aafgbc72npli5d7p4dunjkgcygalrkhcqdcvz6dghjabd7ou
