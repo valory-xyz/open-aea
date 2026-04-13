@@ -3,7 +3,7 @@ package dhtpeer
 import (
 	"context"
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"libp2p_node/acn"
 	"libp2p_node/aea"
 	"net/http"
@@ -27,7 +27,7 @@ func (mailboxServer *MailboxServer) apiRegister(res http.ResponseWriter, req *ht
 		ignore(err)
 		return
 	}
-	body, err = ioutil.ReadAll(req.Body)
+	body, err = io.ReadAll(req.Body)
 	if err != nil {
 		res.WriteHeader(400)
 		_, err = res.Write([]byte(err.Error()))
@@ -159,7 +159,7 @@ func (mailboxServer *MailboxServer) apiSendEnvelope(res http.ResponseWriter, req
 		return
 	}
 
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		res.WriteHeader(400)
 		_, err = res.Write([]byte(err.Error()))

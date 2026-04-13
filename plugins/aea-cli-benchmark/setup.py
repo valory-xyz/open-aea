@@ -39,8 +39,13 @@ setup(
         "psutil>=5.7.0, <6.0.0",
         "click>=8.1.0,<8.4.0",
         "cosmpy>=0.11.0,<0.12",
-        "docker==7.1.0",
     ],
+    extras_require={
+        # Optional: required only for the `tx-generate` benchmark case,
+        # which spins up a dockerised fetchai ledger node. Pin kept in
+        # sync with the other plugins (ledger-ethereum, ledger-fetchai).
+        "tx-generate": ["docker==7.1.0"],
+    },
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",

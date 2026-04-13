@@ -116,9 +116,9 @@ func BTCPubKeyFromEthereumPublicKey(publicKey string) (*btcec.PublicKey, error) 
 // R/S had a leading zero that needed preserving.
 const secp256k1SignatureComponentSize = 32
 
-// padToLeft left-pads `b` with zero bytes to exactly `size` bytes. Panics
-// if `len(b) > size`; callers must ensure R and S from a secp256k1
-// signature fit in 32 bytes (which they always do).
+// padToLeft left-pads `b` with zero bytes to exactly `size` bytes. Returns
+// `b` unchanged if it is already `size` bytes or longer; callers must ensure
+// R and S from a secp256k1 signature fit in 32 bytes (which they always do).
 func padToLeft(b []byte, size int) []byte {
 	if len(b) >= size {
 		return b
@@ -152,19 +152,7 @@ func ConvertStrEncodedSignatureToDER(signature []byte) ([]byte, error) {
 		R, S *big.Int
 	}{R: r, S: s})
 	if err != nil {
-		// This should never happen for well-formed big.Ints; fall back to
-		// a manual encoding to preserve previous behavior.
-		length := 6 + len(rb) + len(sb)
-		sigDER := make([]byte, length)
-		sigDER[0] = 0x30
-		sigDER[1] = byte(length - 2)
-		sigDER[2] = 0x02
-		sigDER[3] = byte(len(rb))
-		offset := copy(sigDER[4:], rb) + 4
-		sigDER[offset] = 0x02
-		sigDER[offset+1] = byte(len(sb))
-		copy(sigDER[offset+2:], sb)
-		return sigDER, nil
+		return nil, fmt.Errorf("failed to marshal ECDSA-Sig-Value: %w", err)
 	}
 	return der, nil
 }

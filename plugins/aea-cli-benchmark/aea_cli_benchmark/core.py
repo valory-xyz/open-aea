@@ -47,7 +47,15 @@ from aea_cli_benchmark.case_multiagent_http_dialogues.command import (
 )
 from aea_cli_benchmark.case_proactive.command import main as case_proactive
 from aea_cli_benchmark.case_reactive.command import main as case_reactive
-from aea_cli_benchmark.case_tx_generate.command import main as case_tx_generate
+
+# case_tx_generate depends on `docker`, which is an optional extra
+# (`aea-cli-benchmark[tx-generate]`). Skip registering the command if
+# the dependency is missing rather than breaking every other benchmark
+# case at import time.
+try:
+    from aea_cli_benchmark.case_tx_generate.command import main as case_tx_generate
+except ImportError:  # pragma: no cover - exercised when docker is not installed
+    case_tx_generate = None
 
 from aea.helpers.yaml_utils import yaml_dump_all, yaml_load_all
 
@@ -75,7 +83,8 @@ benchmark.add_command(case_mulltiagent)
 benchmark.add_command(case_proactive)
 
 benchmark.add_command(case_reactive)
-benchmark.add_command(case_tx_generate)
+if case_tx_generate is not None:
+    benchmark.add_command(case_tx_generate)
 benchmark.add_command(case_acn_startup)
 benchmark.add_command(case_acn_communication)
 

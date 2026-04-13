@@ -213,7 +213,7 @@ func New(opts ...Option) (*DHTClient, error) {
 	}
 
 	// select a relay node randomly from entry peers
-	rand.Seed(time.Now().Unix())
+	// (math/rand is auto-seeded in Go 1.20+; no explicit Seed needed)
 	index := rand.Intn(len(dhtClient.bootstrapPeers))
 	dhtClient.relayPeer = dhtClient.bootstrapPeers[index].ID
 

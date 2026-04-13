@@ -627,7 +627,12 @@ jobs:
           pip install -e plugins/aea-ledger-cosmos
           pip install -e plugins/aea-ledger-fetchai
           pip install -e plugins/aea-cli-ipfs
-          pip install pexpect
+          # The FIPA harness imports test_libp2p/tests/base, which
+          # transitively imports p2p_libp2p_client/connection.py. That
+          # module's runtime deps (asn1crypto, pexpect for the harness
+          # itself) are declared via connection.yaml but not in the
+          # core setup.py, so install them explicitly here.
+          pip install pexpect "asn1crypto>=1.4.0,<1.5.0"
           pytest -v libs/go/aea_end2end/test_fipa_end2end.py
       - name: aealite_agent_example build/vet
         shell: bash

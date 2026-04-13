@@ -802,10 +802,12 @@ func (dhtPeer *DHTPeer) launchMailboxService() {
 
 // Make signature for session public key using peer private key
 func makeSessionKeySignature(cert *tls.Certificate, privateKey p2pCrypto.PrivKey) ([]byte, error) {
-	cert_pub_key := cert.PrivateKey.(*ecdsa.PrivateKey).Public().(*ecdsa.PublicKey)
-	cert_pub_key_bytes := elliptic.Marshal(cert_pub_key.Curve, cert_pub_key.X, cert_pub_key.Y)
-	signature, err := privateKey.Sign(cert_pub_key_bytes)
-	return signature, err
+	certPubKey := cert.PrivateKey.(*ecdsa.PrivateKey).Public().(*ecdsa.PublicKey)
+	ecdhPub, err := certPubKey.ECDH()
+	if err != nil {
+		return nil, err
+	}
+	return privateKey.Sign(ecdhPub.Bytes())
 }
 
 // handleDelegateService listens for new connections to delegate service and handles them
