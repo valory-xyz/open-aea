@@ -263,13 +263,16 @@ func New(opts ...Option) (*DHTPeer, error) {
 		libp2p.AddrsFactory(addressFactory),
 		libp2p.Identity(dhtPeer.key),
 		// ACN is TCP-only by design: every multiaddr produced anywhere
-		// in the codebase (Python MultiAddr.format(), Go LocalURI/PublicURI,
-		// the /p2p-circuit fallback, the bootstrap peers fed from Python)
+		// in the codebase (Go LocalURI/PublicURI, the /p2p-circuit
+		// fallback, the bootstrap peers fed from the embedding host)
 		// is /ip4|/dns4 + /tcp. We never bind UDP / QUIC / WebTransport /
 		// WebSocket and we never dial any of those either. Registering
 		// only the TCP transport closes the entire QUIC + WebTransport +
-		// HTTP/3 attack surface (Dependabot alerts #163-#168) and shrinks
-		// the binary, with zero behaviour change.
+		// HTTP/3 attack surface; the upstream go-libp2p transitive
+		// dependencies (quic-go, webtransport-go) remain in go.mod
+		// because libp2p/config imports them unconditionally, but the
+		// vulnerable server-side code paths are unreachable since no
+		// transport instance is ever constructed.
 		libp2p.NoTransports,
 		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.DefaultMuxers,
@@ -1433,7 +1436,7 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 			// function returned `peerID="" err=nil` to the caller —
 			// which then passed the empty peer ID straight into
 			// routedHost.NewStream and got a misleading "empty peer ID"
-			// error. See CLEANUP.md item 9 (follow-up b).
+			// error.
 			var record *acn.AgentRecord
 			record, err = acn.PerformAddressLookup(streamPipe, address)
 

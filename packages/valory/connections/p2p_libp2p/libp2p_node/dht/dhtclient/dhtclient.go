@@ -245,9 +245,9 @@ func New(opts ...Option) (*DHTClient, error) {
 		libp2p.ListenAddrs(),
 		libp2p.Identity(dhtClient.key),
 		// TCP-only by design — see the matching comment in dhtpeer.go for
-		// the full justification. Closes Dependabot alerts #163-#168
-		// (quic-go + webtransport-go) by removing those transports from
-		// the dependency graph entirely.
+		// the full justification. Closes the QUIC + WebTransport server-
+		// side attack surface even though those packages remain transitive
+		// dependencies of go-libp2p; no transport instance is constructed.
 		libp2p.NoTransports,
 		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.DefaultMuxers,
