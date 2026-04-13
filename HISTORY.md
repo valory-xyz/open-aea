@@ -1,5 +1,44 @@
 # Release History - open AEA
 
+## 2.2.0 (2026-04-13)
+
+AEA:
+- Removes `requests`, `ipfshttpclient`, `jsonschema`, `python-dotenv`, `semver`, `morphys`, `ecdsa`, `base58`/`multibase`/`multicodec`/`pymultihash` from core dependencies -- replaced with stdlib or inlined implementations. #858 #859 #860 #861 #862 #863 #866 #867
+- Adds env var resolution on component override sections in AEABuilder. #868
+- Switches to strict PEP 440 version parsing (replaces `semver`). #859
+- Enhances env file parser to support `export` prefix, `${VAR}` interpolation, and inline comments. #860
+- Inlines IPFS HTTP client (replaces `ipfshttpclient`). #866
+- Inlines JSON Schema Draft-04 validator (replaces `jsonschema`). #862
+- Inlines secp256k1 validation (replaces `ecdsa` from base deps). #863
+- Inlines multiformat helpers (replaces `base58`/`multibase`/`multicodec`/`pymultihash`). #861
+
+Plugins:
+- Adds new plugin: `open-aea-ci-helpers` (`aea-ci`) with 8 CI automation commands migrated from scripts/. #871
+- Adds new plugin: `open-aea-dev-helpers` (`aea-dev`) with 7 release/dev tool commands migrated from scripts/. #865
+- Migrates `check_copyright`, `check_doc_links`, `freeze_dependencies` to tomte CLI. #865
+- Widens dependency pins across all plugins for broader compatibility. #864
+
+Go / libp2p:
+- Bumps Go module dependencies to Go 1.24. #872
+- Restores circuit-relay v2 routing parity. #872
+- Fixes golangci-lint integration for libp2p_node. #872
+- Adds Python<->Go FIPA e2e test harness to CI. #872
+
+Tooling:
+- Migrates from Pipenv to Poetry. #857
+- Bumps `tomte` from `0.6.1` to `0.6.5`. #857
+- Deletes 12 Python scripts from scripts/ (migrated to plugins). #865 #871
+- Removes benchmark/checks/ legacy scripts. #865
+- Comprehensive docs refresh. #872
+
+CI:
+- Bumps GitHub Actions (checkout v4, setup-python v5, golangci-lint v6). #872
+- Bumps Go from 1.17-1.20 to 1.24. #872
+- Adds golangci-lint for libp2p_node and aealite. #872
+- Reduces platform matrix for faster CI runs. #869
+- Fixes Click `flag_value` default handling follow-up. #855
+
+
 ## 2.1.0 (2026-03-06)
 
 AEA:
