@@ -651,7 +651,7 @@ jobs:
           # module's runtime deps (asn1crypto, pexpect for the harness
           # itself) are declared via connection.yaml but not in the
           # core setup.py, so install them explicitly here.
-          pip install pexpect "asn1crypto>=1.4.0,<1.5.0"
+          pip install pexpect "asn1crypto>=1.4.0,<1.5.0" docker
           pytest -v libs/go/aea_end2end/test_fipa_end2end.py
       - name: aealite_agent_example build/vet
         shell: bash
