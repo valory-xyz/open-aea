@@ -896,7 +896,6 @@ func TestMessageOrderingWithDelegateClient(t *testing.T) {
 // "ACN total-ordering guarantee" follow-up section. Once the ordering
 // guarantee actually holds in the implementation, drop this Skip.
 func TestMessageOrderingWithDelegateClientTwoHops(t *testing.T) {
-	t.Skip("pre-existing slow-queue ordering bug (not a bump regression); see CLEANUP.md ACN ordering follow-up")
 	peer1Index := 0
 	peer2Index := 1
 	client1Index := 2

@@ -39,7 +39,11 @@ from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 from aea.skills.base import Handler, Skill, SkillContext
 from aea.skills.behaviours import TickerBehaviour
 from aea.test_tools.test_cases import AEATestCaseEmpty
-from libs.go.aea_end2end.pexpect_popen import PexpectWrapper
+_HERE = Path(__file__).resolve().parent
+_REPO_ROOT = _HERE.parent.parent.parent
+sys.path.insert(0, str(_HERE))
+sys.path.insert(0, str(_REPO_ROOT))
+from pexpect_popen import PexpectWrapper  # noqa: E402
 
 from packages.valory.connections.p2p_libp2p.connection import P2PLibp2pConnection
 from packages.fetchai.protocols.fipa.dialogues import FipaDialogue, FipaDialogues

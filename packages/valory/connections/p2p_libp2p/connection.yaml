@@ -30,8 +30,8 @@ fingerprint:
   libp2p_node/dht/dhtnode/streams.go: bafybeiglkbzmp7imgcg544cb3kr4xq3hopoockqoaxbgveeszclvtq4pni
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
-  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeidbnn2csaq7ww54ru7iykfhuxtv7fj3z7u6dlrrzjly3scrb77u34
-  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeig2ekrl4byexzj7nu4q62uesnkhmhb7mgu5yfgnwiyk2ylyruxloe
+  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeiayytmffav2jxmv5jcw2ndabph4jzer3ks7wqk7gvu6xj4sqylzlq
+  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeibbj5xrfjih6fkeqvfavnhywkuw4iat5ldrh3ppssttfn5lx3nqka
   libp2p_node/dht/dhtpeer/mailbox.go: bafybeic5lng7ozhxw6cwibwh5s3lqcyyhurovsl2qy77om6ctir6qctnuy
   libp2p_node/dht/dhtpeer/notifee.go: bafybeidzcmhfgh3efwp4t4kph5gdy4jps4useusmclwxe4pgdvhz5cnche
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy
@@ -59,7 +59,7 @@ fingerprint:
   tests/test_aea_cli.py: bafybeihllxrp6bjvplvogrdsemel6rrqajl6qvei6ogagx55friwjajiti
   tests/test_build.py: bafybeigkz7isg4enmvfp7sfgx3mpinobi7apja63jfwxwpj2pcf4xepfjq
   tests/test_errors.py: bafybeiev36bsc4zxz2gverenqj4wuqw5btprm7ho5fj3juy3n5f4ppat4q
-  tests/test_go_code_matching_acn.py: bafybeicsua43ax6xsps4a4w35migvrfqmuynfjkai3costywoycnp4uvr4
+  tests/test_go_code_matching_acn.py: bafybeifj5klcofcxtfzfltkxb2fofnniamzj4eeby5r52sho6k7hoypf6y
 fingerprint_ignore_patterns: []
 build_entrypoint: check_dependencies.py
 connections: []

@@ -276,6 +276,15 @@ func New(opts ...Option) (*DHTPeer, error) {
 		// EnableRelay(circuit.OptHop)).
 		libp2p.EnableRelayService(),
 		libp2p.ForceReachabilityPublic(),
+		// libp2p v0.33's default Resource Manager caps per-peer stream
+		// counts (256 inbound + 256 outbound), which is too low for the
+		// ACN routing pattern where every envelope opens a fresh
+		// /aea-address and /aea stream pair against the same peer.
+		// Under a 1000-envelope burst we hit the cap after ~82 successful
+		// routes and subsequent NewStream calls fail with stream-reset /
+		// "empty peer ID". The legacy v0.8 host had no resource manager,
+		// so the null manager restores pre-bump behaviour.
+		libp2p.ResourceManager(&network.NullResourceManager{}),
 	}
 
 	// create a basic host

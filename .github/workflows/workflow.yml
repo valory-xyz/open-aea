@@ -627,6 +627,7 @@ jobs:
           pip install -e plugins/aea-ledger-cosmos
           pip install -e plugins/aea-ledger-fetchai
           pip install -e plugins/aea-cli-ipfs
+          pip install pexpect
           pytest -v libs/go/aea_end2end/test_fipa_end2end.py
       - name: aealite_agent_example build/vet
         shell: bash
