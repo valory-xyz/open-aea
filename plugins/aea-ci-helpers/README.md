@@ -13,7 +13,7 @@ This installs an `aea-ci` command.
 ## Commands
 
 ```
-aea-ci check-dependencies     Check dependencies across packages, tox.ini, pyproject.toml and Pipfile
+aea-ci check-dependencies     Check dependencies are consistent across tox.ini and pyproject.toml
 aea-ci check-doc-hashes       Validate and fix IPFS hashes in documentation
 aea-ci check-imports          Verify all imports are declared as dependencies
 aea-ci check-ipfs-pushed      Verify all package IPFS hashes from the latest git tag are reachable
