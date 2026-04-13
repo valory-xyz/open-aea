@@ -54,6 +54,7 @@ COPY . /build
 
 RUN sudo make clean
 
+RUN poetry config virtualenvs.create false
 RUN poetry install --all-extras --no-interaction
 
 RUN python3 -m pip install -U open-aea-ledger-ethereum[all]
