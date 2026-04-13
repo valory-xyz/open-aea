@@ -146,6 +146,7 @@ tox -e darglint        # catches missing :param: / :return: lines
 tox -e dependencies-check
 tox -e hash-check      # only if packages/ or aea/ scaffolds touched
 tox -e check-doc-links-hashes  # only if docs/ touched
+tox -e check-api-docs  # only if any aea/ or plugins/*/aea_*/ source touched
 ```
 
 Notes:
@@ -177,3 +178,8 @@ fix-mode env (or manual step), then re-run the check until clean:
 - `tox -e check-copyright` fails → `tox -e fix-copyright`.
 - `tox -e black-check` / `tox -e isort-check` fail →
   `make formatters`.
+- `tox -e check-api-docs` fails → `tox -e generate-api-documentation`
+  regenerates the markdown under `docs/api/`. Commit the regenerated
+  files. The check is essentially a "no uncommitted regen needed"
+  gate, so it fails whenever a public docstring or signature changed
+  without rerunning the generator.

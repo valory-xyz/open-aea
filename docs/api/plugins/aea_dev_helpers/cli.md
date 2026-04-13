@@ -16,23 +16,6 @@ def cli() -> None
 
 AEA development and release helper utilities.
 
-<a id="plugins.aea-dev-helpers.aea_dev_helpers.cli.parse_lock_deps_cmd"></a>
-
-#### parse`_`lock`_`deps`_`cmd
-
-```python
-@cli.command("parse-lock-deps")
-@click.argument("pipfile_lock_path", type=click.Path(exists=True))
-@click.option("-o",
-              "--output",
-              type=click.Path(),
-              default=None,
-              help="Output file path.")
-def parse_lock_deps_cmd(pipfile_lock_path: str, output: Optional[str]) -> None
-```
-
-Parse main dependencies from a Pipfile.lock and print in requirements.txt format.
-
 <a id="plugins.aea-dev-helpers.aea_dev_helpers.cli.publish_local_cmd"></a>
 
 #### publish`_`local`_`cmd
