@@ -657,5 +657,6 @@ jobs:
         shell: bash
         working-directory: libs/go/aealite_agent_example
         run: |
+          go mod tidy
           go build ./...
           go vet ./...
