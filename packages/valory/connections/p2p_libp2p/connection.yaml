@@ -30,8 +30,8 @@ fingerprint:
   libp2p_node/dht/dhtnode/streams.go: bafybeiglkbzmp7imgcg544cb3kr4xq3hopoockqoaxbgveeszclvtq4pni
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
-  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeihl5fc3r5ab2izius3dasfzrs4cuvo7xrkhsezaxwqorwir72jneu
-  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeibbj5xrfjih6fkeqvfavnhywkuw4iat5ldrh3ppssttfn5lx3nqka
+  libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeid53uzluhya4l72rlo2v4seatd46cw35rjly6vfighcoxdrcruxvq
+  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeifbmabtxg4kscs2cejpgw7q2ze7qzy7qr5gaqmjsujg4v2nm6jmzq
   libp2p_node/dht/dhtpeer/mailbox.go: bafybeigmrn3cctcyehdslo3rqscwganlvkq4w5766ibqqmhovw6s7rgvge
   libp2p_node/dht/dhtpeer/notifee.go: bafybeidzcmhfgh3efwp4t4kph5gdy4jps4useusmclwxe4pgdvhz5cnche
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy

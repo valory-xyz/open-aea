@@ -23,7 +23,6 @@ package dhtpeer
 import (
 	"context"
 	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/tls"
 	"math/rand"
 	"net"
@@ -1662,7 +1661,7 @@ func TestRoutingAllToAll(t *testing.T) {
 */
 
 func randSeq(n int) string {
-	rand.Seed(time.Now().UnixNano())
+	// math/rand is auto-seeded in Go 1.20+; no explicit Seed needed.
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, n)
 	for i := range b {
@@ -1824,7 +1823,11 @@ func ValidateTLSSignature(
 	sessionPubKey *ecdsa.PublicKey,
 	peerPubKey string,
 ) error {
-	sessionPubKeyBytes := elliptic.Marshal(sessionPubKey.Curve, sessionPubKey.X, sessionPubKey.Y)
+	ecdhPub, err := sessionPubKey.ECDH()
+	if err != nil {
+		return err
+	}
+	sessionPubKeyBytes := ecdhPub.Bytes()
 	verifyKey, err := utils.PubKeyFromFetchAIPublicKey(peerPubKey)
 	if err != nil {
 		return err

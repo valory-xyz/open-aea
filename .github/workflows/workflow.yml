@@ -80,6 +80,12 @@ jobs:
           version: v1.64.5
           args: --timeout=5m
           working-directory: libs/go/aealite
+      - name: Golang code style check (libp2p_node)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.5
+          args: --timeout=5m
+          working-directory: packages/valory/connections/p2p_libp2p/libp2p_node
 
   common_checks_3:
     continue-on-error: False

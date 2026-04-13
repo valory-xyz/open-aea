@@ -51,7 +51,7 @@ Done in a separate subagent pass after the libp2p_node bump. `libs/go/aealite/go
 
 The `golang_checks` CI job was previously a no-op (checkout + setup-go, no test steps, `continue-on-error: True`). It now runs `go build ./... && go vet ./... && go test ./...` for all four Go modules (libp2p_node, aealite, aea_end2end, aealite_agent_example) on Ubuntu/macOS/Windows with Go 1.24. `continue-on-error: False`. `libs/go/aealite` unit tests (helpers, wallet, protocols) pass; the 2 peer-dependent integration tests (`TestAgent`, `TestP2PClientApiInit`) are gated behind `//go:build integration` and only run under `go test -tags integration`.
 
-**Known gap: libp2p_node is not covered by `golangci-lint`.** Only `libs/go/aealite` runs under `golangci-lint-action` in `common_checks_2`. As of Go 1.24 + golangci-lint v1.64.5, `libp2p_node` has 3 pre-existing deprecation warnings that CI therefore doesn't surface: `rand.Seed` at `dhtclient.go:216` (`SA1019`, deprecated since Go 1.20 — seeding is automatic), `elliptic.Marshal` at `dhtpeer.go:797` (`SA1019`, deprecated since Go 1.21 — use `(*ecdsa.PublicKey).ECDH().Bytes()`, same fix already applied to aealite's `tcpsocket.go`), and `io/ioutil` at `mailbox.go:6` (deprecated since Go 1.19 — use `os`/`io`). None block compilation; they're trivially fixable and a follow-up should (a) fix them and (b) wire libp2p_node into the same `golangci-lint` step so this doesn't drift again.
+**`libp2p_node` golangci-lint coverage ✓ fixed.** `libp2p_node` is now run under the same `golangci-lint-action@v6` step in `common_checks_2` that covers `libs/go/aealite`. The five deprecation findings that the initial wiring surfaced have all been fixed: `rand.Seed` at `dhtclient.go:216` and `dhtpeer_test.go:1665` (auto-seeded since Go 1.20), `elliptic.Marshal` at `dhtpeer.go:797` and `dhtpeer_test.go:1827` (replaced with `(*ecdsa.PublicKey).ECDH().Bytes()`, same pattern as aealite's `tcpsocket.go`), and `io/ioutil` at `mailbox.go:6` (replaced with `io.ReadAll`). `golangci-lint run --timeout=5m` against libp2p_node on Go 1.24 is now clean (0 findings).
 
 ### `InsecureSkipVerify` in `libs/go/aealite/connections/tcpsocket.go` ✓ annotated
 
@@ -330,11 +330,12 @@ Current state on this branch: pinned `ecdsa>=0.15,<0.17.0` (resolving to `0.16.1
 - The call sites are non-trivial: cosmos uses `sign_deterministic(sigencode=sigencode_string_canonize)` + `VerifyingKey.from_public_key_recovery`; `p2p_libp2p_{client,mailbox}` use `from_der` + DER-signature verify; `scripts/acn/run_acn_node_standalone.py` uses `SigningKey.from_string` for config validation. Each would need per-site rewrite with byte-level compat testing for cosmos on-chain signatures.
 - A plain pin bump is mechanically trivial, closes the only actionable alert, and preserves all signature byte formats.
 
-**Action — pin bump to `ecdsa>=0.19.2,<0.20`**, gated on downstream compatibility:
+**Action — pin bump to `ecdsa>=0.19.2,<0.20`** ✓ done.
 
 - [x] API compatibility verified locally (`sign_deterministic`, `sigencode_string_canonize`, `VerifyingKey.from_public_key_recovery`, `from_der`, `verify(sigdecode=sigdecode_der)` all byte-compatible between `0.16.1` and `0.19.2`; 64-byte sig + 2 recovered keys match).
-- [ ] Confirm downstream consumers (Valory agents, olas-protocol-resolver, etc.) are compatible with a cosmos plugin that requires `ecdsa>=0.19.2` before flipping the pin.
-- [ ] Bump pins in 4 locations: `plugins/aea-ledger-cosmos/setup.py:42`, `tox.ini:21`, `tox.ini:40`, `pyproject.toml:36`.
+- [x] Pins bumped in all 4 locations: `plugins/aea-ledger-cosmos/setup.py`, `tox.ini` (×2), `pyproject.toml`. Closes alert #147.
+
+One downstream follow-up surfaced after the bump: `ecdsa 0.19.2` removed the private `VerifyingKey._from_compressed` helper, which broke `tests/test_helpers/test_secp256k1.py::TestCrossValidation`. Swapped to the public `VerifyingKey.from_string(compressed, curve=...)` which auto-detects the 0x02/0x03 prefix and raises the same `MalformedPointError` on invalid input. Same migration pattern also applied to `aea/helpers/multiaddr/base.py` via the new `validate_secp256k1_compressed_pubkey` helper.
 
 ### Python: `requests` (1 alert) ✓ closed
 

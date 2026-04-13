@@ -1414,8 +1414,18 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 			linfo().Str("op", "lookup").Str("addr", address).
 				Msgf("getting agent record from provider %s...", provider)
 
-			// perfrormaddress lookup
-			record, err := acn.PerformAddressLookup(streamPipe, address)
+			// perform address lookup.
+			// Assign to the outer `err` with `=`, not `:=`, so that a
+			// read/decode failure is visible to the loop-exit return at
+			// the bottom of this function. The previous `record, err :=`
+			// shadowed the outer err, so on a stream-reset the outer err
+			// stayed nil (from the earlier successful NewStream), and the
+			// function returned `peerID="" err=nil` to the caller —
+			// which then passed the empty peer ID straight into
+			// routedHost.NewStream and got a misleading "empty peer ID"
+			// error. See CLEANUP.md item 9 (follow-up b).
+			var record *acn.AgentRecord
+			record, err = acn.PerformAddressLookup(streamPipe, address)
 
 			// Response is either a LookupResponse or Status
 			ignore(stream.Reset())
@@ -1426,8 +1436,11 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 				continue
 			}
 
-			// lookupResponse must be set
-			valid, err := dhtnode.IsValidProofOfRepresentation(
+			// lookupResponse must be set. Use `=` so a validation failure
+			// propagates to the outer `err` (same shadowing concern as
+			// the PerformAddressLookup call above).
+			var valid *acn.StatusBody
+			valid, err = dhtnode.IsValidProofOfRepresentation(
 				record,
 				address,
 				record.PeerPublicKey,
@@ -1444,7 +1457,8 @@ func (dhtPeer *DHTPeer) lookupAddressDHT(
 				continue
 			}
 
-			peerid, err := utils.IDFromFetchAIPublicKey(record.PeerPublicKey)
+			var peerid peer.ID
+			peerid, err = utils.IDFromFetchAIPublicKey(record.PeerPublicKey)
 			if err != nil {
 				return "", nil, errors.New(
 					"CRITICAL couldn't get peer ID from message:" + err.Error(),
