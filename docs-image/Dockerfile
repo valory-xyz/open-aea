@@ -8,18 +8,15 @@ RUN apt-get install -y                                                       \
        python3-dev                                                           \
        git
 
-# needed by Pipenv
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-
-RUN python3 -m pip install -U pipenv
 
 RUN mkdir /build
 WORKDIR /build
 COPY docs/ /build/docs
 COPY mkdocs.yml /build
 
-RUN python3 -m pip install "tomte[docs]==0.6.1"
+RUN python3 -m pip install "tomte[docs]==0.6.5"
 RUN python3 -m pip install git+https://github.com/pugong/mkdocs-mermaid-plugin.git
 RUN mkdocs build
 

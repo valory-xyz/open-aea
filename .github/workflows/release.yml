@@ -14,77 +14,37 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.10"]
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-versions }}
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
           python -m pip install --upgrade pip
-          pip install pipenv twine
-
-      - name: Setup pipenv and install build dependencies
-        run: |
-          make new_env
-          pipenv run pip install --upgrade setuptools wheel
+          pip install build twine
 
       - name: Build wheels and source tarball
         run: |
           echo Processing open-aea
-          pipenv run make dist
+          python -m build --sdist --wheel
 
-          echo Processing aea-cli-benchmark
-          cd plugins/aea-cli-benchmark
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-cli-ipfs
-          cd plugins/aea-cli-ipfs
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-cosmos
-          cd plugins/aea-ledger-cosmos
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum
-          cd plugins/aea-ledger-ethereum
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum-hwi
-          cd plugins/aea-ledger-ethereum-hwi
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-ethereum-flashbots
-          cd plugins/aea-ledger-ethereum-flashbots
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-solana
-          cd plugins/aea-ledger-solana
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ledger-fetchai
-          cd plugins/aea-ledger-fetchai
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-ci-helpers
-          cd plugins/aea-ci-helpers
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
-
-          echo Processing aea-dev-helpers
-          cd plugins/aea-dev-helpers
-          pipenv run python setup.py sdist bdist_wheel
-          cd ../..
+          for plugin in \
+            aea-cli-benchmark \
+            aea-cli-ipfs \
+            aea-ledger-cosmos \
+            aea-ledger-ethereum \
+            aea-ledger-ethereum-hwi \
+            aea-ledger-ethereum-flashbots \
+            aea-ledger-solana \
+            aea-ledger-fetchai \
+            aea-ci-helpers \
+            aea-dev-helpers; do
+            echo "Processing $plugin"
+            (cd "plugins/$plugin" && python -m build --sdist --wheel)
+          done
 
       - name: Publish open-aea Framework to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -185,10 +145,10 @@ jobs:
         python-version: ["3.10"]
 
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-versions }}
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           sudo apt-get update --fix-missing
@@ -213,7 +173,7 @@ jobs:
     needs:
       - publish-aea-packages
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -240,7 +200,7 @@ jobs:
     needs:
       - publish-aea-packages
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -267,7 +227,7 @@ jobs:
     needs:
       - publish-aea-packages
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}

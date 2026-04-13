@@ -3,7 +3,32 @@
 # global dictionary is at the start, file overrides afterwards
 # one word per line, to define a file override use ' - filename'
 # where filename is relative to this configuration file
+aea-ci
+aea-dev
+AEABuilder
+aealite
+CLIs
 ClickException
+deps
+Draft-04
+e2e
+FIPA
+golangci-lint
+inlined
+Inlines
+setup-python
+v4
+v5
+v6
+ecdsa
+golangci
+jsonschema
+libp2p_node
+multiformat
+pymultihash
+secp256k1
+tomte
+v2.2.0
 mutexes
 v2.0.0
 fraxtal

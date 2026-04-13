@@ -9,6 +9,61 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.1.0` to `v2.2.0`
+
+This release removes several core dependencies and replaces them with inlined stdlib-based implementations. Plugins and downstream projects that relied on these packages being transitively available must now declare them explicitly.
+
+### Core dependencies removed
+
+The following packages are no longer installed by `open-aea`:
+
+- `requests` -- plugins that use `requests` (e.g. `open-aea-ledger-cosmos`, `open-aea-ledger-ethereum`) already declare it in their own `install_requires`; if your code imports `requests` directly, add it to your own dependencies.
+- `ipfshttpclient` -- replaced by an inlined IPFS HTTP client in `aea.helpers.ipfs`.
+- `jsonschema` -- replaced by an inlined JSON Schema Draft-04 validator in `aea.helpers.jsonschema`.
+- `python-dotenv` -- replaced by an enhanced stdlib-based env file parser in `aea.helpers.env_vars`.
+- `semver` -- replaced by strict PEP 440 version parsing via `packaging`.
+- `morphys` -- removed; functionality inlined.
+- `ecdsa` -- removed from base deps; inlined secp256k1 validation in `aea.helpers.multiformat`. Plugins that use `ecdsa` (e.g. `open-aea-ledger-cosmos`) declare it themselves.
+- `base58`, `multibase`, `multicodec`, `pymultihash` -- replaced by inlined multiformat helpers in `aea.helpers.multiformat`.
+
+### New plugins
+
+- `open-aea-ci-helpers` (`aea-ci` CLI) -- 8 CI automation commands previously in `scripts/`.
+- `open-aea-dev-helpers` (`aea-dev` CLI) -- 7 release/dev tool commands previously in `scripts/`.
+
+Install them with:
+```bash
+pip install open-aea-ci-helpers open-aea-dev-helpers
+```
+
+### Scripts removed
+
+12 Python scripts have been deleted from `scripts/` and migrated to the `aea-ci` and `aea-dev` plugin CLIs, or to `tomte`. If you invoked any of these scripts directly, switch to the corresponding CLI command:
+
+- `scripts/check_copyright.py` -> `tomte check-copyright`
+- `scripts/check_doc_links.py` -> `tomte check-doc-links`
+- `scripts/freeze_dependencies.py` -> `tomte freeze-dependencies`
+- Other scripts -> `aea-ci <command>` or `aea-dev <command>`
+
+### Tooling migration
+
+- **Pipenv replaced by Poetry**: delete `Pipfile` / `Pipfile.lock` and use `pyproject.toml` + `poetry.lock`. Run `poetry install` to set up your environment.
+- **tomte bumped to 0.6.5**: update your tomte pin from `0.6.1` to `0.6.5`.
+
+### Concrete upgrade steps
+
+1. Upgrade:
+    - `pip install --upgrade "open-aea[all]==2.2.0"`
+2. Audit your imports for any of the removed packages listed above and add explicit dependencies where needed.
+3. If using Pipenv, migrate to Poetry:
+    - `poetry init` (or adopt the upstream `pyproject.toml` as a template)
+    - `poetry install`
+4. Replace any direct `scripts/` invocations with `aea-ci`, `aea-dev`, or `tomte` CLI commands.
+5. Verify:
+    - `aea --version` should report `2.2.0`
+    - `python -c "from aea.helpers.ipfs.base import IPFSHashOnly; print('OK')"` -- confirms inlined IPFS client works
+    - `python -c "from aea.helpers.jsonschema import validate; print('OK')"` -- confirms inlined JSON Schema validator works
+
 ## `v2.0.8` to `v2.1.0`
 
 - Python support is now `3.10-3.14` (previously `3.10-3.11`).

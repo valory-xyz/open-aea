@@ -21,7 +21,7 @@ pytest
 ## Start
 
 ```bash
-PIPENV_IGNORE_VIRTUALENVS=1 && pipenv --python 3.10 && pipenv shell
+python3.10 -m venv .venv && source .venv/bin/activate
 ```
 
 ## Pull and start testnet docker image

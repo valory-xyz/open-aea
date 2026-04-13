@@ -50,7 +50,7 @@ This is a fork of <a href="https://github.com/fetchai/agents-aea">the original A
 
 1. Create and launch a clean virtual environment with Python 3.10 (any Python `>=` 3.10 works):
 
-       pipenv --python 3.10 && pipenv shell
+       python3.10 -m venv .venv && source .venv/bin/activate
 
 2. Install the package from [PyPI](https://pypi.org/project/open-aea/):
 
@@ -90,7 +90,7 @@ This repository contains submodules. Clone with recursive strategy:
 
 ### Dependencies
 
-All python specific framework dependencies are specified in `setup.py` and installed with the framework. All development dependencies are specified in `Pipfile` (and installed via the commands specified in [Preliminaries](#preliminaries)).
+All python specific framework dependencies are specified in `setup.py` and installed with the framework. All development dependencies are specified in `pyproject.toml` (and installed via the commands specified in [Preliminaries](#preliminaries)).
 
 You can have more control on the installed dependencies by leveraging the setuptools' extras mechanism.
 
@@ -98,7 +98,7 @@ You can have more control on the installed dependencies by leveraging the setupt
 
 - Create and launch a virtual environment with Python 3.10 (any Python `>=` 3.10 works):
 
-      pipenv --python 3.10 && pipenv shell
+      python3.10 -m venv .venv && source .venv/bin/activate
 
 - Install the package from source:
 

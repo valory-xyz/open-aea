@@ -30,7 +30,7 @@ plugin_dir = os.path.abspath(os.path.join(here, ".."))
 
 setup(
     name="open-aea-ledger-fetchai",
-    version="2.1.0",
+    version="2.2.0",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger API of Fetch.AI.",
@@ -44,7 +44,7 @@ setup(
         ]
     },
     python_requires=">=3.10,<3.15",
-    install_requires=["open-aea-ledger-cosmos~=2.1.0", "requests>=2.32.5,<3"],
+    install_requires=["open-aea-ledger-cosmos~=2.2.0", "requests>=2.32.5,<3"],
     extras_require={
         "test_tools": ["pytest>=7.0,<10", "docker==7.1.0"],
     },

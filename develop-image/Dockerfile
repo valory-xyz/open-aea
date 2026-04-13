@@ -42,12 +42,11 @@ RUN apt-get install -y                                                       \
        libfreetype6-dev
 
 
-# needed by Pipenv
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 RUN sudo apt-get install -y tox
-RUN python3 -m pip install -U pipenv
+RUN python3 -m pip install -U poetry==2.3.2
 
 # fix ssl issue.
 COPY develop-image/openssl.cnf /etc/ssl
@@ -61,10 +60,7 @@ COPY . /build
 
 RUN sudo make clean
 
-RUN pipenv --python python3.10
-RUN pipenv run pip3 install --upgrade pip
-RUN pipenv install --dev --skip-lock
-
-RUN pipenv run pip3 install .[all]
+RUN poetry install --all-extras --no-interaction
+RUN poetry run pip3 install .[all]
 
 CMD ["/bin/bash"]
