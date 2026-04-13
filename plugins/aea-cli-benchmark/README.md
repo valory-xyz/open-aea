@@ -11,6 +11,12 @@ Then, install the plug-in:
 pip install open-aea-cli-benchmark
 ```
 
+The `tx-generate` case spins up a dockerised fetchai ledger node and is therefore an optional extra. Install it with:
+```bash
+pip install "open-aea-cli-benchmark[tx-generate]"
+```
+Without the `[tx-generate]` extra the `tx-generate` command is not registered and the rest of the benchmark commands work as normal.
+
 Now you should be able to run `aea benchmark`:
 
 ```bash
@@ -33,7 +39,7 @@ Commands:
   multiagent-http-dialogues     Multi-agent HTTP dialogue throughput
   proactive                     Proactive skill behaviour benchmark
   reactive                      Reactive skill handler benchmark
-  tx-generate                   Transaction generation throughput
+  tx-generate                   Transaction generation throughput (requires the [tx-generate] extra)
 ```
 
 Run any command with `--help` for per-case options.
