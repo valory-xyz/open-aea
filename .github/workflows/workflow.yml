@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies (ubuntu-latest)
@@ -46,8 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
@@ -92,8 +92,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies (ubuntu-latest)
@@ -110,8 +110,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
@@ -149,10 +149,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies (ubuntu-latest)
@@ -171,13 +171,13 @@ jobs:
     timeout-minutes: 10
     if: github.base_ref == 'main'
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: 12.x
       - name: Install dependencies (ubuntu-latest)
@@ -199,13 +199,13 @@ jobs:
     timeout-minutes: 5
     if: github.base_ref == 'main'
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: 12.x
       - name: Install dependencies (ubuntu-latest)
@@ -221,7 +221,7 @@ jobs:
     name: gitleaks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v5.2.0
@@ -241,8 +241,8 @@ jobs:
     timeout-minutes: 10
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
@@ -262,8 +262,9 @@ jobs:
     continue-on-error: False
     runs-on: ${{ matrix.sys.os }}
     env:
-      PYTHONUTF8: 1 
+      PYTHONUTF8: 1
     strategy:
+      fail-fast: false
       matrix:
         sys:
           - { os: windows-latest, shell: "msys2 {0}" }
@@ -272,10 +273,10 @@ jobs:
         python_version: ["3.10",]
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - if: matrix.sys.os == 'windows-latest'
         uses: msys2/setup-msys2@v2
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
@@ -316,8 +317,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
@@ -347,8 +348,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
@@ -387,8 +388,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
@@ -422,8 +423,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies (ubuntu-latest)
@@ -466,8 +467,8 @@ jobs:
             python_version: '3.14'
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
       - uses: actions/setup-go@v5.2.0
@@ -581,7 +582,7 @@ jobs:
 
       - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
         name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
@@ -607,8 +608,8 @@ jobs:
         python-version: ["3.10"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - uses: actions/setup-go@v5.2.0
