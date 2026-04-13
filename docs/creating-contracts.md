@@ -16,7 +16,7 @@ Now, let's create our contract package:
 
 2. Initialize the IPFS registry:
 ```bash
-autonomy init --reset --author john_doe --remote --ipfs --ipfs-node "/dns/registry.autonolas.tech/tcp/443/https"
+aea init --reset --author john_doe --remote --ipfs --ipfs-node "/dns/registry.autonolas.tech/tcp/443/https"
 ```
 
 3. Scaffold the ERC20 contract:

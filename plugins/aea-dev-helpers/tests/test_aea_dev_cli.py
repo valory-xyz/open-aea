@@ -34,7 +34,6 @@ from click.testing import CliRunner
 EXPECTED_COMMANDS = {
     "bump-version",
     "deploy-registry",
-    "parse-lock-deps",
     "publish-local",
     "update-pkg-versions",
     "update-plugin-versions",

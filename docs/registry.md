@@ -36,12 +36,12 @@ Successfully added skill 'fetchai/echo:0.19.0'.
 ```
 
 ## Adding a Package to Local IPFS Node
-To generate the hash of a component, we use a local IPFS node which allows use to create the same hash as generated upon deployment of the component to main net IPFS.
+To generate the hash of a component, we use a local IPFS node which allows us to create the same hash as generated upon deployment of the component to main net IPFS.
 
 ```bash
-aea ipfs add packages/fetchai/connections/gym/
-Starting processing: /root/open-aea/packages/fetchai/connections/gym
+aea ipfs add packages/fetchai/skills/echo/
+Starting processing: /root/open-aea/packages/fetchai/skills/echo
 Registered item with:
-        public id : fetchai/gym:0.19.0
-        hash : QmVLvrU8w8nJB57ncPfoYwB5niA3RWeeKpqyRi3ug2hkY8
+        public id : fetchai/echo:0.19.0
+        hash : bafybeieqhk2g6l4pitjmuwbtt7n6vx3wawclygjv5cywjjrgay66lzq74u
 ```

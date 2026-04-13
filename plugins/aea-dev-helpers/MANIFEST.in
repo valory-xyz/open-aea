@@ -1,0 +1,4 @@
+include README.md LICENSE
+
+recursive-include aea_dev_helpers *
+recursive-include tests *

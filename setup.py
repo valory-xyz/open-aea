@@ -120,7 +120,7 @@ if __name__ == "__main__":
         zip_safe=False,
         include_package_data=True,
         license=about["__license__"],
-        python_requires=">=3.10",
+        python_requires=">=3.10,<3.15",
         keywords="aea open-aea autonomous-economic-agents agent-framework multi-agent-systems multi-agent cryptocurrency cryptocurrencies dezentralized dezentralized-network",
         project_urls={
             "Bug Reports": "https://github.com/valory-xyz/open-aea/issues",

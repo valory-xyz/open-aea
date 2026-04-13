@@ -7,16 +7,14 @@ A full break down of the development flow is covered within the <a href="../quic
 
 It is highly recommended that developers begin by following the quick start!
 
-It is assumed that developers are within a pipenv virtual environment.
+It is assumed that developers are within an activated Python virtual environment (see the <a href="../quickstart/">quickstart</a>).
 
-A full break down of the development flow is covered within the <a href="../quickstart/">Development Quickstart</a>.
 The easiest way to get started with the http server is to use our pre-built example skill.
 
 
 
 ``` bash
-pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeicwaj3kyeeomclwjxyaf36zhyxygjc5mrbkspzvrzgbhej3uzwqoy --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeifhpnvkl366jl75rwgz3xeomopg2dlmvz6ihmj3yn4gver57p7yce --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install
@@ -38,7 +36,7 @@ Agent http_echo successfully fetched.
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 5000.

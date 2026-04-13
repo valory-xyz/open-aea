@@ -37,15 +37,16 @@ setup(
             "py.typed",
         ]
     },
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
-        "ecdsa>=0.15,<0.17.0",
+        "ecdsa>=0.19.2,<0.20",
         "bech32>=1.2.0,<2",
         "pycryptodome>=3.10.1,<4.0.0",
         "cosmpy<0.12,>=0.11.0",
-        "requests>=2.20.0,<3",
+        "requests>=2.32.5,<3",
     ],
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": ["cosmos = aea_ledger_cosmos:CosmosCrypto"],
         "aea.ledger_apis": ["cosmos = aea_ledger_cosmos:CosmosApi"],

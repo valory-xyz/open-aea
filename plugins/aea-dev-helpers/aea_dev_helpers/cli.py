@@ -19,7 +19,7 @@
 
 """CLI entry point for aea-dev-helpers."""
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 import click
 
@@ -28,18 +28,6 @@ import click
 @click.version_option()
 def cli() -> None:
     """AEA development and release helper utilities."""
-
-
-@cli.command("parse-lock-deps")
-@click.argument("pipfile_lock_path", type=click.Path(exists=True))
-@click.option(
-    "-o", "--output", type=click.Path(), default=None, help="Output file path."
-)
-def parse_lock_deps_cmd(pipfile_lock_path: str, output: Optional[str]) -> None:
-    """Parse main dependencies from a Pipfile.lock and print in requirements.txt format."""
-    from aea_dev_helpers.parse_lock_deps import parse_lock_deps
-
-    parse_lock_deps(pipfile_lock_path, output)
 
 
 @cli.command("publish-local")

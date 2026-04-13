@@ -126,3 +126,60 @@ Pytest with custom markers: `integration` (requires external services), `ledger`
 4. `make security`
 5. If `packages/` modified: `make generators` then `make common-checks-1` and `make common-checks-2`
 6. If `packages/` not modified: `make check-copyright`
+
+## Before every commit — always run these
+
+Do NOT commit until every check below passes locally. Do not cherry-pick
+a subset; each one has caught real regressions. When linters report no
+findings you are much better off than inferring from the output of a
+partial run.
+
+The full set (per tox env):
+
+```bash
+tox -e black-check
+tox -e isort-check
+tox -e flake8
+tox -e check-copyright
+tox -e spell-check
+tox -e darglint        # catches missing :param: / :return: lines
+tox -e dependencies-check
+tox -e hash-check      # only if packages/ or aea/ scaffolds touched
+tox -e check-doc-links-hashes  # only if docs/ touched
+tox -e check-api-docs  # only if any aea/ or plugins/*/aea_*/ source touched
+```
+
+Notes:
+- `tox -e darglint` also scans stale setuptools build artifacts under
+  the plugins directory. If you see an error in a `build/lib/...`
+  path, run `rm -rf plugins/*/build` and re-run.
+- For Go changes under `libs/go/aealite` or
+  `packages/valory/connections/p2p_libp2p/libp2p_node`, also run
+  `go build ./... && go vet ./... && go test ./...` in each module,
+  plus `golangci-lint run --timeout=5m` on aealite. The libp2p_node
+  module is not yet covered by golangci (see CLEANUP.md).
+- `make code-checks` bundles most of the Python tox envs above but
+  runs them in parallel; if it fails, re-run the failing ones
+  individually to see which one reported what.
+
+### If a check fails — fix modes
+
+Check-mode envs above are read-only. When they fail, run the matching
+fix-mode env (or manual step), then re-run the check until clean:
+
+- `tox -e hash-check` fails → `tox -e lock-packages` regenerates
+  `packages/packages.json` hashes + `docs/package_list.md`. Commit the
+  regenerated files.
+- `tox -e spell-check` fails → add legitimate project terms to
+  `.spelling` (global section, before the first ` - filename`
+  override). Do not guess at flagged tokens — read the surrounding
+  markdown to identify the actual word.
+- `tox -e check-doc-links-hashes` fails → `tox -e fix-doc-hashes`.
+- `tox -e check-copyright` fails → `tox -e fix-copyright`.
+- `tox -e black-check` / `tox -e isort-check` fail →
+  `make formatters`.
+- `tox -e check-api-docs` fails → `tox -e generate-api-documentation`
+  regenerates the markdown under `docs/api/`. Commit the regenerated
+  files. The check is essentially a "no uncommitted regen needed"
+  gate, so it fails whenever a public docstring or signature changed
+  without rerunning the generator.

@@ -22,7 +22,7 @@ To prepare a directory (henceforth working directory) for development with the A
 
 - Or, automated:
 
-	- Fork our <a href="https://github.com/fetchai/agents-template" target="_blank">template repo</a> for AEA development. Then clone it to your machine.
+	- Fork our <a href="https://github.com/valory-xyz/dev-template" target="_blank">developer template repo</a> for AEA development. Then clone it to your machine.
 
 - Depending on your editor, you might take further steps:
 

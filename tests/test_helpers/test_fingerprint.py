@@ -28,6 +28,7 @@ import pytest
 import yaml
 
 from aea.configurations.base import PACKAGE_TYPE_TO_CONFIG_CLASS
+from aea.configurations.constants import AEA_DIR
 from aea.helpers.cid import CID
 from aea.helpers.dependency_tree import COMPONENTS
 from aea.helpers.fingerprint import (
@@ -40,6 +41,14 @@ from tests.conftest import PACKAGES_DIR
 
 CONFIG_CLASSES = {k.value: v for k, v in PACKAGE_TYPE_TO_CONFIG_CLASS.items()}
 CONFIG_FILES = {k: Path(PACKAGES_DIR).rglob(f_name) for k, f_name in COMPONENTS}
+
+# Framework-included packages shipped under `aea/` (scaffold templates, etc.)
+# whose fingerprints are not tracked in `packages/packages.json` and therefore
+# are not verified by `aea packages lock --check`. We verify them directly
+# below so a source-vs-fingerprint drift gets caught by the test suite.
+FRAMEWORK_PACKAGE_YAMLS = sorted(
+    p for _, config_file in COMPONENTS for p in Path(AEA_DIR).rglob(config_file)
+)
 
 
 def test_compute_fingerprint():
@@ -123,3 +132,29 @@ def test_update_fingerprint(package_type, files):
             update_fingerprint(config)
             config = load_config(Path(tmp_dir) / file.name)
             assert not config.fingerprint
+
+
+@pytest.mark.parametrize(
+    "yaml_path", FRAMEWORK_PACKAGE_YAMLS, ids=lambda p: str(p.relative_to(AEA_DIR))
+)
+def test_framework_package_fingerprints(yaml_path: Path) -> None:
+    """Check that fingerprints of framework-included packages match their source.
+
+    `aea packages lock --check` only verifies packages under `packages/`, not
+    the scaffold and other framework-included packages shipped under `aea/`.
+    This test closes that gap by running the same `check_fingerprint` logic
+    directly on each yaml file. Any source change that isn't followed by
+    `tox -e lock-packages` (which updates these fingerprints via
+    `aea/cli/ipfs_hash.py`'s SCAFFOLD_PACKAGES extension) will fail here.
+    """
+    file_contents = yaml_path.read_text().split("---")
+    base_doc = file_contents[0]
+    json_data = yaml.safe_load(base_doc)
+    package_type = json_data["type"]
+    config_cls = CONFIG_CLASSES[package_type]
+    config = config_cls._create_or_update_from_json(json_data)
+    config.directory = yaml_path.parent
+    assert check_fingerprint(config), (
+        f"Fingerprint mismatch for {yaml_path.relative_to(AEA_DIR)}: "
+        f"run `tox -e lock-packages` to regenerate."
+    )

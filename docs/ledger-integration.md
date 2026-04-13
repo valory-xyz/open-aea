@@ -1,4 +1,4 @@
-In this section, we show you how to integrate the AEA with the Fetch.ai and third-party ledgers.
+In this section, we show you how to integrate the AEA framework with blockchain ledgers.
 
 ## Ledger support
 
@@ -34,8 +34,8 @@ from setuptools import setup
 setup(
     name="open-aea-ledger-myledger",
     packages=["aea_ledger_myledger"],
-    # plugins must depend on 'aea'  
-    install_requires=["aea"], # add other dependencies...
+    # plugins must depend on 'open-aea'
+    install_requires=["open-aea>=2.0.0, <3.0.0"],  # add other dependencies...
     # the following makes a plugin available to aea
     entry_points={
         "aea.cryptos": ["myledger = aea_ledger_myledger:MyLedgerCrypto"],
@@ -57,13 +57,16 @@ You can search for AEA ledger plug-ins on PyPI:
 
 ## Maintained plug-ins
 
-At the moment, the framework natively supports the following three ledgers:
+The framework currently ships the following ledger plugins:
 
-- Fetch.ai: <a href="https://pypi.org/project/open-aea-ledger-fetchai/" target="_blank">PyPI package: `open-aea-ledger-fetchai`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-fetchai" target="_blank">source code</a>.
 - Ethereum: <a href="https://pypi.org/project/open-aea-ledger-ethereum/" target="_blank">PyPI package: `open-aea-ledger-ethereum`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum" target="_blank">source code</a>.
+- Ethereum Flashbots: <a href="https://pypi.org/project/open-aea-ledger-ethereum-flashbots/" target="_blank">PyPI package: `open-aea-ledger-ethereum-flashbots`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum-flashbots" target="_blank">source code</a>.
+- Ethereum Hardware Wallet Interface: <a href="https://pypi.org/project/open-aea-ledger-ethereum-hwi/" target="_blank">PyPI package: `open-aea-ledger-ethereum-hwi`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum-hwi" target="_blank">source code</a>.
 - Cosmos: <a href="https://pypi.org/project/open-aea-ledger-cosmos/" target="_blank">PyPI package: `open-aea-ledger-cosmos`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-cosmos" target="_blank">source code</a>.
+- Fetch.ai: <a href="https://pypi.org/project/open-aea-ledger-fetchai/" target="_blank">PyPI package: `open-aea-ledger-fetchai`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-fetchai" target="_blank">source code</a>.
+- Solana: <a href="https://pypi.org/project/open-aea-ledger-solana/" target="_blank">PyPI package: `open-aea-ledger-solana`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-solana" target="_blank">source code</a>.
 
-However, support for additional ledgers can be added to the framework at runtime.
+Support for additional ledgers can be added to the framework at runtime via the plug-in mechanism described above.
 
 
 ## Examples

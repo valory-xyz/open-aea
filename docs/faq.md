@@ -11,7 +11,7 @@ The AEA framework provides the necessary services to address all three problems.
 </details>
 
 <details><summary>How does an AEA use blockchain?</summary>
-The AEA framework enables agents to interact with blockchains to settle transactions. Currently, the framework has native support for three different networks: <i>Fetch.ai</i>, <i>Ethereum</i> and <i>Cosmos</i>.
+The AEA framework enables agents to interact with blockchains to settle transactions. Ledger integrations are provided as plugins; the framework currently ships plugins for <i>Ethereum</i> (including Flashbots and hardware-wallet variants), <i>Cosmos</i>, <i>Fetch.ai</i>, and <i>Solana</i>.
 <br><br>
 You can read more about the framework's integration with the different blockchains <a href="../ledger-integration/">here</a>.
 </details>
@@ -45,7 +45,7 @@ You can find more details about the file structure <a href="../package-imports/"
 </details>
 
 <details><summary>Is there a standard for private key files?</summary>
-Currently, the private keys are stored in <code>.txt</code> files. This is temporary and will be improved soon.
+Private keys are stored in plain <code>.txt</code> files by default. To encrypt them at rest, pass <code>-p</code> or <code>--password PASSWORD</code> when generating or adding a key via the CLI (see the <a href="../security/">security notes</a>).
 </details>
 
 <details><summary>How to use the same protocol in different skills?</summary>

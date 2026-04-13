@@ -4,11 +4,8 @@ sudo apt-get update
 sudo apt-get dist-upgrade 
 ```
 ``` bash
-sudo apt-get install pipenv
+python3.10 -m venv .venv && source .venv/bin/activate
 ```
 ``` bash
-pipenv --python 3.10 && pipenv shell
-```
-``` bash
-pip install aea[all]
+pip install open-aea[all]
 ```

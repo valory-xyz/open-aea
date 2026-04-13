@@ -29,19 +29,21 @@ setup(
     description="CI helper utilities for AEA-based projects.",
     long_description="CI helper utilities for AEA-based projects.",
     long_description_content_type="text/markdown",
-    packages=find_packages(where=".", include=["aea_ci_helpers", "aea_ci_helpers.*"]),
+    packages=find_packages(include=["aea_ci_helpers*"]),
     entry_points={
         "console_scripts": [
             "aea-ci=aea_ci_helpers.cli:cli",
         ],
     },
     install_requires=[
-        "click>=8.1.0,<9",
-        "packaging",
-        "toml>=0.10,<1",
-        "tomli",
+        "click>=8.1.0,<8.4.0",
+        "packaging>=22.0,<27",
+        "pyyaml>=6.0.1,<7",
+        # `tomli` is the 3.10 back-compat shim for stdlib `tomllib` (3.11+).
+        'tomli; python_version < "3.11"',
+        "tomli-w",
     ],
-    python_requires=">=3.10",
+    python_requires=">=3.10,<3.15",
     classifiers=[
         "Environment :: Console",
         "License :: OSI Approved :: Apache Software License",

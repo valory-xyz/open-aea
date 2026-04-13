@@ -35,9 +35,15 @@ import (
 
 //
 const (
-	DHTPeerDefaultLocalHost    = "127.0.0.1"
-	DHTPeerDefaultLocalPort    = 2000
-	DHTPeerDefaultDelegatePort = 3000
+	DHTPeerDefaultLocalHost = "127.0.0.1"
+	// `go test ./...` runs packages in parallel, so dhttests (used
+	// by the dhtclient tests) and dhtpeer_test cannot share ports
+	// without racing for the same TCP socket. dhtpeer_test uses
+	// 22000/23000; keep dhttests on 24000/25000. The previous
+	// 2000/3000 range also collided with macOS Control Center /
+	// AirPlay Receiver on macOS-large CI runners.
+	DHTPeerDefaultLocalPort    = 24000
+	DHTPeerDefaultDelegatePort = 25000
 
 	DHTPeerDefaultFetchAIKey       = "34604436e55b0eb99b5e62508433e172dd3ee133cf7a2fecb705e69611147605"
 	DHTPeerDefaultFetchAIPublicKey = "039e883de988eededb9afaa4d3a6baec9ba74dd1cc237028e810569780b319940a"

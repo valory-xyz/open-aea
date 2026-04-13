@@ -96,3 +96,23 @@ protoc -I="aealite/protocols/" --go_out="." aealite/protocols/acn.proto
 protoc -I="aealite/protocols/" --go_out="." aealite/protocols/base.proto
 cd aealite
 ```
+
+## Tests
+
+Unit tests are run by default and do not require any external service:
+
+``` bash
+go test ./...
+```
+
+The tests in `agent_test.go` and `connections/p2pclient_test.go` are
+integration tests that talk to a running AEA `p2p_libp2p_client` peer. They
+are gated behind the `integration` build tag and are therefore excluded from
+the default `go test` run. To execute them, first start an AEA with a
+`p2p_libp2p_client` connection configured to match the values in
+`test_env_file.env` (ledger `fetchai`, matching keys, and a reachable ACN
+delegate at `acn.fetch.ai:11000` or your local peer), then run:
+
+``` bash
+go test -tags integration ./...
+```

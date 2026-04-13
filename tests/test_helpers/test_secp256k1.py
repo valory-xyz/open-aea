@@ -93,8 +93,12 @@ class TestCrossValidation:
             sk = SigningKey.generate(curve=SECP256k1)
             compressed = sk.get_verifying_key().to_string("compressed")
 
-            # Both should accept
-            VerifyingKey._from_compressed(compressed, curves.SECP256k1)
+            # Both should accept. Use the public `from_string` API
+            # which auto-detects the encoding from the 0x02/0x03
+            # compressed-point prefix; the older private
+            # `VerifyingKey._from_compressed` helper was removed in
+            # ecdsa 0.19.x.
+            VerifyingKey.from_string(compressed, curve=curves.SECP256k1)
             validate_secp256k1_compressed_pubkey(compressed)
 
     def test_known_invalid_keys_match(self) -> None:
@@ -113,7 +117,7 @@ class TestCrossValidation:
             except ValueError:
                 ours_raises = True
             try:
-                VerifyingKey._from_compressed(key, curves.SECP256k1)
+                VerifyingKey.from_string(key, curve=curves.SECP256k1)
             except keys.MalformedPointError:
                 ecdsa_raises = True
             assert (

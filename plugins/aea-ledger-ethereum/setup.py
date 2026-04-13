@@ -38,13 +38,17 @@ setup(
             "test_tools/data/*",
         ]
     },
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "web3>=7.0.0,<8",
         "eth-account>=0.13.0,<0.14.0",
-        "requests>=2.20.0,<3",
+        "requests>=2.32.5,<3",
     ],
-    tests_require=["pytest"],
+    extras_require={
+        "test_tools": ["pytest>=7.0,<10", "docker==7.1.0"],
+    },
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": ["ethereum = aea_ledger_ethereum:EthereumCrypto"],
         "aea.ledger_apis": ["ethereum = aea_ledger_ethereum:EthereumApi"],

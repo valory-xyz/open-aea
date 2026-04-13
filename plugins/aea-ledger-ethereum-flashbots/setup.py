@@ -38,12 +38,12 @@ setup(
             "py.typed",
         ]
     },
-    python_requires=">=3.10,<4.0",
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea-ledger-ethereum~=2.1.0",
         "open-aea-flashbots~=2.1.0",
     ],
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": [
             "ethereum_flashbots = aea_ledger_ethereum_flashbots:EthereumFlashbotCrypto"

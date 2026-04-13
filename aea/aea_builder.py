@@ -306,6 +306,14 @@ class AEABuilder(WithLogger):  # pylint: disable=too-many-public-methods
         # second call
         my_aea_2 = builder.builder()
 
+    Known limitations:
+
+    - Package consistency is only checked at the ``add`` stage, not again
+      at ``load``. If a package is tampered with after being added to the
+      builder, the inconsistency may not be detected.
+    - If two packages are registered with public ids that share the same
+      author and package name but differ in version, the builder does not
+      detect the mismatch and simply uses the last-loaded package.
     """
 
     DEFAULT_LEDGER = DEFAULT_LEDGER

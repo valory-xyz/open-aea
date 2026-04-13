@@ -24,6 +24,7 @@ import (
 	"bufio"
 	"context"
 	"crypto/sha256"
+	"encoding/asn1"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
@@ -31,15 +32,16 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/big"
 	"net"
 	"os"
 	"sync"
 	"time"
 
 	cid "github.com/ipfs/go-cid"
-	p2pCrypto "github.com/libp2p/go-libp2p-core/crypto"
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
+	p2pCrypto "github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
 	kaddht "github.com/libp2p/go-libp2p-kad-dht"
 	multiaddr "github.com/multiformats/go-multiaddr"
 	multihash "github.com/multiformats/go-multihash"
@@ -47,11 +49,12 @@ import (
 	"golang.org/x/crypto/ripemd160" // nolint:staticcheck
 	"golang.org/x/crypto/sha3"
 
-	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/peerstore"
+	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/peerstore"
 
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcutil/bech32"
+	"github.com/btcsuite/btcd/btcec/v2"
+	btcecdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
+	"github.com/btcsuite/btcd/btcutil/bech32"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"google.golang.org/protobuf/proto"
@@ -125,6 +128,15 @@ func NewDefaultLoggerWithFields(fields map[string]string) zerolog.Logger {
 	Helpers
 */
 
+// dhtFindPeer wraps `dht.RoutingTable().Find(id)` behind a package-level
+// function variable so that tests can inject a fake routing-table lookup
+// without depending on monkey patching (bou.ke/monkey relies on Go
+// runtime internals that were removed in Go 1.21+ and no longer works
+// on modern toolchains).
+var dhtFindPeer = func(dht *kaddht.IpfsDHT, id peer.ID) peer.ID {
+	return dht.RoutingTable().Find(id)
+}
+
 // BootstrapConnect connect to `peers` at bootstrap
 // This code is borrowed from the go-ipfs bootstrap process
 func BootstrapConnect(
@@ -185,11 +197,11 @@ func BootstrapConnect(
 	for _, peer := range peers {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		for dht.RoutingTable().Find(peer.ID) == "" {
+		for dhtFindPeer(dht, peer.ID) == "" {
 			select {
 			case <-ctx.Done():
 				return errors.New(
-					"timeout: entry peer haven't been added to DHT routing table " + peer.ID.Pretty(),
+					"timeout: entry peer haven't been added to DHT routing table " + peer.ID.String(),
 				)
 			case <-time.After(time.Millisecond * 5):
 			}
@@ -256,7 +268,7 @@ func BTCPubKeyFromFetchAIPublicKey(publicKey string) (*btcec.PublicKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	pbk, err := btcec.ParsePubKey(pbkBytes, btcec.S256())
+	pbk, err := btcec.ParsePubKey(pbkBytes)
 	return pbk, err
 }
 
@@ -270,20 +282,51 @@ func BTCPubKeyFromEthereumPublicKey(publicKey string) (*btcec.PublicKey, error) 
 // References:
 //  - https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L258
 //  - https://github.com/btcsuite/btcd/blob/master/btcec/signature.go#L47
-func ConvertStrEncodedSignatureToDER(signature []byte) []byte {
-	rb := signature[:len(signature)/2]
-	sb := signature[len(signature)/2:]
-	length := 6 + len(rb) + len(sb)
-	sigDER := make([]byte, length)
-	sigDER[0] = 0x30
-	sigDER[1] = byte(length - 2)
-	sigDER[2] = 0x02
-	sigDER[3] = byte(len(rb))
-	offset := copy(sigDER[4:], rb) + 4
-	sigDER[offset] = 0x02
-	sigDER[offset+1] = byte(len(sb))
-	copy(sigDER[offset+2:], sb)
-	return sigDER
+//
+// Pre-bump this function did manual byte assembly. That produced invalid
+// DER when either r or s had its high bit set (because DER integers need a
+// leading zero byte for sign disambiguation in that case). btcec v1's
+// ParseSignature was lenient about it; btcec/v2's ParseDERSignature is not,
+// so we now use encoding/asn1 to marshal a proper ECDSA-Sig-Value sequence.
+// secp256k1SignatureComponentSize is the fixed byte length of each of the
+// R and S components of a secp256k1 ECDSA signature. The str encoding
+// produced and consumed by this file is a 64-byte R||S buffer so that it
+// round-trips losslessly — earlier versions used `big.Int.Bytes()` which
+// strips leading zero bytes and produced variable-width output, breaking
+// round-trip when only one of R/S had a leading zero that needed
+// preserving.
+const secp256k1SignatureComponentSize = 32
+
+// padToLeft left-pads `b` with zero bytes to exactly `size` bytes. Callers
+// must ensure `len(b) <= size`; for secp256k1 R and S this always holds.
+func padToLeft(b []byte, size int) []byte {
+	if len(b) >= size {
+		return b
+	}
+	padded := make([]byte, size)
+	copy(padded[size-len(b):], b)
+	return padded
+}
+
+func ConvertStrEncodedSignatureToDER(signature []byte) ([]byte, error) {
+	if len(signature) != 2*secp256k1SignatureComponentSize {
+		return nil, fmt.Errorf(
+			"invalid secp256k1 signature length: got %d, want %d (%d-byte R || %d-byte S)",
+			len(signature),
+			2*secp256k1SignatureComponentSize,
+			secp256k1SignatureComponentSize,
+			secp256k1SignatureComponentSize,
+		)
+	}
+	rb := signature[:secp256k1SignatureComponentSize]
+	sb := signature[secp256k1SignatureComponentSize:]
+	der, err := asn1.Marshal(struct {
+		R, S *big.Int
+	}{R: new(big.Int).SetBytes(rb), S: new(big.Int).SetBytes(sb)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal ECDSA-Sig-Value: %w", err)
+	}
+	return der, nil
 }
 
 // ConvertDEREncodedSignatureToStr Convert signatue from der format to string
@@ -291,24 +334,38 @@ func ConvertStrEncodedSignatureToDER(signature []byte) []byte {
 //  - https://github.com/fetchai/agents-aea/blob/main/aea/crypto/cosmos.py#L258
 //  - https://github.com/btcsuite/btcd/blob/master/btcec/signature.go#L47
 func ConvertDEREncodedSignatureToStr(signature []byte) ([]byte, error) {
-	sig, err := btcec.ParseDERSignature(signature, btcec.S256())
+	// Parse DER-encoded signature manually to extract raw R and S bytes,
+	// since btcec/v2 Signature does not expose R/S accessors.
+	type ecdsaSig struct {
+		R, S *big.Int
+	}
+	var parsed ecdsaSig
+	_, err := asn1.Unmarshal(signature, &parsed)
 	if err != nil {
 		return []byte{}, err
 	}
-	return append(sig.R.Bytes(), sig.S.Bytes()...), nil
+	// Left-pad to 32 bytes each so the output is always a fixed 64 bytes
+	// and round-trips losslessly through ConvertStrEncodedSignatureToDER.
+	out := make([]byte, 2*secp256k1SignatureComponentSize)
+	copy(out, padToLeft(parsed.R.Bytes(), secp256k1SignatureComponentSize))
+	copy(out[secp256k1SignatureComponentSize:], padToLeft(parsed.S.Bytes(), secp256k1SignatureComponentSize))
+	return out, nil
 }
 
 // ParseFetchAISignature create btcec Signature from base64 formated, string (not DER) encoded RFC6979 signature
-func ParseFetchAISignature(signature string) (*btcec.Signature, error) {
+func ParseFetchAISignature(signature string) (*btcecdsa.Signature, error) {
 	// First convert the signature into a DER one
 	sigBytes, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		return nil, err
 	}
-	sigDER := ConvertStrEncodedSignatureToDER(sigBytes)
+	sigDER, err := ConvertStrEncodedSignatureToDER(sigBytes)
+	if err != nil {
+		return nil, err
+	}
 
 	// Parse
-	sigBTC, err := btcec.ParseSignature(sigDER, btcec.S256())
+	sigBTC, err := btcecdsa.ParseDERSignature(sigDER)
 	return sigBTC, err
 }
 
@@ -363,7 +420,10 @@ func VerifyFetchAISignatureLibp2p(message []byte, signature string, pubkey strin
 	if err != nil {
 		return false, err
 	}
-	sigDER := ConvertStrEncodedSignatureToDER(sigBytes)
+	sigDER, err := ConvertStrEncodedSignatureToDER(sigBytes)
+	if err != nil {
+		return false, err
+	}
 
 	// verify signature
 	return verifyKey.Verify(message, sigDER)
@@ -445,7 +505,7 @@ func KeyPairFromFetchAIKey(key string) (p2pCrypto.PrivKey, p2pCrypto.PubKey, err
 		return nil, nil, err
 	}
 
-	btcPrivateKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
+	btcPrivateKey, _ := btcec.PrivKeyFromBytes(pkBytes)
 	prvKey, pubKey, err := p2pCrypto.KeyPairFromStdKey(btcPrivateKey)
 	if err != nil {
 		return nil, nil, err
@@ -554,7 +614,7 @@ func IDFromFetchAIPublicKey(publicKey string) (peer.ID, error) {
 		return "", err
 	}
 
-	pubKey, err := btcec.ParsePubKey(b, btcec.S256())
+	pubKey, err := btcec.ParsePubKey(b)
 	if err != nil {
 		return "", err
 	}
@@ -574,11 +634,12 @@ func BTCPubKeyFromUncompressedHex(publicKey string) (*btcec.PublicKey, error) {
 		return nil, err
 	}
 
-	pubBytes := make([]byte, 0, btcec.PubKeyBytesLenUncompressed)
-	pubBytes = append(pubBytes, 0x4) // btcec.pubkeyUncompressed
+	// 65 = 1 byte prefix + 32 byte X + 32 byte Y (uncompressed secp256k1 pubkey length)
+	pubBytes := make([]byte, 0, 65)
+	pubBytes = append(pubBytes, 0x4) // uncompressed pubkey prefix
 	pubBytes = append(pubBytes, b...)
 
-	return btcec.ParsePubKey(pubBytes, btcec.S256())
+	return btcec.ParsePubKey(pubBytes)
 }
 
 // IDFromFetchAIPublicKeyUncompressed Get PeeID (multihash) from fetchai public key
@@ -602,7 +663,7 @@ func FetchAIPublicKeyFromFetchAIPrivateKey(privateKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, btcPublicKey := btcec.PrivKeyFromBytes(btcec.S256(), pkBytes)
+	_, btcPublicKey := btcec.PrivKeyFromBytes(pkBytes)
 
 	return hex.EncodeToString(btcPublicKey.SerializeCompressed()), nil
 }

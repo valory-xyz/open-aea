@@ -28,12 +28,12 @@ import sys
 from abc import abstractmethod
 from collections import defaultdict
 from functools import partial, wraps
+from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
 from typing import Any, Callable, Dict, Generator, List, Optional, Set, Tuple, Union
 
 import click
 import yaml
-from pip._internal.commands.show import search_packages_info
 
 from aea.cli.utils.context import Context
 from aea.cli.utils.decorators import pass_ctx
@@ -424,16 +424,12 @@ class DependenciesTool:
     @staticmethod
     def get_package_files(package_name: str) -> List[Path]:
         """Get package files list."""
-        packages_info = list(search_packages_info([package_name]))
-        if len(packages_info) == 0:
-            raise ValueError(f"package {package_name} not found")
-        if isinstance(packages_info[0], dict):
-            files = packages_info[0]["files"]
-            location = packages_info[0]["location"]
-        else:
-            files = packages_info[0].files  # type: ignore
-            location = packages_info[0].location  # type: ignore
-        return [Path(location) / i for i in files]  # type: ignore
+        try:
+            dist = distribution(package_name)
+        except PackageNotFoundError as e:
+            raise ValueError(f"package {package_name} not found") from e
+        files = dist.files or []
+        return [Path(str(dist.locate_file(f))) for f in files]
 
     @staticmethod
     def clean_dependency_name(dependecy_specification: str) -> str:

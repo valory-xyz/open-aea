@@ -1,6 +1,5 @@
 ``` bash
-pipenv shell
-aea fetch open_aea/http_echo:0.1.0:bafybeicwaj3kyeeomclwjxyaf36zhyxygjc5mrbkspzvrzgbhej3uzwqoy --remote
+aea fetch open_aea/http_echo:0.1.0:bafybeifhpnvkl366jl75rwgz3xeomopg2dlmvz6ihmj3yn4gver57p7yce --remote
 cd http_echo
 aea generate-key ethereum; aea add-key ethereum
 aea install
@@ -22,18 +21,16 @@ Agent http_echo successfully fetched.
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 5000.
 info: [http_echo] Start processing messages...
 ```
-
 ``` bash
 curl 0.0.0.0:5000
 {"tom": {"type": "cat", "age": 10}}
 ```
-
 ``` bash
 aea delete http_echo
 ```

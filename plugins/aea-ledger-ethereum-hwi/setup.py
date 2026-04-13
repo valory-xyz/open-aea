@@ -36,16 +36,15 @@ setup(
             "py.typed",
         ]
     },
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
-        "web3>=7.0.0,<8",
         "eth-account>=0.13.0,<0.14.0",
         "open-aea-ledger-ethereum~=2.1.0",
         "ledgerwallet==0.1.3",
-        "protobuf>=5,<7",
         "construct<=2.10.61",
     ],
-    tests_require=["pytest"],
+    tests_require=["pytest>=7.0,<10"],
     entry_points={
         "aea.cryptos": ["ethereum_hwi = aea_ledger_ethereum_hwi:EthereumHWICrypto"],
         "aea.ledger_apis": ["ethereum_hwi = aea_ledger_ethereum_hwi:EthereumHWIApi"],

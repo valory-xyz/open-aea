@@ -72,7 +72,6 @@ nav:
       - Testing Skills: 'skill-testing.md'
       - Deployment: 'deployment.md'
       - 12-Factor app and AEAs: '12-factor.md'
-      - Known limitations: 'known-limits.md'
       - Build an AEA programmatically: 'build-aea-programmatically.md'
       - AEAs vs agents: 'agent-vs-aea.md'
       - Modes of running an AEA: 'modes.md'

@@ -1,15 +1,15 @@
 ``` bash
-pip install aea[cli]
+pip install open-aea[cli]
 ```
 ``` bash
-pip install aea[all]
-```
-``` bash
-pip install aea[all] --force --no-cache-dir
+pip install open-aea[all]
 ```
 ``` bash
 aea
 ```
 ``` bash
 python -m aea.cli
+```
+``` bash
+pip install open-aea[all] --force --no-cache-dir
 ```

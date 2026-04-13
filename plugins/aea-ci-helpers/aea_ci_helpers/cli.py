@@ -142,13 +142,18 @@ def generate_api_docs(check_clean: bool) -> None:
 
 
 @click.command(name="generate-pkg-list")
-def generate_pkg_list() -> None:
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Verify docs/package_list.md is in sync instead of overwriting it.",
+)
+def generate_pkg_list(check: bool) -> None:
     """Generate markdown table of all packages with their IPFS hashes."""
     from aea_ci_helpers.generate_pkg_list import (  # pylint: disable=import-outside-toplevel
         generate_table,
     )
 
-    generate_table()
+    generate_table(check=check)
 
 
 @click.command(name="check-doc-hashes")

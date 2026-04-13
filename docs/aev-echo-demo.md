@@ -8,7 +8,7 @@ It is highly recommended that developers begin by following the quick start!
 
 After you have followed the quick start, create a <a href="../http-echo-demo/">HTTP Echo Agent blueprint</a>. 
 
-It is assumed that developers are within a pipenv virtual environment.
+It is assumed that developers are within an activated Python virtual environment (see the <a href="../quickstart/">quickstart</a>).
 
 Notice, that the configuration of the AEA is as so;
 
@@ -87,7 +87,7 @@ The AEA will then start a web server as so:
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 5000.
@@ -114,7 +114,7 @@ aea run --aev
  / ___ \ | |___  / ___ \
 /_/   \_\|_____|/_/   \_\
 
-v1.4.0
+v2.1.0
 
 Starting AEA 'http_echo' in 'async' mode...
 info: [http_echo] HTTP Server has connected to port: 8081.

@@ -7,7 +7,7 @@ license = "Apache-2.0"
 packages = [{include = "aea"}]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.16"
+python = ">=3.10,<3.15"
 # Core dependencies
 packaging = ">=22.0,<27"
 protobuf = ">=5,<7"
@@ -27,13 +27,13 @@ all = ["click", "pyyaml", "packaging", "pytest", "coverage"]
 setuptools = "==59.6.0"
 # Used by plugins (cosmos, ethereum, fetchai) at runtime and by tests;
 # kept here as a dev dep so `poetry install` provisions it for development.
-requests = ">=2.20.0,<3"
+requests = ">=2.32.5,<3"
 aiohttp = ">=3.8.5,<4.0.0"
 asn1crypto = ">=1.4.0,<1.5.0"
-bech32 = "==1.2.0"
+bech32 = ">=1.2.0,<2"
 defusedxml = "==0.6.0"
 docker = "==7.1.0"
-ecdsa = ">=0.15"
+ecdsa = ">=0.19.2,<0.20"
 eth-account = ">=0.13.0,<0.14.0"
 hypothesis = "==6.151.9"
 liccheck = "==0.6.0"
@@ -43,8 +43,8 @@ openapi-core = "==0.22.0"
 openapi-spec-validator = ">=0.7.0,<0.8.0"
 pexpect = "==4.8.0"
 protobuf = ">=5,<7"
-psutil = "==5.7.0"
-pycryptodome = ">=3.10.1"
+psutil = ">=5.7.0,<6.0.0"
+pycryptodome = ">=3.10.1,<4.0.0"
 pytest-custom-exit-code = "==0.3.0"
 GitPython = ">=3.1.37,<4.0.0"
 idna = "<=3.3"
@@ -62,7 +62,6 @@ construct = "<=2.10.61"
 werkzeug = "*"
 pytest-asyncio = "*"
 multidict = "*"
-toml = "==0.10.2"
 typer = "==0.16.0"
 
 [tool.poetry.scripts]

@@ -215,6 +215,15 @@ builder.add_component_instance(...)
 # second call
 my_aea_2 = builder.builder()
 
+Known limitations:
+
+- Package consistency is only checked at the ``add`` stage, not again
+at ``load``. If a package is tampered with after being added to the
+builder, the inconsistency may not be detected.
+- If two packages are registered with public ids that share the same
+author and package name but differ in version, the builder does not
+detect the mismatch and simply uses the last-loaded package.
+
 <a id="aea.aea_builder.AEABuilder.DEFAULT_AGENT_ACT_PERIOD"></a>
 
 #### DEFAULT`_`AGENT`_`ACT`_`PERIOD

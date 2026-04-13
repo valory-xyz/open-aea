@@ -136,7 +136,7 @@ func (aea AeaApi) RecordStoragePath() string {
 func (aea AeaApi) Put(envelope *Envelope) error {
 	if aea.standalone {
 		errorMsg := "node running in standalone mode"
-		logger.Warn().Msgf(errorMsg)
+		logger.Warn().Msg(errorMsg)
 		return errors.New(errorMsg)
 	}
 	aea.send_queue <- envelope
@@ -146,7 +146,7 @@ func (aea AeaApi) Put(envelope *Envelope) error {
 func (aea *AeaApi) Get() *Envelope {
 	if aea.standalone {
 		errorMsg := "node running in standalone mode"
-		logger.Warn().Msgf(errorMsg)
+		logger.Warn().Msg(errorMsg)
 		return nil
 	}
 	return <-aea.out_queue

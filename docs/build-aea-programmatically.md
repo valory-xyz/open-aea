@@ -82,7 +82,7 @@ We set the name, add the private key for the AEA to use and set the ledger confi
     builder.add_private_key(EthereumCrypto.identifier, PRIVATE_KEY_FILE)
 ```
 
-Next, we add the `fetchai/stub:0.15.0` connection which will read/write messages from file:
+Next, we add the `fetchai/stub:0.21.0` connection which will read/write messages from file:
 ``` python
     # Add the default protocol (assuming it is present in the local directory 'packages')
     builder.add_protocol("./packages/fetchai/protocols/default")

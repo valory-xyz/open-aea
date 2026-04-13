@@ -22,7 +22,7 @@
 
 """Setup script for the plug-in."""
 
-from setuptools import setup  # type: ignore
+from setuptools import find_packages, setup  # type: ignore
 
 setup(
     name="open-aea-cli-ipfs",
@@ -32,13 +32,18 @@ setup(
     description="CLI extension for open AEA framework wrapping IPFS functionality.",
     long_description="CLI extension for open AEA framework wrapping IPFS functionality.",
     long_description_content_type="text/markdown",
-    packages=["aea_cli_ipfs"],
+    packages=find_packages(include=["aea_cli_ipfs*"]),
     package_data={"aea_cli_ipfs": ["py.typed"]},
     entry_points={"aea.cli": ["ipfs_cli_command = aea_cli_ipfs.core:ipfs"]},
+    python_requires=">=3.10,<3.15",
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
+        "click>=8.1.0,<8.4.0",
     ],
-    tests_require=["pytest"],
+    extras_require={
+        "test_tools": ["pytest>=7.0,<10"],
+    },
+    tests_require=["pytest>=7.0,<10"],
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",

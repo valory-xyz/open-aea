@@ -20,8 +20,7 @@
 # ------------------------------------------------------------------------------
 """Setup script for the plug-in."""
 
-from setuptools import find_packages  # type: ignore
-from setuptools import setup  # type: ignore
+from setuptools import find_packages, setup  # type: ignore
 
 setup(
     name="open-aea-cli-benchmark",
@@ -31,12 +30,22 @@ setup(
     description="CLI extension for AEA framework benchmarking.",
     long_description="CLI extension for AEA framework benchmarking.",
     long_description_content_type="text/markdown",
-    packages=find_packages(
-        where=".", include=["aea_cli_benchmark", "aea_cli_benchmark.*"]
-    ),
+    packages=find_packages(include=["aea_cli_benchmark*"]),
     package_data={"aea_cli_benchmark": ["py.typed"]},
     entry_points={"aea.cli": ["benchmark = aea_cli_benchmark.core:benchmark"]},
-    install_requires=["open-aea>=2.0.0, <3.0.0", "psutil>=5.7.0, <6.0.0"],
+    python_requires=">=3.10,<3.15",
+    install_requires=[
+        "open-aea>=2.0.0, <3.0.0",
+        "psutil>=5.7.0, <6.0.0",
+        "click>=8.1.0,<8.4.0",
+        "cosmpy>=0.11.0,<0.12",
+    ],
+    extras_require={
+        # Optional: required only for the `tx-generate` benchmark case,
+        # which spins up a dockerised fetchai ledger node. Pin kept in
+        # sync with the other plugins (ledger-ethereum, ledger-fetchai).
+        "tx-generate": ["docker==7.1.0"],
+    },
     classifiers=[
         "Environment :: Console",
         "Environment :: Web Environment",

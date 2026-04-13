@@ -35,7 +35,12 @@ from typing import OrderedDict as OrderedDictType
 from typing import Tuple, cast
 
 import click
-import toml
+import tomli_w
+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # pragma: no cover
+    import tomli as tomllib  # type: ignore[no-redef]
 
 from aea.configurations.data_types import Dependency
 from aea.package_manager.base import load_configuration
@@ -375,7 +380,8 @@ class PyProjectToml:
     @classmethod
     def load(cls, pyproject_path: Path) -> Optional["PyProjectToml"]:
         """Load pyproject.yaml dependencies."""
-        config = toml.load(pyproject_path)
+        with pyproject_path.open("rb") as fp:
+            config = tomllib.load(fp)
         dependencies: OrderedDictType[str, Dependency] = OrderedDict()
         try:
             config["tool"]["poetry"]["dependencies"]
@@ -412,8 +418,8 @@ class PyProjectToml:
             package.name: package.version if package.version != "" else "*"
             for package in self.dependencies.values()
         }
-        with self.file.open("w") as fp:
-            toml.dump(self.config, fp)
+        with self.file.open("wb") as fp:
+            tomli_w.dump(self.config, fp)
 
 
 def load_packages_dependencies(packages_dir: Path) -> List:

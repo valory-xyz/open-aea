@@ -769,10 +769,8 @@ Possible solutions:
 - Keep the delegate client record for longer;
 - Clean up the record by timeout, per client queues.
 
-Code references:
-
-- <a href="https://github.com/valory-xyz/open-aea/blob/main/packages/valory/connections/p2p_libp2p/libp2p_node/dht/dhtpeer/dhtpeer.go#L999" target="_blank">agent record removal</a>
-- <a href="https://github.com/valory-xyz/open-aea/blob/main/packages/valory/connections/p2p_libp2p/libp2p_node/dht/dhtpeer/dhtpeer.go#L1110" target="_blank">message routing</a>
+Code references: see `agent record removal` and `message routing` in
+<a href="https://github.com/valory-xyz/open-aea/blob/main/packages/valory/connections/p2p_libp2p/libp2p_node/dht/dhtpeer/dhtpeer.go" target="_blank">`dhtpeer.go`</a>.
 
 
 ### Golang Node <> Python Client `libp2p` connection
