@@ -268,7 +268,7 @@ jobs:
         sys:
           - { os: windows-latest, shell: "msys2 {0}" }
           - { os: ubuntu-latest, shell: bash }
-#          - { os: macos-latest-large, shell: bash }
+          - { os: macos-latest-large, shell: bash }
         python_version: ["3.10",]
     timeout-minutes: 15
     steps:
@@ -299,6 +299,18 @@ jobs:
       - name: Check plugin aea-ledger-solana
         run: |
           tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-solana && aea generate-key solana && echo aea-ledger-solana checked!"
+      - name: Check plugin aea-ledger-ethereum-flashbots
+        run: |
+          tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-ethereum && pip install ./plugins/aea-ledger-ethereum-flashbots && echo aea-ledger-ethereum-flashbots checked!"
+      - name: Check plugin aea-cli-benchmark
+        run: |
+          tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-cli-benchmark && aea benchmark --help && echo aea-cli-benchmark checked!"
+      - name: Check plugin aea-ci-helpers
+        run: |
+          tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ci-helpers && aea-ci --help && echo aea-ci-helpers checked!"
+      - name: Check plugin aea-dev-helpers
+        run: |
+          tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-dev-helpers && aea-dev --help && echo aea-dev-helpers checked!"
   protolint:
     continue-on-error: False
     runs-on: ubuntu-latest
