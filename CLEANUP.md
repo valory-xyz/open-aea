@@ -53,6 +53,14 @@ The `golang_checks` CI job was previously a no-op (checkout + setup-go, no test 
 
 **`libp2p_node` golangci-lint coverage ✓ fixed.** `libp2p_node` is now run under the same `golangci-lint-action@v6` step in `common_checks_2` that covers `libs/go/aealite`. The five deprecation findings that the initial wiring surfaced have all been fixed: `rand.Seed` at `dhtclient.go:216` and `dhtpeer_test.go:1665` (auto-seeded since Go 1.20), `elliptic.Marshal` at `dhtpeer.go:797` and `dhtpeer_test.go:1827` (replaced with `(*ecdsa.PublicKey).ECDH().Bytes()`, same pattern as aealite's `tcpsocket.go`), and `io/ioutil` at `mailbox.go:6` (replaced with `io.ReadAll`). `golangci-lint run --timeout=5m` against libp2p_node on Go 1.24 is now clean (0 findings).
 
+**`libp2p_node` byte-identity with `open-acn` upstream ✓ enforced.** `TestP2PLibp2pGoCodeMatchingOpenACN` (in `packages/valory/connections/p2p_libp2p/tests/test_go_code_matching_acn.py`) clones `valory-xyz/open-acn@main` and `filecmp.cmp`'s every `.go` file against our `libp2p_node/` tree. The test was skipped during PR #872 because the open-acn upstream hadn't yet been bumped to libp2p v0.33; it is **re-enabled in PR #874** now that open-acn main has caught up. All 37 tracked files (`.go`, `.proto`, `Makefile`, `go.mod`, `go.sum`) are byte-identical. The test runs in CI and will fail loudly the next time the two repos drift, so any future libp2p_node change must land on both sides in lockstep (or be reverted on one side).
+
+**`libp2p_node` is now TCP-only by design ✓ (PR #874).** Replaced `libp2p.DefaultTransports` with explicit `libp2p.NoTransports` + `libp2p.Transport(tcp.NewTCPTransport)` in both `dhtpeer.go` and `dhtclient.go`. Every multiaddr the codebase produces is `/ip4|/dns4 + /tcp` (Go `LocalURI`/`PublicURI`, the `/p2p-circuit` fallback, the bootstrap peers fed from the Python embedding host, and Python's `MultiAddr.format()` itself). We never bind UDP, never run an HTTP/3 server, never construct or dial a `/quic`, `/webtransport`, `/ws`, or `/wss` multiaddr, and neither dhtpeer nor dhtclient enables hole-punching. Closes the runtime attack surface for the `quic-go` + `webtransport-go` Dependabot alerts (#163–#168) and shrinks the binary's reachable code. The packages remain in `go.mod` because `libp2p/config/quic.go` imports `quic-go` unconditionally for its key-derivation helpers, but those helpers are only called from the QUIC transport factory which is no longer constructed — so the vulnerable server-side code paths are unreachable.
+
+### `test_dht.py` integration tests — skipped pending ACN image rebuild
+
+`packages/valory/connections/test_libp2p/tests/test_dht.py` (23 tests, marked `@pytest.mark.integration`) dial pre-existing ACN peers — either the local `valory/open-acn-node:latest` docker image or the production fetchai/valory ACN nodes over the internet. Both targets were still on libp2p v0.8 / circuit-relay v1 at the time of PR #872 / #874 merge. This branch's libp2p v0.33 / circuit-relay v2 migration is wire-incompatible by design (documented in CLEANUP.md item 9 and the `p2p_libp2p` connection README). Skipping the whole module with `skip_acn_docker_mismatch` so CI shows `skipped: image outdated` instead of a random integration flake. **Re-enable once `valory/open-acn-node:latest` is rebuilt from the post-bump source tree** — the upstream open-acn main already has the equivalent code, so the rebuild is mechanical.
+
 ### `InsecureSkipVerify` in `libs/go/aealite/connections/tcpsocket.go` ✓ annotated
 
 CodeQL flagged the `InsecureSkipVerify: true` setting in the ACN handshake code. This is intentional — the code does manual application-level signature verification of the peer certificate's public key against a pre-shared out-of-band peer public key, which is the correct ACN protocol pattern (mirrors the Python `p2p_libp2p_client/connection.py`). Added an 8-line inline comment explaining the design, `//nolint:gosec // G402 intentional: see comment above` suppressions, and `MinVersion: tls.VersionTLS12` as a belt-and-braces hardening. Behaviour unchanged.
@@ -307,9 +315,16 @@ All docs/examples cleanup items landed across commits `710805517` (A1 pipenv →
 
 ## Dependabot alerts requiring action
 
-### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` — 1 remaining, unfixable
+### Go: `packages/valory/connections/p2p_libp2p/libp2p_node/go.mod` — all actionable alerts closed ✓
 
-Down from 15 open alerts to 1 after the two Go-dep bump commits on this branch. See the "libp2p_node Go dependency bumps" entry in the "Completed" section above. The remaining alert is #108 (`github.com/libp2p/go-libp2p-kad-dht`, medium — Kademlia DHT content censorship abuse) which has **no upstream fix** and is tracked as not-actionable. The Dependabot UI may still show some already-closed alerts until the next rescan; they will auto-close when the bumped branch reaches the default branch.
+Down from 15 open alerts to 0 actionable across two PRs:
+
+- **PR #872** (the original bump) closed 14 of 15 via the `go.mod` update; only #108 (`go-libp2p-kad-dht` Kademlia content-censorship, medium — no upstream fix) remained tracked as not-actionable.
+- **PR #874** (the post-merge follow-up) addressed the next 7 alerts that surfaced after the libp2p v0.33 bump:
+  - **#163–#168** (`quic-go` × 3, `webtransport-go` × 3): closed by switching `libp2p.DefaultTransports` to `libp2p.NoTransports` + `libp2p.Transport(tcp.NewTCPTransport)` in both `dhtpeer.go` and `dhtclient.go`. ACN is TCP-only by design — every multiaddr produced anywhere in the codebase is `/ip4|/dns4 + /tcp`. The CVEs are all server-side; with no QUIC / WebTransport listener and no dial path (our peers only advertise TCP), the vulnerable code is unreachable. The packages remain in `go.mod` because `libp2p/config/quic.go` imports `quic-go` unconditionally, but no transport instance is constructed. **Dismissed as `tolerable_risk`** with this justification.
+  - **#169** (`go-ipld-prime` v0.20.0, DAG-CBOR decoder unbounded memory): closed by pinning to v0.22.0 via a `replace` directive in `libp2p_node/go.mod`. This was the only one *potentially reachable* in our code path: kad-dht's IPNS validator is registered even though we don't intentionally use IPNS, so a malicious peer could in theory inject a crafted IPNS record into the DHT. Used `replace` rather than waiting for kad-dht to bump, since `kad-dht v0.25.2` (our pin) doesn't have a release that picks up the patched go-ipld-prime.
+
+The only remaining alert is **#108** (`go-libp2p-kad-dht`), still no upstream fix.
 
 ### Python: `plugins/aea-ledger-cosmos/setup.py` — one open `ecdsa` alert
 
