@@ -31,12 +31,12 @@ fingerprint:
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
   libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeid53uzluhya4l72rlo2v4seatd46cw35rjly6vfighcoxdrcruxvq
-  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeifbmabtxg4kscs2cejpgw7q2ze7qzy7qr5gaqmjsujg4v2nm6jmzq
+  libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeicyzylpohjtiykebxk5ktnzer2ym7a5ojcvruh3ujjylqfyqem2yy
   libp2p_node/dht/dhtpeer/mailbox.go: bafybeigmrn3cctcyehdslo3rqscwganlvkq4w5766ibqqmhovw6s7rgvge
   libp2p_node/dht/dhtpeer/notifee.go: bafybeidzcmhfgh3efwp4t4kph5gdy4jps4useusmclwxe4pgdvhz5cnche
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy
   libp2p_node/dht/dhtpeer/utils.go: bafybeig733qrkn5io6usih7chm5ranptao6xao4cihyfgpjps3gt5hbnqu
-  libp2p_node/dht/dhttests/dhttests.go: bafybeib75ekn7p2sd5shi53nb4tfjcgotiwxsiteg3kj2yha2n632gf4qm
+  libp2p_node/dht/dhttests/dhttests.go: bafybeidjjs2zwenhxhoqqqx65nuu4rwsuo4buqwlytjy2fc72nrv55uswq
   libp2p_node/dht/monitoring/file.go: bafybeifmj5vvaacy4potovdkiqvektaymntsbun6i4niaehj5af3nhu64e
   libp2p_node/dht/monitoring/prometheus.go: bafybeibgmu5h7hl2ygzfw3lvg4eaihzrnyqacc4zvjxzpk2b6xb7c3yrrq
   libp2p_node/dht/monitoring/service.go: bafybeicgbzqxi4jpae3w4es4owhdt63rd4limt4o46gbdanaia2buxddhy
