@@ -47,9 +47,13 @@ import (
 */
 
 const (
-	DefaultLocalHost    = "127.0.0.1"
-	DefaultLocalPort    = 2000
-	DefaultDelegatePort = 3000
+	DefaultLocalHost = "127.0.0.1"
+	// Ports 2000/3000 collide with common dev tools (macOS Control
+	// Center, AirPlay Receiver, frontend dev servers). Use the
+	// 22000/23000 range, which is well outside the IANA registered
+	// range and what other ACN tests in the repo already use.
+	DefaultLocalPort    = 22000
+	DefaultDelegatePort = 23000
 
 	EnvelopeDeliveryTimeout = 1 * time.Second
 	DHTPeerSetupTimeout     = 5 * time.Second
