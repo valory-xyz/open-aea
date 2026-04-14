@@ -25,7 +25,6 @@ from typing import Dict, Tuple
 from unittest import mock
 
 import pytest
-import requests
 from aea_ci_helpers.check_third_party_hashes import (
     Upstream,
     check_hashes,
@@ -33,6 +32,8 @@ from aea_ci_helpers.check_third_party_hashes import (
     load_local_third_party,
     run,
 )
+
+from aea.helpers import http_requests
 
 
 class TestUpstream:
@@ -99,7 +100,7 @@ class TestFetchUpstreamPackages:
         """The tag URL uses the stripped version with a leading ``v``."""
         upstream = Upstream("valory-xyz/open-aea", "v2.2.0")
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(json_data={"dev": {}}),
         ) as get:
             fetch_upstream_packages(upstream)
@@ -113,7 +114,7 @@ class TestFetchUpstreamPackages:
         """A non-200 response raises ``RuntimeError`` with the status."""
         upstream = Upstream("o/r", "1.0.0")
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(status_code=404),
         ):
             with pytest.raises(RuntimeError, match="status 404"):
@@ -123,8 +124,8 @@ class TestFetchUpstreamPackages:
         """Transport errors become ``RuntimeError`` (not raw exceptions)."""
         upstream = Upstream("o/r", "1.0.0")
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
-            side_effect=requests.exceptions.ConnectionError("boom"),
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
+            side_effect=http_requests.ConnectionError("boom"),
         ):
             with pytest.raises(RuntimeError, match="Failed to fetch"):
                 fetch_upstream_packages(upstream)
@@ -133,7 +134,7 @@ class TestFetchUpstreamPackages:
         """A non-JSON 200 body (e.g. GitHub HTML error) raises ``RuntimeError``."""
         upstream = Upstream("o/r", "1.0.0")
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(
                 raise_on_json=True, text="<html>oops</html>", content_type="text/html"
             ),
@@ -149,7 +150,7 @@ class TestFetchUpstreamPackages:
             "third_party": {"protocol/x/y/0.1.0": "bafy2"},
         }
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(json_data=payload),
         ):
             result = fetch_upstream_packages(upstream)
@@ -162,7 +163,7 @@ class TestFetchUpstreamPackages:
         """A response without a ``dev`` section is treated as malformed."""
         upstream = Upstream("o/r", "1.0.0")
         with mock.patch(
-            "aea_ci_helpers.check_third_party_hashes.requests.get",
+            "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(json_data={"third_party": {}}),
         ):
             with pytest.raises(RuntimeError, match="does not contain a 'dev' section"):

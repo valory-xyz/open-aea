@@ -25,14 +25,14 @@ from pathlib import Path
 from typing import Optional
 
 import click
-from aea_ci_helpers.check_third_party_hashes import run as run_third_party_hash_check
 
-# NOTE: imports from ``aea.*`` and from ``aea_ci_helpers.generate_api_docs``
-# (which itself imports ``aea.*``) are intentionally kept inline inside the
-# ``generate_api_docs`` command. ``aea-ci-helpers`` is designed to be
-# installable and usable without ``open-aea`` present (e.g. for the
-# ``check-pyproject`` job which runs before ``aea`` is available), so the
-# ``aea`` dependency must not be pulled in at module import time.
+# NOTE: imports from ``aea.*`` and from aea_ci_helpers modules that transitively
+# import ``aea.*`` (``generate_api_docs`` and ``check_third_party_hashes``) are
+# intentionally kept inline inside the handler functions that need them.
+# ``aea-ci-helpers`` is designed to be installable and usable without
+# ``open-aea`` present (e.g. for the ``check-pyproject`` CI job which runs
+# before ``aea`` is available), so the ``aea`` dependency must not be pulled
+# in at module import time.
 
 
 @click.group()
@@ -383,7 +383,13 @@ def check_dependencies_cmd(
 )
 def check_third_party_hashes(root_dir: str, upstreams: tuple) -> None:
     """Verify local third-party package hashes against one or more upstream repos."""
-    sys.exit(run_third_party_hash_check(Path(root_dir).resolve(), list(upstreams)))
+    # Deferred import: this command needs ``aea.helpers.http_requests``
+    # (see note at top of the module).
+    from aea_ci_helpers.check_third_party_hashes import (  # pylint: disable=import-outside-toplevel
+        run,
+    )
+
+    sys.exit(run(Path(root_dir).resolve(), list(upstreams)))
 
 
 cli.add_command(check_dependencies_cmd)

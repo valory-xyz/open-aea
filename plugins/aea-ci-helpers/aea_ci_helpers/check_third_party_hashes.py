@@ -46,7 +46,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import requests
+import click
+
+from aea.helpers import http_requests
 
 RAW_PACKAGES_URL = (
     "https://raw.githubusercontent.com/{repo}/v{version}/packages/packages.json"
@@ -114,8 +116,8 @@ def fetch_upstream_packages(upstream: Upstream, timeout: int = 30) -> Dict[str, 
     """
     url = RAW_PACKAGES_URL.format(repo=upstream.repo, version=upstream.tag_version)
     try:
-        response = requests.get(url, timeout=timeout)
-    except requests.exceptions.RequestException as e:
+        response = http_requests.get(url, timeout=timeout)
+    except http_requests.ConnectionError as e:
         raise RuntimeError(f"Failed to fetch packages.json from {url}: {e}") from e
     if response.status_code != 200:
         raise RuntimeError(
@@ -126,14 +128,14 @@ def fetch_upstream_packages(upstream: Upstream, timeout: int = 30) -> Dict[str, 
         data = response.json()
     except ValueError as e:
         snippet = response.text[:120].replace("\n", " ")
-        raise RuntimeError(
-            f"Malformed JSON from {url} (content-type="
-            f"{response.headers.get('Content-Type', 'unknown')!r}): {snippet!r}"
-        ) from e
+        raise RuntimeError(f"Malformed JSON from {url}: {snippet!r}") from e
     if "dev" not in data:
         raise RuntimeError(
             f"{url} does not contain a 'dev' section; " f"not a valid packages.json"
         )
+    # Merge ``dev`` and ``third_party`` into a single lookup: a downstream's
+    # third-party entry may originate from either the upstream's own
+    # first-party packages (``dev``) or its re-exported third-party set.
     combined: Dict[str, str] = {}
     combined.update(data.get("dev", {}))
     combined.update(data.get("third_party", {}))
@@ -242,60 +244,63 @@ def run(root_dir: Path, upstream_specs: List[str]) -> int:
     try:
         upstreams = [Upstream.parse(s) for s in upstream_specs]
     except ValueError as e:
-        print(f"ERROR: {e}")
+        click.echo(f"ERROR: {e}", err=True)
         return 1
 
     if not upstreams:
-        print("ERROR: at least one --upstream must be provided")
+        click.echo("ERROR: at least one --upstream must be provided", err=True)
         return 1
 
-    print(f"Checking third-party hashes in {root_dir}")
+    click.echo(f"Checking third-party hashes in {root_dir}")
     for u in upstreams:
-        print(f"  upstream: {u.display}")
+        click.echo(f"  upstream: {u.display}")
 
     try:
         local_third_party = load_local_third_party(root_dir)
     except RuntimeError as e:
-        print(f"ERROR: {e}")
+        click.echo(f"ERROR: {e}", err=True)
         return 1
 
     if not local_third_party:
-        print("No third-party packages declared locally; nothing to check.")
+        click.echo("No third-party packages declared locally; nothing to check.")
         return 0
 
     reachable, failed = _fetch_all(upstreams)
 
     if failed:
-        print(
+        click.echo(
             f"\nWARNING: {len(failed)} upstream(s) could not be fetched "
-            "(tolerated as long as at least one other upstream responded):"
+            "(tolerated as long as at least one other upstream responded):",
+            err=True,
         )
         for spec, err in failed:
-            print(f"  - {spec}: {err}")
+            click.echo(f"  - {spec}: {err}", err=True)
 
     if not reachable:
-        print(
+        click.echo(
             "\nERROR: all upstreams are unreachable; cannot verify "
-            "third-party hashes."
+            "third-party hashes.",
+            err=True,
         )
         return 1
 
     mismatches, missing = check_hashes(local_third_party, reachable)
 
     if missing:
-        print(
+        click.echo(
             f"\nWARNING: {len(missing)} third-party package(s) not found "
-            "in any reachable upstream:"
+            "in any reachable upstream:",
+            err=True,
         )
         for pkg in missing:
-            print(f"  - {pkg}")
+            click.echo(f"  - {pkg}", err=True)
 
     if mismatches:
-        print(f"\nERROR: {len(mismatches)} hash mismatch(es) found:")
+        click.echo(f"\nERROR: {len(mismatches)} hash mismatch(es) found:", err=True)
         for pkg, local_h, remote_h, spec in mismatches:
-            print(f"  {pkg} (upstream: {spec})")
-            print(f"    local:  {local_h}")
-            print(f"    remote: {remote_h}")
+            click.echo(f"  {pkg} (upstream: {spec})", err=True)
+            click.echo(f"    local:  {local_h}", err=True)
+            click.echo(f"    remote: {remote_h}", err=True)
         return 1
 
     if missing:
@@ -303,7 +308,7 @@ def run(root_dir: Path, upstream_specs: List[str]) -> int:
         # than "mismatch" — we cannot verify the package at all.
         return 1
 
-    print(
+    click.echo(
         f"\nAll {len(local_third_party)} third-party hashes are consistent "
         f"with {len(reachable)} reachable upstream(s)."
     )

@@ -26,10 +26,10 @@ import re
 import shutil
 import subprocess  # nosec
 import sys
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from aea.configurations.base import ComponentType, PublicId
 from aea.configurations.constants import PACKAGES, SIGNING_PROTOCOL
@@ -86,17 +86,21 @@ class ApiDocsConfig:
         return self.docs_dir / "api"
 
     def should_skip(self, module_path: Path) -> bool:
-        """Return true if the file should be skipped."""
+        """Return true if the file should be skipped.
+
+        :param module_path: the candidate file.
+        :return: True if it should be excluded from API doc generation.
+        """
         if any(re.search(pattern, module_path.name) for pattern in self.ignore_names):
-            print("Skipping, it's in ignore patterns")
+            print(f"Skipping {module_path}: matches ignore pattern")
             return True
         if module_path.suffix != ".py":
-            print("Skipping, it's not a Python module.")
+            print(f"Skipping {module_path}: not a Python module")
             return True
         if any(
             is_relative_to(module_path, Path(prefix)) for prefix in self.ignore_prefixes
         ):
-            print(f"Ignoring prefix {module_path}")
+            print(f"Skipping {module_path}: ignored prefix")
             return True
         return False
 
@@ -123,20 +127,40 @@ def is_not_dir(p: Path) -> bool:
     return not p.is_dir()
 
 
-def _submit(
-    executor: Optional[ThreadPoolExecutor], dotted_path: str, doc_file: Path
+def _dispatch(
+    executor: Optional[ThreadPoolExecutor],
+    dotted_path: str,
+    doc_file: Path,
+    futures: List[Future],
 ) -> None:
-    """Submit a pydoc job or run it inline if no executor provided."""
+    """Run ``make_pydoc`` inline or submit it to the executor.
+
+    In parallel mode the returned ``Future`` is appended to ``futures``
+    so the caller can ``.result()`` on each job and surface any
+    exception instead of silently dropping it.
+
+    :param executor: optional thread pool; ``None`` runs inline.
+    :param dotted_path: dotted module path to pass to pydoc-markdown.
+    :param doc_file: destination markdown file.
+    :param futures: accumulator for submitted jobs (parallel mode only).
+    """
     if executor is None:
         make_pydoc(dotted_path, doc_file)
     else:
-        executor.submit(make_pydoc, dotted_path, doc_file)
+        futures.append(executor.submit(make_pydoc, dotted_path, doc_file))
 
 
 def _generate_apidocs_source_modules(
-    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+    config: ApiDocsConfig,
+    executor: Optional[ThreadPoolExecutor],
+    futures: List[Future],
 ) -> None:
-    """Generate API docs for the main source package."""
+    """Generate API docs for the main source package.
+
+    :param config: resolved configuration.
+    :param executor: optional thread pool for parallel mode.
+    :param futures: accumulator for submitted jobs.
+    """
     for module_path in filter(is_not_dir, config.source_dir.rglob("*")):
         print(f"Processing {module_path}... ", end="")
         if config.should_skip(module_path):
@@ -146,13 +170,20 @@ def _generate_apidocs_source_modules(
         last = module_path.stem
         doc_file = config.api_dir / Path(*parents_without_root) / f"{last}.md"
         dotted_path = ".".join(parents) + "." + last
-        _submit(executor, dotted_path, doc_file)
+        _dispatch(executor, dotted_path, doc_file, futures)
 
 
 def _generate_apidocs_default_packages(
-    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+    config: ApiDocsConfig,
+    executor: Optional[ThreadPoolExecutor],
+    futures: List[Future],
 ) -> None:
-    """Generate API docs for the configured default packages."""
+    """Generate API docs for the configured default packages.
+
+    :param config: resolved configuration.
+    :param executor: optional thread pool for parallel mode.
+    :param futures: accumulator for submitted jobs.
+    """
     for component_type, default_package in config.default_packages:
         public_id = PublicId.from_str(default_package)
         author = public_id.author
@@ -166,13 +197,20 @@ def _generate_apidocs_default_packages(
             suffix = Path(str(module_path.relative_to(package_dir))[:-3] + ".md")
             dotted_path = ".".join(module_path.parts)[:-3]
             doc_file = config.api_dir / type_plural / name / suffix
-            _submit(executor, dotted_path, doc_file)
+            _dispatch(executor, dotted_path, doc_file, futures)
 
 
 def _generate_apidocs_plugins(
-    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+    config: ApiDocsConfig,
+    executor: Optional[ThreadPoolExecutor],
+    futures: List[Future],
 ) -> None:
-    """Generate API docs for plugins."""
+    """Generate API docs for plugins.
+
+    :param config: resolved configuration.
+    :param executor: optional thread pool for parallel mode.
+    :param futures: accumulator for submitted jobs.
+    """
     if not config.plugins_dir.is_dir():
         return
     for plugin in config.plugins_dir.iterdir():
@@ -191,7 +229,7 @@ def _generate_apidocs_plugins(
             suffix = Path(str(relative_module_path)[:-3] + ".md")
             dotted_path = ".".join(module_path.parts)[:-3]
             doc_file = config.api_dir / "plugins" / plugin_module_name / suffix
-            _submit(executor, dotted_path, doc_file)
+            _dispatch(executor, dotted_path, doc_file, futures)
 
 
 def make_pydoc(dotted_path: str, dest_file: Path) -> None:
@@ -239,12 +277,17 @@ def generate_api_docs(config: Optional[ApiDocsConfig] = None) -> None:
     shutil.rmtree(cfg.api_dir, ignore_errors=True)
     cfg.api_dir.mkdir(parents=True)
     executor: Optional[ThreadPoolExecutor] = None
+    futures: List[Future] = []
     if cfg.parallel:
         executor = ThreadPoolExecutor()
     try:
-        _generate_apidocs_default_packages(cfg, executor)
-        _generate_apidocs_source_modules(cfg, executor)
-        _generate_apidocs_plugins(cfg, executor)
+        _generate_apidocs_default_packages(cfg, executor, futures)
+        _generate_apidocs_source_modules(cfg, executor, futures)
+        _generate_apidocs_plugins(cfg, executor, futures)
+        # Re-raise any exception swallowed by a background worker so
+        # parallel mode has the same failure semantics as serial mode.
+        for fut in futures:
+            fut.result()
     finally:
         if executor is not None:
             executor.shutdown(wait=True)
