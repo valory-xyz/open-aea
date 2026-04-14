@@ -194,19 +194,14 @@ def generate_api_docs(  # pylint: disable=too-many-arguments,too-many-locals,too
     # Deferred imports: this command is the only one that needs ``open-aea``.
     # Keeping these lazy lets the rest of aea-ci-helpers run without it
     # installed (see note at top of the module).
-    from aea_ci_helpers.generate_api_docs import (  # pylint: disable=import-outside-toplevel
-        ApiDocsConfig,
-    )
-    from aea_ci_helpers.generate_api_docs import (
-        generate_api_docs as gen_api_docs,  # pylint: disable=import-outside-toplevel
-    )
+    # pylint: disable=import-outside-toplevel
+    from aea_ci_helpers.generate_api_docs import ApiDocsConfig
+    from aea_ci_helpers.generate_api_docs import generate_api_docs as gen_api_docs
 
-    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
-        ComponentType,
-    )
-    from aea.helpers.git import (  # pylint: disable=import-outside-toplevel
-        check_working_tree_is_dirty,
-    )
+    from aea.configurations.base import ComponentType
+    from aea.helpers.git import check_working_tree_is_dirty
+
+    # pylint: enable=import-outside-toplevel
 
     res = shutil.which("pydoc-markdown")
     if res is None:
@@ -232,7 +227,14 @@ def generate_api_docs(  # pylint: disable=too-many-arguments,too-many-locals,too
                     f"--default-package {spec!r} must be " "'component_type:public_id'"
                 )
             type_str, public_id = spec.split(":", 1)
-            parsed.append((ComponentType(type_str), public_id))
+            try:
+                component_type = ComponentType(type_str)
+            except ValueError as e:
+                raise click.BadParameter(
+                    f"--default-package {spec!r} has invalid component "
+                    f"type {type_str!r}"
+                ) from e
+            parsed.append((component_type, public_id))
         cfg.default_packages = tuple(parsed)
     if ignore_plugins:
         cfg.ignore_plugins = tuple(ignore_plugins)
