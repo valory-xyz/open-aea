@@ -26,45 +26,79 @@ import re
 import shutil
 import subprocess  # nosec
 import sys
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional, Tuple
 
 from aea.configurations.base import ComponentType, PublicId
-from aea.configurations.constants import PACKAGES, SIGNING_PROTOCOL, _FETCHAI_IDENTIFIER
-from aea.helpers.git import check_working_tree_is_dirty
+from aea.configurations.constants import PACKAGES, SIGNING_PROTOCOL
 
-DOCS_DIR = Path("docs/")
-API_DIR = DOCS_DIR / "api/"
-AEA_DIR = Path("aea")
-PACKAGES_DIR = Path(PACKAGES)
-PLUGIN_DIR = Path("plugins")
-FETCHAI_PACKAGES = PACKAGES_DIR / _FETCHAI_IDENTIFIER
-DEFAULT_PACKAGES = {
-    (ComponentType.PROTOCOL, SIGNING_PROTOCOL),
-}
-
-IGNORE_NAMES = {r"^__init__\.py$", r"^__version__\.py$", r"^py\.typed$", r"^.*_pb2.py$"}
+DEFAULT_SOURCE_DIR = "aea"
+DEFAULT_PACKAGES_DIR = PACKAGES
+DEFAULT_PLUGINS_DIR = "plugins"
+DEFAULT_DOCS_DIR = "docs"
+DEFAULT_IGNORE_NAMES: Tuple[str, ...] = (
+    r"^__init__\.py$",
+    r"^__version__\.py$",
+    r"^py\.typed$",
+    r"^.*_pb2.py$",
+)
 # Plugins that should not have API docs generated (CI tooling, not framework API)
-IGNORE_PLUGINS = {"aea-ci-helpers"}
-IGNORE_PREFIXES = {
-    Path("aea", "cli"),
-    Path("aea", "connections", "scaffold"),
-    Path("aea", "contracts", "scaffold"),
-    Path("aea", "protocols", "scaffold"),
-    Path("aea", "skills", "scaffold"),
-    Path("aea", "decision_maker", "scaffold.py"),
-    Path("aea", "error_handler", "scaffold.py"),
-    Path("aea", "test_tools", "click_testing.py"),
-}
+DEFAULT_IGNORE_PLUGINS: Tuple[str, ...] = ("aea-ci-helpers",)
+DEFAULT_IGNORE_PREFIXES: Tuple[str, ...] = (
+    str(Path("aea", "cli")),
+    str(Path("aea", "connections", "scaffold")),
+    str(Path("aea", "contracts", "scaffold")),
+    str(Path("aea", "protocols", "scaffold")),
+    str(Path("aea", "skills", "scaffold")),
+    str(Path("aea", "decision_maker", "scaffold.py")),
+    str(Path("aea", "error_handler", "scaffold.py")),
+    str(Path("aea", "test_tools", "click_testing.py")),
+)
+DEFAULT_DEFAULT_PACKAGES: Tuple[Tuple[ComponentType, str], ...] = (
+    (ComponentType.PROTOCOL, SIGNING_PROTOCOL),
+)
 
 
-def create_subdir(path: str) -> None:
+@dataclass
+class ApiDocsConfig:
+    """Configuration for API docs generation.
+
+    Parameters are declared explicitly so callers can customise the
+    command for any repo (not just open-aea). All paths are resolved
+    relative to the current working directory.
     """
-    Create a subdirectory.
 
-    :param path: the directory path
-    """
-    directory = "/".join(path.split("/")[:-1])
-    Path(directory).mkdir(parents=True, exist_ok=True)
+    source_dir: Path = Path(DEFAULT_SOURCE_DIR)
+    packages_dir: Path = Path(DEFAULT_PACKAGES_DIR)
+    plugins_dir: Path = Path(DEFAULT_PLUGINS_DIR)
+    docs_dir: Path = Path(DEFAULT_DOCS_DIR)
+    default_packages: Tuple[Tuple[ComponentType, str], ...] = DEFAULT_DEFAULT_PACKAGES
+    ignore_names: Tuple[str, ...] = DEFAULT_IGNORE_NAMES
+    ignore_plugins: Tuple[str, ...] = DEFAULT_IGNORE_PLUGINS
+    ignore_prefixes: Tuple[str, ...] = DEFAULT_IGNORE_PREFIXES
+    parallel: bool = False
+
+    @property
+    def api_dir(self) -> Path:
+        """Output directory for generated markdown files."""
+        return self.docs_dir / "api"
+
+    def should_skip(self, module_path: Path) -> bool:
+        """Return true if the file should be skipped."""
+        if any(re.search(pattern, module_path.name) for pattern in self.ignore_names):
+            print("Skipping, it's in ignore patterns")
+            return True
+        if module_path.suffix != ".py":
+            print("Skipping, it's not a Python module.")
+            return True
+        if any(
+            is_relative_to(module_path, Path(prefix)) for prefix in self.ignore_prefixes
+        ):
+            print(f"Ignoring prefix {module_path}")
+            return True
+        return False
 
 
 def replace_underscores(text: str) -> str:
@@ -89,70 +123,75 @@ def is_not_dir(p: Path) -> bool:
     return not p.is_dir()
 
 
-def should_skip(module_path: Path) -> bool:
-    """Return true if the file should be skipped."""
-    if any(re.search(pattern, module_path.name) for pattern in IGNORE_NAMES):
-        print("Skipping, it's in ignore patterns")
-        return True
-    if module_path.suffix != ".py":
-        print("Skipping, it's not a Python module.")
-        return True
-    if any(is_relative_to(module_path, prefix) for prefix in IGNORE_PREFIXES):
-        print(f"Ignoring prefix {module_path}")
-        return True
-    return False
+def _submit(
+    executor: Optional[ThreadPoolExecutor], dotted_path: str, doc_file: Path
+) -> None:
+    """Submit a pydoc job or run it inline if no executor provided."""
+    if executor is None:
+        make_pydoc(dotted_path, doc_file)
+    else:
+        executor.submit(make_pydoc, dotted_path, doc_file)
 
 
-def _generate_apidocs_aea_modules() -> None:
-    """Generate API docs for aea.* modules."""
-    for module_path in filter(is_not_dir, Path(AEA_DIR).rglob("*")):
+def _generate_apidocs_source_modules(
+    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+) -> None:
+    """Generate API docs for the main source package."""
+    for module_path in filter(is_not_dir, config.source_dir.rglob("*")):
         print(f"Processing {module_path}... ", end="")
-        if should_skip(module_path):
+        if config.should_skip(module_path):
             continue
         parents = module_path.parts[:-1]
         parents_without_root = module_path.parts[1:-1]
         last = module_path.stem
-        doc_file = API_DIR / Path(*parents_without_root) / f"{last}.md"
+        doc_file = config.api_dir / Path(*parents_without_root) / f"{last}.md"
         dotted_path = ".".join(parents) + "." + last
-        make_pydoc(dotted_path, doc_file)
+        _submit(executor, dotted_path, doc_file)
 
 
-def _generate_apidocs_default_packages() -> None:
-    """Generate API docs for Fetch.AI default packages."""
-    for component_type, default_package in DEFAULT_PACKAGES:
+def _generate_apidocs_default_packages(
+    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+) -> None:
+    """Generate API docs for the configured default packages."""
+    for component_type, default_package in config.default_packages:
         public_id = PublicId.from_str(default_package)
         author = public_id.author
         name = public_id.name
         type_plural = component_type.to_plural()
-        package_dir = PACKAGES_DIR / author / type_plural / name
+        package_dir = config.packages_dir / author / type_plural / name
         for module_path in package_dir.rglob("*.py"):
             print(f"Processing {module_path}...", end="")
-            if should_skip(module_path):
+            if config.should_skip(module_path):
                 continue
             suffix = Path(str(module_path.relative_to(package_dir))[:-3] + ".md")
             dotted_path = ".".join(module_path.parts)[:-3]
-            doc_file = API_DIR / type_plural / name / suffix
-            make_pydoc(dotted_path, doc_file)
+            doc_file = config.api_dir / type_plural / name / suffix
+            _submit(executor, dotted_path, doc_file)
 
 
-def _generate_apidocs_plugins() -> None:
-    """Generate API docs for cyrpto plugins."""
-    for plugin in PLUGIN_DIR.iterdir():
+def _generate_apidocs_plugins(
+    config: ApiDocsConfig, executor: Optional[ThreadPoolExecutor]
+) -> None:
+    """Generate API docs for plugins."""
+    if not config.plugins_dir.is_dir():
+        return
+    for plugin in config.plugins_dir.iterdir():
         plugin_name = plugin.name
-        if plugin_name in IGNORE_PLUGINS:
+        if plugin_name in config.ignore_plugins:
             continue
         plugin_module_name = plugin_name.replace("-", "_")
         python_package_root = plugin / plugin_module_name
+        if not python_package_root.is_dir():
+            continue
         for module_path in python_package_root.rglob("*.py"):
             print(f"Processing {module_path}...", end="")
-            if should_skip(module_path):
+            if config.should_skip(module_path):
                 continue
-            # remove ".py"
             relative_module_path = module_path.relative_to(python_package_root)
             suffix = Path(str(relative_module_path)[:-3] + ".md")
             dotted_path = ".".join(module_path.parts)[:-3]
-            doc_file = API_DIR / "plugins" / plugin_module_name / suffix
-            make_pydoc(dotted_path, doc_file)
+            doc_file = config.api_dir / "plugins" / plugin_module_name / suffix
+            _submit(executor, dotted_path, doc_file)
 
 
 def make_pydoc(dotted_path: str, dest_file: Path) -> None:
@@ -177,7 +216,7 @@ def run_pydoc_markdown(module: str) -> str:
     :param module: the dotted path.
     :return: the PyDoc content (pre-processed).
     """
-    pydoc = subprocess.Popen(  # nosec
+    pydoc = subprocess.Popen(  # nosec  # pylint: disable=consider-using-with
         ["pydoc-markdown", "-m", module, "-I", "."],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -190,13 +229,25 @@ def run_pydoc_markdown(module: str) -> str:
     return text
 
 
-def generate_api_docs() -> None:
-    """Generate the api docs."""
-    shutil.rmtree(API_DIR, ignore_errors=True)
-    API_DIR.mkdir()
-    _generate_apidocs_default_packages()
-    _generate_apidocs_aea_modules()
-    _generate_apidocs_plugins()
+def generate_api_docs(config: Optional[ApiDocsConfig] = None) -> None:
+    """Generate the api docs.
+
+    :param config: optional ``ApiDocsConfig`` controlling paths and
+        ignore rules. Defaults to open-aea layout when omitted.
+    """
+    cfg = config if config is not None else ApiDocsConfig()
+    shutil.rmtree(cfg.api_dir, ignore_errors=True)
+    cfg.api_dir.mkdir(parents=True)
+    executor: Optional[ThreadPoolExecutor] = None
+    if cfg.parallel:
+        executor = ThreadPoolExecutor()
+    try:
+        _generate_apidocs_default_packages(cfg, executor)
+        _generate_apidocs_source_modules(cfg, executor)
+        _generate_apidocs_plugins(cfg, executor)
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=True)
 
 
 def install(package: str) -> int:
@@ -212,6 +263,8 @@ def install(package: str) -> int:
 
 
 if __name__ == "__main__":
+    from aea.helpers.git import check_working_tree_is_dirty
+
     parser = argparse.ArgumentParser("generate_api_docs")
     parser.add_argument(
         "--check-clean", action="store_true", help="Check if the working tree is clean."

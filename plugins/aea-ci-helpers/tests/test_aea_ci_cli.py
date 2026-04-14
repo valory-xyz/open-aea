@@ -38,6 +38,7 @@ EXPECTED_COMMANDS = {
     "check-ipfs-pushed",
     "check-pkg-versions",
     "check-pyproject",
+    "check-third-party-hashes",
     "generate-api-docs",
     "generate-pkg-list",
 }
