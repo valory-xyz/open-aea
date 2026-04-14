@@ -26,11 +26,13 @@ from typing import Optional
 
 import click
 from aea_ci_helpers.check_third_party_hashes import run as run_third_party_hash_check
-from aea_ci_helpers.generate_api_docs import ApiDocsConfig
-from aea_ci_helpers.generate_api_docs import generate_api_docs as gen_api_docs
 
-from aea.configurations.base import ComponentType
-from aea.helpers.git import check_working_tree_is_dirty
+# NOTE: imports from ``aea.*`` and from ``aea_ci_helpers.generate_api_docs``
+# (which itself imports ``aea.*``) are intentionally kept inline inside the
+# ``generate_api_docs`` command. ``aea-ci-helpers`` is designed to be
+# installable and usable without ``open-aea`` present (e.g. for the
+# ``check-pyproject`` job which runs before ``aea`` is available), so the
+# ``aea`` dependency must not be pulled in at module import time.
 
 
 @click.group()
@@ -189,6 +191,23 @@ def generate_api_docs(  # pylint: disable=too-many-arguments,too-many-locals,too
     parallel: bool,
 ) -> None:
     """Generate API documentation from source."""
+    # Deferred imports: this command is the only one that needs ``open-aea``.
+    # Keeping these lazy lets the rest of aea-ci-helpers run without it
+    # installed (see note at top of the module).
+    from aea_ci_helpers.generate_api_docs import (  # pylint: disable=import-outside-toplevel
+        ApiDocsConfig,
+    )
+    from aea_ci_helpers.generate_api_docs import (
+        generate_api_docs as gen_api_docs,  # pylint: disable=import-outside-toplevel
+    )
+
+    from aea.configurations.base import (  # pylint: disable=import-outside-toplevel
+        ComponentType,
+    )
+    from aea.helpers.git import (  # pylint: disable=import-outside-toplevel
+        check_working_tree_is_dirty,
+    )
+
     res = shutil.which("pydoc-markdown")
     if res is None:
         click.echo(
