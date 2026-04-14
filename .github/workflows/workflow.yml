@@ -660,3 +660,32 @@ jobs:
           go mod tidy
           go build ./...
           go vet ./...
+
+  all_checks_passed:
+    # Aggregate gate used by branch protection as the single required
+    # status check. Update `needs` when adding/removing mandatory jobs.
+    name: All checks passed
+    if: always()
+    needs:
+      - common_checks_1
+      - common_checks_2
+      - common_checks_3
+      - common_checks_4
+      - common_checks_5
+      - copyright_check
+      - scan
+      - dependencies_checks
+      - plugins_install_check
+      - protolint
+      - platform_checks
+      - golang_checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Fail if any required job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more required jobs failed or were cancelled."
+          exit 1
+      - name: Success
+        run: echo "All required jobs succeeded."
