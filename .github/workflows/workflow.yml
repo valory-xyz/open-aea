@@ -31,7 +31,6 @@ jobs:
           poetry check --lock
           time poetry install --all-extras --no-interaction -vvv
           time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum
-          time poetry run pip install --no-deps file:plugins/aea-ledger-ethereum-flashbots
           time poetry run pip install --no-deps file:plugins/aea-ledger-cosmos
           time poetry run pip install --no-deps file:plugins/aea-ledger-fetchai
           time poetry run pip install --no-deps file:plugins/aea-ledger-solana
@@ -300,9 +299,6 @@ jobs:
       - name: Check plugin aea-ledger-solana
         run: |
           tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-solana && aea generate-key solana && echo aea-ledger-solana checked!"
-      - name: Check plugin aea-ledger-ethereum-flashbots
-        run: |
-          tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-ethereum && pip install ./plugins/aea-ledger-ethereum-flashbots && echo aea-ledger-ethereum-flashbots checked!"
       - name: Check plugin aea-cli-benchmark
         run: |
           tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-cli-benchmark && aea benchmark --help && echo aea-cli-benchmark checked!"

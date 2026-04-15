@@ -1019,7 +1019,7 @@ def send_signed_transactions(signed_transactions: List[JSONLike],
 
 Atomically send multiple of transactions.
 
-This operation is not supported for ethereum. Please use the ethereum_flashbots instead.
+This operation is not supported for the ethereum ledger.
 
 **Arguments**:
 

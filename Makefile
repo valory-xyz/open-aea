@@ -112,7 +112,6 @@ all-checks: clean formatters code-checks generators common-checks-1 common-check
 PYTHON_VERSION ?= 3.10
 PLUGINS := \
 	aea-ledger-ethereum \
-	aea-ledger-ethereum-flashbots \
 	aea-ledger-cosmos \
 	aea-ledger-fetchai \
 	aea-ledger-solana \

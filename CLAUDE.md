@@ -101,7 +101,7 @@ Communication uses **Envelopes** (`to`, `sender`, `protocol_id`, `message`, `con
 
 Ledger integrations and CLI extensions are plugins, each with their own `setup.py` and tests:
 - `aea-ledger-ethereum`, `aea-ledger-cosmos`, `aea-ledger-fetchai`, `aea-ledger-solana`
-- `aea-ledger-ethereum-flashbots`, `aea-ledger-ethereum-hwi`
+- `aea-ledger-ethereum-hwi`
 - `aea-cli-ipfs`, `aea-cli-benchmark`
 
 Crypto implementations are registered via a plugin registry (`aea/crypto/`).

@@ -535,7 +535,7 @@ Unlike all the deps we successfully removed/inlined, protobuf has:
 
 ## Plugin crypto dependency analysis
 
-The ledger plugins (`aea-ledger-cosmos`, `aea-ledger-ethereum`, `aea-ledger-ethereum-flashbots`, `aea-ledger-ethereum-hwi`, `aea-ledger-fetchai`, `aea-ledger-solana`) each pull in a different set of crypto libraries. This section audits whether a more unified stack is possible.
+The ledger plugins (`aea-ledger-cosmos`, `aea-ledger-ethereum`, `aea-ledger-ethereum-hwi`, `aea-ledger-fetchai`, `aea-ledger-solana`) each pull in a different set of crypto libraries. This section audits whether a more unified stack is possible.
 
 ### Current direct crypto deps per plugin
 
@@ -546,7 +546,6 @@ The ledger plugins (`aea-ledger-cosmos`, `aea-ledger-ethereum`, `aea-ledger-ethe
 | `fetchai` | inherits `cosmos`, plus `requests` | same alerts propagate |
 | `ethereum-hwi` | inherits `ethereum`, plus `ledgerwallet`, `construct`, `protobuf` | hardware wallet niche |
 | `solana` | `cryptography`, `solders`, `solana`, `anchorpy` | `PyNaCl` removed — see "Completed" section above |
-| `ethereum-flashbots` | inherits `ethereum`, plus `open-aea-flashbots` | — |
 
 ### Is there a single "unified" crypto library?
 

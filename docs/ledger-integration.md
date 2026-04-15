@@ -60,7 +60,6 @@ You can search for AEA ledger plug-ins on PyPI:
 The framework currently ships the following ledger plugins:
 
 - Ethereum: <a href="https://pypi.org/project/open-aea-ledger-ethereum/" target="_blank">PyPI package: `open-aea-ledger-ethereum`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum" target="_blank">source code</a>.
-- Ethereum Flashbots: <a href="https://pypi.org/project/open-aea-ledger-ethereum-flashbots/" target="_blank">PyPI package: `open-aea-ledger-ethereum-flashbots`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum-flashbots" target="_blank">source code</a>.
 - Ethereum Hardware Wallet Interface: <a href="https://pypi.org/project/open-aea-ledger-ethereum-hwi/" target="_blank">PyPI package: `open-aea-ledger-ethereum-hwi`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-ethereum-hwi" target="_blank">source code</a>.
 - Cosmos: <a href="https://pypi.org/project/open-aea-ledger-cosmos/" target="_blank">PyPI package: `open-aea-ledger-cosmos`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-cosmos" target="_blank">source code</a>.
 - Fetch.ai: <a href="https://pypi.org/project/open-aea-ledger-fetchai/" target="_blank">PyPI package: `open-aea-ledger-fetchai`</a>, and <a href="https://github.com/valory-xyz/open-aea/tree/main/plugins/aea-ledger-fetchai" target="_blank">source code</a>.

@@ -1753,7 +1753,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         """
         Atomically send multiple of transactions.
 
-        This operation is not supported for ethereum. Please use the ethereum_flashbots instead.
+        This operation is not supported for the ethereum ledger.
 
         :param signed_transactions: the signed transactions to bundle together and send.
         :param raise_on_try: whether the method will raise or log on error
