@@ -19,7 +19,7 @@
 | connection/valory/p2p_libp2p_mailbox/0.1.0                    | `bafybeifdbpetirc5id7v3y6wop5mylqh726mo7jgscl2jl3t4f7vusqcnq` |
 | connection/fetchai/local/0.20.0                               | `bafybeichu3hdecg2xk5luddc4qxkaluhnbk2qxiastdkp4ujwbftuhpyry` |
 | connection/valory/http_client/0.23.0                          | `bafybeihel6sg2yayxu7lqygaswdgciaxpqrgsbl5rwx74c6znu5qz2edd4` |
-| connection/valory/test_libp2p/0.1.0                           | `bafybeiabkhmxcfmjt5csjpzvhqep64v7jx44jk3yfjlrxnwt2gouvpgo44` |
+| connection/valory/test_libp2p/0.1.0                           | `bafybeiek2vebos35kioto3wxsrwsoque6f46bcc4rcssuqcwvtiv54cyva` |
 | skill/fetchai/echo/0.19.0                                     | `bafybeieqhk2g6l4pitjmuwbtt7n6vx3wawclygjv5cywjjrgay66lzq74u` |
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeiclf3qlci56sk5bw2jh3k52dc4o3hsqmn34msfud5qlsm65j7nrtm` |
 | skill/fetchai/http_echo/0.20.0                                | `bafybeie7j4y6ppruwf33fydd34yxaiwnhtpn7ocri37gslsnbvjfs7pg7m` |
