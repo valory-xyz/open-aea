@@ -63,31 +63,22 @@ skip_if_ci_marker = [
     )
 ]
 
-# The tests in this module all run against pre-existing ACN peers:
-#   - "Local" tests use the `valory/open-acn-node:latest` docker image
-#     via the ACNWithBootstrappedEntryNodes fixture.
+# The tests in this module run against pre-existing ACN peers:
+#   - "Local" tests spin up the ``valory/open-acn:<tag>`` docker image
+#     (pinned in ``acn_image.py``) via ``ACNWithBootstrappedEntryNodes``.
+#     The image was rebuilt against libp2p v0.33 / circuit-relay v2 and
+#     is wire-compatible with this branch, so the Local variants now run
+#     by default.
 #   - "Public" tests dial the production fetchai/valory ACN nodes over
-#     the internet.
-#
-# Both of those target peers are still running libp2p v0.8 / circuit-relay
-# v1. This branch migrates the p2p_libp2p connection to libp2p v0.33 /
-# circuit-relay v2, which is a wire-breaking change (documented in
-# CLEANUP.md as an intentional side-effect of the dependency bump). Until
-# the docker image and the public nodes are upgraded to a libp2p v0.33
-# build of the ACN, every test in this file either errors at bootstrap
-# (dial fails / "no good addresses") or hangs on message delivery.
-#
-# Skip the whole module with an explicit reason so CI (and local runs)
-# see "skipped: image outdated" instead of a random integration flake.
-# Remove this marker once the ACN side has been rebuilt from the post-
-# bump source tree.
-skip_acn_docker_mismatch = pytest.mark.skip(
+#     the internet. Those have not (yet) been redeployed against the new
+#     libp2p version, so dialling them still fails / hangs. They remain
+#     skipped until the production side is upgraded.
+skip_public_acn_not_upgraded = pytest.mark.skip(
     reason=(
-        "ACN peer (docker image `valory/open-acn-node:latest` for local "
-        "tests, production nodes for public tests) is libp2p v0.8 / "
-        "circuit-relay v1; this branch migrated to v0.33 / v2, which is "
-        "wire-incompatible by design. Re-enable once the ACN side is "
-        "rebuilt."
+        "Production fetchai/valory ACN nodes are still running libp2p "
+        "v0.8 / circuit-relay v1; this branch migrated to v0.33 / v2, "
+        "which is wire-incompatible. Re-enable when production is "
+        "redeployed from the post-bump source tree."
     ),
 )
 
@@ -262,10 +253,10 @@ for base_cls in test_classes:
             test_cls = type(name, bases, {})
         else:
             test_cls = type(name, (base_cls,), {})
-        # Local AND public variants depend on an ACN peer running libp2p
-        # v0.8 / circuit-v1; this branch migrates to v0.33 / v2. Skip
-        # unconditionally; see `skip_acn_docker_mismatch` above.
-        test_cls = skip_acn_docker_mismatch(test_cls)
+            # Public variants still depend on production ACN nodes
+            # running libp2p v0.8 / circuit-v1; skip until they are
+            # redeployed against the new libp2p version.
+            test_cls = skip_public_acn_not_upgraded(test_cls)
 
         test_cls.__name__ = name
         test_cls.nodes = test_case.nodes
@@ -286,7 +277,6 @@ default_message_strategy = dict(
 )
 
 
-@skip_acn_docker_mismatch
 class TestDHTRobustness(BaseP2PLibp2pTest, ACNWithBootstrappedEntryNodes):
     """Test DHT Robustness"""
 

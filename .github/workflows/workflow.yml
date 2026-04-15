@@ -367,7 +367,7 @@ jobs:
           sudo mv protoc/bin/protoc /usr/local/bin/protoc
           
           # pull pre-built images
-          docker pull valory/open-acn-node:latest
+          docker pull valory/open-acn:latest
       - name: Framework integration tests
         run: tox -e py3.10 -- -m 'integration and not unstable and not ledger and not profiling'
       - name: Packages integration tests

@@ -27,7 +27,11 @@ from typing import Dict, List
 from aea.exceptions import enforce
 from aea.test_tools.docker_image import Container, DockerClient, DockerImage
 
-META_ADDRESS = "0.0.0.0"  # nosec
+# Loopback, not the bind-all wildcard: libp2p v0.33 refuses to *dial*
+# a ``/dns4/0.0.0.0/...`` multiaddr ("no good addresses"), so the ACN
+# node URIs — which are consumed both as bind addresses and as peer
+# entry points — must be real loopback addresses.
+META_ADDRESS = "127.0.0.1"  # nosec
 
 # created agent: bootstrap_peer
 #     private key: 7f669ab5eee5719e385f7aeb1973769fc75b7cbbe0850ca16c4eabe84e01afbd
@@ -104,10 +108,16 @@ class ACNNodeDockerImage(DockerImage):
         self._config = config
         self._extra_hosts = {name: "host-gateway" for name in self.nodes}
 
+    # Tracks the current main build of the ACN via the ``:latest``
+    # alias (valory-xyz/open-acn#22). Post-libp2p-v0.33 rebuilds are
+    # wire-compatible with this branch's p2p_libp2p connection after
+    # the v0.8 → v0.33 bump.
+    ACN_IMAGE_TAG = "valory/open-acn:latest"
+
     @property
     def tag(self) -> str:
         """Get the image tag."""
-        return "valory/open-acn-node:latest"
+        return self.ACN_IMAGE_TAG
 
     @property
     def ports(self) -> List[str]:
