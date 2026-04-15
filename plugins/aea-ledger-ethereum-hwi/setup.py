@@ -20,7 +20,15 @@
 
 """Setup script for "aea_ledger_ethereum_hwi" package."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+
+def _read_long_description() -> str:
+    """Read the plugin README as the PyPI long description."""
+    return (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
+
 
 setup(
     name="open-aea-ledger-ethereum-hwi",
@@ -28,7 +36,7 @@ setup(
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and support for hardware wallet interactions.",
-    long_description="Python package wrapping the public and private key cryptography and support for hardware wallet interactions.",
+    long_description=_read_long_description(),
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ledger_ethereum_hwi*"]),
     package_data={

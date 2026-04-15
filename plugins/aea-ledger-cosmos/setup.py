@@ -21,7 +21,15 @@
 
 """Setup script for "aea_ledger_cosmos" package."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+
+def _read_long_description() -> str:
+    """Read the plugin README as the PyPI long description."""
+    return (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
+
 
 setup(
     name="open-aea-ledger-cosmos",
@@ -29,7 +37,7 @@ setup(
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of Cosmos.",
-    long_description="Python package wrapping the public and private key cryptography and ledger api of Cosmos.",
+    long_description=_read_long_description(),
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ledger_cosmos*"]),
     package_data={

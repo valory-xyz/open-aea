@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2022 Valory AG
+#   Copyright 2022-2026 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -57,7 +57,10 @@ DOCKER_PRINT_SEPARATOR = ("\n" + "*" * 40) * 3 + "\n"
 logger = logging.getLogger(__name__)
 
 
-META_ADDRESS = "0.0.0.0"  # nosec
+# Loopback, not bind-all: libp2p v0.33 refuses to *dial*
+# ``/dns4/0.0.0.0/...`` multiaddrs, so entry-peer multiaddrs must use
+# a real loopback address.
+META_ADDRESS = "127.0.0.1"  # nosec
 ACN_CONFIGURATION: Dict[str, str] = dict(
     AEA_P2P_ID="54562eb807d2f80df8151db0a394cac72e16435a5f64275c277cae70308e8b24",
     AEA_P2P_URI_PUBLIC=f"{META_ADDRESS}:5000",
