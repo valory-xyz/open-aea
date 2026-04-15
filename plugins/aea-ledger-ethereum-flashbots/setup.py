@@ -20,7 +20,15 @@
 
 """Setup script for "aea_ledger_ethereum_flashbots" package."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+
+def _read_long_description() -> str:
+    """Read the plugin README as the PyPI long description."""
+    return (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
+
 
 setup(
     name="open-aea-ledger-ethereum-flashbots",
@@ -28,9 +36,7 @@ setup(
     author="Valory AG",
     license="Apache-2.0",
     description="Python package extending the default open-aea ethereum ledger plugin to add support for flashbots.",
-    long_description=(
-        "Python package extending the default open-aea ethereum ledger plugin to add support for flashbots."
-    ),
+    long_description=_read_long_description(),
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ledger_ethereum_flashbots*"]),
     package_data={

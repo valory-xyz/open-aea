@@ -20,7 +20,15 @@
 # ------------------------------------------------------------------------------
 """Setup script for the plug-in."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup  # type: ignore
+
+
+def _read_long_description() -> str:
+    """Read the plugin README as the PyPI long description."""
+    return (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
+
 
 setup(
     name="open-aea-cli-benchmark",
@@ -28,7 +36,7 @@ setup(
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for AEA framework benchmarking.",
-    long_description="CLI extension for AEA framework benchmarking.",
+    long_description=_read_long_description(),
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_cli_benchmark*"]),
     package_data={"aea_cli_benchmark": ["py.typed"]},

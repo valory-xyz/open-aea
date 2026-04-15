@@ -25,15 +25,8 @@ from setuptools import find_packages, setup  # type: ignore
 
 
 def _read_long_description() -> str:
-    """Read the plugin README as the PyPI long description.
-
-    Keeping this in-file (rather than relying on ``file:`` directives
-    in a ``setup.cfg`` or a pyproject.toml ``readme`` key) preserves
-    parity with the other ``plugins/aea-*`` setup scripts while still
-    producing a populated ``Description`` field on PyPI.
-    """
-    readme = Path(__file__).parent / "README.md"
-    return readme.read_text(encoding="utf-8")
+    """Read the plugin README as the PyPI long description."""
+    return (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
 
 
 setup(
