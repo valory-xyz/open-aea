@@ -11,15 +11,19 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ## `v2.2.0` to `v2.2.1`
 
-### Removed plugin: `open-aea-ledger-ethereum-flashbots`
+This is a non-breaking patch release. The core framework is unchanged and the last published `open-aea-ledger-ethereum-flashbots==2.2.0` wheel continues to install against this core; the notes below are only relevant if you want to drop that plugin from your project.
 
-The `aea-ledger-ethereum-flashbots` plugin is no longer maintained and has been removed from this repository. Consumers that relied on it should:
+### `open-aea-ledger-ethereum-flashbots` no longer built here
 
-- Remove the `open-aea-ledger-ethereum-flashbots` pin from their dependency files.
-- Drop any `ethereum_flashbots` section from the `valory/ledger` connection config (the `config.ledger_apis.ethereum_flashbots` block is no longer recognised — use plain `ethereum` instead).
+The `aea-ledger-ethereum-flashbots` plugin has been removed from this repository — it was unmaintained and its source tree is no longer shipped alongside the rest of `open-aea`. The `2.2.0` wheel remains on PyPI; nothing breaks for existing consumers.
+
+If you want to migrate off the plugin:
+
+- Remove the `open-aea-ledger-ethereum-flashbots` pin from your dependency files.
+- Drop any `ethereum_flashbots` section from the `valory/ledger` connection config (the `config.ledger_apis.ethereum_flashbots` block is no longer part of the shipped `connection.yaml` — use plain `ethereum` instead).
 - Remove any `--collect-all aea_ledger_ethereum_flashbots` / `--hidden-import aea_ledger_ethereum_flashbots` flags from PyInstaller invocations.
 
-If you still need flashbots submission, bundle the functionality into your own fork / plugin; the last published release remains available on PyPI but is frozen.
+If you still need flashbots submission, keep the existing pin or bundle the functionality into your own fork / plugin.
 
 ### Concrete upgrade steps
 

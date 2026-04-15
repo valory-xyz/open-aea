@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Swap the following lines if you want to work with 'latest'
-DOCKER_IMAGE_TAG=valory/open-aea-user:2.2.0
+DOCKER_IMAGE_TAG=valory/open-aea-user:2.2.1
 # DOCKER_IMAGE_TAG=valory/open-aea-user:latest
 
 DOCKER_BUILD_CONTEXT_DIR=..

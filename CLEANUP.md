@@ -306,7 +306,7 @@ Walked all 19 files and made targeted fixes where ground truth was out of sync w
 - `identity.md`, `trust.md`, `language-agnostic-definition.md`: confirmed evergreen; left untouched. `language-agnostic-definition.md` is deliberately the interop spec for third-party AEA implementations, and the protobuf schemas shown still match the real `envelope.proto`.
 
 **Meta bucket — fixed:**
-- `faq.md`: "native support for three different networks: Fetch.ai, Ethereum and Cosmos" → updated to reflect the real current plugin set (Ethereum incl. Flashbots/HWI, Cosmos, Fetch.ai, Solana). Reworded the "private keys stored in .txt files. This is temporary and will be improved soon" entry, since that has been the behavior for years — pointer added to the `-p`/`--password` flag and the security notes.
+- `faq.md`: "native support for three different networks: Fetch.ai, Ethereum and Cosmos" → updated to reflect the real current plugin set (Ethereum incl. HWI, Cosmos, Fetch.ai, Solana). Reworded the "private keys stored in .txt files. This is temporary and will be improved soon" entry, since that has been the behavior for years — pointer added to the `-p`/`--password` flag and the security notes.
 - `vision.md`, `app-areas.md`, `demos.md`, `security.md`, `design-principles.md`: confirmed accurate / evergreen; left untouched.
 
 ### D. Minor cosmetic items

@@ -26,7 +26,7 @@ version tag. This command verifies that alignment.
 
 Upstreams are passed as ``owner/repo@version`` and may be repeated. The
 ``version`` segment may optionally include a leading ``v`` — both
-``@2.2.0`` and ``@v2.2.0`` resolve to the same tag. For each upstream
+``@2.2.1`` and ``@v2.2.1`` resolve to the same tag. For each upstream
 the command fetches ``packages/packages.json`` from
 ``raw.githubusercontent.com`` at tag ``v<version>`` and compares
 against any local ``third_party`` entries.
@@ -67,7 +67,7 @@ class Upstream:
         """Return the version segment used to build the tag URL.
 
         Any leading ``v`` supplied by the caller is stripped so that
-        both ``@2.2.0`` and ``@v2.2.0`` build the same URL.
+        both ``@2.2.1`` and ``@v2.2.1`` build the same URL.
 
         :return: the version string with any leading ``v`` removed.
         """
@@ -75,7 +75,7 @@ class Upstream:
 
     @property
     def display(self) -> str:
-        """Return a human-readable form, e.g. ``valory-xyz/open-aea@v2.2.0``.
+        """Return a human-readable form, e.g. ``valory-xyz/open-aea@v2.2.1``.
 
         :return: the canonical display string.
         """

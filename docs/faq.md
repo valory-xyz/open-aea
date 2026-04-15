@@ -11,7 +11,7 @@ The AEA framework provides the necessary services to address all three problems.
 </details>
 
 <details><summary>How does an AEA use blockchain?</summary>
-The AEA framework enables agents to interact with blockchains to settle transactions. Ledger integrations are provided as plugins; the framework currently ships plugins for <i>Ethereum</i> (including Flashbots and hardware-wallet variants), <i>Cosmos</i>, <i>Fetch.ai</i>, and <i>Solana</i>.
+The AEA framework enables agents to interact with blockchains to settle transactions. Ledger integrations are provided as plugins; the framework currently ships plugins for <i>Ethereum</i> (including a hardware-wallet variant), <i>Cosmos</i>, <i>Fetch.ai</i>, and <i>Solana</i>.
 <br><br>
 You can read more about the framework's integration with the different blockchains <a href="../ledger-integration/">here</a>.
 </details>
