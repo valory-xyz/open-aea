@@ -378,7 +378,7 @@ def check_dependencies_cmd(
     required=True,
     help=(
         "Upstream repository to verify against, as 'owner/repo@version' "
-        "(e.g. 'valory-xyz/open-aea@2.2.0'). Repeatable."
+        "(e.g. 'valory-xyz/open-aea@2.2.1'). Repeatable."
     ),
 )
 def check_third_party_hashes(root_dir: str, upstreams: tuple) -> None:

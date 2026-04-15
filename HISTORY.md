@@ -1,5 +1,21 @@
 # Release History - open AEA
 
+## 2.2.1 (2026-04-15)
+
+AEA:
+- Populates the PyPI `Description` section for the root package and every plugin from the corresponding `README.md` (was empty / a one-liner before). #876
+
+Plugins:
+- Removes the unmaintained `open-aea-ledger-ethereum-flashbots` plugin and every CI / docs / config reference to it. Consumers should drop `ethereum_flashbots` from the `valory/ledger` connection config and remove `aea_ledger_ethereum_flashbots` PyInstaller flags. See `docs/upgrading.md`.
+- Makes `aea-ci generate-api-docs` configurable (`--source-dir`, `--packages-dir`, `--plugins-dir`, `--docs-dir`, `--default-package`, `--ignore-plugin`, `--ignore-prefix`, `--parallel`) so downstream repos can reuse it. Parallel mode now surfaces worker exceptions instead of silently dropping them. #876
+- Adds `aea-ci check-third-party-hashes` — verifies local `packages/packages.json` `third_party` entries against one or more upstream repos, with per-upstream fault tolerance. #876
+
+Tests:
+- Re-enables the "Local" `test_libp2p` DHT integration tests against the rebuilt `valory/open-acn:latest` image (libp2p v0.33.2). Switches fixture entry-peer multiaddrs from `0.0.0.0` to `127.0.0.1` to satisfy libp2p v0.33's stricter dial checks. #876
+
+CI:
+- Adds `bugs.python.org/issue8296` to the doc-link skip list to eliminate a flaky external URL. #876
+
 ## 2.2.0 (2026-04-13)
 
 AEA:

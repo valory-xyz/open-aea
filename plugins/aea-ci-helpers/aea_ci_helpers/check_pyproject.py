@@ -40,7 +40,6 @@ WHITELIST = {
     "memory-profiler",
     "apduboy",
     "matplotlib",
-    "open-aea-flashbots",
     # Dev deps declared with version ranges in pyproject.toml but pinned
     # exactly in tox.ini — string comparison would always mismatch
     "requests",

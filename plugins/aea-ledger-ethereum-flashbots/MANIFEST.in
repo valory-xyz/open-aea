@@ -1,4 +1,0 @@
-include README.md LICENSE
-
-recursive-include aea_ledger_ethereum_flashbots
-recursive-include tests *
