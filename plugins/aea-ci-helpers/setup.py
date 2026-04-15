@@ -19,7 +19,22 @@
 # ------------------------------------------------------------------------------
 """Setup script for the plug-in."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup  # type: ignore
+
+
+def _read_long_description() -> str:
+    """Read the plugin README as the PyPI long description.
+
+    Keeping this in-file (rather than relying on ``file:`` directives
+    in a ``setup.cfg`` or a pyproject.toml ``readme`` key) preserves
+    parity with the other ``plugins/aea-*`` setup scripts while still
+    producing a populated ``Description`` field on PyPI.
+    """
+    readme = Path(__file__).parent / "README.md"
+    return readme.read_text(encoding="utf-8")
+
 
 setup(
     name="open-aea-ci-helpers",
@@ -27,7 +42,7 @@ setup(
     author="Valory AG",
     license="Apache-2.0",
     description="CI helper utilities for AEA-based projects.",
-    long_description="CI helper utilities for AEA-based projects.",
+    long_description=_read_long_description(),
     long_description_content_type="text/markdown",
     packages=find_packages(include=["aea_ci_helpers*"]),
     entry_points={
