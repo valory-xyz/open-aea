@@ -115,6 +115,53 @@ FALLBACK_ESTIMATE = {
     "maxPriorityFeePerGas": to_wei(3, GWEI),
 }
 
+# Per-chain fallback overrides applied by `get_default_gas_strategy` when the
+# caller does not pass `gas_price_strategies` explicitly. Chains not listed
+# here inherit `FALLBACK_ESTIMATE` above. Values are empirically chosen
+# safety-ceilings, not aggressive targets: each is high enough to clear the
+# chain's documented gas floor during fee spikes, low enough to avoid the
+# pathological "asks for 44 ETH" scenario that motivated this map.
+CHAIN_FALLBACK_ESTIMATES: Dict[int, Dict[str, Any]] = {
+    # OP-stack L2s: sub-gwei typical; 5 gwei is a generous ceiling
+    10: {  # Optimism
+        "maxFeePerGas": to_wei(5, GWEI),
+        "maxPriorityFeePerGas": to_wei(3, GWEI),
+    },
+    8453: {  # Base
+        "maxFeePerGas": to_wei(5, GWEI),
+        "maxPriorityFeePerGas": to_wei(3, GWEI),
+    },
+    34443: {  # Mode
+        "maxFeePerGas": to_wei(5, GWEI),
+        "maxPriorityFeePerGas": to_wei(3, GWEI),
+    },
+    252: {  # Fraxtal (OP-stack)
+        "maxFeePerGas": to_wei(5, GWEI),
+        "maxPriorityFeePerGas": to_wei(3, GWEI),
+    },
+    # Arbitrum One: 0.1 gwei floor, ~0.02 gwei typical; 2 gwei is 20x floor
+    42161: {
+        "maxFeePerGas": to_wei(2, GWEI),
+        "maxPriorityFeePerGas": to_wei(1, GWEI),
+    },
+    # Polygon PoS: validator-enforced 25-30 gwei min priority fee; maxFee
+    # headroom for congestion bursts
+    137: {
+        "maxFeePerGas": to_wei(6000, GWEI),
+        "maxPriorityFeePerGas": to_wei(30, GWEI),
+    },
+    # Celo: governance raised min gas price to 25 gwei in 2025
+    42220: {
+        "maxFeePerGas": to_wei(30, GWEI),
+        "maxPriorityFeePerGas": to_wei(3, GWEI),
+    },
+}
+
+# Chains needing a non-default `max_gas_fast` for the EIP-1559 strategy.
+CHAIN_MAX_GAS_FAST: Dict[int, int] = {
+    137: 10000,  # Polygon bursts routinely exceed the default 1500
+}
+
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 
 DEFAULT_MIN_ALLOWED_TIP = 1
@@ -234,6 +281,15 @@ def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     if chain_id == 100:
         # this is the minimum allowed max fee per gas on Gnosis
         default_strategy[EIP1559]["min_allowed_tip"] = DEFAULT_GNOSIS_MIN_ALLOWED_TIP
+    if chain_id in CHAIN_FALLBACK_ESTIMATES:
+        # apply to every strategy that carries a `fallback_estimate` (covers
+        # both `eip1559` and `eip1559_polygon`)
+        chain_fallback = CHAIN_FALLBACK_ESTIMATES[chain_id]
+        for strategy in default_strategy.values():
+            if "fallback_estimate" in strategy:
+                strategy["fallback_estimate"] = deepcopy(chain_fallback)
+    if chain_id in CHAIN_MAX_GAS_FAST:
+        default_strategy[EIP1559]["max_gas_fast"] = CHAIN_MAX_GAS_FAST[chain_id]
 
     return default_strategy
 
@@ -306,10 +362,16 @@ def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-argum
     """Get the gas price strategy."""
 
     def fallback(
-        warning: str = "An error occurred while estimating gas price. Falling back.",
+        reason: str = "An error occurred while estimating gas price.",
     ) -> Dict[str, Wei]:
-        """Return the fallback estimate and log a warning."""
-        _default_logger.warning(warning)
+        """Return the fallback estimate and log a warning naming the values and override knob."""
+        _default_logger.warning(
+            f"{reason} Falling back to "
+            f"maxFeePerGas={fallback_estimate.get('maxFeePerGas')} wei, "
+            f"maxPriorityFeePerGas={fallback_estimate.get('maxPriorityFeePerGas')} wei. "
+            "To override, pass `gas_price_strategies` (with an `eip1559.fallback_estimate` "
+            "block tuned for the target chain) to `make_ledger_api`."
+        )
         return fallback_estimate
 
     def eip1559_price_strategy(
@@ -359,7 +421,7 @@ def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-argum
             or to_eth_unit(estimated_priority_fee) >= max_gas_fast
         ):
             return fallback(
-                "The estimated gas price is larger than the `max_gas_fast`. Falling back."
+                "The estimated gas price is larger than the `max_gas_fast`."
             )
 
         estimate = {

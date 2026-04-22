@@ -12,7 +12,7 @@
         "protocol/fetchai/tac/1.0.0": "bafybeigrhtzciyh2r6pa4g3kpqqpg3uni2jt6u4ibhf6ayyd73e6kgqjwq",
         "contract/fetchai/erc1155/0.22.0": "bafybeicmo3rzgvp2s7xrxlksumnmkrprvwttbouvfq7owibl7uvgivygqq",
         "connection/fetchai/stub/0.21.0": "bafybeihjlr7xeurjm56ckji3gjjlao4pykkgk5xcdmfpjraxwyaljmlh4q",
-        "connection/valory/ledger/0.19.0": "bafybeidqf5dmueqm655z3bkw36mviobpcpuek4bhha7iq2nnz6sfu32kva",
+        "connection/valory/ledger/0.19.0": "bafybeicl2tc754e4eg2ahelxaojs2qxpbr2xa2ro6jrj5usdn4yi6l5hjq",
         "connection/valory/http_server/0.22.0": "bafybeihs6dufyaa5l4uorplzx3wiyna5qlq2x43tmyl3yonkl265vspdle",
         "connection/valory/p2p_libp2p/0.1.0": "bafybeibi5w3kw54uqrjwfcsxxnomwkykglckxyshyxgj7dl7gxytf6asmu",
         "connection/valory/p2p_libp2p_client/0.1.0": "bafybeielj3jso3wvrarp5n5rq7llpw4vgxybqiyensgjalb5ubfiawwhhu",
