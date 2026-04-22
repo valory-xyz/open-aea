@@ -23,12 +23,12 @@
 | skill/fetchai/echo/0.19.0                                     | `bafybeieqhk2g6l4pitjmuwbtt7n6vx3wawclygjv5cywjjrgay66lzq74u` |
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeiclf3qlci56sk5bw2jh3k52dc4o3hsqmn34msfud5qlsm65j7nrtm` |
 | skill/fetchai/http_echo/0.20.0                                | `bafybeie7j4y6ppruwf33fydd34yxaiwnhtpn7ocri37gslsnbvjfs7pg7m` |
-| skill/fetchai/erc1155_client/0.28.0                           | `bafybeieiivq4biudmlhkasjoq6uh5srcvokvkbnklopfldgankwwieo4mi` |
-| skill/fetchai/erc1155_deploy/0.30.0                           | `bafybeidixixwi7w72gam3yzuvxeajt3be3uigiwinhkunurjoooysgdcfi` |
+| skill/fetchai/erc1155_client/0.28.0                           | `bafybeif5m4izfgsicycppsplugrasa4gjqynhspipgpahgacbw62mzgbz4` |
+| skill/fetchai/erc1155_deploy/0.30.0                           | `bafybeid5etjscu5rpu5mos53gsp7y4emxtrivw65ifyqcfsjnmfyk6y6xu` |
 | skill/fetchai/error/0.17.0                                    | `bafybeibupgcqs5mofvr5nyfncb7soxoktbuhgudisyht56mm6lpqyqi2rq` |
 | skill/fetchai/fipa_dummy_buyer/0.2.0                          | `bafybeih3cn2b7n6o272yem7v44dd5tdfdrvvjzpt2nvd2drnng75o5kok4` |
-| skill/fetchai/generic_buyer/0.26.0                            | `bafybeigtxoupfvd7ckfqwu5faur6lkfhhhr4pvlhmpqde4piyedty5foh4` |
-| skill/fetchai/generic_seller/0.27.0                           | `bafybeifzqhno57d76arqviqdfhdkwn6mmwlx2tid3iwgcfxertydeqva4i` |
+| skill/fetchai/generic_buyer/0.26.0                            | `bafybeigdsnjwwnqeiraoh46k4r6zyc57a6hqbd77ts5npooat3qsfq3b2q` |
+| skill/fetchai/generic_seller/0.27.0                           | `bafybeibi26b5yd24tej4erc5vsw4qlsriv3kewpmnmrq6absebsd3osube` |
 | skill/fetchai/task_test_skill/0.1.0                           | `bafybeic73246oscw5glrvs66b5ptfdzhgnc27le4ivmlz77t7kfjdhyh2e` |
 | agent/fetchai/error_test/0.1.0                                | `bafybeiespr3cxvz2mlmuqwdnhyaexhx2hdq3a75axxeqk5ug5to6yqpi3m` |
 | agent/fetchai/my_first_aea/0.27.0                             | `bafybeigvzq5ygrsworlbz342hvmcrbauyj2444ugxfahzmfwgudvtwoaf4` |
