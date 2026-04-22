@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## Unreleased
+
+Plugins:
+
+- `open-aea-ledger-ethereum`: generalises `EthereumApi.get_l1_data_fee` to dispatch by `chain_id`. Covers OP-stack (Optimism, Base, Mode, Fraxtal) via the `GasPriceOracle` and Arbitrum Nitro (Arbitrum One, Arbitrum Nova) via the `NodeInterface` precompile; returns 0 on any other chain. Non-OP-stack L2 queries previously failed silently. Callers that need the L1 data fee (e.g. drain-address budgeting) invoke the helper explicitly — it is safe to call on any chain. #780
+
 ## 2.2.1 (2026-04-15)
 
 AEA:

@@ -1137,17 +1137,19 @@ def test_gas_estimation(
 
 
 @pytest.mark.parametrize("mock_exception", (True, False))
-def test_get_l1_data_fee(
+def test_get_l1_data_fee_op_stack(
     mock_exception,
     ethereum_testnet_config: dict,
     caplog,
 ) -> None:
-    """Test gas estimation."""
+    """Test the OP-stack branch of get_l1_data_fee via the GasPriceOracle."""
     ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Force an OP-stack chain id (Base) so the dispatcher picks the OP-stack path.
+    ethereum_api._chain_id = 8453  # noqa: SLF001
     tx = {
         "nonce": 0,
         "value": 0,
-        "chainId": 1337,
+        "chainId": 8453,
         "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
         "gas": 291661,
         "maxPriorityFeePerGas": 3000000000,
@@ -1170,6 +1172,71 @@ def test_get_l1_data_fee(
                 assert ethereum_api.get_l1_data_fee(tx) == 0
             else:
                 assert ethereum_api.get_l1_data_fee(tx) == 112
+
+
+@pytest.mark.parametrize("mock_exception", (True, False))
+def test_get_l1_data_fee_arbitrum(
+    mock_exception,
+    ethereum_testnet_config: dict,
+    caplog,
+) -> None:
+    """Test the Arbitrum branch of get_l1_data_fee via NodeInterface.gasEstimateL1Component."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Force Arbitrum One so the dispatcher picks the Arbitrum path.
+    ethereum_api._chain_id = 42161  # noqa: SLF001
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 42161,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
+        with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+            contract_instance = contract_mock.return_value
+            node_interface_function = contract_instance.functions.gasEstimateL1Component
+            # (gasEstimateForL1=2000, baseFee=100, l1BaseFeeEstimate=ignored).
+            # Expected: 2000 * 100 * 1.1 = 220000 wei.
+            node_interface_function.return_value.call.return_value = (
+                2000,
+                100,
+                0,
+            )
+
+            if mock_exception:
+                node_interface_function.return_value.call.side_effect = ValueError(
+                    "triggered exception"
+                )
+                assert ethereum_api.get_l1_data_fee(tx) == 0
+            else:
+                assert ethereum_api.get_l1_data_fee(tx) == 220000
+
+
+def test_get_l1_data_fee_non_l2_returns_zero(
+    ethereum_testnet_config: dict,
+) -> None:
+    """Non-L2 chains return 0 without calling any oracle / precompile."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Gnosis (100) is not in _OP_STACK_CHAIN_IDS or _ARBITRUM_CHAIN_IDS.
+    ethereum_api._chain_id = 100  # noqa: SLF001
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 100,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+        assert ethereum_api.get_l1_data_fee(tx) == 0
+        contract_mock.assert_not_called()
 
 
 @patch.object(EthereumApi, "_try_get_transaction_count", return_value=1)

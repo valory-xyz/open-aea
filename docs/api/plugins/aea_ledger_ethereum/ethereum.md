@@ -801,17 +801,7 @@ the updated transaction
 def get_l1_data_fee(transaction: JSONLike) -> int
 ```
 
-Get the L1 data fee for the transaction on OP stack chains.
-
-Docs: https://docs.optimism.io/builders/app-developers/transactions/estimates#l1-data-fee
-
-**Arguments**:
-
-- `transaction`: the transaction
-
-**Returns**:
-
-the data fee in wei
+Get the L1 data fee for the transaction in wei (0 if not an L2).
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.send_signed_transaction"></a>
 
