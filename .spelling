@@ -436,6 +436,22 @@ ListenAddrs
 aealite
 runnable
 env
+arbitrum
+polygon
+celo
+nitro
+nova
+gwei
+kwarg
+kwargs
+maxfeepergas
+maxpriorityfeepergas
+max_gas_fast
+gas_price_strategies
+gaspriceoracle
+nodeinterface
+op-stack
+precompile
  - docs/language-agnostic-definition.md
 fetchai
 protocol_id
