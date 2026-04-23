@@ -50,9 +50,9 @@ from aea_ledger_ethereum import (
 )
 from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
+    DEFAULT_FALLBACK_ESTIMATE,
     DEFAULT_GAS_STATION_STRATEGY,
     DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
-    DEFAULT_FALLBACK_ESTIMATE,
     DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
