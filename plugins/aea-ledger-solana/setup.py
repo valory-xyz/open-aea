@@ -44,11 +44,6 @@ setup(
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "cryptography",
-        # Upper bounds pin to the minor range that keeps the plugin's
-        # import surface intact. `solana.blockhash.BlockhashCache` was
-        # already inlined locally (removed upstream in 0.33+). A future
-        # PR can refactor `solana.transaction` → `solders.transaction` to
-        # allow newer solana-py; that's out of scope for this dep bump.
         "solders>=0.21.0,<0.22.0",
         "solana>=0.33.0,<0.34.0",
         "anchorpy>=0.20.0,<0.21.0",
