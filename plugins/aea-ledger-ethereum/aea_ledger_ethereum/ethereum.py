@@ -372,7 +372,9 @@ def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-argum
             "To override, pass `gas_price_strategies` (with an `eip1559.fallback_estimate` "
             "block tuned for the target chain) to `make_ledger_api`."
         )
-        return fallback_estimate
+        # return a copy; callers may mutate the returned dict (e.g. repricing in
+        # try_get_gas_pricing)
+        return dict(fallback_estimate)
 
     def eip1559_price_strategy(
         web3: Web3,  # pylint: disable=redefined-outer-name
@@ -457,9 +459,10 @@ def get_gas_price_strategy_eip1559_polygon(
                     "maxFeePerGas": Wei(to_wei(data["maxFee"], GWEI)),
                     "maxPriorityFeePerGas": Wei(to_wei(data["maxPriorityFee"], GWEI)),
                 }
-            return fallback_estimate
+            # return a copy; see note in get_gas_price_strategy_eip1559.fallback
+            return dict(fallback_estimate)
         except requests.exceptions.RequestException:
-            return fallback_estimate
+            return dict(fallback_estimate)
 
     return eip1559_price_strategy
 
