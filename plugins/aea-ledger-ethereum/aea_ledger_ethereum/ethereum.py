@@ -110,56 +110,9 @@ FEE_HISTORY_PERCENTILE = 5
 DEFAULT_PRIORITY_FEE = None
 
 # In case something goes wrong fall back to this estimate
-FALLBACK_ESTIMATE = {
+DEFAULT_FALLBACK_ESTIMATE = {
     "maxFeePerGas": to_wei(20, GWEI),
     "maxPriorityFeePerGas": to_wei(3, GWEI),
-}
-
-# Per-chain fallback overrides applied by `get_default_gas_strategy` when the
-# caller does not pass `gas_price_strategies` explicitly. Chains not listed
-# here inherit `FALLBACK_ESTIMATE` above. Values are empirically chosen
-# safety-ceilings, not aggressive targets: each is high enough to clear the
-# chain's documented gas floor during fee spikes, low enough to avoid the
-# pathological "asks for 44 ETH" scenario that motivated this map.
-CHAIN_FALLBACK_ESTIMATES: Dict[int, Dict[str, Any]] = {
-    # OP-stack L2s: sub-gwei typical; 5 gwei is a generous ceiling
-    10: {  # Optimism
-        "maxFeePerGas": to_wei(5, GWEI),
-        "maxPriorityFeePerGas": to_wei(3, GWEI),
-    },
-    8453: {  # Base
-        "maxFeePerGas": to_wei(5, GWEI),
-        "maxPriorityFeePerGas": to_wei(3, GWEI),
-    },
-    34443: {  # Mode
-        "maxFeePerGas": to_wei(5, GWEI),
-        "maxPriorityFeePerGas": to_wei(3, GWEI),
-    },
-    252: {  # Fraxtal (OP-stack)
-        "maxFeePerGas": to_wei(5, GWEI),
-        "maxPriorityFeePerGas": to_wei(3, GWEI),
-    },
-    # Arbitrum One: 0.1 gwei floor, ~0.02 gwei typical; 2 gwei is 20x floor
-    42161: {
-        "maxFeePerGas": to_wei(2, GWEI),
-        "maxPriorityFeePerGas": to_wei(1, GWEI),
-    },
-    # Polygon PoS: validator-enforced 25-30 gwei min priority fee; maxFee
-    # headroom for congestion bursts
-    137: {
-        "maxFeePerGas": to_wei(6000, GWEI),
-        "maxPriorityFeePerGas": to_wei(30, GWEI),
-    },
-    # Celo: governance raised min gas price to 25 gwei in 2025
-    42220: {
-        "maxFeePerGas": to_wei(30, GWEI),
-        "maxPriorityFeePerGas": to_wei(3, GWEI),
-    },
-}
-
-# Chains needing a non-default `max_gas_fast` for the EIP-1559 strategy.
-CHAIN_MAX_GAS_FAST: Dict[int, int] = {
-    137: 10000,  # Polygon bursts routinely exceed the default 1500
 }
 
 PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
@@ -167,12 +120,85 @@ PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 DEFAULT_MIN_ALLOWED_TIP = 1
 DEFAULT_GNOSIS_MIN_ALLOWED_TIP = to_wei(1, GWEI)
 
+# Per-chain EIP-1559 strategy overrides applied by `get_default_gas_strategy`
+# when the caller does not pass `gas_price_strategies` explicitly. Each entry
+# is a patch on top of `DEFAULT_EIP1559_STRATEGY` (see below); keys present
+# here replace the defaults, anything absent is inherited. A `fallback_estimate`
+# override applies to both `eip1559` and `eip1559_polygon` strategies.
+# Chains not listed here inherit the defaults entirely (including
+# `DEFAULT_FALLBACK_ESTIMATE`).
+CHAIN_EIP1559_OVERRIDES: Dict[int, Dict[str, Any]] = {
+    # Gnosis: typical base fee <2 gwei; 1 gwei validator floor on priority fee
+    100: {
+        "min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(1, GWEI),
+        },
+    },
+    # OP-stack L2s: sub-gwei typical; 5 gwei is a generous ceiling; no
+    # enforced tip floor, so default `min_allowed_tip` (1 wei) is fine.
+    10: {  # Optimism
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    8453: {  # Base
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    34443: {  # Mode
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    252: {  # Fraxtal (OP-stack)
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    # Arbitrum One: 0.1 gwei floor, ~0.02 gwei typical; 2 gwei is 20x floor;
+    # no enforced tip floor either.
+    42161: {
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(2, GWEI),
+            "maxPriorityFeePerGas": to_wei(1, GWEI),
+        },
+    },
+    # Polygon PoS: validator-enforced ~30 gwei min priority fee — `min_allowed_tip`
+    # set so the estimator proposes at least 30 gwei when recent blocks have no
+    # tips. `max_gas_fast` raised because Polygon bursts routinely exceed the
+    # default. `fallback_estimate` maxFee has headroom for congestion bursts.
+    137: {
+        "max_gas_fast": 10000,
+        "min_allowed_tip": to_wei(30, GWEI),
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(6000, GWEI),
+            "maxPriorityFeePerGas": to_wei(30, GWEI),
+        },
+    },
+    # Celo: governance raised min gas price to 25 gwei in 2025 — `min_allowed_tip`
+    # and `fallback_estimate` tip both set at/above the network floor.
+    42220: {
+        "min_allowed_tip": to_wei(25, GWEI),
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(50, GWEI),
+            "maxPriorityFeePerGas": to_wei(25, GWEI),
+        },
+    },
+}
+
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
     "fee_history_blocks": FEE_HISTORY_BLOCKS,
     "fee_history_percentile": FEE_HISTORY_PERCENTILE,
     "default_priority_fee": DEFAULT_PRIORITY_FEE,
-    "fallback_estimate": FALLBACK_ESTIMATE,
+    "fallback_estimate": DEFAULT_FALLBACK_ESTIMATE,
     "min_allowed_tip": DEFAULT_MIN_ALLOWED_TIP,
     "priority_fee_increase_boundary": PRIORITY_FEE_INCREASE_BOUNDARY,
 }
@@ -180,7 +206,7 @@ DEFAULT_EIP1559_STRATEGY = {
 DEFAULT_EIP1559_STRATEGY_POLYGON = {
     "gas_endpoint": POLYGON_GAS_ENDPOINT,
     "speed": SPEED_FAST,
-    "fallback_estimate": FALLBACK_ESTIMATE,
+    "fallback_estimate": DEFAULT_FALLBACK_ESTIMATE,
 }
 
 DEFAULT_GAS_STATION_STRATEGY = {"gas_price_api_key": "", "gas_price_strategy": "fast"}
@@ -278,18 +304,16 @@ def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float
 def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     """Get default gas strategy for the given chain ID."""
     default_strategy = deepcopy(DEFAULT_GAS_PRICE_STRATEGIES)
-    if chain_id == 100:
-        # this is the minimum allowed max fee per gas on Gnosis
-        default_strategy[EIP1559]["min_allowed_tip"] = DEFAULT_GNOSIS_MIN_ALLOWED_TIP
-    if chain_id in CHAIN_FALLBACK_ESTIMATES:
+    overrides = CHAIN_EIP1559_OVERRIDES.get(chain_id, {})
+    if "fallback_estimate" in overrides:
         # apply to every strategy that carries a `fallback_estimate` (covers
         # both `eip1559` and `eip1559_polygon`)
-        chain_fallback = CHAIN_FALLBACK_ESTIMATES[chain_id]
         for strategy in default_strategy.values():
             if "fallback_estimate" in strategy:
-                strategy["fallback_estimate"] = deepcopy(chain_fallback)
-    if chain_id in CHAIN_MAX_GAS_FAST:
-        default_strategy[EIP1559]["max_gas_fast"] = CHAIN_MAX_GAS_FAST[chain_id]
+                strategy["fallback_estimate"] = deepcopy(overrides["fallback_estimate"])
+    for key in ("min_allowed_tip", "max_gas_fast"):
+        if key in overrides:
+            default_strategy[EIP1559][key] = overrides[key]
 
     return default_strategy
 
@@ -1417,7 +1441,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
 
     def get_l1_data_fee(self, transaction: JSONLike) -> int:
-        """Get the L1 data fee for the transaction in wei (0 if not an L2)."""
+        """Get the L1 data fee for the transaction in wei (0 if chain not supported L2)."""
         if self._chain_id in _OP_STACK_CHAIN_IDS:
             return self._get_op_stack_l1_data_fee(transaction)
         if self._chain_id in _ARBITRUM_CHAIN_IDS:
@@ -1427,7 +1451,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
     def _get_op_stack_l1_data_fee(self, transaction: JSONLike) -> int:
         """Get the L1 data fee on OP-stack chains via the GasPriceOracle."""
         transaction = deepcopy(transaction)
-        del transaction["from"]
+        transaction.pop("from", None)
         try:
             unsigned_raw_tx = serializable_unsigned_transaction_from_dict(transaction)
             # v, r, s don't affect size; the oracle only needs the raw bytes

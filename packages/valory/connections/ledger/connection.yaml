@@ -119,8 +119,8 @@ config:
           min_allowed_tip: 1000000000
           default_priority_fee: null
           fallback_estimate:
-            maxFeePerGas: 20000000000
-            maxPriorityFeePerGas: 3000000000
+            maxFeePerGas: 5000000000
+            maxPriorityFeePerGas: 1000000000
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: false
@@ -135,11 +135,11 @@ config:
           max_gas_fast: 1500
           fee_history_blocks: 10
           fee_history_percentile: 5
-          min_allowed_tip: 1
+          min_allowed_tip: 25000000000
           default_priority_fee: null
           fallback_estimate:
-            maxFeePerGas: 30000000000
-            maxPriorityFeePerGas: 3000000000
+            maxFeePerGas: 50000000000
+            maxPriorityFeePerGas: 25000000000
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
       poa_chain: true
@@ -211,12 +211,18 @@ config:
           max_gas_fast: 10000
           fee_history_blocks: 10
           fee_history_percentile: 5
-          min_allowed_tip: 1
+          min_allowed_tip: 30000000000
           default_priority_fee: null
           fallback_estimate:
             maxFeePerGas: 6000000000000
             maxPriorityFeePerGas: 30000000000
           priority_fee_increase_boundary: 200
+        eip1559_polygon:
+          gas_endpoint: https://gasstation-mainnet.matic.network/v2
+          speed: fast
+          fallback_estimate:
+            maxFeePerGas: 6000000000000
+            maxPriorityFeePerGas: 30000000000
       is_gas_estimation_enabled: true
       poa_chain: false
       timeout: 10
