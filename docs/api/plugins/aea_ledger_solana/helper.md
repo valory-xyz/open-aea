@@ -4,6 +4,50 @@
 
 This module contains the helpers for the solana ledger.
 
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.BlockhashCache"></a>
+
+## BlockhashCache Objects
+
+```python
+class BlockhashCache()
+```
+
+Minimal TTL cache for a recent blockhash.
+
+Inlined because `solana.blockhash.BlockhashCache` was removed in
+solana-py 0.33.0 (coinciding with the drop of the `cachetools<5` pin
+that this plugin needs to shed to coexist with modern `tomte[tox]`).
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.BlockhashCache.__init__"></a>
+
+#### `__`init`__`
+
+```python
+def __init__(ttl: int = 60) -> None
+```
+
+Initialise with a time-to-live in seconds.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.BlockhashCache.set"></a>
+
+#### set
+
+```python
+def set(blockhash: str, slot: int) -> None
+```
+
+Store a blockhash and its slot.
+
+<a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.BlockhashCache.get"></a>
+
+#### get
+
+```python
+def get() -> str
+```
+
+Return the cached blockhash or raise if stale/missing.
+
 <a id="plugins.aea-ledger-solana.aea_ledger_solana.helper.SolanaHelper"></a>
 
 ## SolanaHelper Objects

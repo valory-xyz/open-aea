@@ -44,9 +44,9 @@ setup(
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "cryptography",
-        "solders>=0.14.0",
-        "solana>=0.29.0",
-        "anchorpy>=0.17.0,<0.19.0",
+        "solders>=0.21.0,<0.22.0",
+        "solana>=0.33.0,<0.34.0",
+        "anchorpy>=0.20.0,<0.21.0",
     ],
     tests_require=["pytest>=7.0,<10"],
     entry_points={

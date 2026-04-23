@@ -28,13 +28,41 @@ from aea_ledger_solana.transaction import SolanaTransaction
 from aea_ledger_solana.utils import pako_inflate
 from anchorpy.coder.accounts import ACCOUNT_DISCRIMINATOR_SIZE
 from anchorpy.idl import _decode_idl_account
-from solana.blockhash import BlockhashCache  # type: ignore
 from solana.rpc.api import Client  # type: ignore
 from solders.pubkey import Pubkey as PublicKey
 
 from aea.common import Address, JSONLike
 from aea.crypto.base import Crypto, Helper
 from aea.helpers.base import try_decorator
+
+
+class BlockhashCache:
+    """
+    Minimal TTL cache for a recent blockhash.
+
+    Inlined because `solana.blockhash.BlockhashCache` was removed in
+    solana-py 0.33.0 (coinciding with the drop of the `cachetools<5` pin
+    that this plugin needs to shed to coexist with modern `tomte[tox]`).
+    """
+
+    def __init__(self, ttl: int = 60) -> None:
+        """Initialise with a time-to-live in seconds."""
+        self.ttl = ttl
+        self._blockhash: Optional[str] = None
+        self._slot: Optional[int] = None
+        self._stored_at: float = 0.0
+
+    def set(self, blockhash: str, slot: int) -> None:
+        """Store a blockhash and its slot."""
+        self._blockhash = blockhash
+        self._slot = slot
+        self._stored_at = time.monotonic()
+
+    def get(self) -> str:
+        """Return the cached blockhash or raise if stale/missing."""
+        if self._blockhash is None or (time.monotonic() - self._stored_at) > self.ttl:
+            raise LookupError("no valid cached blockhash")
+        return self._blockhash
 
 
 class SolanaHelper(Helper):
