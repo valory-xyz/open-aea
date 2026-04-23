@@ -1441,7 +1441,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
 
     def get_l1_data_fee(self, transaction: JSONLike) -> int:
-        """Get the L1 data fee for the transaction in wei (0 if chain not supported L2)."""
+        """Get the L1 data fee for the transaction in wei (0 if chain is not a supported L2)."""
         if self._chain_id in _OP_STACK_CHAIN_IDS:
             return self._get_op_stack_l1_data_fee(transaction)
         if self._chain_id in _ARBITRUM_CHAIN_IDS:
