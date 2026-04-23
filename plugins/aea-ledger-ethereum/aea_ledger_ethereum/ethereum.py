@@ -96,7 +96,7 @@ EIP1559_POLYGON = "eip1559_polygon"
 GAS_STATION = "gas_station"
 AVAILABLE_STRATEGIES = (EIP1559, GAS_STATION, EIP1559_POLYGON)
 SPEED_FAST = "fast"  # safeLow, standard, fast
-POLYGON_GAS_ENDPOINT = "https://gasstation-mainnet.matic.network/v2"
+POLYGON_GAS_ENDPOINT = "https://gasstation.polygon.technology/v2"
 MAX_GAS_FAST = 1500
 RPC_CALL_MAX_WORKERS = 1
 
@@ -110,7 +110,7 @@ FEE_HISTORY_PERCENTILE = 5
 DEFAULT_PRIORITY_FEE = None
 
 # In case something goes wrong fall back to this estimate
-FALLBACK_ESTIMATE = {
+DEFAULT_FALLBACK_ESTIMATE = {
     "maxFeePerGas": to_wei(20, GWEI),
     "maxPriorityFeePerGas": to_wei(3, GWEI),
 }
@@ -120,12 +120,85 @@ PRIORITY_FEE_INCREASE_BOUNDARY = 200  # percentage
 DEFAULT_MIN_ALLOWED_TIP = 1
 DEFAULT_GNOSIS_MIN_ALLOWED_TIP = to_wei(1, GWEI)
 
+# Per-chain EIP-1559 strategy overrides applied by `get_default_gas_strategy`
+# when the caller does not pass `gas_price_strategies` explicitly. Each entry
+# is a patch on top of `DEFAULT_EIP1559_STRATEGY` (see below); keys present
+# here replace the defaults, anything absent is inherited. A `fallback_estimate`
+# override applies to both `eip1559` and `eip1559_polygon` strategies.
+# Chains not listed here inherit the defaults entirely (including
+# `DEFAULT_FALLBACK_ESTIMATE`).
+CHAIN_EIP1559_OVERRIDES: Dict[int, Dict[str, Any]] = {
+    # Gnosis: typical base fee <2 gwei; 1 gwei validator floor on priority fee
+    100: {
+        "min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(1, GWEI),
+        },
+    },
+    # OP-stack L2s: sub-gwei typical; 5 gwei is a generous ceiling; no
+    # enforced tip floor, so default `min_allowed_tip` (1 wei) is fine.
+    10: {  # Optimism
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    8453: {  # Base
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    34443: {  # Mode
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    252: {  # Fraxtal (OP-stack)
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(5, GWEI),
+            "maxPriorityFeePerGas": to_wei(3, GWEI),
+        },
+    },
+    # Arbitrum One: 0.1 gwei floor, ~0.02 gwei typical; 2 gwei is 20x floor;
+    # no enforced tip floor either.
+    42161: {
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(2, GWEI),
+            "maxPriorityFeePerGas": to_wei(1, GWEI),
+        },
+    },
+    # Polygon PoS: validator-enforced ~30 gwei min priority fee — `min_allowed_tip`
+    # set so the estimator proposes at least 30 gwei when recent blocks have no
+    # tips. `max_gas_fast` raised because Polygon bursts routinely exceed the
+    # default. `fallback_estimate` maxFee has headroom for congestion bursts.
+    137: {
+        "max_gas_fast": 10000,
+        "min_allowed_tip": to_wei(30, GWEI),
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(6000, GWEI),
+            "maxPriorityFeePerGas": to_wei(30, GWEI),
+        },
+    },
+    # Celo: governance raised min gas price to 25 gwei in 2025 — `min_allowed_tip`
+    # and `fallback_estimate` tip both set at/above the network floor.
+    42220: {
+        "min_allowed_tip": to_wei(25, GWEI),
+        "fallback_estimate": {
+            "maxFeePerGas": to_wei(50, GWEI),
+            "maxPriorityFeePerGas": to_wei(25, GWEI),
+        },
+    },
+}
+
 DEFAULT_EIP1559_STRATEGY = {
     "max_gas_fast": MAX_GAS_FAST,
     "fee_history_blocks": FEE_HISTORY_BLOCKS,
     "fee_history_percentile": FEE_HISTORY_PERCENTILE,
     "default_priority_fee": DEFAULT_PRIORITY_FEE,
-    "fallback_estimate": FALLBACK_ESTIMATE,
+    "fallback_estimate": DEFAULT_FALLBACK_ESTIMATE,
     "min_allowed_tip": DEFAULT_MIN_ALLOWED_TIP,
     "priority_fee_increase_boundary": PRIORITY_FEE_INCREASE_BOUNDARY,
 }
@@ -133,7 +206,7 @@ DEFAULT_EIP1559_STRATEGY = {
 DEFAULT_EIP1559_STRATEGY_POLYGON = {
     "gas_endpoint": POLYGON_GAS_ENDPOINT,
     "speed": SPEED_FAST,
-    "fallback_estimate": FALLBACK_ESTIMATE,
+    "fallback_estimate": DEFAULT_FALLBACK_ESTIMATE,
 }
 
 DEFAULT_GAS_STATION_STRATEGY = {"gas_price_api_key": "", "gas_price_strategy": "fast"}
@@ -159,6 +232,37 @@ GET_L1_FEE_ABI = [
     }
 ]
 MAX_OP_L1_FEE_INCREASE_RELATIVE_PER_BLOCK = 1.125
+
+# OP-stack chain IDs: Optimism, Base, Mode, Fraxtal.
+_OP_STACK_CHAIN_IDS = frozenset({10, 8453, 34443, 252})
+
+# Arbitrum Nitro chain IDs: Arbitrum One, Arbitrum Nova.
+_ARBITRUM_CHAIN_IDS = frozenset({42161, 42170})
+ARBITRUM_NODE_INTERFACE_ADDRESS = "0x00000000000000000000000000000000000000C8"
+ARBITRUM_GAS_ESTIMATE_L1_COMPONENT_ABI = [
+    {
+        "inputs": [
+            {"internalType": "address", "name": "to", "type": "address"},
+            {"internalType": "bool", "name": "contractCreation", "type": "bool"},
+            {"internalType": "bytes", "name": "data", "type": "bytes"},
+        ],
+        "name": "gasEstimateL1Component",
+        "outputs": [
+            {"internalType": "uint64", "name": "gasEstimateForL1", "type": "uint64"},
+            {"internalType": "uint256", "name": "baseFee", "type": "uint256"},
+            {
+                "internalType": "uint256",
+                "name": "l1BaseFeeEstimate",
+                "type": "uint256",
+            },
+        ],
+        "stateMutability": "payable",
+        "type": "function",
+    }
+]
+# Arbitrum docs recommend padding by 10% when using the returned estimate
+# to build a live tx (NodeInterface.sol, gasEstimateL1Component docstring).
+ARBITRUM_L1_FEE_PADDING = 1.1
 
 # The tip increase is the minimum required of 10%.
 TIP_INCREASE = 1.1
@@ -200,9 +304,16 @@ def get_base_fee_multiplier(base_fee_gwei: Union[int, decimal.Decimal]) -> float
 def get_default_gas_strategy(chain_id: int) -> Dict[str, Any]:
     """Get default gas strategy for the given chain ID."""
     default_strategy = deepcopy(DEFAULT_GAS_PRICE_STRATEGIES)
-    if chain_id == 100:
-        # this is the minimum allowed max fee per gas on Gnosis
-        default_strategy[EIP1559]["min_allowed_tip"] = DEFAULT_GNOSIS_MIN_ALLOWED_TIP
+    overrides = CHAIN_EIP1559_OVERRIDES.get(chain_id, {})
+    if "fallback_estimate" in overrides:
+        # apply to every strategy that carries a `fallback_estimate` (covers
+        # both `eip1559` and `eip1559_polygon`)
+        for strategy in default_strategy.values():
+            if "fallback_estimate" in strategy:
+                strategy["fallback_estimate"] = deepcopy(overrides["fallback_estimate"])
+    for key in ("min_allowed_tip", "max_gas_fast"):
+        if key in overrides:
+            default_strategy[EIP1559][key] = overrides[key]
 
     return default_strategy
 
@@ -275,11 +386,19 @@ def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-argum
     """Get the gas price strategy."""
 
     def fallback(
-        warning: str = "An error occurred while estimating gas price. Falling back.",
+        reason: str = "An error occurred while estimating gas price.",
     ) -> Dict[str, Wei]:
-        """Return the fallback estimate and log a warning."""
-        _default_logger.warning(warning)
-        return fallback_estimate
+        """Return the fallback estimate and log a warning naming the values and override knob."""
+        _default_logger.warning(
+            f"{reason} Falling back to "
+            f"maxFeePerGas={fallback_estimate.get('maxFeePerGas')} wei, "
+            f"maxPriorityFeePerGas={fallback_estimate.get('maxPriorityFeePerGas')} wei. "
+            "To override, pass `gas_price_strategies` (with an `eip1559.fallback_estimate` "
+            "block tuned for the target chain) to `make_ledger_api`."
+        )
+        # return a copy; callers may mutate the returned dict (e.g. repricing in
+        # try_get_gas_pricing)
+        return dict(fallback_estimate)
 
     def eip1559_price_strategy(
         web3: Web3,  # pylint: disable=redefined-outer-name
@@ -328,7 +447,7 @@ def get_gas_price_strategy_eip1559(  # pylint: disable=too-many-positional-argum
             or to_eth_unit(estimated_priority_fee) >= max_gas_fast
         ):
             return fallback(
-                "The estimated gas price is larger than the `max_gas_fast`. Falling back."
+                "The estimated gas price is larger than the `max_gas_fast`."
             )
 
         estimate = {
@@ -364,9 +483,10 @@ def get_gas_price_strategy_eip1559_polygon(
                     "maxFeePerGas": Wei(to_wei(data["maxFee"], GWEI)),
                     "maxPriorityFeePerGas": Wei(to_wei(data["maxPriorityFee"], GWEI)),
                 }
-            return fallback_estimate
+            # return a copy; see note in get_gas_price_strategy_eip1559.fallback
+            return dict(fallback_estimate)
         except requests.exceptions.RequestException:
-            return fallback_estimate
+            return dict(fallback_estimate)
 
     return eip1559_price_strategy
 
@@ -1321,22 +1441,20 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
 
     def get_l1_data_fee(self, transaction: JSONLike) -> int:
-        """
-        Get the L1 data fee for the transaction on OP stack chains.
+        """Get the L1 data fee for the transaction in wei (0 if chain is not a supported L2)."""
+        if self._chain_id in _OP_STACK_CHAIN_IDS:
+            return self._get_op_stack_l1_data_fee(transaction)
+        if self._chain_id in _ARBITRUM_CHAIN_IDS:
+            return self._get_arbitrum_l1_data_fee(transaction)
+        return 0
 
-        Docs: https://docs.optimism.io/builders/app-developers/transactions/estimates#l1-data-fee
-
-        :param transaction: the transaction
-        :return: the data fee in wei
-        """
+    def _get_op_stack_l1_data_fee(self, transaction: JSONLike) -> int:
+        """Get the L1 data fee on OP-stack chains via the GasPriceOracle."""
         transaction = deepcopy(transaction)
-        del transaction["from"]
+        transaction.pop("from", None)
         try:
             unsigned_raw_tx = serializable_unsigned_transaction_from_dict(transaction)
-            # the GasPriceOracle contract expects an unsigned transaction bytes, and returns
-            # the amount of fee in wei, that is the cost of storing this tx bytes on L1
-            # since the size of the trasaction will be the same regardless of the signature,
-            # here the v, r, s doesn't matter, because we only need to get the size of the unsigned tx
+            # v, r, s don't affect size; the oracle only needs the raw bytes
             unsigned_raw_tx_hex = encode_transaction(unsigned_raw_tx, (0, "0", "0"))
             gas_oracle = self.api.eth.contract(
                 address=GAS_PRICE_ORACLE_ADDRESS,
@@ -1351,9 +1469,38 @@ class EthereumApi(LedgerApi, EthereumHelper):
             )
             l1_fee_estimate = 0
 
-        # increase it by 12.5% because that's the max it can increase in the next block
-        # docs: https://docs.optimism.io/builders/app-developers/transactions/fees#mechanism
+        # pad by 12.5% for next-block worst case (per Optimism docs)
         return int(l1_fee_estimate * MAX_OP_L1_FEE_INCREASE_RELATIVE_PER_BLOCK)
+
+    # How to estimate gas in Arbitrum https://docs.arbitrum.io/build-decentralized-apps/how-to-estimate-gas#where-to-get-each-variable
+    def _get_arbitrum_l1_data_fee(self, transaction: JSONLike) -> int:
+        """Get the L1 data fee on Arbitrum Nitro chains via NodeInterface."""
+        to_address = (
+            transaction.get("to") or "0x0000000000000000000000000000000000000000"
+        )
+        data_hex = transaction.get("data", b"") or b""
+        is_contract_creation = not transaction.get("to")
+        try:
+            node_interface = self.api.eth.contract(  # type: ignore[call-overload]
+                address=ARBITRUM_NODE_INTERFACE_ADDRESS,
+                abi=ARBITRUM_GAS_ESTIMATE_L1_COMPONENT_ABI,
+            )
+            # precompile is declared payable but invoked via eth_call per its docstring
+            (
+                gas_estimate_for_l1,
+                base_fee,
+                _l1_base_fee_estimate,
+            ) = node_interface.functions.gasEstimateL1Component(
+                to_address, is_contract_creation, data_hex
+            ).call()
+        except (ContractLogicError, ValueError) as e:
+            _default_logger.warning(
+                f"Unable to estimate Arbitrum L1 data fee, "
+                f"{type(e).__name__}: {str(e)}"
+            )
+            return 0
+
+        return int(gas_estimate_for_l1 * base_fee * ARBITRUM_L1_FEE_PADDING)
 
     def send_signed_transaction(
         self, tx_signed: JSONLike, raise_on_try: bool = False

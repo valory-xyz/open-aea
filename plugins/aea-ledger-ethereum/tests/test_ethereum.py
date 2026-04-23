@@ -50,12 +50,12 @@ from aea_ledger_ethereum import (
 )
 from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
+    DEFAULT_FALLBACK_ESTIMATE,
     DEFAULT_GAS_STATION_STRATEGY,
     DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
     DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
-    FALLBACK_ESTIMATE,
     GAS_STATION,
     TIP_INCREASE,
     estimate_priority_fee,
@@ -641,6 +641,76 @@ def test_gas_price_strategy_eip1559_fallback_max_gas_fast() -> None:
     assert gas_stregy == strategy_kwargs["fallback_estimate"]
 
 
+@pytest.mark.parametrize(
+    "chain_id,expected_max_fee_gwei,expected_tip_gwei,expected_max_gas_fast",
+    [
+        (10, 5, 3, 1500),  # Optimism
+        (8453, 5, 3, 1500),  # Base
+        (34443, 5, 3, 1500),  # Mode
+        (252, 5, 3, 1500),  # Fraxtal (OP-stack)
+        (42161, 2, 1, 1500),  # Arbitrum One — 0.1 gwei floor
+        (42220, 50, 25, 1500),  # Celo — 25 gwei network minimum
+        (137, 6000, 30, 10000),  # Polygon — tip must clear 25 gwei validator floor
+        (100, 5, 1, 1500),  # Gnosis — tuned: 1 gwei tip matches validator floor
+        (1, 20, 3, 1500),  # Ethereum mainnet — unchanged default
+        (56, 20, 3, 1500),  # BNB — unchanged (not in map)
+        (324, 20, 3, 1500),  # zkSync — unchanged (not in map)
+    ],
+)
+def test_get_default_gas_strategy_per_chain_fallbacks(
+    chain_id, expected_max_fee_gwei, expected_tip_gwei, expected_max_gas_fast
+) -> None:
+    """`get_default_gas_strategy` returns chain-appropriate fallback values."""
+    from aea_ledger_ethereum.ethereum import EIP1559, get_default_gas_strategy
+
+    strategy = get_default_gas_strategy(chain_id)
+    fallback = strategy[EIP1559]["fallback_estimate"]
+    assert fallback["maxFeePerGas"] == expected_max_fee_gwei * 10**9
+    assert fallback["maxPriorityFeePerGas"] == expected_tip_gwei * 10**9
+    assert strategy[EIP1559]["max_gas_fast"] == expected_max_gas_fast
+
+
+def test_get_default_gas_strategy_polygon_applies_to_eip1559_polygon() -> None:
+    """Polygon's primary strategy `eip1559_polygon` picks up the override too."""
+    from aea_ledger_ethereum.ethereum import EIP1559_POLYGON, get_default_gas_strategy
+
+    strategy = get_default_gas_strategy(137)
+    polygon_fallback = strategy[EIP1559_POLYGON]["fallback_estimate"]
+    assert polygon_fallback["maxFeePerGas"] == 6000 * 10**9
+    assert polygon_fallback["maxPriorityFeePerGas"] == 30 * 10**9
+
+
+def test_ethereum_api_init_applies_chain_specific_fallback() -> None:
+    """`make_ledger_api('ethereum', chain_id=8453)` picks up Base's 5-gwei fallback."""
+    api = EthereumApi(address="http://127.0.0.1:8545", chain_id=8453)
+    fallback = api._gas_price_strategies["eip1559"]["fallback_estimate"]  # noqa: SLF001
+    assert fallback["maxFeePerGas"] == 5 * 10**9
+    assert fallback["maxPriorityFeePerGas"] == 3 * 10**9
+
+
+def test_ethereum_api_init_user_gas_price_strategies_wins() -> None:
+    """User-supplied `gas_price_strategies` kwarg wins over per-chain defaults."""
+    user_override = {
+        "eip1559": {
+            "max_gas_fast": 42,
+            "fee_history_blocks": 10,
+            "fee_history_percentile": 5,
+            "min_allowed_tip": 1,
+            "default_priority_fee": None,
+            "fallback_estimate": {"maxFeePerGas": 123, "maxPriorityFeePerGas": 456},
+            "priority_fee_increase_boundary": 200,
+        },
+    }
+    api = EthereumApi(
+        address="http://127.0.0.1:8545",
+        chain_id=8453,  # Base — would otherwise get 5 gwei
+        gas_price_strategies=user_override,
+    )
+    fallback = api._gas_price_strategies["eip1559"]["fallback_estimate"]  # noqa: SLF001
+    assert fallback["maxFeePerGas"] == 123
+    assert fallback["maxPriorityFeePerGas"] == 456
+
+
 def test_gas_price_strategy_eth_gasstation():
     """Test the gas price strategy when using eth gasstation."""
     gas_price_strategy = "fast"
@@ -1059,8 +1129,8 @@ def test_eip1559_on_network(
         if base_fee
         else gas_price["maxFeePerGas"] == max_priority_fee
     )
-    assert max_priority_fee != FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
-    assert gas_price["maxFeePerGas"] != FALLBACK_ESTIMATE["maxFeePerGas"]
+    assert max_priority_fee != DEFAULT_FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
+    assert gas_price["maxFeePerGas"] != DEFAULT_FALLBACK_ESTIMATE["maxFeePerGas"]
 
 
 @pytest.mark.parametrize(
@@ -1137,17 +1207,19 @@ def test_gas_estimation(
 
 
 @pytest.mark.parametrize("mock_exception", (True, False))
-def test_get_l1_data_fee(
+def test_get_l1_data_fee_op_stack(
     mock_exception,
     ethereum_testnet_config: dict,
     caplog,
 ) -> None:
-    """Test gas estimation."""
+    """Test the OP-stack branch of get_l1_data_fee via the GasPriceOracle."""
     ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Force an OP-stack chain id (Base) so the dispatcher picks the OP-stack path.
+    ethereum_api._chain_id = 8453  # noqa: SLF001
     tx = {
         "nonce": 0,
         "value": 0,
-        "chainId": 1337,
+        "chainId": 8453,
         "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
         "gas": 291661,
         "maxPriorityFeePerGas": 3000000000,
@@ -1170,6 +1242,71 @@ def test_get_l1_data_fee(
                 assert ethereum_api.get_l1_data_fee(tx) == 0
             else:
                 assert ethereum_api.get_l1_data_fee(tx) == 112
+
+
+@pytest.mark.parametrize("mock_exception", (True, False))
+def test_get_l1_data_fee_arbitrum(
+    mock_exception,
+    ethereum_testnet_config: dict,
+    caplog,
+) -> None:
+    """Test the Arbitrum branch of get_l1_data_fee via NodeInterface.gasEstimateL1Component."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Force Arbitrum One so the dispatcher picks the Arbitrum path.
+    ethereum_api._chain_id = 42161  # noqa: SLF001
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 42161,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with caplog.at_level(logging.DEBUG, logger="aea.crypto.ethereum._default_logger"):
+        with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+            contract_instance = contract_mock.return_value
+            node_interface_function = contract_instance.functions.gasEstimateL1Component
+            # (gasEstimateForL1=2000, baseFee=100, l1BaseFeeEstimate=ignored).
+            # Expected: int(2000 * 100 * 1.1) = 220000 wei.
+            node_interface_function.return_value.call.return_value = (
+                2000,
+                100,
+                0,
+            )
+
+            if mock_exception:
+                node_interface_function.return_value.call.side_effect = ValueError(
+                    "triggered exception"
+                )
+                assert ethereum_api.get_l1_data_fee(tx) == 0
+            else:
+                assert ethereum_api.get_l1_data_fee(tx) == 220000
+
+
+def test_get_l1_data_fee_non_l2_returns_zero(
+    ethereum_testnet_config: dict,
+) -> None:
+    """Non-L2 chains return 0 without calling any oracle / precompile."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # Gnosis (100) is not in _OP_STACK_CHAIN_IDS or _ARBITRUM_CHAIN_IDS.
+    ethereum_api._chain_id = 100  # noqa: SLF001
+    tx = {
+        "nonce": 0,
+        "value": 0,
+        "chainId": 100,
+        "from": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+        "gas": 291661,
+        "maxPriorityFeePerGas": 3000000000,
+        "maxFeePerGas": 4000000000,
+        "to": "0x68FCdF52066CcE5612827E872c45767E5a1f6551",
+        "data": "",
+    }
+    with patch.object(ethereum_api._api.eth, "contract") as contract_mock:
+        assert ethereum_api.get_l1_data_fee(tx) == 0
+        contract_mock.assert_not_called()
 
 
 @patch.object(EthereumApi, "_try_get_transaction_count", return_value=1)
