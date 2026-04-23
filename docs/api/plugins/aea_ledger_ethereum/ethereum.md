@@ -801,7 +801,7 @@ the updated transaction
 def get_l1_data_fee(transaction: JSONLike) -> int
 ```
 
-Get the L1 data fee for the transaction in wei (0 if not an L2).
+Get the L1 data fee for the transaction in wei (0 if chain not supported L2).
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.ethereum.EthereumApi.send_signed_transaction"></a>
 

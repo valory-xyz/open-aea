@@ -96,7 +96,7 @@ EIP1559_POLYGON = "eip1559_polygon"
 GAS_STATION = "gas_station"
 AVAILABLE_STRATEGIES = (EIP1559, GAS_STATION, EIP1559_POLYGON)
 SPEED_FAST = "fast"  # safeLow, standard, fast
-POLYGON_GAS_ENDPOINT = "https://gasstation-mainnet.matic.network/v2"
+POLYGON_GAS_ENDPOINT = "https://gasstation.polygon.technology/v2"
 MAX_GAS_FAST = 1500
 RPC_CALL_MAX_WORKERS = 1
 

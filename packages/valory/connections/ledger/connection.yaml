@@ -218,7 +218,7 @@ config:
             maxPriorityFeePerGas: 30000000000
           priority_fee_increase_boundary: 200
         eip1559_polygon:
-          gas_endpoint: https://gasstation-mainnet.matic.network/v2
+          gas_endpoint: https://gasstation.polygon.technology/v2
           speed: fast
           fallback_estimate:
             maxFeePerGas: 6000000000000
