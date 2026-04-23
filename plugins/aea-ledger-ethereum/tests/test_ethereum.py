@@ -52,10 +52,10 @@ from aea_ledger_ethereum.ethereum import (
     DEFAULT_EIP1559_STRATEGY,
     DEFAULT_GAS_STATION_STRATEGY,
     DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
+    DEFAULT_FALLBACK_ESTIMATE,
     DEFAULT_MIN_ALLOWED_TIP,
     EIP1559,
     EIP1559_POLYGON,
-    FALLBACK_ESTIMATE,
     GAS_STATION,
     TIP_INCREASE,
     estimate_priority_fee,
@@ -649,10 +649,10 @@ def test_gas_price_strategy_eip1559_fallback_max_gas_fast() -> None:
         (34443, 5, 3, 1500),  # Mode
         (252, 5, 3, 1500),  # Fraxtal (OP-stack)
         (42161, 2, 1, 1500),  # Arbitrum One — 0.1 gwei floor
-        (42220, 30, 3, 1500),  # Celo — 25 gwei network minimum
+        (42220, 50, 25, 1500),  # Celo — 25 gwei network minimum
         (137, 6000, 30, 10000),  # Polygon — tip must clear 25 gwei validator floor
+        (100, 5, 1, 1500),  # Gnosis — tuned: 1 gwei tip matches validator floor
         (1, 20, 3, 1500),  # Ethereum mainnet — unchanged default
-        (100, 20, 3, 1500),  # Gnosis — unchanged default
         (56, 20, 3, 1500),  # BNB — unchanged (not in map)
         (324, 20, 3, 1500),  # zkSync — unchanged (not in map)
     ],
@@ -1129,8 +1129,8 @@ def test_eip1559_on_network(
         if base_fee
         else gas_price["maxFeePerGas"] == max_priority_fee
     )
-    assert max_priority_fee != FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
-    assert gas_price["maxFeePerGas"] != FALLBACK_ESTIMATE["maxFeePerGas"]
+    assert max_priority_fee != DEFAULT_FALLBACK_ESTIMATE["maxPriorityFeePerGas"]
+    assert gas_price["maxFeePerGas"] != DEFAULT_FALLBACK_ESTIMATE["maxFeePerGas"]
 
 
 @pytest.mark.parametrize(
@@ -1270,7 +1270,7 @@ def test_get_l1_data_fee_arbitrum(
             contract_instance = contract_mock.return_value
             node_interface_function = contract_instance.functions.gasEstimateL1Component
             # (gasEstimateForL1=2000, baseFee=100, l1BaseFeeEstimate=ignored).
-            # Expected: 2000 * 100 * 1.1 = 220000 wei.
+            # Expected: int(2000 * 100 * 1.1) = 220000 wei.
             node_interface_function.return_value.call.return_value = (
                 2000,
                 100,

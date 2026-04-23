@@ -1472,6 +1472,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
         # pad by 12.5% for next-block worst case (per Optimism docs)
         return int(l1_fee_estimate * MAX_OP_L1_FEE_INCREASE_RELATIVE_PER_BLOCK)
 
+    # How to estimate gas in Arbitrum https://docs.arbitrum.io/build-decentralized-apps/how-to-estimate-gas#where-to-get-each-variable
     def _get_arbitrum_l1_data_fee(self, transaction: JSONLike) -> int:
         """Get the L1 data fee on Arbitrum Nitro chains via NodeInterface."""
         to_address = (
