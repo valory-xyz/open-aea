@@ -60,10 +60,7 @@ class BlockhashCache:
 
     def get(self) -> str:
         """Return the cached blockhash or raise if stale/missing."""
-        if (
-            self._blockhash is None
-            or (time.monotonic() - self._stored_at) > self.ttl
-        ):
+        if self._blockhash is None or (time.monotonic() - self._stored_at) > self.ttl:
             raise LookupError("no valid cached blockhash")
         return self._blockhash
 
