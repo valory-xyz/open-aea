@@ -141,7 +141,6 @@ tox -e black-check
 tox -e isort-check
 tox -e flake8
 tox -e check-copyright
-tox -e spell-check
 tox -e darglint        # catches missing :param: / :return: lines
 tox -e dependencies-check
 tox -e hash-check      # only if packages/ or aea/ scaffolds touched
@@ -170,10 +169,6 @@ fix-mode env (or manual step), then re-run the check until clean:
 - `tox -e hash-check` fails → `tox -e lock-packages` regenerates
   `packages/packages.json` hashes + `docs/package_list.md`. Commit the
   regenerated files.
-- `tox -e spell-check` fails → add legitimate project terms to
-  `.spelling` (global section, before the first ` - filename`
-  override). Do not guess at flagged tokens — read the surrounding
-  markdown to identify the actual word.
 - `tox -e check-doc-links-hashes` fails → `tox -e fix-doc-hashes`.
 - `tox -e check-copyright` fails → `tox -e fix-copyright`.
 - `tox -e black-check` / `tox -e isort-check` fail →

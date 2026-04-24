@@ -1,6 +1,6 @@
 # Release History - open AEA
 
-## Unreleased
+## 2.2.2 (2026-04-24)
 
 Plugins:
 
@@ -8,7 +8,8 @@ Plugins:
 - `open-aea-ledger-ethereum`: adds chain-aware fallback defaults inside the plugin itself via a unified `CHAIN_EIP1559_OVERRIDES` map applied by `get_default_gas_strategy(chain_id)`. Per-chain tunings: Optimism / Base / Mode / Fraxtal (5 gwei maxFeePerGas, 3 gwei tip — OP-stack), Arbitrum One (2 gwei maxFeePerGas, 1 gwei tip — above the 0.1 gwei floor), Polygon (6000 gwei maxFeePerGas, 30 gwei tip, `min_allowed_tip` 30 gwei — clears the validator-enforced priority fee floor; `max_gas_fast` 10000), Celo (50 gwei maxFeePerGas, 25 gwei tip, `min_allowed_tip` 25 gwei — above the 25 gwei network floor), and Gnosis (5 gwei maxFeePerGas, 1 gwei tip, `min_allowed_tip` 1 gwei). All other chains inherit `DEFAULT_FALLBACK_ESTIMATE`. Applies whether the ledger is built via `make_ledger_api('ethereum', chain_id=...)` directly OR through the `valory/ledger` connection, and covers both `eip1559` and `eip1559_polygon` strategies. User-supplied `gas_price_strategies` kwargs still take precedence. #775
 - `open-aea-ledger-ethereum`: improves the fallback-gas warning emitted by `get_gas_price_strategy_eip1559` to name the actual `maxFeePerGas` / `maxPriorityFeePerGas` values being used and point at the `gas_price_strategies` kwarg as the supported override. #775
 - `open-aea-ledger-ethereum`: updates `POLYGON_GAS_ENDPOINT` from the deprecated `gasstation-mainnet.matic.network/v2` to the canonical `gasstation.polygon.technology/v2` per Polygon docs. Affects callers of the `eip1559_polygon` strategy. #775
-- `open-aea-ledger-solana`: bumps `solana>=0.33.0,<0.34.0`, `solders>=0.21.0,<0.22.0`, `anchorpy>=0.20.0,<0.21.0`. Removes the transitive `cachetools<5` pin that `solana-py` 0.29–0.32 carried, unblocking consumers that need `cachetools>=7` (e.g. `tomte[tox]==0.6.5 → tox 4.46`). `solana.blockhash.BlockhashCache` was removed upstream in 0.33.0; inlined locally as a minimal TTL cache to preserve the plugin's public import surface. See `open-autonomy#2479`.
+- `open-aea-ledger-solana`: bumps `solana>=0.33.0,<0.34.0`, `solders>=0.21.0,<0.22.0`, `anchorpy>=0.20.0,<0.21.0`. Removes the transitive `cachetools<5` pin that `solana-py` 0.29–0.32 carried, unblocking consumers that need `cachetools>=7` (e.g. `tomte[tox]==0.6.5 → tox 4.46`). `solana.blockhash.BlockhashCache` was removed upstream in 0.33.0; inlined locally as a minimal TTL cache to preserve the plugin's public import surface. See `open-autonomy#2479`. #880
+- `open-aea-ledger-ethereum-hwi`: drops the orphaned `construct<=2.10.61` cap from the plugin's `install_requires` and the repo-level `pyproject.toml` / `tox.ini`, unblocking dependency resolution for consumers that pull in the solana plugin alongside hwi. #882
 
 Packages:
 
