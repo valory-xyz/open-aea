@@ -50,7 +50,6 @@ setup(
         "eth-account>=0.13.0,<0.14.0",
         "open-aea-ledger-ethereum~=2.2.1",
         "ledgerwallet==0.1.3",
-        "construct<=2.10.61",
     ],
     tests_require=["pytest>=7.0,<10"],
     entry_points={
