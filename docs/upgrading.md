@@ -9,6 +9,50 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.1` to `v2.2.2`
+
+This is a non-breaking patch release. The core framework is unchanged; the notes below concern the Ethereum and Solana ledger plugins.
+
+### `open-aea-ledger-ethereum` — chain-aware gas defaults
+
+`get_default_gas_strategy(chain_id)` now applies a unified `CHAIN_EIP1559_OVERRIDES` map, so the `eip1559` and `eip1559_polygon` fallback values differ per chain:
+
+- Optimism / Base / Mode / Fraxtal — 5 gwei `maxFeePerGas`, 3 gwei tip.
+- Arbitrum One — 2 gwei `maxFeePerGas`, 1 gwei tip (above the 0.1 gwei floor).
+- Polygon — 6000 gwei `maxFeePerGas`, 30 gwei tip, `min_allowed_tip` 30 gwei, `max_gas_fast` 10000.
+- Celo — 50 gwei `maxFeePerGas`, 25 gwei tip, `min_allowed_tip` 25 gwei.
+- Gnosis — 5 gwei `maxFeePerGas`, 1 gwei tip, `min_allowed_tip` 1 gwei.
+- Every other chain inherits `DEFAULT_FALLBACK_ESTIMATE` unchanged.
+
+The new defaults apply whether the ledger is built via `make_ledger_api('ethereum', chain_id=...)` directly or through the `valory/ledger` connection. Anything explicitly passed in `gas_price_strategies` keeps precedence, so existing overrides continue to win. If your project shipped per-chain overrides *because* the old defaults were off, you can drop them — but audit transactions on the chains above after the bump to confirm the new numbers fit your budget.
+
+The `valory/ledger` connection's `connection.yaml` was also re-aligned to the same per-chain values and gained a Polygon-specific `eip1559_polygon` block so tuned values apply on the default path.
+
+### `open-aea-ledger-ethereum` — `get_l1_data_fee` now safe on every chain
+
+`EthereumApi.get_l1_data_fee` used to be OP-stack only and would fail silently on other L2s. It now dispatches by `chain_id`: OP-stack (Optimism, Base, Mode, Fraxtal) via `GasPriceOracle`, Arbitrum Nitro (Arbitrum One, Arbitrum Nova) via the `NodeInterface` precompile, and `0` on any other chain. Callers that need the L1 data fee (e.g. drain-address budgeting) can invoke the helper unconditionally.
+
+### `open-aea-ledger-ethereum` — Polygon gas station URL
+
+`POLYGON_GAS_ENDPOINT` was switched from the deprecated `gasstation-mainnet.matic.network/v2` to the canonical `gasstation.polygon.technology/v2`. Callers of the `eip1559_polygon` strategy benefit automatically; no action required unless you proxy / allow-list the old host.
+
+### `open-aea-ledger-solana` — bumped to solana-py 0.33.x
+
+The plugin now pins `solana>=0.33.0,<0.34.0`, `solders>=0.21.0,<0.22.0`, `anchorpy>=0.20.0,<0.21.0`. This removes the transitive `cachetools<5` pin that `solana-py` 0.29–0.32 carried, so projects that need `cachetools>=7` (for example `tomte[tox]==0.6.5 → tox 4.46`) unblock.
+
+`solana.blockhash.BlockhashCache` was removed upstream in 0.33.0; the plugin now ships a minimal TTL cache locally under the same import path so the public import surface is preserved. Downstream code that imports `BlockhashCache` from `aea_ledger_solana` continues to work. If you import it directly from `solana.blockhash`, switch to the plugin's re-export.
+
+### `open-aea-ledger-ethereum-hwi` — orphaned `construct` cap dropped
+
+The `construct<=2.10.61` pin was removed from the plugin's `install_requires`, `pyproject.toml`, and `tox.ini`. It had no current justification and conflicted with the solana plugin's resolution path. If you mirrored the pin in your own project, you can drop it.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.2"` (and the same `2.2.2` pin for any `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.2`.
+- If you ship custom Ethereum gas overrides for Optimism / Arbitrum / Polygon / Celo / Gnosis, re-verify them against the new plugin defaults and drop any that are now redundant.
+- If you import from `solana.blockhash` directly, switch to importing `BlockhashCache` from `aea_ledger_solana`.
+
 ## `v2.2.0` to `v2.2.1`
 
 This is a non-breaking patch release. The core framework is unchanged and the last published `open-aea-ledger-ethereum-flashbots==2.2.0` wheel continues to install against this core; the notes below are only relevant if you want to drop that plugin from your project.
