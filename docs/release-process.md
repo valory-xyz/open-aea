@@ -13,10 +13,8 @@
 
 6. Write release notes and place them in `HISTORY.md`. Add upgrading tips in `upgrading.md`. If necessary, adjust version references in `SECURITY.md`. Commit if satisfied.
 
-7. Run spell checker: `pylint --disable all --enable spelling ...`. Commit if required.
+7. Open PRs and merge into develop. Then open develop to main PR and merge it.
 
-8. Open PRs and merge into develop. Then open develop to main PR and merge it.
-
-9. Tag a release from main.
+8. Tag a release from main.
 
 If something goes wrong and only needs a small fix do `LAST_VERSION.post1` as version, apply fixes, push again to PyPI.
