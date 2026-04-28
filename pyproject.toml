@@ -54,7 +54,7 @@ web3 = ">=7.0.0,<8"
 google-api-python-client = "<=2.60.0"
 certifi = "<=2022.6.15.1"
 mistune = "==2.0.3"
-tomte = { git = "https://github.com/valory-xyz/tomte.git", rev = "ff0ca24f3227e7a1e55f9a56f974e4d2ead88448", extras = ["tox", "tests"] }
+tomte = { git = "https://github.com/valory-xyz/tomte.git", rev = "08e9cd419cc8ec62a176b462baf7737332138dee", extras = ["tox", "tests"] }
 docspec = "==2.2.1"
 docspec-python = "==2.2.1"
 hexbytes = "==1.3.1"
@@ -71,15 +71,6 @@ aea = "aea.cli:cli"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
-# -- linter / pytest configs (folded from setup.cfg + pytest.ini per Wave 2a) -
-#
-# pytest.ini, setup.cfg, and .pylintrc removed in Wave 2a. Per-tool
-# config now lives here (auto-discovered from pyproject.toml by the
-# tools), with one exception: `[mypy]` + `[mypy-*]` blocks live in
-# tox.ini per David's review on `valory-xyz/tomte#46` ("tox more
-# expanded" model). The `[testenv:mypy]` command above passes
-# `--config-file=tox.ini` so mypy picks them up.
 
 [tool.pytest.ini_options]
 log_cli = true
@@ -105,93 +96,3 @@ filterwarnings = [
     "ignore:There is no current event loop",
     "ignore::DeprecationWarning",
 ]
-
-# Flake8 reads pyproject.toml only via the `Flake8-pyproject` plugin
-# (already shipped under `tomte[flake8]`'s extras).
-[tool.flake8]
-paths = "aea,examples,packages,scripts,tests"
-exclude = ".md,*_pb2.py,aea/__init__.py,aea/cli/__init__.py,tests/common/oef_search_pluto_scripts,tests/common/click_testing.py,scripts/oef/launch.py"
-max-line-length = 88
-select = "B,C,D,E,F,I,W"
-# D400: First line should end with a period (ignored — too restrictive)
-# D401: First line should be in imperative mood (ignored — too restrictive)
-# E501: line-too-long (handled by black)
-# E203: whitespace (clashes with black)
-# W503: line-break (clashes with black)
-# D202: blank lines
-# B014: redundant exception
-ignore = "E203,E501,W503,D202,B014,D400,D401,DAR,B028,B017,B042"
-application-import-names = "aea,packages,tests,scripts"
-per-file-ignores = [
-    "tests/test_cli/test_upgrade.py:E800",
-    "tests/test_protocols/test_generator/test_end_to_end.py:E800,F401",
-    "tests/test_cli/test_launch_end_to_end.py:E800",
-    "**/aea_ledger_cosmos/cosmos.py:F401",
-    "**/aea_ledger_fetchai/_cosmos.py:F401",
-]
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-line_length = 88
-order_by_type = false
-case_sensitive = true
-lines_after_imports = -1
-skip = ["tests/data/dummy_aea/vendor/", "tests/data/dummy_aea/skills/dummy"]
-skip_glob = ["**/*_pb2.py"]
-known_first_party = "aea"
-known_packages = "packages"
-known_local_folder = "tests"
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "PACKAGES", "LOCALFOLDER"]
-
-# Darglint config — darglint reads tox.ini / setup.cfg / .darglint, but
-# not pyproject.toml. Settings live in tox.ini (`[darglint]` section)
-# at the bottom of that file. Listed here as the canonical statement of
-# intent; the tox.ini block is the source of truth.
-# [tool.darglint]
-# docstring_style = "sphinx"
-# strictness = "short"
-# ignore_regex = ".*_pb2\\.py"
-# ignore = "DAR401"
-
-[tool.pylint.master]
-ignore-patterns = ["__main__.py", ".*_pb2.py", "tac.sh", "tac_local.sh"]
-
-[tool.pylint."messages control"]
-# Skips after C0209 are temporary
-# C0103 invalid-name; C0201 consider-iterating-dictionary; C0301 line-too-long
-# C0302 too-many-lines; W0105 pointless-string-statement; W0707 raise-missing-from
-# W1202 logging-format-interpolation; W1203 logging-fstring-interpolation
-# R0801 similar-lines; E1136 unsubscriptable-object; E0611 no-name-in-module
-# C0209 consider-using-fstring; R1710 inconsistent-return-statements
-# R1729 use-a-generator; C0206 consider-using-dict-items; W0237 arguments-renamed
-# R1735 use-dict-literal; R1732 consider-using-with; W1514 unspecified-encoding
-# R0402 consider-using-from-import; R1714 consider-using-in
-# R1734 use-list-literal; W0640 cell-var-from-loop
-# R1733 unnecessary-dict-index-lookup
-disable = ["C0103", "C0201", "C0301", "C0302", "W0105", "W0707", "W1202", "W1203", "R0801", "E1136", "E0611", "C0209", "R1710", "R1729", "C0206", "W0237", "R1735", "R1732", "W1514", "R0402", "R1714", "R1734", "W0640", "R1733"]
-
-[tool.pylint.imports]
-# Per David's review on `valory-xyz/tomte#46`: this is OAEA's own
-# library list, not tomte's. Tomte 0.7.0's canonical pylintrc carries
-# zero downstream library names.
-ignored-modules = ["bech32", "ecdsa", "lru", "eth_typing", "eth_keys", "eth_account", "ipfshttpclient", "werkzeug", "openapi_spec_validator", "aiohttp", "multidict", "yoti_python_sdk", "defusedxml", "fetch", "matplotlib", "memory_profiler", "numpy", "oef", "openapi_core", "psutil", "tensorflow", "temper", "skimage", "web3", "aioprometheus", "pyaes", "Crypto", "asn1crypto", "cosmpy", "google", "coverage", "pylint", "pytest", "gitpython", "protobuf", "docker", "signal", "anchorpy", "cryptography.fernet", "solana", "solders", "hexbytes", "toml"]
-
-[tool.pylint.design]
-min-public-methods = 1
-max-public-methods = 36
-max-returns = 10
-max-bool-expr = 7
-max-args = 27
-max-locals = 31
-max-statements = 80
-max-parents = 11
-max-branches = 24
-max-attributes = 38
-
-[tool.pylint.refactoring]
-max-nested-blocks = 6

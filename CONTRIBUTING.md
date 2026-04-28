@@ -1,9 +1,5 @@
 # Contributing
 
-> **Building an agent on top of AEA?** See the canonical AEA-agent stack contribution workflow at <https://github.com/valory-xyz/open-autonomy/blob/main/CONTRIBUTING.md> — it covers the pre-commit routine, PR checklist, and `tomte format-code` → `tomte check-code` order that every Valory agent repo follows.
->
-> The notes below are specific to **contributing to the open-aea framework itself** (this repo).
-
 Contributions to the framework, its plugins, related tools and packages are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
 
 There are various ways to contribute:
