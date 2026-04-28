@@ -31,7 +31,6 @@ from typing import Callable, Generator, List, Tuple
 
 import memory_profiler  # type: ignore
 import psutil  # type: ignore
-
 from benchmark.framework.benchmark import BenchmarkControl  # noqa: I100
 
 

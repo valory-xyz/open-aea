@@ -54,7 +54,7 @@ web3 = ">=7.0.0,<8"
 google-api-python-client = "<=2.60.0"
 certifi = "<=2022.6.15.1"
 mistune = "==2.0.3"
-tomte = {version = "==0.6.5", extras = ["tox", "tests"]}
+tomte = { git = "https://github.com/valory-xyz/tomte.git", rev = "44a61a275e3752a6ea74d90f179d103934c7e08b", extras = ["tox", "tests"] }
 docspec = "==2.2.1"
 docspec-python = "==2.2.1"
 hexbytes = "==1.3.1"
@@ -70,3 +70,29 @@ aea = "aea.cli:cli"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+markers = [
+    "integration: marks end-to-end tests which require the oef, soef, ledger or other network services",
+    "unstable: marks test as unstable (won't be run in CI)",
+    "ledger: marks tests which require ledger test networks (ethereum, cosmos, fetchai); these tests should also be marked 'integration'",
+    "flaky: marks tests which are flaky and worth re-running",
+    "sync: marks test for run in sync mode",
+    "profiling: marks profiler tests that must be run separately to avoid garbage collector interferences",
+]
+filterwarnings = [
+    "ignore:the imp module is deprecated in favour of importlib:DeprecationWarning",
+    "ignore:Call to deprecated create function FileDescriptor().",
+    "ignore:Call to deprecated create function Descriptor().",
+    "ignore:Call to deprecated create function FieldDescriptor().",
+    "ignore:Call to deprecated create function EnumValueDescriptor().",
+    "ignore:Call to deprecated create function EnumDescriptor().",
+    "ignore:The 'asyncio_mode' default value will change to 'strict' in future, please explicitly use 'asyncio_mode=strict' or 'asyncio_mode=auto' in pytest configuration file.",
+    "ignore:There is no current event loop",
+    "ignore::DeprecationWarning",
+]
