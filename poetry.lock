@@ -4574,8 +4574,8 @@ vulture = ["vulture (==2.14)"]
 [package.source]
 type = "git"
 url = "https://github.com/valory-xyz/tomte.git"
-reference = "44a61a275e3752a6ea74d90f179d103934c7e08b"
-resolved_reference = "44a61a275e3752a6ea74d90f179d103934c7e08b"
+reference = "e3dcda641f4add9fe36bc8f5127b7a8863d7711e"
+resolved_reference = "e3dcda641f4add9fe36bc8f5127b7a8863d7711e"
 
 [[package]]
 name = "toolz"
@@ -5127,4 +5127,4 @@ test-tools = ["click", "coverage", "packaging", "pytest", "pyyaml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "216ca4d434a51d2c45d7aa20ac562b3df487e23e6e6d286aff004ff1cad52105"
+content-hash = "fee28a7ef841004d39aafdc72fb43d32a4c556a5959c48727f22acb48fd3a6df"
