@@ -23,6 +23,8 @@ import uuid
 from threading import Thread
 from typing import Dict, List, Optional, Tuple, Type, Union
 
+from benchmark.framework.fake_connection import FakeConnection
+
 from aea.aea import AEA
 from aea.aea_builder import AEABuilder
 from aea.components.base import Component
@@ -31,7 +33,6 @@ from aea.configurations.constants import _FETCHAI_IDENTIFIER
 from aea.mail.base import Envelope
 from aea.protocols.base import Message
 from aea.skills.base import Handler, Skill, SkillContext
-from benchmark.framework.fake_connection import FakeConnection
 
 from packages.fetchai.protocols.default.message import DefaultMessage
 from packages.fetchai.protocols.default.serialization import DefaultSerializer

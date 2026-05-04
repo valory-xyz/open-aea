@@ -57,7 +57,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Security Check
         run: tox -e bandit
       - name: Safety Check
@@ -100,7 +100,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Pylint check
         run: |
           tox -e pylint
@@ -121,7 +121,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           pip install --user --upgrade setuptools
           # install Protobuf compiler
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
@@ -159,7 +159,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           pip install --user --upgrade setuptools
       - name: Copyright Check
         run: tox -e check-copyright
@@ -184,7 +184,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Check API Docs updated
         run: tox -e check-api-docs
 
@@ -208,7 +208,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Check Docs links and IPFS hashes
         run: tox -e check-doc-links-hashes
 
@@ -222,11 +222,20 @@ jobs:
       - uses: actions/setup-go@v5.2.0
         with:
           go-version: '1.24.0'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
       - run: |
-          wget https://github.com/zricethezav/gitleaks/releases/download/v8.10.1/gitleaks_8.10.1_linux_x64.tar.gz && \
-          tar -xzf gitleaks_8.10.1_linux_x64.tar.gz && \
-          sudo install gitleaks /usr/bin && \
-          gitleaks detect --report-format json --report-path leak_report
+          set -euo pipefail
+          wget https://github.com/zricethezav/gitleaks/releases/download/v8.10.1/gitleaks_8.10.1_linux_x64.tar.gz
+          tar -xzf gitleaks_8.10.1_linux_x64.tar.gz
+          sudo install gitleaks /usr/bin
+          pip install 'tomte[cli]==0.7.0'
+          # tomte.configs.GITLEAKS_TOML is part of tomte.configs.__all__,
+          # i.e. a stable public Python API. If renamed/removed upstream,
+          # the import below fails fast under `set -e`.
+          GITLEAKS_CONFIG=$(python -c "from tomte.configs import GITLEAKS_TOML; print(GITLEAKS_TOML)")
+          gitleaks detect --config="$GITLEAKS_CONFIG" --report-format json --report-path leak_report
   dependencies_checks:
     continue-on-error: False
     strategy:
@@ -242,7 +251,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
         run: |
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Check pyproject.toml and tox.ini consistency
         run: |
           pip install ./plugins/aea-ci-helpers
@@ -276,7 +285,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - name: Install tox
         run: |
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Check plugin aea-ledger-cosmos
         run: |
           tox -r -e plugins_env -- sh -c "pip install ./plugins/aea-ledger-cosmos && aea generate-key cosmos && echo aea-ledger-cosmos checked!"
@@ -352,7 +361,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           # install Protobuf compiler
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
           unzip protoc-24.3-linux-x86_64.zip -d protoc
@@ -392,7 +401,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           # install Protobuf compiler
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
           unzip protoc-24.3-linux-x86_64.zip -d protoc
@@ -424,7 +433,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
       - name: Framework integration tests
         run: tox -e py3.10 -- -m 'integration and not unstable and ledger and not profiling'
       - name: Packages integration tests
@@ -472,7 +481,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get autoremove
           sudo apt-get autoclean
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           # install Protobuf compiler
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-linux-x86_64.zip
           unzip protoc-24.3-linux-x86_64.zip -d protoc
@@ -494,7 +503,7 @@ jobs:
       - if: matrix.os == 'macos-latest-large'
         name: Install dependencies (macos-latest-large)
         run: |
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           brew install gcc
           # brew install protobuf
           # brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/72457f0166d5619a83f508f2345b22d0617b5021/Formula/protobuf.rb
@@ -525,7 +534,7 @@ jobs:
           choco install make -y
           # to check make was installed
           make --version
-          pip install tomte[tox]==0.6.5
+          pip install tomte[tox]==0.7.0
           # wget https://github.com/protocolbuffers/protobuf/releases/download/v24.3/protoc-24.3-win64.zip
           # unzip protoc-24.3-win64.zip -d protoc
           # sudo mv protoc/bin/protoc /usr/local/bin/protoc
@@ -569,7 +578,7 @@ jobs:
       - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
         name: Show full coverage report
         run: |
-          pip install tomte[tests]==0.6.5
+          pip install tomte[tests]==0.7.0
           coverage report -m -i
 
       - if: matrix.os == 'ubuntu-latest' && matrix.python_version == '3.10'
@@ -632,7 +641,7 @@ jobs:
         name: aea_end2end Python<->Go FIPA harness
         shell: bash
         run: |
-          pip install tomte[tests]==0.6.5
+          pip install tomte[tests]==0.7.0
           pip install -e .[all]
           pip install -e plugins/aea-ledger-ethereum
           pip install -e plugins/aea-ledger-cosmos
