@@ -226,10 +226,14 @@ jobs:
         with:
           python-version: "3.10"
       - run: |
+          set -euo pipefail
           wget https://github.com/zricethezav/gitleaks/releases/download/v8.10.1/gitleaks_8.10.1_linux_x64.tar.gz
           tar -xzf gitleaks_8.10.1_linux_x64.tar.gz
           sudo install gitleaks /usr/bin
           pip install 'tomte[cli]==0.7.0'
+          # tomte.configs.GITLEAKS_TOML is part of tomte.configs.__all__,
+          # i.e. a stable public Python API. If renamed/removed upstream,
+          # the import below fails fast under `set -e`.
           GITLEAKS_CONFIG=$(python -c "from tomte.configs import GITLEAKS_TOML; print(GITLEAKS_TOML)")
           gitleaks detect --config="$GITLEAKS_CONFIG" --report-format json --report-path leak_report
   dependencies_checks:
