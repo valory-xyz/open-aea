@@ -9,6 +9,29 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.2` to `v2.2.3`
+
+This is a non-breaking patch release. There are no API or runtime behaviour changes; the work below is a security bump and a repo-wide lint/test config consolidation that does not affect downstream consumers.
+
+### `aea` core — `GitPython` floor bumped to `>=3.1.47`
+
+`open-aea` now requires `GitPython>=3.1.47,<4.0.0` to pull in the upstream fixes for `GHSA-rpm5-65cw-6hj4` (insecure non-multi options accepted by `clone` / `clone_from`) and `GHSA-x2qx-6953-8485` (blind local-file-read via `git ls-remote`). Projects that pinned `GitPython<3.1.47` directly will need to widen the pin.
+
+### Tooling — lint/test config consolidation
+
+`pytest.ini`, `.pylintrc`, and the forked `.gitleaks.toml` were removed. The remaining lint configuration now comes from canonical configs shipped by `tomte==0.7.0` (`{envsitepackagesdir}/tomte/configs/`), with OAEA-specific overrides layered in `tox.ini`. `setup.cfg` is preserved as a minimal `[isort]` stub because `aea generate-all-protocols` invokes isort with `--settings-path=setup.cfg` against generated protocol code; that path is unchanged.
+
+This is internal cleanup. Downstream consumers who don't fork OAEA's tox/pyproject have nothing to do. Forks that:
+
+- pinned the previous `tomte[tox,tests]==0.6.5`: bump to `==0.7.0`. Tomte 0.7.0 ships canonical `pylintrc` / `mypy.ini` / `gitleaks.toml` / `flake8.cfg` / `darglint` / `safety.toml` / `isort.cfg` resources; reference them from your testenvs as `{envsitepackagesdir}/tomte/configs/<config>` rather than maintaining your own copies.
+- mirrored OAEA's `[tool.flake8]` / `[tool.pylint.*]` / `[tool.mypy]` blocks in `pyproject.toml`: those blocks no longer exist here. Move per-package mypy overrides next to the testenv that runs mypy (mypy doesn't auto-discover tox.ini, so pass `--config-file=tox.ini`). Move darglint settings to `[darglint]` in `tox.ini` (darglint doesn't read pyproject.toml either).
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.3"` (and the same `2.2.3` pin for any `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.3`.
+- If you pin `GitPython` directly, ensure your pin allows `>=3.1.47`.
+
 ## `v2.2.1` to `v2.2.2`
 
 This is a non-breaking patch release. The core framework is unchanged; the notes below concern the Ethereum and Solana ledger plugins.

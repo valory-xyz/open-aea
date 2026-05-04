@@ -1,5 +1,18 @@
 # Release History - open AEA
 
+## 2.2.3 (2026-05-04)
+
+AEA:
+
+- Bumps the `GitPython` floor to `>=3.1.47,<4.0.0` to pull in the upstream fixes for `GHSA-rpm5-65cw-6hj4` (insecure non-multi options in clone / clone_from) and `GHSA-x2qx-6953-8485` (blind local-file-read via `git ls-remote`). #884
+
+Tooling:
+
+- Collapses the four out-of-band lint/test config files (`pytest.ini`, `setup.cfg`, `.pylintrc`, `.gitleaks.toml`) into `pyproject.toml` + `tox.ini` (Wave 2a). Pytest config moves to `[tool.pytest.ini_options]`; the only remaining `setup.cfg` content is a minimal `[isort]` block consumed by `aea generate-all-protocols` to format generated protocol code. `[mypy]` and per-module `[mypy-*]` overrides plus the `[darglint]` block live at the bottom of `tox.ini` (mypy/darglint don't read pyproject.toml); the `[testenv:mypy]` command passes `--config-file=tox.ini` so they're picked up. #885
+- Bumps `tomte` to `==0.7.0` (released). Every lint testenv now references `{envsitepackagesdir}/tomte/configs/<config>` for its config — pylint, mypy, isort, flake8, bandit, darglint, safety, gitleaks — instead of carrying a forked copy in this repo. The pylint testenv keeps OAEA-specific extras (`--ignored-modules=…`, `--ignore-patterns=…`) inline because they're project-specific. #885
+- Slims `pyproject.toml` to strict PEP 621 + `[tool.poetry]` + `[tool.pytest.ini_options]` + `[tool.isort]` (no `[tool.pylint.*]` / `[tool.flake8]` / `[tool.mypy]` blocks). #885
+- Updates the `gitleaks` GitHub Actions job to install tomte and run with `--config={envsitepackagesdir}/tomte/configs/gitleaks.toml`. The previous job ran against gitleaks default rules. `.gitleaksignore` regenerated via `tomte freeze-gitleaks` (66 historical fingerprints). #885
+
 ## 2.2.2 (2026-04-24)
 
 Plugins:
