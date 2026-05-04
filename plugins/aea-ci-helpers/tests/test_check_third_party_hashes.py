@@ -224,7 +224,10 @@ class TestCheckHashes:
         """No mismatches or missing when local hashes match upstream."""
         local = {"protocol/valory/abci/0.1.0": "bafyA"}
         upstream_maps = self._maps(
-            (f"valory-xyz/open-aea@v{VERSION}", {"protocol/valory/abci/0.1.0": "bafyA"}),
+            (
+                f"valory-xyz/open-aea@v{VERSION}",
+                {"protocol/valory/abci/0.1.0": "bafyA"},
+            ),
         )
         mismatches, missing = check_hashes(local, upstream_maps)
         assert mismatches == []
@@ -265,7 +268,10 @@ class TestCheckHashes:
         """A match in *any* upstream is enough; no mismatch reported."""
         local = {"protocol/valory/abci/0.1.0": "bafyA"}
         upstream_maps = self._maps(
-            (f"valory-xyz/open-aea@v{VERSION}", {"protocol/valory/abci/0.1.0": "bafyOTHER"}),
+            (
+                f"valory-xyz/open-aea@v{VERSION}",
+                {"protocol/valory/abci/0.1.0": "bafyOTHER"},
+            ),
             ("other/repo@v1.0.0", {"protocol/valory/abci/0.1.0": "bafyA"}),
         )
         mismatches, missing = check_hashes(local, upstream_maps)
