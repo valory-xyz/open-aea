@@ -33,6 +33,7 @@ from aea_ci_helpers.check_third_party_hashes import (
     run,
 )
 
+from aea.__version__ import __version__ as VERSION
 from aea.helpers import http_requests
 
 
@@ -41,27 +42,27 @@ class TestUpstream:
 
     def test_parse_valid(self) -> None:
         """A well-formed spec yields the expected fields."""
-        u = Upstream.parse("valory-xyz/open-aea@2.2.2")
+        u = Upstream.parse(f"valory-xyz/open-aea@{VERSION}")
         assert u.repo == "valory-xyz/open-aea"
-        assert u.version == "2.2.2"
+        assert u.version == VERSION
 
     def test_tag_version_strips_leading_v(self) -> None:
-        """``@v2.2.2`` and ``@2.2.2`` build the same tag URL."""
-        assert Upstream("o/r", "v2.2.2").tag_version == "2.2.2"
-        assert Upstream("o/r", "2.2.2").tag_version == "2.2.2"
+        """``@v<VERSION>`` and ``@<VERSION>`` build the same tag URL."""
+        assert Upstream("o/r", f"v{VERSION}").tag_version == VERSION
+        assert Upstream("o/r", VERSION).tag_version == VERSION
 
     def test_display_always_shows_v(self) -> None:
         """The human-readable form is consistent regardless of input."""
-        assert Upstream("o/r", "2.2.2").display == "o/r@v2.2.2"
-        assert Upstream("o/r", "v2.2.2").display == "o/r@v2.2.2"
+        assert Upstream("o/r", VERSION).display == f"o/r@v{VERSION}"
+        assert Upstream("o/r", f"v{VERSION}").display == f"o/r@v{VERSION}"
 
     @pytest.mark.parametrize(
         "spec",
         [
             "no-at-sign",
-            "@2.2.2",
+            f"@{VERSION}",
             "valory-xyz/open-aea@",
-            "noslash@2.2.2",
+            f"noslash@{VERSION}",
         ],
     )
     def test_parse_invalid(self, spec: str) -> None:
@@ -98,7 +99,7 @@ class TestFetchUpstreamPackages:
 
     def test_builds_expected_url(self) -> None:
         """The tag URL uses the stripped version with a leading ``v``."""
-        upstream = Upstream("valory-xyz/open-aea", "v2.2.2")
+        upstream = Upstream("valory-xyz/open-aea", f"v{VERSION}")
         with mock.patch(
             "aea_ci_helpers.check_third_party_hashes.http_requests.get",
             return_value=self._mock_response(json_data={"dev": {}}),
@@ -107,7 +108,7 @@ class TestFetchUpstreamPackages:
         called_url = get.call_args.args[0]
         assert called_url == (
             "https://raw.githubusercontent.com/valory-xyz/open-aea/"
-            "v2.2.2/packages/packages.json"
+            f"v{VERSION}/packages/packages.json"
         )
 
     def test_non_200_raises(self) -> None:
@@ -223,7 +224,10 @@ class TestCheckHashes:
         """No mismatches or missing when local hashes match upstream."""
         local = {"protocol/valory/abci/0.1.0": "bafyA"}
         upstream_maps = self._maps(
-            ("valory-xyz/open-aea@v2.2.2", {"protocol/valory/abci/0.1.0": "bafyA"}),
+            (
+                f"valory-xyz/open-aea@v{VERSION}",
+                {"protocol/valory/abci/0.1.0": "bafyA"},
+            ),
         )
         mismatches, missing = check_hashes(local, upstream_maps)
         assert mismatches == []
@@ -234,7 +238,7 @@ class TestCheckHashes:
         local = {"protocol/valory/abci/0.1.0": "bafyLOCAL"}
         upstream_maps = self._maps(
             (
-                "valory-xyz/open-aea@v2.2.2",
+                f"valory-xyz/open-aea@v{VERSION}",
                 {"protocol/valory/abci/0.1.0": "bafyREMOTE"},
             ),
         )
@@ -244,7 +248,7 @@ class TestCheckHashes:
                 "protocol/valory/abci/0.1.0",
                 "bafyLOCAL",
                 "bafyREMOTE",
-                "valory-xyz/open-aea@v2.2.2",
+                f"valory-xyz/open-aea@v{VERSION}",
             )
         ]
         assert missing == []
@@ -253,7 +257,7 @@ class TestCheckHashes:
         """A package absent from every upstream is reported as missing."""
         local = {"protocol/valory/orphan/0.1.0": "bafyX"}
         upstream_maps = self._maps(
-            ("valory-xyz/open-aea@v2.2.2", {}),
+            (f"valory-xyz/open-aea@v{VERSION}", {}),
             ("other/repo@v1.0.0", {}),
         )
         mismatches, missing = check_hashes(local, upstream_maps)
@@ -264,7 +268,10 @@ class TestCheckHashes:
         """A match in *any* upstream is enough; no mismatch reported."""
         local = {"protocol/valory/abci/0.1.0": "bafyA"}
         upstream_maps = self._maps(
-            ("valory-xyz/open-aea@v2.2.2", {"protocol/valory/abci/0.1.0": "bafyOTHER"}),
+            (
+                f"valory-xyz/open-aea@v{VERSION}",
+                {"protocol/valory/abci/0.1.0": "bafyOTHER"},
+            ),
             ("other/repo@v1.0.0", {"protocol/valory/abci/0.1.0": "bafyA"}),
         )
         mismatches, missing = check_hashes(local, upstream_maps)
@@ -293,7 +300,7 @@ class TestRun:
 
     def test_missing_local_packages_json_yields_exit_1(self, tmp_path: Path) -> None:
         """A missing local file is reported cleanly."""
-        assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 1
+        assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 1
 
     def test_empty_third_party_is_ok(self, tmp_path: Path) -> None:
         """An empty ``third_party`` section succeeds without any requests."""
@@ -301,7 +308,7 @@ class TestRun:
         with mock.patch(
             "aea_ci_helpers.check_third_party_hashes.fetch_upstream_packages",
         ) as fetch:
-            assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 0
+            assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 0
             fetch.assert_not_called()
 
     def test_mismatch_yields_exit_1(self, tmp_path: Path) -> None:
@@ -311,7 +318,7 @@ class TestRun:
             "aea_ci_helpers.check_third_party_hashes.fetch_upstream_packages",
             return_value={"p/v/a/0.1.0": "bafyREMOTE"},
         ):
-            assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 1
+            assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 1
 
     def test_match_yields_exit_0(self, tmp_path: Path) -> None:
         """All hashes matching returns exit code 0."""
@@ -320,7 +327,7 @@ class TestRun:
             "aea_ci_helpers.check_third_party_hashes.fetch_upstream_packages",
             return_value={"p/v/a/0.1.0": "bafyOK"},
         ):
-            assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 0
+            assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 0
 
     def test_all_upstreams_unreachable_yields_exit_1(self, tmp_path: Path) -> None:
         """If no upstream is reachable, the command cannot verify and fails."""
@@ -329,7 +336,7 @@ class TestRun:
             "aea_ci_helpers.check_third_party_hashes.fetch_upstream_packages",
             side_effect=RuntimeError("network unreachable"),
         ):
-            assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 1
+            assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 1
 
     def test_one_unreachable_but_other_matches_is_ok(self, tmp_path: Path) -> None:
         """A flaky upstream is tolerated when another upstream succeeds."""
@@ -348,8 +355,8 @@ class TestRun:
                 run(
                     tmp_path,
                     [
-                        "flaky/mirror@2.2.2",
-                        "valory-xyz/open-aea@2.2.2",
+                        f"flaky/mirror@{VERSION}",
+                        f"valory-xyz/open-aea@{VERSION}",
                     ],
                 )
                 == 0
@@ -364,4 +371,4 @@ class TestRun:
             "aea_ci_helpers.check_third_party_hashes.fetch_upstream_packages",
             return_value={},
         ):
-            assert run(tmp_path, ["valory-xyz/open-aea@2.2.2"]) == 1
+            assert run(tmp_path, [f"valory-xyz/open-aea@{VERSION}"]) == 1

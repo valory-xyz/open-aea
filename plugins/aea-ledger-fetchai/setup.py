@@ -37,7 +37,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-ledger-fetchai",
-    version="2.2.2",
+    version="2.2.3",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger API of Fetch.AI.",
@@ -51,7 +51,7 @@ setup(
         ]
     },
     python_requires=">=3.10,<3.15",
-    install_requires=["open-aea-ledger-cosmos~=2.2.2", "requests>=2.32.5,<3"],
+    install_requires=["open-aea-ledger-cosmos~=2.2.3", "requests>=2.32.5,<3"],
     extras_require={
         "test_tools": ["pytest>=7.0,<10", "docker==7.1.0"],
     },

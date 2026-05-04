@@ -6,4 +6,4 @@
 # [SPELLING]).
 
 [IMPORTS]
-ignored-modules=bech32,ecdsa,lru,eth_typing,eth_keys,eth_account,ipfshttpclient,werkzeug,openapi_spec_validator,aiohttp,multidict,yoti_python_sdk,defusedxml,fetch,matplotlib,memory_profiler,numpy,oef,openapi_core,psutil,tensorflow,temper,skimage,web3,aioprometheus,pyaes,Crypto,asn1crypto,cosmpy,google,coverage,pylint,pytest,gitpython,protobuf,docker,signal,anchorpy,cryptography.fernet,solana,solders,hexbytes,toml
+ignored-modules=aiohttp,anchorpy,asn1crypto,bech32,coverage,cosmpy,Crypto,cryptography.fernet,docker,ecdsa,eth_account,eth_keys,eth_typing,git,google,hexbytes,lru,matplotlib,memory_profiler,multidict,numpy,openapi_core,openapi_spec_validator,psutil,pyaes,pytest,signal,solana,solders,toml,web3,werkzeug

@@ -31,7 +31,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-dev-helpers",
-    version="2.2.2",
+    version="2.2.3",
     author="Valory AG",
     license="Apache-2.0",
     description="Development and release helper utilities for AEA-based projects.",
