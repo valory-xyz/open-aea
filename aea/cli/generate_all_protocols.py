@@ -60,6 +60,7 @@ from aea.exceptions import AEAEnforceError, enforce
 from aea.helpers.git import check_working_tree_is_dirty
 from aea.helpers.protocols import get_protocol_specification_from_readme
 from aea.manager.helpers import AEAProject
+from aea.protocols.generator.common import ISORT_CONFIGURATION_FILE
 
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
 LIBPROTOC_VERSION = "libprotoc 24.3"
@@ -139,7 +140,7 @@ def run_isort_and_black(directory: Path, **kwargs: Any) -> None:
             "-m",
             "isort",
             "--settings-path",
-            "setup.cfg",
+            ISORT_CONFIGURATION_FILE,
             str(directory.absolute()),
             **kwargs,
         )
