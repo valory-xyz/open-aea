@@ -19,6 +19,7 @@
 
 """Tests for the RPC rotation middleware (no Ganache required)."""
 
+import ssl
 import time
 from unittest.mock import MagicMock, patch
 
@@ -29,6 +30,7 @@ from aea_ledger_ethereum.rpc_rotation import (
     RATE_LIMIT_BACKOFF,
     RPCRotationMiddleware,
     SERVER_ERROR_BACKOFF,
+    _is_connection_reset,
     classify_error,
     parse_rpc_urls,
 )
@@ -121,6 +123,94 @@ class TestClassifyError:
 
 
 # ---------------------------------------------------------------------------
+# _is_connection_reset
+# ---------------------------------------------------------------------------
+
+
+class TestIsConnectionReset:
+    """Tests for the _is_connection_reset locale-safe helper."""
+
+    def test_connection_reset_error_direct(self) -> None:
+        """ConnectionResetError is detected by type."""
+        assert _is_connection_reset(ConnectionResetError("reset")) is True
+
+    def test_ssl_eof_error(self) -> None:
+        """ssl.SSLEOFError is detected by type."""
+        assert _is_connection_reset(ssl.SSLEOFError()) is True
+
+    def test_ssl_error(self) -> None:
+        """ssl.SSLError is detected by type."""
+        assert _is_connection_reset(ssl.SSLError("EOF occurred")) is True
+
+    def test_errno_10054(self) -> None:
+        """OSError with errno 10054 (WSAECONNRESET) detected with non-English text."""
+        err = OSError()
+        err.errno = 10054
+        # Chinese WSAECONNRESET — must not rely on string matching
+        err.strerror = (
+            "\u8fdc\u7a0b\u4e3b\u673a\u5f3a\u5236\u5173\u95ed\u4e86\u4e00\u4e2a"
+            "\u73b0\u6709\u7684\u8fde\u63a5"
+        )
+        assert _is_connection_reset(err) is True
+
+    def test_errno_10054_spanish_message(self) -> None:
+        """OSError with errno 10054 and Spanish text is still detected."""
+        err = OSError()
+        err.errno = 10054
+        err.strerror = (
+            "Se ha forzado la interrupci\u00f3n de una conexi\u00f3n existente"
+        )
+        assert _is_connection_reset(err) is True
+
+    def test_wrapped_connection_reset_via_cause(self) -> None:
+        """ConnectionResetError wrapped as __cause__ is detected."""
+        inner = ConnectionResetError("inner reset")
+        outer = Exception("outer wrapper")
+        outer.__cause__ = inner  # type: ignore[assignment]
+        assert _is_connection_reset(outer) is True
+
+    def test_wrapped_connection_reset_via_context(self) -> None:
+        """ConnectionResetError set as __context__ is detected."""
+        inner = ConnectionResetError("inner reset")
+        outer = Exception("outer wrapper")
+        outer.__context__ = inner  # type: ignore[assignment]
+        assert _is_connection_reset(outer) is True
+
+    def test_unrelated_error_not_detected(self) -> None:
+        """Generic ValueError is not a connection reset."""
+        assert _is_connection_reset(ValueError("bad value")) is False
+
+    def test_errno_other_than_10054(self) -> None:
+        """OSError with a different errno is not a connection reset."""
+        err = OSError()
+        err.errno = 111  # connection refused
+        assert _is_connection_reset(err) is False
+
+
+class TestClassifyErrorLocaleSafe:
+    """Tests that classify_error uses class-based checks for connection resets."""
+
+    def test_connection_reset_error_classified_as_connection(self) -> None:
+        """ConnectionResetError classifies as 'connection' regardless of string."""
+        assert classify_error(ConnectionResetError("")) == "connection"
+
+    def test_errno_10054_classified_as_connection(self) -> None:
+        """OSError(errno=10054) classifies as 'connection' with non-English text."""
+        err = OSError()
+        err.errno = 10054
+        # Chinese WSAECONNRESET — classify_error must not rely on string matching
+        err.strerror = (
+            "\u8fdc\u7a0b\u4e3b\u673a\u5f3a\u5236\u5173\u95ed\u4e86\u4e00\u4e2a"
+            "\u73b0\u6709\u7684\u8fde\u63a5"
+        )
+        assert classify_error(err) == "connection"
+
+    def test_ssl_eof_classified_as_connection(self) -> None:
+        """ssl.SSLEOFError classifies as 'connection'."""
+        assert classify_error(ssl.SSLEOFError()) == "connection"
+
+
+# ---------------------------------------------------------------------------
 # RPCRotationMiddleware helpers to build test instances
 # ---------------------------------------------------------------------------
 
@@ -148,12 +238,15 @@ def _make_middleware(rpc_urls, request_kwargs=None):
 class TestRPCRotationMiddlewareBuild:
     """Tests for build() and introspection properties."""
 
-    def test_single_rpc_disables_rotation(self) -> None:
-        """With one RPC, rotation is disabled."""
+    def test_single_rpc_rotation_not_performed(self) -> None:
+        """With one RPC, _rotate() returns False (no actual rotation happens)."""
         mw = _make_middleware(["http://rpc1"])
         assert mw.rpc_count == 1
         assert mw.current_rpc_url == "http://rpc1"
-        assert mw._rotation_enabled is False
+        # _rotation_enabled is True so the retry/session-eviction path fires;
+        # but _rotate() itself returns False for a single URL.
+        assert mw._rotation_enabled is True
+        assert mw._rotate() is False
 
     def test_multiple_rpcs_enables_rotation(self) -> None:
         """With multiple RPCs, rotation is enabled."""
@@ -273,29 +366,64 @@ class TestHandleErrorAndRotate:
 
 
 # ---------------------------------------------------------------------------
-# wrap_make_request — single RPC (pass-through)
+# wrap_make_request — single RPC
 # ---------------------------------------------------------------------------
 
 
 class TestWrapMakeRequestSingleRpc:
-    """Tests for wrap_make_request with a single RPC (rotation disabled)."""
+    """Tests for wrap_make_request with a single RPC.
 
-    def test_passes_through_to_make_request(self) -> None:
-        """Single-RPC: calls make_request directly."""
+    With _rotation_enabled = True for all configs, single-RPC deployments now
+    use the retry loop (calling self._providers[0].make_request directly) so
+    they also benefit from session eviction on connection resets.
+    """
+
+    def test_success_via_provider(self) -> None:
+        """Single-RPC: calls provider.make_request (not inner make_request)."""
         mw = _make_middleware(["http://only"])
-        inner = MagicMock(return_value={"result": 42})
+        mw._providers[0].make_request = MagicMock(return_value={"result": 42})
+        inner = MagicMock()
         middleware_fn = mw.wrap_make_request(inner)
         result = middleware_fn("eth_blockNumber", [])
-        inner.assert_called_once_with("eth_blockNumber", [])
+        mw._providers[0].make_request.assert_called_once_with("eth_blockNumber", [])
         assert result == {"result": 42}
+        # inner (next middleware) is not called — provider is used directly
+        inner.assert_not_called()
 
-    def test_propagates_exception(self) -> None:
-        """Single-RPC: exceptions propagate immediately."""
+    @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
+    def test_retries_on_connection_reset(self, mock_sleep: MagicMock) -> None:
+        """Single-RPC: connection resets are retried with session eviction."""
         mw = _make_middleware(["http://only"])
-        inner = MagicMock(side_effect=ConnectionError("refused"))
-        middleware_fn = mw.wrap_make_request(inner)
-        with pytest.raises(ConnectionError):
+        call_count = 0
+
+        def _make_request(method, params):
+            nonlocal call_count
+            call_count += 1
+            if call_count < 3:
+                raise ConnectionResetError("reset")
+            return {"result": "ok"}
+
+        mw._providers[0].make_request = _make_request
+        middleware_fn = mw.wrap_make_request(MagicMock())
+        result = middleware_fn("eth_blockNumber", [])
+        assert result == {"result": "ok"}
+        assert call_count == 3
+
+    def test_non_retriable_error_propagates_immediately(self) -> None:
+        """Single-RPC: unknown errors raise without retry."""
+        mw = _make_middleware(["http://only"])
+        call_count = 0
+
+        def _fail(method, params):
+            nonlocal call_count
+            call_count += 1
+            raise TypeError("unexpected type")
+
+        mw._providers[0].make_request = _fail
+        middleware_fn = mw.wrap_make_request(MagicMock())
+        with pytest.raises(TypeError):
             middleware_fn("eth_blockNumber", [])
+        assert call_count == 1
 
 
 # ---------------------------------------------------------------------------
@@ -421,10 +549,10 @@ class TestEthereumApiMultiRpc:
         "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
         side_effect=lambda urls, **kw: urls,
     )
-    def test_single_rpc_rotation_disabled(
+    def test_single_rpc_retry_path_enabled(
         self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
     ) -> None:
-        """Single RPC: rotation middleware is disabled."""
+        """Single RPC: rotation is a no-op but retry/session-eviction path is active."""
         from aea_ledger_ethereum.ethereum import EthereumApi
 
         mock_web3 = MagicMock()
@@ -432,9 +560,11 @@ class TestEthereumApiMultiRpc:
         mock_web3.middleware_onion = MagicMock()
 
         api = EthereumApi(address="http://localhost:8545")
-        assert api._rpc_rotation._rotation_enabled is False
+        assert api._rpc_rotation._rotation_enabled is True
         assert api._rpc_rotation.rpc_count == 1
         assert api._rpc_rotation.current_rpc_url == "http://localhost:8545"
+        # _rotate() returns False for single URL — no rotation occurs
+        assert api._rpc_rotation._rotate() is False
 
     @patch("aea_ledger_ethereum.ethereum.Web3")
     @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
@@ -477,6 +607,79 @@ class TestEthereumApiMultiRpc:
         # middleware_onion.add should be called at least twice
         # (once for RPCRotation, once for CachedChainId)
         assert mock_web3.middleware_onion.add.call_count >= 2
+
+
+# ---------------------------------------------------------------------------
+# Session cache eviction on connection reset
+# ---------------------------------------------------------------------------
+
+
+class TestSessionCacheEvictionOnConnectionReset:
+    """Session cache is cleared when a connection-reset error is handled."""
+
+    def test_session_cache_cleared_on_connection_reset(self) -> None:
+        """_handle_error_and_rotate clears the session cache on connection errors."""
+        mw = _make_middleware(["http://a", "http://b"])
+        mock_cache = MagicMock()
+        mock_session_mgr = MagicMock()
+        mock_session_mgr.session_cache = mock_cache
+        mw._providers[0]._request_session_manager = mock_session_mgr
+
+        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call")
+
+        mock_cache.clear.assert_called_once()
+
+    def test_session_cache_not_cleared_on_rate_limit(self) -> None:
+        """Rate-limit errors do not trigger session eviction."""
+        mw = _make_middleware(["http://a", "http://b"])
+        mock_cache = MagicMock()
+        mock_session_mgr = MagicMock()
+        mock_session_mgr.session_cache = mock_cache
+        mw._providers[0]._request_session_manager = mock_session_mgr
+
+        mw._handle_error_and_rotate(Exception("429 rate limit"), "eth_call")
+
+        mock_cache.clear.assert_not_called()
+
+    def test_session_eviction_survives_missing_manager(self) -> None:
+        """_evict_provider_session is silent when provider has no session manager."""
+        mw = _make_middleware(["http://a"])
+        # No _request_session_manager attribute on provider — should not raise
+        mw._evict_provider_session(0)  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# Single-URL retry path
+# ---------------------------------------------------------------------------
+
+
+class TestSingleRpcRetryPath:
+    """Single-URL deployments retry on connection errors (no rotation)."""
+
+    @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
+    def test_single_url_retries_on_connection_reset(
+        self, mock_sleep: MagicMock
+    ) -> None:
+        """Single URL: WSAECONNRESET triggers retry without rotation."""
+        mw = _make_middleware(["http://only"])
+        call_count = 0
+
+        def _make_request(method, params):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                err = OSError()
+                err.errno = 10054
+                raise err
+            return {"result": "ok"}
+
+        mw._providers[0].make_request = _make_request
+        middleware_fn = mw.wrap_make_request(MagicMock())
+        result = middleware_fn("eth_call", [])
+        assert result == {"result": "ok"}
+        assert call_count == 2
+        # _rotate returned False (single URL) but retry still happened
+        assert mw._current_index == 0  # stayed on the only URL
 
 
 # ---------------------------------------------------------------------------

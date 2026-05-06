@@ -22,10 +22,11 @@
 When multiple RPC endpoints are provided (comma-separated), the
 :class:`RPCRotationMiddleware` automatically fails over to healthy
 endpoints on rate-limit, connection, or quota errors.  With a single
-RPC URL the middleware is a transparent pass-through.
+RPC URL the middleware retries on transport failures without rotation.
 """
 
 import logging
+import ssl
 import threading
 import time
 from typing import Any, Dict, FrozenSet, List, Optional, Union
@@ -142,6 +143,30 @@ def parse_rpc_urls(address: str) -> List[str]:
     return [address.strip()]
 
 
+def _is_connection_reset(error: BaseException) -> bool:
+    """Return ``True`` if *error* (or its cause chain) is a connection-reset.
+
+    Checks exception type and ``errno`` so locale-specific OS error messages
+    (e.g. Chinese or Spanish WSAECONNRESET text) do not cause misses.
+    Walks ``__cause__`` / ``__context__`` chains for wrapped exceptions.
+
+    :param error: exception to inspect.
+    :return: ``True`` if the error indicates a connection reset.
+    """
+    seen: set = set()
+    candidate: Optional[BaseException] = error
+    while candidate is not None and id(candidate) not in seen:
+        seen.add(id(candidate))
+        if isinstance(candidate, (ConnectionResetError, ssl.SSLEOFError, ssl.SSLError)):
+            return True
+        if getattr(candidate, "errno", None) == 10054:  # WSAECONNRESET on Windows
+            return True
+        cause = getattr(candidate, "__cause__", None)
+        context = getattr(candidate, "__context__", None)
+        candidate = cause if cause is not None else context
+    return False
+
+
 def classify_error(error: Exception) -> str:
     """Classify an RPC error into a category.
 
@@ -152,6 +177,11 @@ def classify_error(error: Exception) -> str:
     :param error: the exception raised by the RPC call.
     :return: error category string.
     """
+    # Locale-safe class-based checks first — English-only string matching
+    # misses localized OS error messages (Spanish, Chinese WSAECONNRESET text).
+    if _is_connection_reset(error):
+        return "connection"
+
     err_text = str(error).lower()
 
     if any(s in err_text for s in FD_EXHAUSTION_SIGNALS):
@@ -235,7 +265,11 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         mw._current_index = 0  # pylint: disable=protected-access
         mw._backoff_until = {}  # pylint: disable=protected-access
         mw._lock = threading.Lock()  # pylint: disable=protected-access
-        mw._rotation_enabled = len(rpc_urls) > 1  # pylint: disable=protected-access
+        # Always enable the retry/session-eviction path so single-URL deployments
+        # also recover from transient WSAECONNRESET errors (Failure B, ZD#976).
+        # The rotation itself is a no-op when len(rpc_urls) == 1 (_rotate returns
+        # False), but the retry loop and session eviction still fire.
+        mw._rotation_enabled = True  # pylint: disable=protected-access
         mw._last_rotation_time = 0.0  # pylint: disable=protected-access
         return mw
 
@@ -313,6 +347,36 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             return True
 
     # ------------------------------------------------------------------
+    # Session eviction
+    # ------------------------------------------------------------------
+
+    def _evict_provider_session(self, index: int) -> None:
+        """Evict the cached ``requests.Session`` for the provider at *index*.
+
+        On a connection reset (WSAECONNRESET / errno 10054) the HTTP keep-alive
+        pool holds a stale socket.  Clearing the session cache forces a fresh
+        TCP/TLS handshake on the next retry rather than reusing the broken
+        connection.  The ``lru_cache``-backed pool cannot evict individual
+        entries, so the whole cache is cleared — the overhead of re-establishing
+        connections is negligible compared to the cost of a stuck withdrawal.
+
+        This is best-effort: if the internal attribute layout of the web3
+        ``HTTPProvider`` differs across versions, the eviction is silently
+        skipped and the retry still proceeds (with the stale socket).
+
+        :param index: index into ``self._providers``.
+        """
+        try:
+            provider = self._providers[index]
+            session_mgr = getattr(provider, "_request_session_manager", None)
+            if session_mgr is not None:
+                cache = getattr(session_mgr, "session_cache", None)
+                if cache is not None:
+                    cache.clear()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass  # Never mask the original error
+
+    # ------------------------------------------------------------------
     # Error handling
     # ------------------------------------------------------------------
 
@@ -337,6 +401,10 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
 
         if category == "unknown":
             return False
+
+        if category == "connection":
+            # Evict the stale session so the retry gets a fresh TCP/TLS handshake.
+            self._evict_provider_session(self._current_index)
 
         backoff = _BACKOFF_MAP.get(category, 0.0)
         self._mark_rpc_backoff(self._current_index, backoff)
@@ -364,9 +432,6 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
 
         def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
             """Middleware function to override the request with."""
-            if not self._rotation_enabled:
-                return make_request(method, params)
-
             is_write = method in WRITE_RPC_METHODS
             max_retries = min(MAX_RETRIES, len(self._rpc_urls) * 2)
             last_error: Optional[Exception] = None
