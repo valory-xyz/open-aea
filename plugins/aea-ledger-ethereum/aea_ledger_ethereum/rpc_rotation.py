@@ -390,7 +390,10 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                 )
         except Exception as exc:  # pylint: disable=broad-exception-caught
             _logger.debug(
-                "Session eviction failed for provider #%d: %s", index, exc, exc_info=True
+                "Session eviction failed for provider #%d: %s",
+                index,
+                exc,
+                exc_info=True,
             )
 
     # ------------------------------------------------------------------
