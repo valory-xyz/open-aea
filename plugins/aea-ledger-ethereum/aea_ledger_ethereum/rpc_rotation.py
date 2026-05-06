@@ -157,7 +157,7 @@ def _is_connection_reset(error: BaseException) -> bool:
     candidate: Optional[BaseException] = error
     while candidate is not None and id(candidate) not in seen:
         seen.add(id(candidate))
-        if isinstance(candidate, (ConnectionResetError, ssl.SSLEOFError)):
+        if isinstance(candidate, (ConnectionResetError, ssl.SSLError)):
             return True
         if getattr(candidate, "errno", None) == 10054:  # WSAECONNRESET on Windows
             return True
@@ -225,6 +225,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     """
 
     # Set by build()
+    _rotation_enabled: bool
     _rpc_urls: List[str]
     _request_kwargs: Dict[str, Any]
     _providers: List[HTTPProvider]
@@ -261,6 +262,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
             for url in rpc_urls
         ]
+        mw._rotation_enabled = True  # pylint: disable=protected-access
         mw._current_index = 0  # pylint: disable=protected-access
         mw._backoff_until = {}  # pylint: disable=protected-access
         mw._lock = threading.Lock()  # pylint: disable=protected-access

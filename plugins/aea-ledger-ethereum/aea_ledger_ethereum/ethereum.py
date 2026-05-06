@@ -698,7 +698,7 @@ class AttributeDictTranslator:
     @classmethod
     def to_dict(cls, attr_dict: Union[AttributeDict, TxReceipt, TxData]) -> JSONLike:
         """Simplify to dict."""
-        if not isinstance(attr_dict, AttributeDict):
+        if not isinstance(attr_dict, (AttributeDict, dict)):
             raise ValueError("No AttributeDict provided.")  # pragma: nocover
         result = {
             cls._valid_key(key): cls._remove_hexbytes(value)
