@@ -186,6 +186,10 @@ class TestIsConnectionReset:
         err.errno = 111  # connection refused
         assert _is_connection_reset(err) is False
 
+    def test_ssl_cert_verification_error_not_detected(self) -> None:
+        """ssl.SSLCertVerificationError is not a connection reset."""
+        assert _is_connection_reset(ssl.SSLCertVerificationError()) is False
+
 
 class TestClassifyErrorLocaleSafe:
     """Tests that classify_error uses class-based checks for connection resets."""

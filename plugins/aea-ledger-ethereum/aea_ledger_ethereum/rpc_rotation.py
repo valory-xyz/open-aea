@@ -157,7 +157,11 @@ def _is_connection_reset(error: BaseException) -> bool:
     candidate: Optional[BaseException] = error
     while candidate is not None and id(candidate) not in seen:
         seen.add(id(candidate))
-        if isinstance(candidate, (ConnectionResetError, ssl.SSLError)):
+        if isinstance(candidate, ConnectionResetError):
+            return True
+        if isinstance(candidate, ssl.SSLError) and not isinstance(
+            candidate, ssl.SSLCertVerificationError
+        ):
             return True
         if getattr(candidate, "errno", None) == 10054:  # WSAECONNRESET on Windows
             return True
@@ -384,8 +388,10 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                     "Provider #%d: HTTPProvider has no '_request_session_manager'; skipping session eviction.",
                     index,
                 )
-        except Exception:  # pylint: disable=broad-exception-caught  # nosec B110
-            pass  # Never mask the original error
+        except Exception as exc:  # pylint: disable=broad-exception-caught
+            _logger.debug(
+                "Session eviction failed for provider #%d: %s", index, exc, exc_info=True
+            )
 
     # ------------------------------------------------------------------
     # Error handling
@@ -439,7 +445,17 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     ) -> MakeRequestFn:
         """Wrap the JSON-RPC make_request with retry and rotation logic.
 
-        :param make_request: the next function in the middleware chain.
+        ``make_request`` (the next function in the middleware chain) is
+        intentionally not called.  Instead, this middleware calls each
+        provider's ``make_request`` directly so it can retry against
+        different providers in the pool without being subject to other
+        middleware's retry or error-conversion logic.  As a result,
+        inner middleware (formatters, ``AttributeDictMiddleware``, ENS,
+        exception, retry) are bypassed on all call paths; callers must
+        handle plain-dict responses.  PoA middleware must therefore be
+        added as the *outermost* layer (via ``add``, not ``inject``).
+
+        :param make_request: not used; present to satisfy the web3 middleware interface.
         :return: wrapped make_request function.
         """
 

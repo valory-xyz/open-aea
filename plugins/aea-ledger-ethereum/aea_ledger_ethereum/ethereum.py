@@ -698,6 +698,12 @@ class AttributeDictTranslator:
     @classmethod
     def to_dict(cls, attr_dict: Union[AttributeDict, TxReceipt, TxData]) -> JSONLike:
         """Simplify to dict."""
+        # Plain dict is accepted in addition to AttributeDict because
+        # RPCRotationMiddleware calls self._providers[i].make_request() directly,
+        # bypassing the inner web3 middleware chain (including AttributeDictMiddleware).
+        # Responses on the rotation path therefore arrive as plain dicts rather than
+        # AttributeDict instances.  TxReceipt / TxData are TypedDicts (dict subclasses)
+        # and handled identically.
         if not isinstance(attr_dict, (AttributeDict, dict)):
             raise ValueError("No AttributeDict provided.")  # pragma: nocover
         result = {
