@@ -432,7 +432,9 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     # wrap_make_request
     # ------------------------------------------------------------------
 
-    def wrap_make_request(self, make_request: MakeRequestFn) -> MakeRequestFn:  # pylint: disable=unused-argument
+    def wrap_make_request(
+        self, make_request: MakeRequestFn
+    ) -> MakeRequestFn:  # pylint: disable=unused-argument
         """Wrap the JSON-RPC make_request with retry and rotation logic.
 
         :param make_request: the next function in the middleware chain.
