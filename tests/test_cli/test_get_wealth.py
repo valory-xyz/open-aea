@@ -74,8 +74,9 @@ class GetWealthCommandTestCase(TestCase):
 class TestGetWealth(AEATestCaseEmpty):
     """Test 'get-wealth' command."""
 
+    @mock.patch("aea.cli.utils.package_utils.LedgerApis.get_balance", return_value=0)
     @mock.patch("click.echo")
-    def test_get_wealth(self, _echo_mock, password_or_none):
+    def test_get_wealth(self, _echo_mock, _get_balance_mock, password_or_none):
         """Run the main test."""
         self.generate_private_key(
             ledger_api_id=FetchAICrypto.identifier,
