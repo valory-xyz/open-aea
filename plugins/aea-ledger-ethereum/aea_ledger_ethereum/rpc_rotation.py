@@ -157,7 +157,7 @@ def _is_connection_reset(error: BaseException) -> bool:
     candidate: Optional[BaseException] = error
     while candidate is not None and id(candidate) not in seen:
         seen.add(id(candidate))
-        if isinstance(candidate, (ConnectionResetError, ssl.SSLEOFError, ssl.SSLError)):
+        if isinstance(candidate, (ConnectionResetError, ssl.SSLEOFError)):
             return True
         if getattr(candidate, "errno", None) == 10054:  # WSAECONNRESET on Windows
             return True
@@ -231,7 +231,6 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     _current_index: int
     _backoff_until: Dict[int, float]
     _lock: threading.Lock
-    _rotation_enabled: bool
     _last_rotation_time: float
 
     @classmethod
@@ -265,11 +264,6 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         mw._current_index = 0  # pylint: disable=protected-access
         mw._backoff_until = {}  # pylint: disable=protected-access
         mw._lock = threading.Lock()  # pylint: disable=protected-access
-        # Always enable the retry/session-eviction path so single-URL deployments
-        # also recover from transient WSAECONNRESET errors (Failure B, ZD#976).
-        # The rotation itself is a no-op when len(rpc_urls) == 1 (_rotate returns
-        # False), but the retry loop and session eviction still fire.
-        mw._rotation_enabled = True  # pylint: disable=protected-access
         mw._last_rotation_time = 0.0  # pylint: disable=protected-access
         return mw
 
@@ -361,8 +355,8 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         connections is negligible compared to the cost of a stuck withdrawal.
 
         This is best-effort: if the internal attribute layout of the web3
-        ``HTTPProvider`` differs across versions, the eviction is silently
-        skipped and the retry still proceeds (with the stale socket).
+        ``HTTPProvider`` differs across versions, a warning is logged and the
+        eviction is skipped — the retry still proceeds (with the stale socket).
 
         :param index: index into ``self._providers``.
         """
@@ -372,7 +366,22 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             if session_mgr is not None:
                 cache = getattr(session_mgr, "session_cache", None)
                 if cache is not None:
-                    cache.clear()
+                    lock = getattr(session_mgr, "_lock", None)
+                    if lock is not None:
+                        with lock:
+                            cache.clear()
+                    else:
+                        cache.clear()
+                else:
+                    _logger.warning(
+                        "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
+                        index,
+                    )
+            else:
+                _logger.warning(
+                    "Provider #%d: HTTPProvider has no '_request_session_manager'; skipping session eviction.",
+                    index,
+                )
         except Exception:  # pylint: disable=broad-exception-caught
             pass  # Never mask the original error
 
