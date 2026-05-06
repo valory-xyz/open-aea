@@ -656,7 +656,7 @@ class AttributeDictTranslator:
             return cls._process_list(value, cls._remove_hexbytes)
         if type(value) in (bool, int, float, str, bytes):
             return value
-        if isinstance(value, AttributeDict):
+        if isinstance(value, (AttributeDict, dict)):
             return cls.to_dict(value)
         raise NotImplementedError(  # pragma: nocover
             f"Unknown type conversion. Found type: {type(value)}"
