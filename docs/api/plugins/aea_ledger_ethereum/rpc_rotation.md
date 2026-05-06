@@ -7,7 +7,7 @@ RPC rotation support for EthereumApi as a web3 middleware.
 When multiple RPC endpoints are provided (comma-separated), the
 :class:`RPCRotationMiddleware` automatically fails over to healthy
 endpoints on rate-limit, connection, or quota errors.  With a single
-RPC URL the middleware is a transparent pass-through.
+RPC URL the middleware retries on transport failures without rotation.
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.rpc_rotation.MakeRequestFn"></a>
 

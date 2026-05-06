@@ -382,7 +382,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                     "Provider #%d: HTTPProvider has no '_request_session_manager'; skipping session eviction.",
                     index,
                 )
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught  # nosec B110
             pass  # Never mask the original error
 
     # ------------------------------------------------------------------
@@ -432,7 +432,7 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     # wrap_make_request
     # ------------------------------------------------------------------
 
-    def wrap_make_request(self, make_request: MakeRequestFn) -> MakeRequestFn:
+    def wrap_make_request(self, make_request: MakeRequestFn) -> MakeRequestFn:  # pylint: disable=unused-argument
         """Wrap the JSON-RPC make_request with retry and rotation logic.
 
         :param make_request: the next function in the middleware chain.
