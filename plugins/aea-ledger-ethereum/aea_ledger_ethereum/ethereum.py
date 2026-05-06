@@ -1145,8 +1145,12 @@ class EthereumApi(LedgerApi, EthereumHelper):
         self._poa_chain = kwargs.pop("poa_chain", False)
         if self._poa_chain:
             # https://web3py.readthedocs.io/en/stable/middleware.html#geth-style-proof-of-authority
-            self._api.middleware_onion.inject(
-                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware", layer=0
+            # Must be added as the outermost middleware so that its response transformation
+            # (truncating the oversized extraData field) is applied even when
+            # RPCRotationMiddleware routes requests to rotation providers directly,
+            # bypassing the inner middleware chain.
+            self._api.middleware_onion.add(
+                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware"
             )
             _default_logger.info(
                 "EthereumApi has been configured with Proof of Authority chain support"
