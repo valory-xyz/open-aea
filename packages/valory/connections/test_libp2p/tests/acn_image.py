@@ -172,6 +172,20 @@ class ACNWithBootstrappedEntryNodesDockerImage(ACNNodeDockerImage):  # noqa: F40
     nodes = ["bootstrap", "entry_node_1", "entry_node_2"]
     configs = [BOOTSTRAP, NODE1, NODE2]
 
+    def __init__(
+        self,
+        client: DockerClient,
+        config: Dict,
+    ):
+        """
+        Initialize the ACNWithBootstrappedEntryNodesDockerImage Docker image.
+
+        :param client: the Docker client.
+        :param config: optional configuration to command line.
+        """
+        super().__init__(client, config)
+        self._wait_call_count = 0
+
     def create(self) -> List[Container]:
         """Instantiate the image in many containers, parametrized."""
 
@@ -192,6 +206,43 @@ class ACNWithBootstrappedEntryNodesDockerImage(ACNNodeDockerImage):  # noqa: F40
         return containers
 
     def wait(self, max_attempts: int = 15, sleep_rate: float = 1.0) -> bool:
-        """Wait - this is container specific (using self._config) so doesn't work"""
-        time.sleep(sleep_rate)
-        return True
+        """Wait until the current node's ports are accessible.
+
+        Called once per container (bootstrap, then node1, then node2).  Uses a
+        call counter to index into ``self.configs`` so each invocation polls the
+        ports of the container that was just started rather than relying on
+        ``self._config`` (which holds the single-node ACN configuration and is
+        irrelevant here).
+
+        :param max_attempts: maximum polling attempts.
+        :param sleep_rate: seconds to sleep between attempts.
+        :return: True if all ports become accessible within the timeout.
+        """
+        config = self.configs[self._wait_call_count % len(self.configs)]
+        self._wait_call_count += 1
+
+        to_be_connected = {config[uri] for uri in self.uris if uri in config}
+        i = 0
+        while i < max_attempts and to_be_connected:
+            i += 1
+            ready = set()
+            for uri in list(to_be_connected):
+                try:
+                    host, port = uri.split(":")
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    result = sock.connect_ex((host, int(port)))
+                    sock.close()
+                    if result == 0:
+                        ready.add(uri)
+                        logging.info(f"URI ready: {uri}")
+                except Exception:  # pylint: disable=broad-except
+                    pass
+            to_be_connected -= ready
+            if to_be_connected:
+                logging.error(
+                    f"Attempt {i}: still waiting for {to_be_connected}. "
+                    f"Retrying in {sleep_rate}s..."
+                )
+                time.sleep(sleep_rate)
+
+        return not to_be_connected
