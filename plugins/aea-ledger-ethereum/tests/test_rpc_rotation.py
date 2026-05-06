@@ -131,7 +131,7 @@ class TestIsConnectionReset:
     """Tests for the _is_connection_reset locale-safe helper."""
 
     def test_connection_reset_error_direct(self) -> None:
-        """ConnectionResetError is detected by type."""
+        """Detect connection reset by exception type."""
         assert _is_connection_reset(ConnectionResetError("reset")) is True
 
     def test_ssl_eof_error(self) -> None:
@@ -143,7 +143,7 @@ class TestIsConnectionReset:
         assert _is_connection_reset(ssl.SSLError("EOF occurred")) is True
 
     def test_errno_10054(self) -> None:
-        """OSError with errno 10054 (WSAECONNRESET) detected with non-English text."""
+        """Detect errno 10054 (WSAECONNRESET) even with non-English error text."""
         err = OSError()
         err.errno = 10054
         # Chinese WSAECONNRESET — must not rely on string matching
@@ -154,7 +154,7 @@ class TestIsConnectionReset:
         assert _is_connection_reset(err) is True
 
     def test_errno_10054_spanish_message(self) -> None:
-        """OSError with errno 10054 and Spanish text is still detected."""
+        """Detect errno 10054 with Spanish text."""
         err = OSError()
         err.errno = 10054
         err.strerror = (
@@ -163,14 +163,14 @@ class TestIsConnectionReset:
         assert _is_connection_reset(err) is True
 
     def test_wrapped_connection_reset_via_cause(self) -> None:
-        """ConnectionResetError wrapped as __cause__ is detected."""
+        """Detect connection reset wrapped as __cause__."""
         inner = ConnectionResetError("inner reset")
         outer = Exception("outer wrapper")
         outer.__cause__ = inner  # type: ignore[assignment]
         assert _is_connection_reset(outer) is True
 
     def test_wrapped_connection_reset_via_context(self) -> None:
-        """ConnectionResetError set as __context__ is detected."""
+        """Detect connection reset set as __context__."""
         inner = ConnectionResetError("inner reset")
         outer = Exception("outer wrapper")
         outer.__context__ = inner  # type: ignore[assignment]
@@ -181,7 +181,7 @@ class TestIsConnectionReset:
         assert _is_connection_reset(ValueError("bad value")) is False
 
     def test_errno_other_than_10054(self) -> None:
-        """OSError with a different errno is not a connection reset."""
+        """Errno other than 10054 is not a connection reset."""
         err = OSError()
         err.errno = 111  # connection refused
         assert _is_connection_reset(err) is False
@@ -191,7 +191,7 @@ class TestClassifyErrorLocaleSafe:
     """Tests that classify_error uses class-based checks for connection resets."""
 
     def test_connection_reset_error_classified_as_connection(self) -> None:
-        """ConnectionResetError classifies as 'connection' regardless of string."""
+        """Classify connection reset as 'connection' regardless of string."""
         assert classify_error(ConnectionResetError("")) == "connection"
 
     def test_errno_10054_classified_as_connection(self) -> None:
