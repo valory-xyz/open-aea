@@ -156,7 +156,12 @@ def test_attribute_dict_translator_plain_dict():
         "nested": {"value": 99},
     }
     result = AttributeDictTranslator.to_dict(di)
-    assert result == {"blockNumber": 42, "status": True, "data": b"raw", "nested": {"value": 99}}
+    assert result == {
+        "blockNumber": 42,
+        "status": True,
+        "data": b"raw",
+        "nested": {"value": 99},
+    }
 
 
 def test_creation(ethereum_private_key_file):
