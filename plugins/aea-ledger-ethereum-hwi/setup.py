@@ -32,7 +32,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-ledger-ethereum-hwi",
-    version="2.2.3",
+    version="2.2.4",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and support for hardware wallet interactions.",
@@ -48,7 +48,7 @@ setup(
     install_requires=[
         "open-aea>=2.0.0, <3.0.0",
         "eth-account>=0.13.0,<0.14.0",
-        "open-aea-ledger-ethereum~=2.2.3",
+        "open-aea-ledger-ethereum~=2.2.4",
         "ledgerwallet==0.1.3",
     ],
     tests_require=["pytest>=7.0,<10"],

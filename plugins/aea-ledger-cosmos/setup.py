@@ -33,7 +33,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-ledger-cosmos",
-    version="2.2.3",
+    version="2.2.4",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of Cosmos.",

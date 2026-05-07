@@ -1,5 +1,19 @@
 # Release History - open AEA
 
+## 2.2.4 (2026-05-07)
+
+Plugins:
+
+- `open-aea-ledger-ethereum`: makes `RPCRotationMiddleware`'s connection-reset detection locale-safe. `classify_error` now matches on `isinstance(ConnectionResetError)`, `isinstance(ssl.SSLError)` (excluding `ssl.SSLCertVerificationError`), and `errno == 10054` (WSAECONNRESET) — and walks the `__cause__`/`__context__` chain — instead of substring-matching the localized OS message. On non-English Windows installs, transient resets that previously slipped through as `"unknown"` and skipped the retry path are now retried correctly. Resolves the `terminate_and_withdraw` HTTP 500 reported on Polystrat / Pearl. #887
+- `open-aea-ledger-ethereum`: on connection-reset errors, `RPCRotationMiddleware` now evicts the cached `requests.Session` for the affected provider (`_evict_provider_session`) before retrying, so the next attempt performs a fresh TCP/TLS handshake instead of reusing the half-closed pooled socket. The cache read and `clear()` execute under the session manager's `_lock` when one is exposed; the `_current_index` snapshot in `_handle_error_and_rotate` is taken under the middleware's own lock. Eviction failures are logged at `WARNING` with `exc_info=True` so recovery-path regressions remain diagnosable. #887
+- `open-aea-ledger-ethereum`: removes the `len(rpc_urls) > 1` gate from `RPCRotationMiddleware.wrap_make_request` — single-URL deployments (Pearl's default) now enter the retry / session-eviction loop. The retry budget remains `min(MAX_RETRIES, len(rpc_urls) * 2)`; when the configured `MAX_RETRIES` is clamped by the pool size, an INFO log line is emitted once at `build()` time. On genuine pool exhaustion a single WARNING summary is emitted before the final `raise`, distinguishing systemic outages from one-off transient failures. #887
+- `open-aea-ledger-ethereum`: changes the registration of `ExtraDataToPOAMiddleware` from `inject(layer=0)` (innermost) to `add(...)` (outermost). Required because `RPCRotationMiddleware.wrap_make_request` calls each provider directly and bypasses the inner middleware chain (formatters, ENS, retry, exception, `AttributeDictMiddleware`); PoA processing must therefore wrap the rotation layer to apply on every response. Fixes BSC `extraData` field truncation that surfaced during CI. #887
+- `open-aea-ledger-ethereum`: widens `AttributeDictTranslator.to_dict` to accept plain `dict` (`Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]`). Required because responses returning through the rotation path arrive as plain dicts rather than `AttributeDict` instances (the inner middleware chain is bypassed). `TxReceipt` and `TxData` are TypedDicts and continue to flow through the same arm. The existing `AttributeDict` callers are unaffected. #887
+
+Tests:
+
+- Reworks `ACNWithBootstrappedEntryNodesDockerImage` (the libp2p ACN docker fixture) to support a multi-container topology (bootstrap node plus two entry nodes), replacing the single-container `wait()` with a per-container port poll. Resolves flaky ACN integration tests; unrelated to the WSAECONNRESET fix but absorbed into the same release for CI continuity. #887
+
 ## 2.2.3 (2026-05-04)
 
 AEA:
