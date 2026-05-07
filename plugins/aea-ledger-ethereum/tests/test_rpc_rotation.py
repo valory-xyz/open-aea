@@ -345,7 +345,9 @@ class TestHandleErrorAndRotate:
     def test_unknown_error_no_retry(self) -> None:
         """Unknown errors don't trigger retry."""
         mw = _make_middleware(["http://a", "http://b"])
-        assert mw._handle_error_and_rotate(Exception("something weird"), "op", 0) is False
+        assert (
+            mw._handle_error_and_rotate(Exception("something weird"), "op", 0) is False
+        )
 
     def test_rate_limit_triggers_backoff_and_rotation(self) -> None:
         """Rate limit backs off current RPC and rotates."""
