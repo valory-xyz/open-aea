@@ -414,11 +414,14 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     # Error handling
     # ------------------------------------------------------------------
 
-    def _handle_error_and_rotate(self, error: Exception, operation: str) -> bool:
+    def _handle_error_and_rotate(
+        self, error: Exception, operation: str, index: int
+    ) -> bool:
         """Classify *error*, apply backoff, and rotate.
 
         :param error: the transport-level exception.
         :param operation: human-readable label for log messages.
+        :param index: provider index that was active when the error occurred.
         :return: ``True`` if the caller should retry.
         """
         category = classify_error(error)
@@ -436,23 +439,15 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         if category == "unknown":
             return False
 
-        # Snapshot index under the lock so concurrent rotations cannot cause
-        # eviction or backoff to target the wrong provider.  This is safe only
-        # because ``self._providers`` is built once in ``build()`` and never
-        # mutated; if that invariant changes, ``_providers`` access must move
-        # inside this lock as well.
-        with self._lock:
-            current_index = self._current_index
-
         if category == "connection":
             # Evict the stale session so the retry gets a fresh TCP/TLS handshake.
-            self._evict_provider_session(current_index)
+            self._evict_provider_session(index)
 
         backoff = _BACKOFF_MAP.get(category, 0.0)
-        self._mark_rpc_backoff(current_index, backoff)
+        self._mark_rpc_backoff(index, backoff)
         _logger.warning(
             "RPC #%d %s error (backoff %ds) during %s: %.120s",
-            current_index,
+            index,
             category.upper(),
             int(backoff),
             operation,
@@ -492,10 +487,9 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             last_error: Optional[Exception] = None
 
             for attempt in range(max_retries + 1):
+                used_index = self._current_index  # snapshot before the call
                 try:
-                    return self._providers[self._current_index].make_request(
-                        method, params
-                    )
+                    return self._providers[used_index].make_request(method, params)
                 except Exception as exc:  # pylint: disable=broad-exception-caught
                     last_error = exc
                     category = classify_error(exc)
@@ -504,7 +498,9 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                     if is_write and category not in ("connection", "fd_exhaustion"):
                         raise
 
-                    should_retry = self._handle_error_and_rotate(exc, str(method))
+                    should_retry = self._handle_error_and_rotate(
+                        exc, str(method), used_index
+                    )
                     if not should_retry:
                         raise
                     if attempt >= max_retries:

@@ -345,13 +345,13 @@ class TestHandleErrorAndRotate:
     def test_unknown_error_no_retry(self) -> None:
         """Unknown errors don't trigger retry."""
         mw = _make_middleware(["http://a", "http://b"])
-        assert mw._handle_error_and_rotate(Exception("something weird"), "op") is False
+        assert mw._handle_error_and_rotate(Exception("something weird"), "op", 0) is False
 
     def test_rate_limit_triggers_backoff_and_rotation(self) -> None:
         """Rate limit backs off current RPC and rotates."""
         mw = _make_middleware(["http://a", "http://b"])
         assert (
-            mw._handle_error_and_rotate(Exception("429 Too Many Requests"), "op")
+            mw._handle_error_and_rotate(Exception("429 Too Many Requests"), "op", 0)
             is True
         )
         assert mw._is_rpc_healthy(0) is False
@@ -360,7 +360,7 @@ class TestHandleErrorAndRotate:
     def test_fd_exhaustion_backs_off_all_rpcs(self) -> None:
         """FD exhaustion marks ALL RPCs as unhealthy."""
         mw = _make_middleware(["http://a", "http://b", "http://c"])
-        mw._handle_error_and_rotate(Exception("too many open files"), "op")
+        mw._handle_error_and_rotate(Exception("too many open files"), "op", 0)
         assert mw._is_rpc_healthy(0) is False
         assert mw._is_rpc_healthy(1) is False
         assert mw._is_rpc_healthy(2) is False
@@ -624,7 +624,7 @@ class TestSessionCacheEvictionOnConnectionReset:
         mock_session_mgr.session_cache = mock_cache
         mw._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call")
+        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
 
         mock_cache.clear.assert_called_once()
 
@@ -636,7 +636,7 @@ class TestSessionCacheEvictionOnConnectionReset:
         mock_session_mgr.session_cache = mock_cache
         mw._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(Exception("429 rate limit"), "eth_call")
+        mw._handle_error_and_rotate(Exception("429 rate limit"), "eth_call", 0)
 
         mock_cache.clear.assert_not_called()
 
@@ -668,7 +668,7 @@ class TestSessionCacheEvictionOnConnectionReset:
         mock_session_mgr._lock = _TrackingLock()
         mw._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call")
+        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
 
         assert "lock_enter" in call_order
         assert "cache_clear" in call_order
@@ -734,7 +734,7 @@ class TestBackoffDurations:
     ) -> None:
         """Each error category applies the correct backoff duration."""
         mw = _make_middleware(["http://a", "http://b"])
-        mw._handle_error_and_rotate(Exception(error_msg), "test")
+        mw._handle_error_and_rotate(Exception(error_msg), "test", 0)
         backoff_until = mw._backoff_until.get(0, 0.0)
         remaining = backoff_until - time.monotonic()
         assert remaining > 0
