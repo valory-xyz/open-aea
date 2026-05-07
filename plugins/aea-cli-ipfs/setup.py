@@ -34,7 +34,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-cli-ipfs",
-    version="2.2.3",
+    version="2.2.4",
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for open AEA framework wrapping IPFS functionality.",

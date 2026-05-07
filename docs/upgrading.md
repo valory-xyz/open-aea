@@ -9,6 +9,34 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.3` to `v2.2.4`
+
+This is a non-breaking patch release. The fixes target the `open-aea-ledger-ethereum` RPC rotation middleware and primarily affect Windows deployments, but two changes (PoA middleware ordering and `AttributeDictTranslator.to_dict` accepting plain `dict`) are global to all Ethereum users. Both are backwards-compatible.
+
+### `open-aea-ledger-ethereum` — RPC rotation: locale-safe reset detection and session eviction
+
+`RPCRotationMiddleware` now classifies WSAECONNRESET / SSL-EOF connection resets via `isinstance` and `errno == 10054` rather than substring-matching the OS error string. Non-English Windows installs that previously fell through as `"unknown"` (skipping the retry path entirely) now retry correctly. On a connection-reset classification, the affected `HTTPProvider`'s pooled `requests.Session` is evicted before the retry so the next attempt performs a fresh TCP/TLS handshake instead of reusing the half-closed socket. The retry path also fires for single-URL deployments (the previous `len(rpc_urls) > 1` gate was removed).
+
+This is purely a behavioural improvement. No API or configuration change is required.
+
+### `open-aea-ledger-ethereum` — PoA middleware now registered as outermost layer
+
+`ExtraDataToPOAMiddleware` is now installed via `web3.middleware_onion.add(...)` (outermost) rather than `inject(..., layer=0)` (innermost). The change is required because `RPCRotationMiddleware.wrap_make_request` calls providers directly and bypasses the inner middleware chain; PoA processing must therefore wrap the rotation layer to apply to every response.
+
+Practical impact for downstream consumers: PoA chains (BSC, etc.) continue to work correctly — and BSC `extraData` truncation that surfaced under rotation is fixed. If you were programmatically inspecting `web3.middleware_onion` and asserting the PoA middleware sits at position 0, update the assertion (or look it up by name).
+
+### `open-aea-ledger-ethereum` — `AttributeDictTranslator.to_dict` accepts plain `dict`
+
+The signature was widened from `Union[AttributeDict, TxReceipt, TxData]` to `Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]`, and the runtime guard accepts `(AttributeDict, dict)`. This is required so receipts returning through the rotation path — which bypasses `AttributeDictMiddleware` and therefore arrives as plain dicts — translate correctly. Existing callers passing `AttributeDict`, `TxReceipt`, or `TxData` are unaffected; the change is additive.
+
+Downstream code that subclassed `AttributeDictTranslator` and tightened the parameter type to `AttributeDict` only should widen its override to match — otherwise mypy will reject the rotation-path call sites.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.4"` (and the same `2.2.4` pin for any `open-aea-*` plugin you use, in particular `open-aea-ledger-ethereum`).
+- `aea --version` should report `2.2.4`.
+- No agent / package / config edits are required.
+
 ## `v2.2.2` to `v2.2.3`
 
 This is a non-breaking patch release. There are no API or runtime behaviour changes; the work below is a security bump and a repo-wide lint/test config consolidation that does not affect downstream consumers.
