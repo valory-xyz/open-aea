@@ -21,6 +21,7 @@
 
 import ssl
 import time
+from typing import Optional
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -655,7 +656,7 @@ class TestSessionCacheEvictionOnConnectionReset:
                 call_order.append("lock_enter")
                 return self
 
-            def __exit__(self, *args: object) -> bool:
+            def __exit__(self, *args: object) -> Optional[bool]:
                 call_order.append("lock_exit")
                 return False
 

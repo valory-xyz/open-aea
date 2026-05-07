@@ -696,7 +696,9 @@ class AttributeDictTranslator:
         raise ValueError("Key must be string.")  # pragma: nocover
 
     @classmethod
-    def to_dict(cls, attr_dict: Union[AttributeDict, TxReceipt, TxData]) -> JSONLike:
+    def to_dict(
+        cls, attr_dict: Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]
+    ) -> JSONLike:
         """Simplify to dict."""
         # Plain dict is accepted in addition to AttributeDict because
         # RPCRotationMiddleware calls self._providers[i].make_request() directly,

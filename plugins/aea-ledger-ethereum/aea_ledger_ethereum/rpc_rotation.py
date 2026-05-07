@@ -29,6 +29,7 @@ import logging
 import ssl
 import threading
 import time
+from contextlib import nullcontext
 from typing import Any, Dict, FrozenSet, List, Optional, Union
 
 from aea_ledger_ethereum.chainlist import enrich_rpc_urls
@@ -269,6 +270,20 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         mw._backoff_until = {}  # pylint: disable=protected-access
         mw._lock = threading.Lock()  # pylint: disable=protected-access
         mw._last_rotation_time = 0.0  # pylint: disable=protected-access
+
+        # Surface that the configured MAX_RETRIES is being clamped by the
+        # (small) provider pool — common for single-URL deployments.  Logged
+        # once at build() rather than per-request to avoid log spam.
+        uncapped_retries = len(rpc_urls) * 2
+        if uncapped_retries < MAX_RETRIES:
+            _logger.info(
+                "RPCRotationMiddleware: retry budget capped at %d "
+                "(RPC count=%d, MAX_RETRIES=%d)",
+                uncapped_retries,
+                len(rpc_urls),
+                MAX_RETRIES,
+            )
+
         return mw
 
     def __call__(self, w3: Any = None) -> "RPCRotationMiddleware":
@@ -367,39 +382,32 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         try:
             provider = self._providers[index]
             session_mgr = getattr(provider, "_request_session_manager", None)
-            if session_mgr is not None:
-                lock = getattr(session_mgr, "_lock", None)
-                if lock is not None:
-                    with lock:
-                        # Read session_cache inside the lock so the reference is
-                        # consistent with the lock's protection scope.
-                        cache = getattr(session_mgr, "session_cache", None)
-                        if cache is not None:
-                            cache.clear()
-                        else:
-                            _logger.warning(
-                                "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
-                                index,
-                            )
-                else:
-                    cache = getattr(session_mgr, "session_cache", None)
-                    if cache is not None:
-                        cache.clear()
-                    else:
-                        _logger.warning(
-                            "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
-                            index,
-                        )
-            else:
+            if session_mgr is None:
                 _logger.warning(
                     "Provider #%d: HTTPProvider has no '_request_session_manager'; skipping session eviction.",
                     index,
                 )
+                return
+
+            # Read session_cache and clear it under the lock when one exists,
+            # so both the reference and the mutation are protected. Fall back
+            # to a nullcontext when the session manager doesn't expose a lock.
+            lock = getattr(session_mgr, "_lock", None)
+            with lock if lock is not None else nullcontext():
+                cache = getattr(session_mgr, "session_cache", None)
+                if cache is None:
+                    _logger.warning(
+                        "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
+                        index,
+                    )
+                    return
+                cache.clear()
         except Exception as exc:  # pylint: disable=broad-exception-caught
             _logger.warning(
                 "Session eviction failed for provider #%d: %s",
                 index,
                 exc,
+                exc_info=True,
             )
 
     # ------------------------------------------------------------------
@@ -429,7 +437,10 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             return False
 
         # Snapshot index under the lock so concurrent rotations cannot cause
-        # eviction or backoff to target the wrong provider.
+        # eviction or backoff to target the wrong provider.  This is safe only
+        # because ``self._providers`` is built once in ``build()`` and never
+        # mutated; if that invariant changes, ``_providers`` access must move
+        # inside this lock as well.
         with self._lock:
             current_index = self._current_index
 
@@ -476,7 +487,8 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
             """Middleware function to override the request with."""
             is_write = method in WRITE_RPC_METHODS
-            max_retries = min(MAX_RETRIES, len(self._rpc_urls) * 2)
+            url_count = len(self._rpc_urls)
+            max_retries = min(MAX_RETRIES, url_count * 2)
             last_error: Optional[Exception] = None
 
             for attempt in range(max_retries + 1):
@@ -493,7 +505,21 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                         raise
 
                     should_retry = self._handle_error_and_rotate(exc, str(method))
-                    if not should_retry or attempt >= max_retries:
+                    if not should_retry:
+                        raise
+                    if attempt >= max_retries:
+                        # All retries used up across the provider pool: surface
+                        # a single summary so a systemic outage is distinguishable
+                        # from a one-off transient failure.
+                        _logger.warning(
+                            "%s: exhausted %d retries across %d provider(s); "
+                            "last error category=%s, last error=%.120s",
+                            method,
+                            max_retries,
+                            url_count,
+                            category,
+                            str(exc),
+                        )
                         raise
 
                     delay = min(RETRY_DELAY * (2**attempt), MAX_RETRY_DELAY)
