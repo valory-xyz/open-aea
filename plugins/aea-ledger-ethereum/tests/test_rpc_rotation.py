@@ -247,16 +247,12 @@ class TestRPCRotationMiddlewareBuild:
         mw = _make_middleware(["http://rpc1"])
         assert mw.rpc_count == 1
         assert mw.current_rpc_url == "http://rpc1"
-        # _rotation_enabled is True so the retry/session-eviction path fires;
-        # but _rotate() itself returns False for a single URL.
-        assert mw._rotation_enabled is True
         assert mw._rotate() is False
 
     def test_multiple_rpcs_enables_rotation(self) -> None:
         """With multiple RPCs, rotation is enabled."""
         mw = _make_middleware(["http://rpc1", "http://rpc2", "http://rpc3"])
         assert mw.rpc_count == 3
-        assert mw._rotation_enabled is True
 
     def test_providers_created_per_url(self) -> None:
         """One HTTPProvider is created per URL."""
@@ -377,9 +373,9 @@ class TestHandleErrorAndRotate:
 class TestWrapMakeRequestSingleRpc:
     """Tests for wrap_make_request with a single RPC.
 
-    With _rotation_enabled = True for all configs, single-RPC deployments now
-    use the retry loop (calling self._providers[0].make_request directly) so
-    they also benefit from session eviction on connection resets.
+    Single-RPC deployments use the retry loop (calling
+    self._providers[0].make_request directly) so they also benefit from
+    session eviction on connection resets.
     """
 
     def test_success_via_provider(self) -> None:
@@ -564,7 +560,6 @@ class TestEthereumApiMultiRpc:
         mock_web3.middleware_onion = MagicMock()
 
         api = EthereumApi(address="http://localhost:8545")
-        assert api._rpc_rotation._rotation_enabled is True
         assert api._rpc_rotation.rpc_count == 1
         assert api._rpc_rotation.current_rpc_url == "http://localhost:8545"
         # _rotate() returns False for single URL — no rotation occurs
@@ -587,7 +582,6 @@ class TestEthereumApiMultiRpc:
         mock_web3.middleware_onion = MagicMock()
 
         api = EthereumApi(address="http://rpc1.example.com,http://rpc2.example.com")
-        assert api._rpc_rotation._rotation_enabled is True
         assert api._rpc_rotation.rpc_count == 2
         assert api._rpc_rotation.current_rpc_url == "http://rpc1.example.com"
 
@@ -650,6 +644,37 @@ class TestSessionCacheEvictionOnConnectionReset:
         mw = _make_middleware(["http://a"])
         # No _request_session_manager attribute on provider — should not raise
         mw._evict_provider_session(0)  # must not raise
+
+    def test_session_cache_cleared_under_lock(self) -> None:
+        """cache.clear() is called while session_mgr._lock is held."""
+        mw = _make_middleware(["http://a", "http://b"])
+        call_order: list = []
+
+        class _TrackingLock:
+            def __enter__(self) -> "_TrackingLock":
+                call_order.append("lock_enter")
+                return self
+
+            def __exit__(self, *args: object) -> bool:
+                call_order.append("lock_exit")
+                return False
+
+        mock_cache = MagicMock()
+        mock_cache.clear.side_effect = lambda: call_order.append("cache_clear")
+
+        mock_session_mgr = MagicMock()
+        mock_session_mgr.session_cache = mock_cache
+        mock_session_mgr._lock = _TrackingLock()
+        mw._providers[0]._request_session_manager = mock_session_mgr
+
+        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call")
+
+        assert "lock_enter" in call_order
+        assert "cache_clear" in call_order
+        assert "lock_exit" in call_order
+        # cache.clear() must execute strictly inside the lock
+        assert call_order.index("lock_enter") < call_order.index("cache_clear")
+        assert call_order.index("cache_clear") < call_order.index("lock_exit")
 
 
 # ---------------------------------------------------------------------------

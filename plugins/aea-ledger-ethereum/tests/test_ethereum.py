@@ -141,6 +141,24 @@ def test_attribute_dict_translator():
     assert AttributeDictTranslator.to_dict(res) == di
 
 
+def test_attribute_dict_translator_plain_dict():
+    """to_dict accepts a plain dict (e.g. from the RPCRotationMiddleware path).
+
+    RPCRotationMiddleware calls provider.make_request() directly, bypassing
+    the inner web3 middleware chain, so responses arrive as plain dicts rather
+    than AttributeDict instances.  Both arms of the isinstance guard and the
+    recursive _remove_hexbytes path must handle plain dicts correctly.
+    """
+    di = {
+        "blockNumber": 42,
+        "status": True,
+        "data": b"raw",
+        "nested": {"value": 99},
+    }
+    result = AttributeDictTranslator.to_dict(di)
+    assert result == {"blockNumber": 42, "status": True, "data": b"raw", "nested": {"value": 99}}
+
+
 def test_creation(ethereum_private_key_file):
     """Test the creation of the crypto_objects."""
     assert EthereumCrypto(), "Managed to initialise the eth_account"

@@ -229,7 +229,6 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     """
 
     # Set by build()
-    _rotation_enabled: bool
     _rpc_urls: List[str]
     _request_kwargs: Dict[str, Any]
     _providers: List[HTTPProvider]
@@ -266,7 +265,6 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
             for url in rpc_urls
         ]
-        mw._rotation_enabled = True  # pylint: disable=protected-access
         mw._current_index = 0  # pylint: disable=protected-access
         mw._backoff_until = {}  # pylint: disable=protected-access
         mw._lock = threading.Lock()  # pylint: disable=protected-access
@@ -370,30 +368,38 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             provider = self._providers[index]
             session_mgr = getattr(provider, "_request_session_manager", None)
             if session_mgr is not None:
-                cache = getattr(session_mgr, "session_cache", None)
-                if cache is not None:
-                    lock = getattr(session_mgr, "_lock", None)
-                    if lock is not None:
-                        with lock:
+                lock = getattr(session_mgr, "_lock", None)
+                if lock is not None:
+                    with lock:
+                        # Read session_cache inside the lock so the reference is
+                        # consistent with the lock's protection scope.
+                        cache = getattr(session_mgr, "session_cache", None)
+                        if cache is not None:
                             cache.clear()
-                    else:
-                        cache.clear()
+                        else:
+                            _logger.warning(
+                                "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
+                                index,
+                            )
                 else:
-                    _logger.warning(
-                        "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
-                        index,
-                    )
+                    cache = getattr(session_mgr, "session_cache", None)
+                    if cache is not None:
+                        cache.clear()
+                    else:
+                        _logger.warning(
+                            "Provider #%d: session_mgr has no 'session_cache'; skipping session eviction.",
+                            index,
+                        )
             else:
                 _logger.warning(
                     "Provider #%d: HTTPProvider has no '_request_session_manager'; skipping session eviction.",
                     index,
                 )
         except Exception as exc:  # pylint: disable=broad-exception-caught
-            _logger.debug(
+            _logger.warning(
                 "Session eviction failed for provider #%d: %s",
                 index,
                 exc,
-                exc_info=True,
             )
 
     # ------------------------------------------------------------------
@@ -422,15 +428,20 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         if category == "unknown":
             return False
 
+        # Snapshot index under the lock so concurrent rotations cannot cause
+        # eviction or backoff to target the wrong provider.
+        with self._lock:
+            current_index = self._current_index
+
         if category == "connection":
             # Evict the stale session so the retry gets a fresh TCP/TLS handshake.
-            self._evict_provider_session(self._current_index)
+            self._evict_provider_session(current_index)
 
         backoff = _BACKOFF_MAP.get(category, 0.0)
-        self._mark_rpc_backoff(self._current_index, backoff)
+        self._mark_rpc_backoff(current_index, backoff)
         _logger.warning(
             "RPC #%d %s error (backoff %ds) during %s: %.120s",
-            self._current_index,
+            current_index,
             category.upper(),
             int(backoff),
             operation,
