@@ -656,7 +656,7 @@ class AttributeDictTranslator:
             return cls._process_list(value, cls._remove_hexbytes)
         if type(value) in (bool, int, float, str, bytes):
             return value
-        if isinstance(value, AttributeDict):
+        if isinstance(value, (AttributeDict, dict)):
             return cls.to_dict(value)
         raise NotImplementedError(  # pragma: nocover
             f"Unknown type conversion. Found type: {type(value)}"
@@ -696,9 +696,17 @@ class AttributeDictTranslator:
         raise ValueError("Key must be string.")  # pragma: nocover
 
     @classmethod
-    def to_dict(cls, attr_dict: Union[AttributeDict, TxReceipt, TxData]) -> JSONLike:
+    def to_dict(
+        cls, attr_dict: Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]
+    ) -> JSONLike:
         """Simplify to dict."""
-        if not isinstance(attr_dict, AttributeDict):
+        # Plain dict is accepted in addition to AttributeDict because
+        # RPCRotationMiddleware calls self._providers[i].make_request() directly,
+        # bypassing the inner web3 middleware chain (including AttributeDictMiddleware).
+        # Responses on the rotation path therefore arrive as plain dicts rather than
+        # AttributeDict instances.  TxReceipt / TxData are TypedDicts (dict subclasses)
+        # and handled identically.
+        if not isinstance(attr_dict, (AttributeDict, dict)):
             raise ValueError("No AttributeDict provided.")  # pragma: nocover
         result = {
             cls._valid_key(key): cls._remove_hexbytes(value)
@@ -1145,8 +1153,12 @@ class EthereumApi(LedgerApi, EthereumHelper):
         self._poa_chain = kwargs.pop("poa_chain", False)
         if self._poa_chain:
             # https://web3py.readthedocs.io/en/stable/middleware.html#geth-style-proof-of-authority
-            self._api.middleware_onion.inject(
-                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware", layer=0
+            # Must be added as the outermost middleware so that its response transformation
+            # (truncating the oversized extraData field) is applied even when
+            # RPCRotationMiddleware routes requests to rotation providers directly,
+            # bypassing the inner middleware chain.
+            self._api.middleware_onion.add(
+                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware"
             )
             _default_logger.info(
                 "EthereumApi has been configured with Proof of Authority chain support"

@@ -191,8 +191,9 @@ Translator for AttributeDict.
 
 ```python
 @classmethod
-def to_dict(cls, attr_dict: Union[AttributeDict, TxReceipt,
-                                  TxData]) -> JSONLike
+def to_dict(
+    cls, attr_dict: Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]
+) -> JSONLike
 ```
 
 Simplify to dict.

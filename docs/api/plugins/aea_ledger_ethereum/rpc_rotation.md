@@ -7,7 +7,7 @@ RPC rotation support for EthereumApi as a web3 middleware.
 When multiple RPC endpoints are provided (comma-separated), the
 :class:`RPCRotationMiddleware` automatically fails over to healthy
 endpoints on rate-limit, connection, or quota errors.  With a single
-RPC URL the middleware is a transparent pass-through.
+RPC URL the middleware retries on transport failures without rotation.
 
 <a id="plugins.aea-ledger-ethereum.aea_ledger_ethereum.rpc_rotation.MakeRequestFn"></a>
 
@@ -183,9 +183,19 @@ def wrap_make_request(make_request: MakeRequestFn) -> MakeRequestFn
 
 Wrap the JSON-RPC make_request with retry and rotation logic.
 
+``make_request`` (the next function in the middleware chain) is
+intentionally not called.  Instead, this middleware calls each
+provider's ``make_request`` directly so it can retry against
+different providers in the pool without being subject to other
+middleware's retry or error-conversion logic.  As a result,
+inner middleware (formatters, ``AttributeDictMiddleware``, ENS,
+exception, retry) are bypassed on all call paths; callers must
+handle plain-dict responses.  PoA middleware must therefore be
+added as the *outermost* layer (via ``add``, not ``inject``).
+
 **Arguments**:
 
-- `make_request`: the next function in the middleware chain.
+- `make_request`: not used; present to satisfy the web3 middleware interface.
 
 **Returns**:
 
