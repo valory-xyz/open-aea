@@ -9,6 +9,32 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.4` to `v2.2.5`
+
+This is a non-breaking patch release. It fixes a v2.2.4 regression where `ledger_api.api.eth.<method>(...)` returned plain dicts instead of `AttributeDict` for downstream consumers reaching into the underlying web3 handle directly (most notably open-autonomy's `TxSettler.settle()`, which crashes on `receipt.blockNumber` attribute access). The fix is a structural refactor of RPC rotation; every public surface (`EthereumApi`, `ledger_api.api`, the web3 instance, the rotation behaviour) keeps the same semantics it had before v2.2.4.
+
+### `open-aea-ledger-ethereum` — RPC rotation moved from middleware to provider
+
+`RPCRotationMiddleware` (a Web3 middleware) has been replaced by `RotatingHTTPProvider` (an `HTTPProvider` subclass). `EthereumApi.__init__` now does `Web3(RotatingHTTPProvider(rpc_urls, ...))` instead of constructing a plain `HTTPProvider` and registering rotation as a middleware.
+
+The motivation: as a middleware, rotation had to call pooled providers' `make_request` directly to retry against different endpoints — which bypassed every other web3 middleware on every call. v2.2.4 patched `ExtraDataToPOAMiddleware` and `AttributeDictTranslator` defensively but left the bypass in place, so `AttributeDictMiddleware` (and several other defaults) silently stopped running. Putting rotation at the transport layer puts it *under* the entire web3 chain — every request runs through the full middleware stack, and only the underlying socket changes when rotation occurs.
+
+Practical impact for downstream consumers:
+
+- Code that calls `ledger_api.api.eth.<method>(...)` directly (e.g. `eth.get_transaction_receipt`, `eth.send_raw_transaction`) once again receives `AttributeDict`-wrapped responses, so attribute access (`receipt.blockNumber`, `tx.hash`, etc.) works as in v2.2.3 and earlier.
+- User-injected middleware at `inject(layer=0)` — silently bypassed under v2.2.4 — runs again.
+- `ExtraDataToPOAMiddleware` returns to its standard `inject(layer=0)` placement. If you were programmatically inspecting `web3.middleware_onion` and asserting PoA was at the *outermost* position (the v2.2.4 workaround), revert that assertion to the pre-2.2.4 expectation, or look it up by name.
+- `web3.provider.endpoint_uri` now reflects the currently active RPC URL after rotation rather than the first URL passed at construction.
+- Constructing an `EthereumApi` (or `RotatingHTTPProvider` directly) with an empty `rpc_urls` list now raises `ValueError` at construction instead of failing on the first RPC call.
+
+If you were pinning `open-aea-ledger-ethereum = "2.2.3"` to work around the v2.2.4 regression, you can drop the pin and upgrade to `2.2.5`.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.5"` (and the same `2.2.5` pin for any `open-aea-*` plugin you use, in particular `open-aea-ledger-ethereum`).
+- `aea --version` should report `2.2.5`.
+- No agent / package / config edits are required.
+
 ## `v2.2.3` to `v2.2.4`
 
 This is a non-breaking patch release. The fixes target the `open-aea-ledger-ethereum` RPC rotation middleware and primarily affect Windows deployments, but two changes (PoA middleware ordering and `AttributeDictTranslator.to_dict` accepting plain `dict`) are global to all Ethereum users. Both are backwards-compatible.
