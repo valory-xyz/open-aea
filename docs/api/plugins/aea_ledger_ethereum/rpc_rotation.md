@@ -172,14 +172,14 @@ the active RPC URL.
 
 ```python
 @endpoint_uri.setter
-def endpoint_uri(_value: str) -> None
+def endpoint_uri(value: str) -> None
 ```
 
 No-op setter retained for parent-class compatibility.
 
 **Arguments**:
 
-- `_value`: ignored.  ``HTTPProvider.__init__`` assigns to
+- `value`: ignored.  ``HTTPProvider.__init__`` assigns to
 ``endpoint_uri`` once at construction; we accept the write so the
 parent constructor does not raise, but the active endpoint is
 always derived from ``self._rpc_urls[self._current_index]``.
