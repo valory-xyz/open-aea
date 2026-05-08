@@ -432,49 +432,41 @@ class TestEnrichRpcUrls:
 
 
 # ---------------------------------------------------------------------------
-# Integration: RPCRotationMiddleware.build with chain_id → Chainlist enrichment
+# Integration: RotatingHTTPProvider with chain_id → Chainlist enrichment
 # ---------------------------------------------------------------------------
 
 
 class TestRotationMixinChainlistIntegration:
-    """Test that RPCRotationMiddleware enriches RPCs when chain_id is given."""
+    """Test that RotatingHTTPProvider enriches RPCs when chain_id is given."""
 
     @patch("aea_ledger_ethereum.chainlist.ChainlistRPC")
     def test_init_rotation_enriches_with_chain_id(self, mock_cl_cls: MagicMock) -> None:
-        """build() enriches RPCs when chain_id is provided."""
-        from unittest.mock import MagicMock as _MM
-
-        from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware
+        """Test RotatingHTTPProvider enriches RPCs when chain_id is provided."""
+        from aea_ledger_ethereum.rpc_rotation import RotatingHTTPProvider
 
         mock_cl = mock_cl_cls.return_value
         mock_cl.get_validated_rpcs.return_value = ["https://extra.com"]
 
-        mock_w3 = _MM()
-        mw = RPCRotationMiddleware.build(
-            mock_w3,
+        provider = RotatingHTTPProvider(
             rpc_urls=["https://original.com"],
             request_kwargs={},
             chain_id=100,
         )
 
-        assert mw.rpc_count == 2
-        assert mw._rpc_urls == ["https://original.com", "https://extra.com"]
+        assert provider.rpc_count == 2
+        assert provider._rpc_urls == ["https://original.com", "https://extra.com"]
 
     @patch("aea_ledger_ethereum.chainlist.ChainlistRPC")
     def test_init_rotation_no_chain_id_no_enrichment(
         self, mock_cl_cls: MagicMock
     ) -> None:
-        """build() skips enrichment when no chain_id is given."""
-        from unittest.mock import MagicMock as _MM
+        """Test RotatingHTTPProvider skips enrichment when no chain_id is given."""
+        from aea_ledger_ethereum.rpc_rotation import RotatingHTTPProvider
 
-        from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware
-
-        mock_w3 = _MM()
-        mw = RPCRotationMiddleware.build(
-            mock_w3,
+        provider = RotatingHTTPProvider(
             rpc_urls=["https://only.com"],
             request_kwargs={},
         )
 
-        assert mw.rpc_count == 1
+        assert provider.rpc_count == 1
         mock_cl_cls.assert_not_called()

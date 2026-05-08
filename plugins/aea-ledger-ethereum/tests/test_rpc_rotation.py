@@ -17,7 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 
-"""Tests for the RPC rotation middleware (no Ganache required)."""
+"""Tests for the rotating HTTP provider (no Ganache required)."""
 
 import ssl
 import time
@@ -29,7 +29,7 @@ from aea_ledger_ethereum.rpc_rotation import (
     CONNECTION_ERROR_BACKOFF,
     QUOTA_EXCEEDED_BACKOFF,
     RATE_LIMIT_BACKOFF,
-    RPCRotationMiddleware,
+    RotatingHTTPProvider,
     SERVER_ERROR_BACKOFF,
     _is_connection_reset,
     classify_error,
@@ -216,49 +216,46 @@ class TestClassifyErrorLocaleSafe:
 
 
 # ---------------------------------------------------------------------------
-# RPCRotationMiddleware helpers to build test instances
+# RotatingHTTPProvider helpers to build test instances
 # ---------------------------------------------------------------------------
 
 
-def _make_middleware(rpc_urls, request_kwargs=None):
-    """Build an RPCRotationMiddleware with a mock web3 instance."""
-    mock_w3 = MagicMock()
+def _make_provider(rpc_urls, request_kwargs=None):
+    """Build a RotatingHTTPProvider, bypassing Chainlist enrichment."""
     with patch(
         "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
         side_effect=lambda urls, **kw: urls,
     ):
-        mw = RPCRotationMiddleware.build(
-            mock_w3,
+        return RotatingHTTPProvider(
             rpc_urls=rpc_urls,
             request_kwargs=request_kwargs or {},
         )
-    return mw
 
 
 # ---------------------------------------------------------------------------
-# Build + introspection
+# Construction + introspection
 # ---------------------------------------------------------------------------
 
 
-class TestRPCRotationMiddlewareBuild:
-    """Tests for build() and introspection properties."""
+class TestRotatingHTTPProviderInit:
+    """Tests for __init__ and introspection properties."""
 
     def test_single_rpc_rotation_not_performed(self) -> None:
         """With one RPC, _rotate() returns False (no actual rotation happens)."""
-        mw = _make_middleware(["http://rpc1"])
-        assert mw.rpc_count == 1
-        assert mw.current_rpc_url == "http://rpc1"
-        assert mw._rotate() is False
+        provider = _make_provider(["http://rpc1"])
+        assert provider.rpc_count == 1
+        assert provider.current_rpc_url == "http://rpc1"
+        assert provider._rotate() is False
 
     def test_multiple_rpcs_enables_rotation(self) -> None:
         """With multiple RPCs, rotation is enabled."""
-        mw = _make_middleware(["http://rpc1", "http://rpc2", "http://rpc3"])
-        assert mw.rpc_count == 3
+        provider = _make_provider(["http://rpc1", "http://rpc2", "http://rpc3"])
+        assert provider.rpc_count == 3
 
     def test_providers_created_per_url(self) -> None:
         """One HTTPProvider is created per URL."""
-        mw = _make_middleware(["http://a", "http://b"])
-        assert len(mw._providers) == 2
+        provider = _make_provider(["http://a", "http://b"])
+        assert len(provider._providers) == 2
 
 
 # ---------------------------------------------------------------------------
@@ -271,23 +268,23 @@ class TestHealthTracking:
 
     def test_healthy_by_default(self) -> None:
         """All RPCs start as healthy."""
-        mw = _make_middleware(["http://a", "http://b"])
-        assert mw._is_rpc_healthy(0) is True
-        assert mw._is_rpc_healthy(1) is True
+        provider = _make_provider(["http://a", "http://b"])
+        assert provider._is_rpc_healthy(0) is True
+        assert provider._is_rpc_healthy(1) is True
 
     def test_backoff_marks_unhealthy(self) -> None:
         """After marking backoff, RPC is unhealthy."""
-        mw = _make_middleware(["http://a", "http://b"])
-        mw._mark_rpc_backoff(0, 100.0)
-        assert mw._is_rpc_healthy(0) is False
-        assert mw._is_rpc_healthy(1) is True
+        provider = _make_provider(["http://a", "http://b"])
+        provider._mark_rpc_backoff(0, 100.0)
+        assert provider._is_rpc_healthy(0) is False
+        assert provider._is_rpc_healthy(1) is True
 
     def test_backoff_expires(self) -> None:
         """After backoff expires, RPC is healthy again."""
-        mw = _make_middleware(["http://a", "http://b"])
-        mw._mark_rpc_backoff(0, 0.01)
+        provider = _make_provider(["http://a", "http://b"])
+        provider._mark_rpc_backoff(0, 0.01)
         time.sleep(0.02)
-        assert mw._is_rpc_healthy(0) is True
+        assert provider._is_rpc_healthy(0) is True
 
 
 # ---------------------------------------------------------------------------
@@ -300,38 +297,70 @@ class TestRotate:
 
     def test_no_rotation_with_single_rpc(self) -> None:
         """Single RPC never rotates."""
-        mw = _make_middleware(["http://only"])
-        assert mw._rotate() is False
+        provider = _make_provider(["http://only"])
+        assert provider._rotate() is False
 
     def test_rotation_selects_next_healthy(self) -> None:
         """Rotation picks the next healthy RPC in round-robin."""
-        mw = _make_middleware(["http://a", "http://b", "http://c"])
-        assert mw._current_index == 0
-        assert mw._rotate() is True
-        assert mw._current_index == 1
-        assert mw.current_rpc_url == "http://b"
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        assert provider._current_index == 0
+        assert provider._rotate() is True
+        assert provider._current_index == 1
+        assert provider.current_rpc_url == "http://b"
 
     def test_rotation_skips_unhealthy(self) -> None:
         """Rotation skips RPCs in backoff."""
-        mw = _make_middleware(["http://a", "http://b", "http://c"])
-        mw._mark_rpc_backoff(1, 300.0)
-        mw._rotate()
-        assert mw._current_index == 2
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        provider._mark_rpc_backoff(1, 300.0)
+        provider._rotate()
+        assert provider._current_index == 2
 
     def test_rotation_cooldown(self) -> None:
         """Cannot rotate again within cooldown period."""
-        mw = _make_middleware(["http://a", "http://b"])
-        mw._rotate()
-        assert mw._rotate() is False
+        provider = _make_provider(["http://a", "http://b"])
+        provider._rotate()
+        assert provider._rotate() is False
+
+    def test_cooldown_bypassed_when_current_unhealthy(self) -> None:
+        """Cooldown does not block rotation when the current provider is in backoff.
+
+        Regression test: the cooldown is meant to prevent thrashing among
+        healthy providers; if the active one was just marked unhealthy,
+        refusing to rotate would loop the next attempt back to a known-bad
+        endpoint and burn the per-call retry budget.
+        """
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        # First rotation: A -> B.  Sets _last_rotation_time = now.
+        assert provider._rotate() is True
+        assert provider._current_index == 1
+
+        # Within the cooldown window, mark B (the new current) unhealthy.
+        provider._mark_rpc_backoff(1, 100.0)
+
+        # Rotation must proceed despite cooldown — current is unhealthy and
+        # a healthy peer (C) exists.
+        assert provider._rotate() is True
+        assert provider._current_index == 2
+
+    def test_cooldown_still_enforced_when_current_healthy(self) -> None:
+        """Cooldown still suppresses cascades when the current provider is healthy."""
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        # First rotation: A -> B.  B remains healthy.
+        assert provider._rotate() is True
+        assert provider._current_index == 1
+        # Second rotation within cooldown window must be blocked because the
+        # current provider is healthy (so we are not stuck on a dead RPC).
+        assert provider._rotate() is False
+        assert provider._current_index == 1
 
     def test_all_in_backoff_picks_soonest_expiry(self) -> None:
         """When all RPCs are in backoff, picks the one expiring soonest."""
-        mw = _make_middleware(["http://a", "http://b", "http://c"])
+        provider = _make_provider(["http://a", "http://b", "http://c"])
         now = time.monotonic()
-        mw._backoff_until[1] = now + 100
-        mw._backoff_until[2] = now + 10
-        mw._rotate()
-        assert mw._current_index == 2
+        provider._backoff_until[1] = now + 100
+        provider._backoff_until[2] = now + 10
+        provider._rotate()
+        assert provider._current_index == 2
 
 
 # ---------------------------------------------------------------------------
@@ -344,37 +373,40 @@ class TestHandleErrorAndRotate:
 
     def test_unknown_error_no_retry(self) -> None:
         """Unknown errors don't trigger retry."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         assert (
-            mw._handle_error_and_rotate(Exception("something weird"), "op", 0) is False
+            provider._handle_error_and_rotate(Exception("something weird"), "op", 0)
+            is False
         )
 
     def test_rate_limit_triggers_backoff_and_rotation(self) -> None:
         """Rate limit backs off current RPC and rotates."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         assert (
-            mw._handle_error_and_rotate(Exception("429 Too Many Requests"), "op", 0)
+            provider._handle_error_and_rotate(
+                Exception("429 Too Many Requests"), "op", 0
+            )
             is True
         )
-        assert mw._is_rpc_healthy(0) is False
-        assert mw._current_index == 1
+        assert provider._is_rpc_healthy(0) is False
+        assert provider._current_index == 1
 
     def test_fd_exhaustion_backs_off_all_rpcs(self) -> None:
         """FD exhaustion marks ALL RPCs as unhealthy."""
-        mw = _make_middleware(["http://a", "http://b", "http://c"])
-        mw._handle_error_and_rotate(Exception("too many open files"), "op", 0)
-        assert mw._is_rpc_healthy(0) is False
-        assert mw._is_rpc_healthy(1) is False
-        assert mw._is_rpc_healthy(2) is False
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        provider._handle_error_and_rotate(Exception("too many open files"), "op", 0)
+        assert provider._is_rpc_healthy(0) is False
+        assert provider._is_rpc_healthy(1) is False
+        assert provider._is_rpc_healthy(2) is False
 
 
 # ---------------------------------------------------------------------------
-# wrap_make_request — single RPC
+# make_request — single RPC
 # ---------------------------------------------------------------------------
 
 
-class TestWrapMakeRequestSingleRpc:
-    """Tests for wrap_make_request with a single RPC.
+class TestMakeRequestSingleRpc:
+    """Tests for make_request with a single RPC.
 
     Single-RPC deployments use the retry loop (calling
     self._providers[0].make_request directly) so they also benefit from
@@ -382,21 +414,19 @@ class TestWrapMakeRequestSingleRpc:
     """
 
     def test_success_via_provider(self) -> None:
-        """Single-RPC: calls provider.make_request (not inner make_request)."""
-        mw = _make_middleware(["http://only"])
-        mw._providers[0].make_request = MagicMock(return_value={"result": 42})
-        inner = MagicMock()
-        middleware_fn = mw.wrap_make_request(inner)
-        result = middleware_fn("eth_blockNumber", [])
-        mw._providers[0].make_request.assert_called_once_with("eth_blockNumber", [])
+        """Single-RPC: routes to the pooled provider's make_request."""
+        provider = _make_provider(["http://only"])
+        provider._providers[0].make_request = MagicMock(return_value={"result": 42})
+        result = provider.make_request("eth_blockNumber", [])
+        provider._providers[0].make_request.assert_called_once_with(
+            "eth_blockNumber", []
+        )
         assert result == {"result": 42}
-        # inner (next middleware) is not called — provider is used directly
-        inner.assert_not_called()
 
     @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
     def test_retries_on_connection_reset(self, mock_sleep: MagicMock) -> None:
         """Single-RPC: connection resets are retried with session eviction."""
-        mw = _make_middleware(["http://only"])
+        provider = _make_provider(["http://only"])
         call_count = 0
 
         def _make_request(method, params):
@@ -406,15 +436,14 @@ class TestWrapMakeRequestSingleRpc:
                 raise ConnectionResetError("reset")
             return {"result": "ok"}
 
-        mw._providers[0].make_request = _make_request
-        middleware_fn = mw.wrap_make_request(MagicMock())
-        result = middleware_fn("eth_blockNumber", [])
+        provider._providers[0].make_request = _make_request
+        result = provider.make_request("eth_blockNumber", [])
         assert result == {"result": "ok"}
         assert call_count == 3
 
     def test_non_retriable_error_propagates_immediately(self) -> None:
         """Single-RPC: unknown errors raise without retry."""
-        mw = _make_middleware(["http://only"])
+        provider = _make_provider(["http://only"])
         call_count = 0
 
         def _fail(method, params):
@@ -422,25 +451,24 @@ class TestWrapMakeRequestSingleRpc:
             call_count += 1
             raise TypeError("unexpected type")
 
-        mw._providers[0].make_request = _fail
-        middleware_fn = mw.wrap_make_request(MagicMock())
+        provider._providers[0].make_request = _fail
         with pytest.raises(TypeError):
-            middleware_fn("eth_blockNumber", [])
+            provider.make_request("eth_blockNumber", [])
         assert call_count == 1
 
 
 # ---------------------------------------------------------------------------
-# wrap_make_request — multi-RPC (rotation enabled)
+# make_request — multi-RPC (rotation enabled)
 # ---------------------------------------------------------------------------
 
 
-class TestWrapMakeRequestMultiRpc:
-    """Tests for wrap_make_request with multiple RPCs."""
+class TestMakeRequestMultiRpc:
+    """Tests for make_request with multiple RPCs."""
 
     @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
     def test_retries_on_rate_limit(self, mock_sleep: MagicMock) -> None:
         """Rate-limit errors are retried with rotation."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         call_count = 0
 
         def _make_request(method, params):
@@ -450,11 +478,10 @@ class TestWrapMakeRequestMultiRpc:
                 raise Exception("429 rate limit")
             return {"result": "ok"}
 
-        for provider in mw._providers:
-            provider.make_request = _make_request
+        for inner_provider in provider._providers:
+            inner_provider.make_request = _make_request
 
-        middleware_fn = mw.wrap_make_request(MagicMock())
-        result = middleware_fn("eth_blockNumber", [])
+        result = provider.make_request("eth_blockNumber", [])
         assert result == {"result": "ok"}
         assert call_count == 3
         assert mock_sleep.call_count >= 1
@@ -462,18 +489,18 @@ class TestWrapMakeRequestMultiRpc:
     @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
     def test_raises_after_max_retries(self, mock_sleep: MagicMock) -> None:
         """Raises last exception after exhausting retries."""
-        mw = _make_middleware(["http://a", "http://b"])
-        for provider in mw._providers:
-            provider.make_request = MagicMock(
+        provider = _make_provider(["http://a", "http://b"])
+        for inner_provider in provider._providers:
+            inner_provider.make_request = MagicMock(
                 side_effect=Exception("connection refused")
             )
-        middleware_fn = mw.wrap_make_request(MagicMock())
+
         with pytest.raises(Exception, match="connection refused"):
-            middleware_fn("eth_blockNumber", [])
+            provider.make_request("eth_blockNumber", [])
 
     def test_unknown_error_not_retried(self) -> None:
         """Unknown errors raise immediately without retry."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         call_count = 0
 
         def _fail(method, params):
@@ -481,18 +508,17 @@ class TestWrapMakeRequestMultiRpc:
             call_count += 1
             raise TypeError("unexpected type")
 
-        for provider in mw._providers:
-            provider.make_request = _fail
+        for inner_provider in provider._providers:
+            inner_provider.make_request = _fail
 
-        middleware_fn = mw.wrap_make_request(MagicMock())
         with pytest.raises(TypeError):
-            middleware_fn("eth_blockNumber", [])
+            provider.make_request("eth_blockNumber", [])
         assert call_count == 1
 
     @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
     def test_write_not_retried_on_rate_limit(self, mock_sleep: MagicMock) -> None:
         """eth_sendRawTransaction is NOT retried on rate limit (write safety)."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         call_count = 0
 
         def _fail(method, params):
@@ -500,18 +526,17 @@ class TestWrapMakeRequestMultiRpc:
             call_count += 1
             raise Exception("429 rate limit")
 
-        for provider in mw._providers:
-            provider.make_request = _fail
+        for inner_provider in provider._providers:
+            inner_provider.make_request = _fail
 
-        middleware_fn = mw.wrap_make_request(MagicMock())
         with pytest.raises(Exception, match="rate limit"):
-            middleware_fn("eth_sendRawTransaction", [])
+            provider.make_request("eth_sendRawTransaction", [])
         assert call_count == 1
 
     @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
     def test_write_retried_on_connection_error(self, mock_sleep: MagicMock) -> None:
         """eth_sendRawTransaction IS retried on connection errors."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         call_count = 0
 
         def _make_request(method, params):
@@ -521,93 +546,115 @@ class TestWrapMakeRequestMultiRpc:
                 raise Exception("connection refused")
             return {"result": "0xtxhash"}
 
-        for provider in mw._providers:
-            provider.make_request = _make_request
+        for inner_provider in provider._providers:
+            inner_provider.make_request = _make_request
 
-        middleware_fn = mw.wrap_make_request(MagicMock())
-        result = middleware_fn("eth_sendRawTransaction", [])
+        result = provider.make_request("eth_sendRawTransaction", [])
         assert result == {"result": "0xtxhash"}
         assert call_count == 3
 
     def test_success_on_first_try(self) -> None:
         """Successful first call returns immediately."""
-        mw = _make_middleware(["http://a", "http://b"])
-        for provider in mw._providers:
-            provider.make_request = MagicMock(return_value={"result": 123})
-        middleware_fn = mw.wrap_make_request(MagicMock())
-        assert middleware_fn("eth_blockNumber", []) == {"result": 123}
+        provider = _make_provider(["http://a", "http://b"])
+        for inner_provider in provider._providers:
+            inner_provider.make_request = MagicMock(return_value={"result": 123})
+
+        assert provider.make_request("eth_blockNumber", []) == {"result": 123}
+
+    @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
+    def test_eth_send_transaction_not_retried_on_rate_limit(
+        self, mock_sleep: MagicMock
+    ) -> None:
+        """eth_sendTransaction (not just eth_sendRawTransaction) is write-protected."""
+        provider = _make_provider(["http://a", "http://b"])
+        call_count = 0
+
+        def _fail(method, params):
+            nonlocal call_count
+            call_count += 1
+            raise Exception("429 rate limit")
+
+        for inner_provider in provider._providers:
+            inner_provider.make_request = _fail
+
+        with pytest.raises(Exception, match="rate limit"):
+            provider.make_request("eth_sendTransaction", [])
+        assert call_count == 1
+
+    @patch("aea_ledger_ethereum.rpc_rotation.time.sleep")
+    def test_wsaeconnreset_rotates_to_next_provider(
+        self, mock_sleep: MagicMock
+    ) -> None:
+        """Test Windows WSAECONNRESET (errno 10054) on RPC #0 rotates to RPC #1."""
+        provider = _make_provider(["http://a", "http://b"])
+        attempts: list = []
+
+        def _make_request_a(method, params):
+            attempts.append(("a", method))
+            err = OSError()
+            err.errno = 10054  # WSAECONNRESET
+            raise err
+
+        def _make_request_b(method, params):
+            attempts.append(("b", method))
+            return {"result": "ok"}
+
+        provider._providers[0].make_request = _make_request_a
+        provider._providers[1].make_request = _make_request_b
+
+        result = provider.make_request("eth_blockNumber", [])
+        assert result == {"result": "ok"}
+        # First attempt hit provider 'a' and reset, second hit 'b' and succeeded.
+        assert attempts[0] == ("a", "eth_blockNumber")
+        assert ("b", "eth_blockNumber") in attempts
+        assert provider._current_index == 1
 
 
 # ---------------------------------------------------------------------------
-# Integration: EthereumApi uses middleware correctly
+# Integration: EthereumApi wires up the rotating provider correctly
 # ---------------------------------------------------------------------------
 
 
 class TestEthereumApiMultiRpc:
-    """Test that EthereumApi correctly sets up RPCRotationMiddleware."""
+    """Test that EthereumApi correctly sets up RotatingHTTPProvider."""
 
-    @patch("aea_ledger_ethereum.ethereum.Web3")
-    @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
     @patch(
         "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
         side_effect=lambda urls, **kw: urls,
     )
-    def test_single_rpc_retry_path_enabled(
-        self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
-    ) -> None:
+    def test_single_rpc_retry_path_enabled(self, _mock_enrich: MagicMock) -> None:
         """Single RPC: rotation is a no-op but retry/session-eviction path is active."""
         from aea_ledger_ethereum.ethereum import EthereumApi
 
-        mock_web3 = MagicMock()
-        mock_web3_cls.return_value = mock_web3
-        mock_web3.middleware_onion = MagicMock()
-
         api = EthereumApi(address="http://localhost:8545")
+        assert isinstance(api._rpc_rotation, RotatingHTTPProvider)
         assert api._rpc_rotation.rpc_count == 1
         assert api._rpc_rotation.current_rpc_url == "http://localhost:8545"
         # _rotate() returns False for single URL — no rotation occurs
         assert api._rpc_rotation._rotate() is False
 
-    @patch("aea_ledger_ethereum.ethereum.Web3")
-    @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
     @patch(
         "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
         side_effect=lambda urls, **kw: urls,
     )
-    def test_multi_rpc_rotation_enabled(
-        self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
-    ) -> None:
-        """Comma-separated RPCs: rotation middleware is enabled."""
+    def test_multi_rpc_rotation_enabled(self, _mock_enrich: MagicMock) -> None:
+        """Comma-separated RPCs: rotation across the pool is enabled."""
         from aea_ledger_ethereum.ethereum import EthereumApi
-
-        mock_web3 = MagicMock()
-        mock_web3_cls.return_value = mock_web3
-        mock_web3.middleware_onion = MagicMock()
 
         api = EthereumApi(address="http://rpc1.example.com,http://rpc2.example.com")
         assert api._rpc_rotation.rpc_count == 2
         assert api._rpc_rotation.current_rpc_url == "http://rpc1.example.com"
 
-    @patch("aea_ledger_ethereum.ethereum.Web3")
-    @patch("aea_ledger_ethereum.ethereum.HTTPProvider")
     @patch(
         "aea_ledger_ethereum.rpc_rotation.enrich_rpc_urls",
         side_effect=lambda urls, **kw: urls,
     )
-    def test_middleware_added_to_onion(
-        self, _mock_enrich, mock_provider_cls: MagicMock, mock_web3_cls: MagicMock
-    ) -> None:
-        """Test that RPCRotationMiddleware is added to the middleware onion."""
+    def test_rotating_provider_is_web3_provider(self, _mock_enrich: MagicMock) -> None:
+        """The RotatingHTTPProvider is what Web3 uses as its transport."""
         from aea_ledger_ethereum.ethereum import EthereumApi
 
-        mock_web3 = MagicMock()
-        mock_web3_cls.return_value = mock_web3
-        mock_web3.middleware_onion = MagicMock()
-
-        EthereumApi(address="http://rpc1.example.com,http://rpc2.example.com")
-        # middleware_onion.add should be called at least twice
-        # (once for RPCRotation, once for CachedChainId)
-        assert mock_web3.middleware_onion.add.call_count >= 2
+        api = EthereumApi(address="http://rpc1.example.com,http://rpc2.example.com")
+        assert api.api.provider is api._rpc_rotation
 
 
 # ---------------------------------------------------------------------------
@@ -620,37 +667,37 @@ class TestSessionCacheEvictionOnConnectionReset:
 
     def test_session_cache_cleared_on_connection_reset(self) -> None:
         """_handle_error_and_rotate clears the session cache on connection errors."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         mock_cache = MagicMock()
         mock_session_mgr = MagicMock()
         mock_session_mgr.session_cache = mock_cache
-        mw._providers[0]._request_session_manager = mock_session_mgr
+        provider._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
+        provider._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
 
         mock_cache.clear.assert_called_once()
 
     def test_session_cache_not_cleared_on_rate_limit(self) -> None:
         """Rate-limit errors do not trigger session eviction."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         mock_cache = MagicMock()
         mock_session_mgr = MagicMock()
         mock_session_mgr.session_cache = mock_cache
-        mw._providers[0]._request_session_manager = mock_session_mgr
+        provider._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(Exception("429 rate limit"), "eth_call", 0)
+        provider._handle_error_and_rotate(Exception("429 rate limit"), "eth_call", 0)
 
         mock_cache.clear.assert_not_called()
 
     def test_session_eviction_survives_missing_manager(self) -> None:
         """_evict_provider_session is silent when provider has no session manager."""
-        mw = _make_middleware(["http://a"])
+        provider = _make_provider(["http://a"])
         # No _request_session_manager attribute on provider — should not raise
-        mw._evict_provider_session(0)  # must not raise
+        provider._evict_provider_session(0)  # must not raise
 
     def test_session_cache_cleared_under_lock(self) -> None:
         """cache.clear() is called while session_mgr._lock is held."""
-        mw = _make_middleware(["http://a", "http://b"])
+        provider = _make_provider(["http://a", "http://b"])
         call_order: list = []
 
         class _TrackingLock:
@@ -668,9 +715,9 @@ class TestSessionCacheEvictionOnConnectionReset:
         mock_session_mgr = MagicMock()
         mock_session_mgr.session_cache = mock_cache
         mock_session_mgr._lock = _TrackingLock()
-        mw._providers[0]._request_session_manager = mock_session_mgr
+        provider._providers[0]._request_session_manager = mock_session_mgr
 
-        mw._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
+        provider._handle_error_and_rotate(ConnectionResetError("reset"), "eth_call", 0)
 
         assert "lock_enter" in call_order
         assert "cache_clear" in call_order
@@ -693,7 +740,7 @@ class TestSingleRpcRetryPath:
         self, mock_sleep: MagicMock
     ) -> None:
         """Single URL: WSAECONNRESET triggers retry without rotation."""
-        mw = _make_middleware(["http://only"])
+        provider = _make_provider(["http://only"])
         call_count = 0
 
         def _make_request(method, params):
@@ -705,13 +752,13 @@ class TestSingleRpcRetryPath:
                 raise err
             return {"result": "ok"}
 
-        mw._providers[0].make_request = _make_request
-        middleware_fn = mw.wrap_make_request(MagicMock())
-        result = middleware_fn("eth_call", [])
+        provider._providers[0].make_request = _make_request
+
+        result = provider.make_request("eth_call", [])
         assert result == {"result": "ok"}
         assert call_count == 2
         # _rotate returned False (single URL) but retry still happened
-        assert mw._current_index == 0  # stayed on the only URL
+        assert provider._current_index == 0  # stayed on the only URL
 
 
 # ---------------------------------------------------------------------------
@@ -735,9 +782,9 @@ class TestBackoffDurations:
         self, error_msg: str, expected_backoff: float
     ) -> None:
         """Each error category applies the correct backoff duration."""
-        mw = _make_middleware(["http://a", "http://b"])
-        mw._handle_error_and_rotate(Exception(error_msg), "test", 0)
-        backoff_until = mw._backoff_until.get(0, 0.0)
+        provider = _make_provider(["http://a", "http://b"])
+        provider._handle_error_and_rotate(Exception(error_msg), "test", 0)
+        backoff_until = provider._backoff_until.get(0, 0.0)
         remaining = backoff_until - time.monotonic()
         assert remaining > 0
         assert remaining <= expected_backoff + 1.0

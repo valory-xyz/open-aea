@@ -34,7 +34,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 import requests
-from aea_ledger_ethereum.rpc_rotation import RPCRotationMiddleware, parse_rpc_urls
+from aea_ledger_ethereum.rpc_rotation import RotatingHTTPProvider, parse_rpc_urls
 from eth_account import Account
 from eth_account._utils.legacy_transactions import (
     encode_transaction,
@@ -51,7 +51,7 @@ from requests import HTTPError
 from requests.exceptions import ReadTimeout as RequestsReadTimeoutError
 from toolz import curry  # type: ignore  # pylint: disable=import-error
 from urllib3.exceptions import ReadTimeoutError as Urllib3ReadTimeoutError
-from web3 import AsyncWeb3, HTTPProvider, Web3
+from web3 import AsyncWeb3, Web3
 from web3._utils.events import EventFilterBuilder
 from web3._utils.http import DEFAULT_HTTP_TIMEOUT
 from web3.contract.contract import ContractEvent
@@ -700,14 +700,13 @@ class AttributeDictTranslator:
         cls, attr_dict: Union[AttributeDict, TxReceipt, TxData, Dict[str, Any]]
     ) -> JSONLike:
         """Simplify to dict."""
-        # Plain dict is accepted in addition to AttributeDict because
-        # RPCRotationMiddleware calls self._providers[i].make_request() directly,
-        # bypassing the inner web3 middleware chain (including AttributeDictMiddleware).
-        # Responses on the rotation path therefore arrive as plain dicts rather than
-        # AttributeDict instances.  TxReceipt / TxData are TypedDicts (dict subclasses)
-        # and handled identically.
+        # TxReceipt / TxData are TypedDicts (dict subclasses), so accept both
+        # AttributeDict and plain dict.
         if not isinstance(attr_dict, (AttributeDict, dict)):
-            raise ValueError("No AttributeDict provided.")  # pragma: nocover
+            raise ValueError(  # pragma: nocover
+                f"Expected AttributeDict or dict-like, "
+                f"got {type(attr_dict).__name__}"
+            )
         result = {
             cls._valid_key(key): cls._remove_hexbytes(value)
             for key, value in attr_dict.items()
@@ -1114,20 +1113,16 @@ class EthereumApi(LedgerApi, EthereumHelper):
         request_kwargs = {
             REQUESTS_TIMEOUT_KEY: kwargs.pop(REQUESTS_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT)
         }
-        self._api = Web3(
-            HTTPProvider(
-                endpoint_uri=rpc_urls[0],
-                request_kwargs=request_kwargs,
-            )
-        )
-        # RPC rotation middleware — handles failover and retry across endpoints
-        self._rpc_rotation: RPCRotationMiddleware = RPCRotationMiddleware.build(
-            self._api,
+        # RotatingHTTPProvider handles failover and retry across endpoints at
+        # the transport layer.  Because rotation lives inside the provider
+        # rather than as a middleware, the standard web3 middleware chain runs
+        # untouched on every call — defaults plus any user-injected middleware.
+        self._rpc_rotation = RotatingHTTPProvider(
             rpc_urls=rpc_urls,
             request_kwargs=request_kwargs,
             chain_id=self._chain_id,
         )
-        self._api.middleware_onion.add(self._rpc_rotation)
+        self._api = Web3(self._rpc_rotation)
         # cache the chain id and use it for all the `eth_chainId` calls to avoid excess RPC usage
         cached_chain_id = (
             CachedChainIdMiddleware.build(  # pylint: disable=no-value-for-parameter
@@ -1153,12 +1148,8 @@ class EthereumApi(LedgerApi, EthereumHelper):
         self._poa_chain = kwargs.pop("poa_chain", False)
         if self._poa_chain:
             # https://web3py.readthedocs.io/en/stable/middleware.html#geth-style-proof-of-authority
-            # Must be added as the outermost middleware so that its response transformation
-            # (truncating the oversized extraData field) is applied even when
-            # RPCRotationMiddleware routes requests to rotation providers directly,
-            # bypassing the inner middleware chain.
-            self._api.middleware_onion.add(
-                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware"
+            self._api.middleware_onion.inject(
+                ExtraDataToPOAMiddleware, name="ExtraDataToPOAMiddleware", layer=0
             )
             _default_logger.info(
                 "EthereumApi has been configured with Proof of Authority chain support"

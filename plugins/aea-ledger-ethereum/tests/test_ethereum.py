@@ -142,12 +142,11 @@ def test_attribute_dict_translator():
 
 
 def test_attribute_dict_translator_plain_dict():
-    """to_dict accepts a plain dict (e.g. from the RPCRotationMiddleware path).
+    """Test to_dict accepts a plain dict in addition to AttributeDict.
 
-    RPCRotationMiddleware calls provider.make_request() directly, bypassing
-    the inner web3 middleware chain, so responses arrive as plain dicts rather
-    than AttributeDict instances.  Both arms of the isinstance guard and the
-    recursive _remove_hexbytes path must handle plain dicts correctly.
+    TxReceipt and TxData are TypedDicts (dict subclasses) so callers may
+    legitimately pass plain dicts; both arms of the isinstance guard and
+    the recursive _remove_hexbytes path must handle them correctly.
     """
     di = {
         "blockNumber": 42,
@@ -259,6 +258,104 @@ def test_api_creation_poa(ethereum_testnet_config):
     """Test api instantiation with the poa flag enabled."""
     ethereum_testnet_config["poa_chain"] = True
     assert EthereumApi(**ethereum_testnet_config), "Failed to initialise the api"
+
+
+def test_attribute_dict_wrapping_on_rotation_path(ethereum_testnet_config):
+    """Test responses routed through RotatingHTTPProvider are wrapped as AttributeDict."""
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    fake_receipt = {
+        "blockNumber": 12345,
+        "status": 1,
+        "transactionHash": "0x" + "ab" * 32,
+        "transactionIndex": 0,
+        "blockHash": "0x" + "cd" * 32,
+        "from": "0x" + "11" * 20,
+        "to": "0x" + "22" * 20,
+        "cumulativeGasUsed": 21000,
+        "gasUsed": 21000,
+        "contractAddress": None,
+        "logs": [],
+        "logsBloom": "0x" + "00" * 256,
+        "type": "0x2",
+        "effectiveGasPrice": 1000000000,
+    }
+    # Patch every rotation provider's make_request so the rotation middleware
+    # returns the fake response without touching the network.  The default
+    # AttributeDictMiddleware (inner to rotation) must still wrap the result.
+    fake_response = {"jsonrpc": "2.0", "id": 1, "result": fake_receipt}
+    for provider in ethereum_api._rpc_rotation._providers:
+        provider.make_request = MagicMock(return_value=fake_response)
+    result = ethereum_api.api.eth.get_transaction_receipt(
+        "0x" + "ab" * 32  # type: ignore[arg-type]
+    )
+    assert isinstance(result, AttributeDict)
+    assert result.blockNumber == 12345
+
+
+def test_user_injected_middleware_runs_on_rotation_path(ethereum_testnet_config):
+    """Test user middleware injected at layer 0 still runs through the rotation path."""
+    from web3.middleware import Web3Middleware  # local import — test-only
+
+    seen = []
+
+    class SpyMiddleware(Web3Middleware):
+        def request_processor(self, method, params):
+            seen.append(("req", method))
+            return method, params
+
+        def response_processor(self, method, response):
+            seen.append(("resp", method))
+            return response
+
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    ethereum_api.api.middleware_onion.inject(
+        SpyMiddleware, name="SpyMiddleware", layer=0
+    )
+    fake_response = {"jsonrpc": "2.0", "id": 1, "result": "0x2a"}
+    for provider in ethereum_api._rpc_rotation._providers:
+        provider.make_request = MagicMock(return_value=fake_response)
+    ethereum_api.api.eth.get_block_number()
+    assert ("req", "eth_blockNumber") in seen
+    assert ("resp", "eth_blockNumber") in seen
+
+
+def test_poa_middleware_transforms_response_on_rotation_path(ethereum_testnet_config):
+    """Test ExtraDataToPOAMiddleware truncates extraData on the rotation path."""
+    ethereum_testnet_config["poa_chain"] = True
+    ethereum_api = EthereumApi(**ethereum_testnet_config)
+    # PoA's response_processor renames extraData -> proofOfAuthorityData on
+    # eth_getBlockByNumber.  Use an oversized extraData (>32 bytes) which web3's
+    # default formatters would reject, but PoA's transform should normalize.
+    fake_block = {
+        "number": "0x1",
+        "hash": "0x" + "ab" * 32,
+        "parentHash": "0x" + "cd" * 32,
+        "extraData": "0x" + "ee" * 64,  # 64-byte extraData (PoA-style)
+        "miner": "0x" + "11" * 20,
+        "difficulty": "0x0",
+        "totalDifficulty": "0x0",
+        "size": "0x100",
+        "gasLimit": "0x1c9c380",
+        "gasUsed": "0x0",
+        "timestamp": "0x0",
+        "transactions": [],
+        "uncles": [],
+        "logsBloom": "0x" + "00" * 256,
+        "sha3Uncles": "0x" + "00" * 32,
+        "stateRoot": "0x" + "00" * 32,
+        "transactionsRoot": "0x" + "00" * 32,
+        "receiptsRoot": "0x" + "00" * 32,
+        "mixHash": "0x" + "00" * 32,
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x0",
+    }
+    fake_response = {"jsonrpc": "2.0", "id": 1, "result": fake_block}
+    for provider in ethereum_api._rpc_rotation._providers:
+        provider.make_request = MagicMock(return_value=fake_response)
+    # Should not raise — without PoA middleware running, web3's default
+    # formatter would reject the oversized extraData field.
+    block = ethereum_api.api.eth.get_block(1)
+    assert block is not None
 
 
 def test_api_none(ethereum_testnet_config):

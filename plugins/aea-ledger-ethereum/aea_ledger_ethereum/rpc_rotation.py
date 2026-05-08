@@ -17,12 +17,17 @@
 #
 # ------------------------------------------------------------------------------
 
-"""RPC rotation support for EthereumApi as a web3 middleware.
+"""RPC rotation support for EthereumApi as a Web3 ``HTTPProvider`` subclass.
 
 When multiple RPC endpoints are provided (comma-separated), the
-:class:`RPCRotationMiddleware` automatically fails over to healthy
+:class:`RotatingHTTPProvider` automatically fails over to healthy
 endpoints on rate-limit, connection, or quota errors.  With a single
-RPC URL the middleware retries on transport failures without rotation.
+RPC URL the provider retries on transport failures without rotation.
+
+Implementing rotation as a provider (rather than a middleware) keeps
+the standard web3 middleware chain intact: every request runs through
+the full chain — defaults plus any user-injected middleware — and only
+the underlying transport changes when rotation occurs.
 """
 
 import logging
@@ -30,16 +35,21 @@ import ssl
 import threading
 import time
 from contextlib import nullcontext
-from typing import Any, Dict, FrozenSet, List, Optional, Union
+from typing import Any, Dict, FrozenSet, List, Literal, Optional
 
 from aea_ledger_ethereum.chainlist import enrich_rpc_urls
-from web3 import AsyncWeb3, HTTPProvider, Web3
-from web3.middleware.base import Web3MiddlewareBuilder
+from web3 import HTTPProvider
 from web3.types import RPCEndpoint, RPCResponse
 
-_logger = logging.getLogger("aea.ledger_apis.ethereum.rpc_rotation")
+# Closed set of error categories returned by :func:`classify_error`.  Using a
+# ``Literal`` keeps the stringly-typed switches in ``make_request`` and
+# ``_handle_error_and_rotate`` checkable by mypy and prevents future
+# maintainers from adding a category without updating every call site.
+ErrorCategory = Literal[
+    "rate_limit", "connection", "quota", "server", "fd_exhaustion", "unknown"
+]
 
-MakeRequestFn = Any  # web3 typing alias
+_logger = logging.getLogger("aea.ledger_apis.ethereum.rpc_rotation")
 
 # ---------------------------------------------------------------------------
 # Write RPC methods — retried only on clear pre-send failures
@@ -172,15 +182,12 @@ def _is_connection_reset(error: BaseException) -> bool:
     return False
 
 
-def classify_error(error: Exception) -> str:
+def classify_error(error: Exception) -> ErrorCategory:
     """Classify an RPC error into a category.
 
-    Returns one of:
-    ``"rate_limit"``, ``"connection"``, ``"quota"``, ``"server"``,
-    ``"fd_exhaustion"``, or ``"unknown"``.
-
     :param error: the exception raised by the RPC call.
-    :return: error category string.
+    :return: one of ``"rate_limit"``, ``"connection"``, ``"quota"``,
+        ``"server"``, ``"fd_exhaustion"``, ``"unknown"``.
     """
     # Locale-safe class-based checks first — English-only string matching
     # misses localized OS error messages (Spanish, Chinese WSAECONNRESET text).
@@ -203,16 +210,19 @@ def classify_error(error: Exception) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Middleware
+# Provider
 # ---------------------------------------------------------------------------
 
 
-class RPCRotationMiddleware(Web3MiddlewareBuilder):
-    """Web3 middleware that rotates RPC endpoints on transport failures.
+class RotatingHTTPProvider(HTTPProvider):
+    """:class:`~web3.HTTPProvider` that rotates RPC endpoints on transport failures.
 
     Manages a pool of :class:`~web3.HTTPProvider` instances with
     per-endpoint health tracking, automatic failover, and
-    exponential-backoff retry logic.
+    exponential-backoff retry logic.  Because rotation happens at the
+    transport layer (inside :meth:`make_request`) rather than as a web3
+    middleware, the standard middleware chain — defaults plus any
+    user-injected middleware — runs untouched on every call.
 
     For **write** operations (``eth_sendRawTransaction``,
     ``eth_sendTransaction``) only clear pre-send connection failures are
@@ -220,82 +230,76 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
 
     Usage::
 
-        rpc_rotation = RPCRotationMiddleware.build(
-            w3,
+        provider = RotatingHTTPProvider(
             rpc_urls=["https://rpc1.example.com", "https://rpc2.example.com"],
             request_kwargs={"timeout": 10},
             chain_id=100,
         )
-        web3.middleware_onion.add(rpc_rotation)
+        w3 = Web3(provider)
     """
 
-    # Set by build()
-    _rpc_urls: List[str]
-    _request_kwargs: Dict[str, Any]
-    _providers: List[HTTPProvider]
-    _current_index: int
-    _backoff_until: Dict[int, float]
-    _lock: threading.Lock
-    _last_rotation_time: float
-
-    @classmethod
-    def build(  # pylint: disable=arguments-differ
-        cls,
-        w3: Union[AsyncWeb3, Web3],
+    def __init__(
+        self,
         rpc_urls: List[str],
         request_kwargs: Optional[Dict[str, Any]] = None,
         chain_id: Optional[int] = None,
-    ) -> "RPCRotationMiddleware":
-        """Build the middleware.
+    ) -> None:
+        """Initialize the rotating provider.
 
-        :param w3: the Web3 instance.
-        :param rpc_urls: list of RPC endpoint URL strings (required).
-        :param request_kwargs: dict forwarded to each HTTPProvider.
+        :param rpc_urls: list of RPC endpoint URL strings (required, non-empty).
+        :param request_kwargs: dict forwarded to each pooled :class:`HTTPProvider`.
         :param chain_id: optional chain ID for Chainlist fallback enrichment.
-        :return: configured :class:`RPCRotationMiddleware` instance.
+        :raises ValueError: if ``rpc_urls`` (after Chainlist enrichment) is empty.
         """
         if request_kwargs is None:
             request_kwargs = {}
 
         rpc_urls = enrich_rpc_urls(rpc_urls, chain_id=chain_id)
+        if not rpc_urls:
+            raise ValueError("RotatingHTTPProvider requires at least one RPC URL.")
 
-        mw = cls(w3)
-        mw._rpc_urls = rpc_urls  # pylint: disable=protected-access
-        mw._request_kwargs = request_kwargs  # pylint: disable=protected-access
-        mw._providers = [  # pylint: disable=protected-access
+        # Set the attributes the ``endpoint_uri`` getter reads *before*
+        # calling ``super().__init__``.  The parent constructor writes to
+        # ``self.endpoint_uri`` (which our no-op setter absorbs); some web3
+        # code paths read ``endpoint_uri`` from within the parent init —
+        # hoisting these assignments keeps the getter defensible regardless
+        # of which parent code paths are taken on a future web3 upgrade.
+        # When upgrading web3.py: re-verify ``HTTPProvider.__init__`` still
+        # does not read ``self.endpoint_uri`` after assignment, and that
+        # the rotating provider is never constructed with ``session=...``
+        # passed through (parent reads ``endpoint_uri`` in that branch).
+        self._rpc_urls: List[str] = rpc_urls
+        self._current_index: int = 0
+
+        # ``isinstance(self, HTTPProvider)`` must hold so web3 treats us
+        # as a proper provider; the parent's session/transport machinery
+        # is otherwise unused since every request is delegated to one of
+        # ``self._providers``.
+        super().__init__(endpoint_uri=rpc_urls[0], request_kwargs=request_kwargs)
+
+        self._providers: List[HTTPProvider] = [
             HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
             for url in rpc_urls
         ]
-        mw._current_index = 0  # pylint: disable=protected-access
-        mw._backoff_until = {}  # pylint: disable=protected-access
-        mw._lock = threading.Lock()  # pylint: disable=protected-access
-        mw._last_rotation_time = 0.0  # pylint: disable=protected-access
+        self._backoff_until: Dict[int, float] = {}
+        # Reentrant so health-tracking helpers can be called both directly
+        # (from ``_handle_error_and_rotate``) and from inside ``_rotate``,
+        # which already holds the lock when iterating candidates.
+        self._lock: threading.RLock = threading.RLock()
+        self._last_rotation_time: float = 0.0
 
         # Surface that the configured MAX_RETRIES is being clamped by the
         # (small) provider pool — common for single-URL deployments.  Logged
-        # once at build() rather than per-request to avoid log spam.
+        # once at construction rather than per-request to avoid log spam.
         uncapped_retries = len(rpc_urls) * 2
         if uncapped_retries < MAX_RETRIES:
             _logger.info(
-                "RPCRotationMiddleware: retry budget capped at %d "
+                "RotatingHTTPProvider: retry budget capped at %d "
                 "(RPC count=%d, MAX_RETRIES=%d)",
                 uncapped_retries,
                 len(rpc_urls),
                 MAX_RETRIES,
             )
-
-        return mw
-
-    def __call__(self, w3: Any = None) -> "RPCRotationMiddleware":
-        """Allow this pre-built instance to be stored directly in the middleware onion.
-
-        web3's ``combine_middleware`` calls ``mw(w3)`` on each entry; returning
-        ``self`` ensures the already-initialised instance is reused unchanged.
-
-        :param w3: web3 instance (ignored — already set on build).
-        :return: this middleware instance.
-        """
-        return self
 
     # ------------------------------------------------------------------
     # Public introspection
@@ -311,17 +315,58 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         """Return the number of configured RPC endpoints."""
         return len(self._rpc_urls)
 
+    @property  # type: ignore[override]
+    def endpoint_uri(self) -> str:  # type: ignore[override]
+        """Return the URL of the currently active RPC endpoint.
+
+        Overrides :attr:`HTTPProvider.endpoint_uri` so that diagnostic tooling
+        (metrics, logging, request IDs) reading ``w3.provider.endpoint_uri``
+        observes the URL we are *currently* dispatching to rather than the
+        URL passed to ``super().__init__``.
+
+        :return: the active RPC URL.
+        """
+        return self._rpc_urls[self._current_index]
+
+    @endpoint_uri.setter
+    def endpoint_uri(self, value: str) -> None:
+        """No-op setter retained for parent-class compatibility.
+
+        :param value: ignored.  ``HTTPProvider.__init__`` assigns to
+            ``endpoint_uri`` once at construction; we accept the write so the
+            parent constructor does not raise, but the active endpoint is
+            always derived from ``self._rpc_urls[self._current_index]``.
+        """
+        # Surface the no-op so a future caller doing
+        # ``provider.endpoint_uri = "https://override"`` can see at DEBUG
+        # level that the assignment did not change the active endpoint.
+        _logger.debug(
+            "RotatingHTTPProvider ignores endpoint_uri assignment to %r; "
+            "active URL is derived from self._rpc_urls[self._current_index]",
+            value,
+        )
+
     # ------------------------------------------------------------------
     # Per-RPC health tracking
     # ------------------------------------------------------------------
 
     def _mark_rpc_backoff(self, index: int, seconds: float) -> None:
-        """Mark an RPC as temporarily unavailable for *seconds*."""
-        self._backoff_until[index] = time.monotonic() + seconds
+        """Mark an RPC as temporarily unavailable for *seconds*.
+
+        :param index: provider index in ``self._providers``.
+        :param seconds: backoff duration in seconds.
+        """
+        with self._lock:
+            self._backoff_until[index] = time.monotonic() + seconds
 
     def _is_rpc_healthy(self, index: int) -> bool:
-        """Return ``True`` if the RPC at *index* is not in backoff."""
-        return time.monotonic() >= self._backoff_until.get(index, 0.0)
+        """Return ``True`` if the RPC at *index* is not in backoff.
+
+        :param index: provider index in ``self._providers``.
+        :return: ``True`` if not in backoff (or never marked).
+        """
+        with self._lock:
+            return time.monotonic() >= self._backoff_until.get(index, 0.0)
 
     # ------------------------------------------------------------------
     # Provider rotation
@@ -338,7 +383,15 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
                 return False
 
             now = time.monotonic()
-            if now - self._last_rotation_time < ROTATION_COOLDOWN:
+            # The cooldown prevents thrashing between *healthy* providers
+            # (e.g. concurrent threads each triggering a rotation).  When
+            # the current provider is itself in backoff — which is the
+            # case immediately after ``_handle_error_and_rotate`` marks
+            # it unhealthy — refusing to rotate would just loop the
+            # next attempt back to a known-bad endpoint and burn the
+            # per-call retry budget.  Skip the cooldown in that case.
+            current_healthy = now >= self._backoff_until.get(self._current_index, 0.0)
+            if current_healthy and now - self._last_rotation_time < ROTATION_COOLDOWN:
                 return False
 
             best: Optional[int] = None
@@ -415,17 +468,24 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
     # ------------------------------------------------------------------
 
     def _handle_error_and_rotate(
-        self, error: Exception, operation: str, index: int
+        self,
+        error: Exception,
+        operation: str,
+        index: int,
+        category: Optional[ErrorCategory] = None,
     ) -> bool:
-        """Classify *error*, apply backoff, and rotate.
+        """Apply backoff and rotation for an error.
 
         :param error: the transport-level exception.
         :param operation: human-readable label for log messages.
         :param index: provider index that was active when the error occurred.
+        :param category: optional pre-computed result of :func:`classify_error`.
+            Pass-through when the caller has already classified the error to
+            avoid a redundant string scan; defaults to running the classifier.
         :return: ``True`` if the caller should retry.
         """
-        category = classify_error(error)
-
+        if category is None:
+            category = classify_error(error)
         if category == "fd_exhaustion":
             _logger.error(
                 "FD exhaustion detected — pausing ALL RPCs for %ds.",
@@ -437,6 +497,14 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
             return True
 
         if category == "unknown":
+            # Surface the unclassified error so operators can spot novel
+            # transport issues; the caller will re-raise without retry.
+            _logger.warning(
+                "RPC #%d unclassified error during %s (will not retry): %.120s",
+                index,
+                operation,
+                str(error),
+            )
             return False
 
         if category == "connection":
@@ -457,76 +525,69 @@ class RPCRotationMiddleware(Web3MiddlewareBuilder):
         return True
 
     # ------------------------------------------------------------------
-    # wrap_make_request
+    # make_request — the rotation/retry loop
     # ------------------------------------------------------------------
 
-    def wrap_make_request(
-        self, make_request: MakeRequestFn  # pylint: disable=unused-argument
-    ) -> MakeRequestFn:
-        """Wrap the JSON-RPC make_request with retry and rotation logic.
+    def make_request(self, method: RPCEndpoint, params: Any) -> RPCResponse:
+        """Dispatch a JSON-RPC call with rotation and retry across the pool.
 
-        ``make_request`` (the next function in the middleware chain) is
-        intentionally not called.  Instead, this middleware calls each
-        provider's ``make_request`` directly so it can retry against
-        different providers in the pool without being subject to other
-        middleware's retry or error-conversion logic.  As a result,
-        inner middleware (formatters, ``AttributeDictMiddleware``, ENS,
-        exception, retry) are bypassed on all call paths; callers must
-        handle plain-dict responses.  PoA middleware must therefore be
-        added as the *outermost* layer (via ``add``, not ``inject``).
+        Each attempt routes to the currently-active pooled provider.  On a
+        retryable transport failure the offending provider is marked unhealthy,
+        rotation advances to the next healthy peer, and the call is retried
+        (with exponential backoff) until the per-call retry budget is
+        exhausted.  Write methods are retried only on clear pre-send failures
+        so a partially-submitted transaction is never re-broadcast.
 
-        :param make_request: not used; present to satisfy the web3 middleware interface.
-        :return: wrapped make_request function.
+        :param method: JSON-RPC method name.
+        :param params: JSON-RPC parameters.
+        :return: the JSON-RPC response.
         """
+        is_write = method in WRITE_RPC_METHODS
+        url_count = len(self._rpc_urls)
+        max_retries = min(MAX_RETRIES, url_count * 2)
 
-        def middleware(method: RPCEndpoint, params: Any) -> RPCResponse:
-            """Middleware function to override the request with."""
-            is_write = method in WRITE_RPC_METHODS
-            url_count = len(self._rpc_urls)
-            max_retries = min(MAX_RETRIES, url_count * 2)
-            last_error: Optional[Exception] = None
+        for attempt in range(max_retries + 1):
+            used_index = self._current_index  # snapshot before the call
+            try:
+                return self._providers[used_index].make_request(method, params)
+            except Exception as exc:  # pylint: disable=broad-exception-caught
+                category = classify_error(exc)
 
-            for attempt in range(max_retries + 1):
-                used_index = self._current_index  # snapshot before the call
-                try:
-                    return self._providers[used_index].make_request(method, params)
-                except Exception as exc:  # pylint: disable=broad-exception-caught
-                    last_error = exc
-                    category = classify_error(exc)
+                # Write safety: only retry on clear pre-send failures
+                if is_write and category not in ("connection", "fd_exhaustion"):
+                    raise
 
-                    # Write safety: only retry on clear pre-send failures
-                    if is_write and category not in ("connection", "fd_exhaustion"):
-                        raise
-
-                    should_retry = self._handle_error_and_rotate(
-                        exc, str(method), used_index
-                    )
-                    if not should_retry:
-                        raise
-                    if attempt >= max_retries:
-                        # All retries used up across the provider pool: surface
-                        # a single summary so a systemic outage is distinguishable
-                        # from a one-off transient failure.
-                        _logger.warning(
-                            "%s: exhausted %d retries across %d provider(s); "
-                            "last error category=%s, last error=%.120s",
-                            method,
-                            max_retries,
-                            url_count,
-                            category,
-                            str(exc),
-                        )
-                        raise
-
-                    delay = min(RETRY_DELAY * (2**attempt), MAX_RETRY_DELAY)
-                    _logger.info(
-                        "%s attempt %d failed, retrying in %.1fs …",
+                should_retry = self._handle_error_and_rotate(
+                    exc, str(method), used_index, category
+                )
+                if not should_retry:
+                    raise
+                if attempt >= max_retries:
+                    # All retries used up across the provider pool: surface
+                    # a single summary so a systemic outage is distinguishable
+                    # from a one-off transient failure.
+                    _logger.warning(
+                        "%s: exhausted %d retries across %d provider(s); "
+                        "last error category=%s, last error=%.120s",
                         method,
-                        attempt + 1,
-                        delay,
+                        max_retries,
+                        url_count,
+                        category,
+                        str(exc),
                     )
-                    time.sleep(delay)
+                    raise
 
-            raise last_error  # type: ignore[misc]
+                delay = min(RETRY_DELAY * (2**attempt), MAX_RETRY_DELAY)
+                _logger.info(
+                    "%s attempt %d failed, retrying in %.1fs …",
+                    method,
+                    attempt + 1,
+                    delay,
+                )
+                time.sleep(delay)
 
-        return middleware
+        # Unreachable: ``range(max_retries + 1)`` always yields at least one
+        # iteration which either returns successfully or re-raises above.
+        raise AssertionError(  # pragma: no cover
+            "unreachable: retry loop exited without returning"
+        )
