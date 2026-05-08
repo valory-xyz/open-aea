@@ -383,7 +383,15 @@ class RotatingHTTPProvider(HTTPProvider):
                 return False
 
             now = time.monotonic()
-            if now - self._last_rotation_time < ROTATION_COOLDOWN:
+            # The cooldown prevents thrashing between *healthy* providers
+            # (e.g. concurrent threads each triggering a rotation).  When
+            # the current provider is itself in backoff — which is the
+            # case immediately after ``_handle_error_and_rotate`` marks
+            # it unhealthy — refusing to rotate would just loop the
+            # next attempt back to a known-bad endpoint and burn the
+            # per-call retry budget.  Skip the cooldown in that case.
+            current_healthy = now >= self._backoff_until.get(self._current_index, 0.0)
+            if current_healthy and now - self._last_rotation_time < ROTATION_COOLDOWN:
                 return False
 
             best: Optional[int] = None
