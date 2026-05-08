@@ -258,19 +258,29 @@ class RotatingHTTPProvider(HTTPProvider):
         if not rpc_urls:
             raise ValueError("RotatingHTTPProvider requires at least one RPC URL.")
 
-        # Initialize the parent HTTPProvider with the first URL.  The parent's
-        # session/transport machinery is unused — every request is delegated
-        # to one of ``self._providers`` — but ``isinstance(self, HTTPProvider)``
-        # must hold so web3 treats us as a proper provider (verified against
-        # web3.py 6.x; the parent does not open any connections eagerly).
+        # Set the attributes the ``endpoint_uri`` getter reads *before*
+        # calling ``super().__init__``.  The parent constructor writes to
+        # ``self.endpoint_uri`` (which our no-op setter absorbs); some web3
+        # code paths read ``endpoint_uri`` from within the parent init —
+        # hoisting these assignments keeps the getter defensible regardless
+        # of which parent code paths are taken on a future web3 upgrade.
+        # When upgrading web3.py: re-verify ``HTTPProvider.__init__`` still
+        # does not read ``self.endpoint_uri`` after assignment, and that
+        # the rotating provider is never constructed with ``session=...``
+        # passed through (parent reads ``endpoint_uri`` in that branch).
+        self._rpc_urls: List[str] = rpc_urls
+        self._current_index: int = 0
+
+        # ``isinstance(self, HTTPProvider)`` must hold so web3 treats us
+        # as a proper provider; the parent's session/transport machinery
+        # is otherwise unused since every request is delegated to one of
+        # ``self._providers``.
         super().__init__(endpoint_uri=rpc_urls[0], request_kwargs=request_kwargs)
 
-        self._rpc_urls: List[str] = rpc_urls
         self._providers: List[HTTPProvider] = [
             HTTPProvider(endpoint_uri=url, request_kwargs=request_kwargs)
             for url in rpc_urls
         ]
-        self._current_index: int = 0
         self._backoff_until: Dict[int, float] = {}
         # Reentrant so health-tracking helpers can be called both directly
         # (from ``_handle_error_and_rotate``) and from inside ``_rotate``,
@@ -319,14 +329,22 @@ class RotatingHTTPProvider(HTTPProvider):
         return self._rpc_urls[self._current_index]
 
     @endpoint_uri.setter
-    def endpoint_uri(self, _value: str) -> None:
+    def endpoint_uri(self, value: str) -> None:
         """No-op setter retained for parent-class compatibility.
 
-        :param _value: ignored.  ``HTTPProvider.__init__`` assigns to
+        :param value: ignored.  ``HTTPProvider.__init__`` assigns to
             ``endpoint_uri`` once at construction; we accept the write so the
             parent constructor does not raise, but the active endpoint is
             always derived from ``self._rpc_urls[self._current_index]``.
         """
+        # Surface the no-op so a future caller doing
+        # ``provider.endpoint_uri = "https://override"`` can see at DEBUG
+        # level that the assignment did not change the active endpoint.
+        _logger.debug(
+            "RotatingHTTPProvider ignores endpoint_uri assignment to %r; "
+            "active URL is derived from self._rpc_urls[self._current_index]",
+            value,
+        )
 
     # ------------------------------------------------------------------
     # Per-RPC health tracking
@@ -365,7 +383,15 @@ class RotatingHTTPProvider(HTTPProvider):
                 return False
 
             now = time.monotonic()
-            if now - self._last_rotation_time < ROTATION_COOLDOWN:
+            # The cooldown prevents thrashing between *healthy* providers
+            # (e.g. concurrent threads each triggering a rotation).  When
+            # the current provider is itself in backoff — which is the
+            # case immediately after ``_handle_error_and_rotate`` marks
+            # it unhealthy — refusing to rotate would just loop the
+            # next attempt back to a known-bad endpoint and burn the
+            # per-call retry budget.  Skip the cooldown in that case.
+            current_healthy = now >= self._backoff_until.get(self._current_index, 0.0)
+            if current_healthy and now - self._last_rotation_time < ROTATION_COOLDOWN:
                 return False
 
             best: Optional[int] = None
@@ -562,4 +588,6 @@ class RotatingHTTPProvider(HTTPProvider):
 
         # Unreachable: ``range(max_retries + 1)`` always yields at least one
         # iteration which either returns successfully or re-raises above.
-        raise AssertionError("unreachable: retry loop exited without returning")
+        raise AssertionError(  # pragma: no cover
+            "unreachable: retry loop exited without returning"
+        )

@@ -321,6 +321,38 @@ class TestRotate:
         provider._rotate()
         assert provider._rotate() is False
 
+    def test_cooldown_bypassed_when_current_unhealthy(self) -> None:
+        """Cooldown does not block rotation when the current provider is in backoff.
+
+        Regression test: the cooldown is meant to prevent thrashing among
+        healthy providers; if the active one was just marked unhealthy,
+        refusing to rotate would loop the next attempt back to a known-bad
+        endpoint and burn the per-call retry budget.
+        """
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        # First rotation: A -> B.  Sets _last_rotation_time = now.
+        assert provider._rotate() is True
+        assert provider._current_index == 1
+
+        # Within the cooldown window, mark B (the new current) unhealthy.
+        provider._mark_rpc_backoff(1, 100.0)
+
+        # Rotation must proceed despite cooldown — current is unhealthy and
+        # a healthy peer (C) exists.
+        assert provider._rotate() is True
+        assert provider._current_index == 2
+
+    def test_cooldown_still_enforced_when_current_healthy(self) -> None:
+        """Cooldown still suppresses cascades when the current provider is healthy."""
+        provider = _make_provider(["http://a", "http://b", "http://c"])
+        # First rotation: A -> B.  B remains healthy.
+        assert provider._rotate() is True
+        assert provider._current_index == 1
+        # Second rotation within cooldown window must be blocked because the
+        # current provider is healthy (so we are not stuck on a dead RPC).
+        assert provider._rotate() is False
+        assert provider._current_index == 1
+
     def test_all_in_backoff_picks_soonest_expiry(self) -> None:
         """When all RPCs are in backoff, picks the one expiring soonest."""
         provider = _make_provider(["http://a", "http://b", "http://c"])

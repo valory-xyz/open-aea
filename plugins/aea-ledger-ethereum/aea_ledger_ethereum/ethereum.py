@@ -703,7 +703,10 @@ class AttributeDictTranslator:
         # TxReceipt / TxData are TypedDicts (dict subclasses), so accept both
         # AttributeDict and plain dict.
         if not isinstance(attr_dict, (AttributeDict, dict)):
-            raise ValueError("No AttributeDict provided.")  # pragma: nocover
+            raise ValueError(  # pragma: nocover
+                f"Expected AttributeDict or dict-like, "
+                f"got {type(attr_dict).__name__}"
+            )
         result = {
             cls._valid_key(key): cls._remove_hexbytes(value)
             for key, value in attr_dict.items()
