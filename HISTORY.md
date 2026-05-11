@@ -1,5 +1,18 @@
 # Release History - open AEA
 
+## 2.2.5 (2026-05-08)
+
+Plugins:
+
+- `open-aea-ledger-ethereum`: refactors `RPCRotationMiddleware` into a `RotatingHTTPProvider` (an `HTTPProvider` subclass) and constructs `Web3(RotatingHTTPProvider(...))` directly in `EthereumApi.__init__`. Rotation now lives at the transport layer, so the standard web3 middleware chain — defaults plus any user-injected middleware — runs untouched on every call. Fixes the v2.2.4 regression where `ledger_api.api.eth.<method>(...)` returned plain dicts instead of `AttributeDict`, breaking attribute access (e.g. `receipt.blockNumber`) for downstream consumers reaching into the underlying web3 handle directly (open-autonomy `TxSettler.settle()`, etc.). All inner middleware (`AttributeDictMiddleware`, `ENSNameToAddressMiddleware`, `FormattingMiddleware`, `BufferedGasEstimateMiddleware`, `GasPriceStrategyMiddleware`, and any user-injected `inject(layer=0)` middleware) — silently dead under the v2.2.4 bypass — now run normally. `ExtraDataToPOAMiddleware` reverts to its standard placement at `inject(layer=0)`. #889
+- `open-aea-ledger-ethereum`: `RotatingHTTPProvider.endpoint_uri` is overridden as a property that reflects the *currently active* RPC URL, so diagnostic tooling (metrics, logs, request IDs) reading `w3.provider.endpoint_uri` post-rotation observes the correct endpoint instead of the URL passed to `super().__init__`. #889
+- `open-aea-ledger-ethereum`: `RotatingHTTPProvider` raises `ValueError` at construction if `rpc_urls` (after Chainlist enrichment) is empty, replacing the silent failure that previously surfaced as an opaque `requests` error on the first RPC call. #889
+- `open-aea-ledger-ethereum`: `_mark_rpc_backoff` and `_is_rpc_healthy` now run under the rotation lock (switched to `threading.RLock` so they remain callable from inside `_rotate`), closing a torn-read window on `_backoff_until` under concurrent error/rotation events. Unknown-category errors emit a `WARNING` log before re-raising so novel transport failures are no longer silent. `classify_error` now returns a `Literal[...]` so the categorical switches in `make_request` / `_handle_error_and_rotate` are mypy-checkable. #889
+
+Tooling:
+
+- `strategy.ini`: loosens the `urllib3` license-whitelist pin from `==2.6.3` to `>=2.6.3,<3` to track minor upgrades that `requests` resolves transitively. Resolves the `liccheck` CI failure where `requests` pulled `urllib3 2.7.0` while the strategy still authorized only `2.6.3`. #889
+
 ## 2.2.4 (2026-05-07)
 
 Plugins:
