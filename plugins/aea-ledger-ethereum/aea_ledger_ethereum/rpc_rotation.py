@@ -228,6 +228,16 @@ class RotatingHTTPProvider(HTTPProvider):
     ``eth_sendTransaction``) only clear pre-send connection failures are
     retried to prevent double-submission.
 
+    Concurrency note: :meth:`make_request` is synchronous and uses
+    ``time.sleep`` between retries, which holds the calling thread for the
+    duration of the sleep. When used through the ``valory/ledger``
+    connection, every call runs in that connection's dedicated thread pool
+    sized by the ``max_thread_workers`` config (default 32). Under sustained
+    RPC errors with many concurrent ledger calls, in-flight retries can
+    occupy threads in this pool until they complete. Size
+    ``max_thread_workers`` to comfortably exceed expected peak retry
+    concurrency for the deployment's RPC topology.
+
     Usage::
 
         provider = RotatingHTTPProvider(

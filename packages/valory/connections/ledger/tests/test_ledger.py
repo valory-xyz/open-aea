@@ -149,6 +149,46 @@ class TestLedgerConnection:
         # cancel remaining task before ending test
         blocking_task.cancel()
 
+    @pytest.mark.asyncio
+    async def test_executor_lifecycle(self) -> None:
+        """Test that connect creates a dedicated executor and disconnect shuts it down.
+
+        Without a dedicated executor the dispatchers share Python's default
+        asyncio thread pool with every other agent component. Pinning the
+        executor here keeps ledger work (including the sync sleep inside
+        ``RotatingHTTPProvider.make_request``) isolated and makes the pool
+        size operator-configurable via ``max_thread_workers``.
+        """
+        ledger_connection = LedgerConnection(
+            configuration=ConnectionConfig(
+                "ledger",
+                "valory",
+                "0.19.0",
+                max_thread_workers=7,
+            ),
+            data_dir="test_data_dir",
+        )
+
+        assert ledger_connection._executor is None  # noqa: SLF001
+        assert ledger_connection.max_thread_workers == 7
+
+        await ledger_connection.connect()
+
+        executor = ledger_connection._executor  # noqa: SLF001
+        assert executor is not None
+        # The dispatchers should reference the connection's executor, not
+        # the default ``None``-routed asyncio executor.
+        assert ledger_connection._ledger_dispatcher.executor is executor  # noqa: SLF001
+        assert ledger_connection._contract_dispatcher.executor is executor  # noqa: SLF001
+        # The configured worker count flows through to the pool.
+        assert executor._max_workers == 7  # noqa: SLF001
+
+        await ledger_connection.disconnect()
+
+        assert ledger_connection._executor is None  # noqa: SLF001
+        # ThreadPoolExecutor exposes ``_shutdown`` after ``shutdown()`` is called.
+        assert executor._shutdown  # noqa: SLF001
+
 
 class TestRequestDispatcher:
     """Test `RequestDispatcher` class."""
