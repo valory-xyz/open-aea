@@ -343,7 +343,7 @@ class TestSuccessPathJSONSafety:
     def test_add_bytes_non_json_200_raises_status_error(
         self, mock_urlopen: MagicMock
     ) -> None:
-        """add_bytes raises StatusError when the 200 body is not JSON."""
+        """Test add_bytes raises StatusError when the 200 body is not JSON."""
         mock_urlopen.return_value = _mock_urlopen(200, b"<html>Bad Gateway</html>")
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(StatusError, match="not JSON"):
@@ -353,7 +353,7 @@ class TestSuccessPathJSONSafety:
     def test_add_stream_malformed_line_raises_status_error(
         self, mock_urlopen: MagicMock
     ) -> None:
-        """add raises StatusError when a stream line is not JSON."""
+        """Test add raises StatusError when a stream line is not JSON."""
         ndjson = '{"Name":"a.txt","Hash":"Qm1"}\nnot json at all\n'
         mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
 
@@ -370,7 +370,7 @@ class TestSuccessPathJSONSafety:
     def test_api_post_non_json_200_raises_status_error(
         self, mock_urlopen: MagicMock
     ) -> None:
-        """_api_post (non-stream) raises StatusError when the 200 body is not JSON."""
+        """Test _api_post (non-stream) raises StatusError when the 200 body is not JSON."""
         mock_urlopen.return_value = _mock_urlopen(200, b"not json")
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
         with pytest.raises(StatusError, match="not JSON"):
@@ -380,7 +380,7 @@ class TestSuccessPathJSONSafety:
     def test_api_post_stream_malformed_line_raises_status_error(
         self, mock_urlopen: MagicMock
     ) -> None:
-        """_api_post (stream) raises StatusError when a stream line is not JSON."""
+        """Test _api_post (stream) raises StatusError when a stream line is not JSON."""
         ndjson = '{"Key":"Qm1"}\n<html>oops</html>\n'
         mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
         client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
