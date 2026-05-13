@@ -295,6 +295,40 @@ def test_try_decorator(raise_on_try: bool):
         assert fn(raise_on_try=raise_on_try)("test_arg") == "failed"
 
 
+@pytest.mark.parametrize(
+    "exc, expected_exc_type",
+    [
+        (ValueError("bad value"), "ValueError"),
+        (KeyError("missing"), "KeyError"),
+        (TimeoutError("slow"), "TimeoutError"),
+    ],
+)
+def test_try_decorator_log_includes_function_and_exception_type(
+    exc: Exception, expected_exc_type: str, caplog
+):
+    """Test the swallow-and-log path includes the function name and exception type.
+
+    ``str(e)`` alone often renders a sparse line (e.g. just ``'missing'`` for
+    a ``KeyError``). Including ``__qualname__`` and ``type(e).__name__`` keeps
+    swallowed failures diagnosable without changing the catch semantics.
+    """
+
+    @try_decorator("call failed: {}")
+    def some_named_function(**_):
+        """Raise the parametrized exception."""
+        raise exc
+
+    with caplog.at_level("ERROR"):
+        result = some_named_function()
+
+    assert result is None
+    assert any(
+        "some_named_function" in record.message
+        and f"exc_type={expected_exc_type}" in record.message
+        for record in caplog.records
+    )
+
+
 def test_retry_decorator():
     """Test auto retry decorator."""
     num_calls = 0

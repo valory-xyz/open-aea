@@ -416,14 +416,21 @@ def try_decorator(
         def wrapper(*args: Any, **kwargs: Any) -> Callable:
             try:
                 return fn(*args, **kwargs)
-            except (
-                Exception  # pylint: disable=broad-except
-            ) as e:  # pragma: no cover  # generic code
+            except Exception as e:  # pylint: disable=broad-except
                 if kwargs.get("raise_on_try", False):
                     raise e
                 if error_message:
                     log = get_logger_method(fn, logger_method)
-                    log(error_message.format(e))
+                    # Include the function's qualified name and the exception
+                    # type so swallowed failures are diagnosable from the log
+                    # without changing the catch semantics. ``str(e)`` alone
+                    # often produces a sparse line (e.g. just ``'maxFee'``
+                    # for a ``KeyError``).
+                    log(
+                        f"{error_message.format(e)} "
+                        f"[function={fn.__qualname__}, "
+                        f"exc_type={type(e).__name__}]"
+                    )
                 return cast(Callable, default_return)
 
         return wrapper
