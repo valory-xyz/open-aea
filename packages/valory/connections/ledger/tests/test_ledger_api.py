@@ -66,9 +66,7 @@ from packages.valory.protocols.ledger_api.custom_types import (
     SignedTransactions,
     TransactionDigests,
 )
-from packages.valory.protocols.ledger_api.dialogues import (
-    LedgerApiDialogue,
-)
+from packages.valory.protocols.ledger_api.dialogues import LedgerApiDialogue
 from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
@@ -753,7 +751,6 @@ class TestLedgerDispatcher:
             ), f"Tried {actual_times_called} times, {expected_times_called} were expected!"
 
 
-
 class TestLedgerDispatcherRetrySleepCap:
     """Unit tests for the retry-sleep cap on the ledger dispatcher.
 
@@ -770,9 +767,7 @@ class TestLedgerDispatcherRetrySleepCap:
         The cap holds each individual sleep at ``MAX_RETRY_DELAY`` (60s),
         which bounds the worst-case loop without changing the retry count.
         """
-        from packages.valory.connections.ledger.ledger_dispatcher import (
-            MAX_RETRY_DELAY,
-        )
+        from packages.valory.connections.ledger.ledger_dispatcher import MAX_RETRY_DELAY
 
         dispatcher = LedgerApiRequestDispatcher(
             AsyncState(ConnectionStates.connected),

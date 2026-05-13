@@ -552,9 +552,7 @@ def get_gas_price_strategy(
                 )
                 return fallback
             response_dict = response.json()
-            _default_logger.debug(
-                "Gas station API response: {}".format(response_dict)
-            )
+            _default_logger.debug("Gas station API response: {}".format(response_dict))
             result = response_dict.get(gas_price_strategy, None)
             if not isinstance(result, (int, float)):
                 raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")

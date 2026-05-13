@@ -179,7 +179,9 @@ class TestLedgerConnection:
         # The dispatchers should reference the connection's executor, not
         # the default ``None``-routed asyncio executor.
         assert ledger_connection._ledger_dispatcher.executor is executor  # noqa: SLF001
-        assert ledger_connection._contract_dispatcher.executor is executor  # noqa: SLF001
+        assert (
+            ledger_connection._contract_dispatcher.executor is executor
+        )  # noqa: SLF001
         # The configured worker count flows through to the pool.
         assert executor._max_workers == 7  # noqa: SLF001
 

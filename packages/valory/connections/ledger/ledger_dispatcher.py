@@ -35,9 +35,7 @@ from packages.valory.protocols.ledger_api.custom_types import (
     TransactionDigests,
     TransactionReceipt,
 )
-from packages.valory.protocols.ledger_api.dialogues import (
-    LedgerApiDialogue,
-)
+from packages.valory.protocols.ledger_api.dialogues import LedgerApiDialogue
 from packages.valory.protocols.ledger_api.dialogues import (
     LedgerApiDialogues as BaseLedgerApiDialogues,
 )
