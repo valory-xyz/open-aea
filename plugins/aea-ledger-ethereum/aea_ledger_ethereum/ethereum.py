@@ -485,7 +485,9 @@ def get_gas_price_strategy_eip1559_polygon(
                 }
             # return a copy; see note in get_gas_price_strategy_eip1559.fallback
             return dict(fallback_estimate)
-        except requests.exceptions.RequestException:
+        # JSONDecodeError is a ValueError subclass; KeyError guards schema drift
+        # in the gas API response.
+        except (requests.exceptions.RequestException, ValueError, KeyError):
             return dict(fallback_estimate)
 
     return eip1559_price_strategy
@@ -537,24 +539,36 @@ def get_gas_price_strategy(
         _default_logger.info(  # pragma: nocover
             "`ethgasstation.info` has been deprecated and will be replaced with an alternative on the next release."
         )
-        response = requests.get(
-            f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}",
-            timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
-        )
-        if response.status_code != 200:  # pragma: nocover
-            # TODO : Use some other gas station API # pylint: disable=fixme
-            _default_logger.error(
-                f"Gas station API response: {response.status_code}, {response.text}, using fallback gas price."
+        fallback = {"gasPrice": web3.to_wei(GAS_STATION_FALLBACK_ESTIMATE, GWEI)}
+        try:
+            response = requests.get(
+                f"{ETH_GASSTATION_URL}?api-key={gas_price_api_key}",
+                timeout=NETWORK_REQUEST_DEFAULT_TIMEOUT,
             )
-            return {"gasPrice": web3.to_wei(GAS_STATION_FALLBACK_ESTIMATE, GWEI)}
-        response_dict = response.json()
-        _default_logger.debug("Gas station API response: {}".format(response_dict))
-        result = response_dict.get(gas_price_strategy, None)
-        if type(result) not in [int, float]:  # pragma: nocover
-            raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")
-        gwei_result = result / 10  # adjustment (see api documentation)
-        wei_result = web3.to_wei(gwei_result, GWEI)
-        return {"gasPrice": wei_result}
+            if response.status_code != 200:  # pragma: nocover
+                # TODO : Use some other gas station API # pylint: disable=fixme
+                _default_logger.error(
+                    f"Gas station API response: {response.status_code}, {response.text}, using fallback gas price."
+                )
+                return fallback
+            response_dict = response.json()
+            _default_logger.debug(
+                "Gas station API response: {}".format(response_dict)
+            )
+            result = response_dict.get(gas_price_strategy, None)
+            if not isinstance(result, (int, float)):
+                raise ValueError(f"Invalid return value for `{gas_price_strategy}`!")
+            gwei_result = result / 10  # adjustment (see api documentation)
+            wei_result = web3.to_wei(gwei_result, GWEI)
+            return {"gasPrice": wei_result}
+        # JSONDecodeError is a ValueError subclass; KeyError guards schema drift
+        # in the gas station response.
+        except (requests.exceptions.RequestException, ValueError, KeyError):
+            _default_logger.warning(
+                "Gas station API request or response could not be handled; "
+                "using fallback gas price."
+            )
+            return fallback
 
     return gas_station_gas_price_strategy
 

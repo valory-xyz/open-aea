@@ -848,6 +848,42 @@ def test_gas_price_strategy_eth_gasstation():
     assert cast(int, result["gasPrice"]) == cast(int, excepted_result / 10 * 1000000000)
 
 
+def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back():
+    """Test eth gasstation returns the fallback when ``response.json()`` raises.
+
+    ``response.json()`` raises ``requests.exceptions.JSONDecodeError`` (a
+    ``ValueError`` subclass) when the daemon returns a 200 with a non-JSON
+    body (e.g. an HTML error page from a CDN). The strategy must return the
+    documented fallback rather than letting the exception escape.
+    """
+    callable_ = get_gas_price_strategy("fast", "api_key")
+    resp = MagicMock(
+        status_code=200,
+        json=MagicMock(side_effect=ValueError("not json")),
+    )
+    web3_mock = MagicMock()
+    web3_mock.to_wei.return_value = 999
+    with patch.object(requests, "get", return_value=resp):
+        assert callable_(web3_mock, "tx_params") == {"gasPrice": 999}
+
+
+def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back():
+    """Test eth gasstation returns the fallback when the speed key is missing.
+
+    Without the broadened ``except`` this would have surfaced an unhandled
+    ``ValueError`` from the inner ``isinstance`` check.
+    """
+    callable_ = get_gas_price_strategy("fast", "api_key")
+    resp = MagicMock(
+        status_code=200,
+        json=MagicMock(return_value={"unexpected": "shape"}),
+    )
+    web3_mock = MagicMock()
+    web3_mock.to_wei.return_value = 999
+    with patch.object(requests, "get", return_value=resp):
+        assert callable_(web3_mock, "tx_params") == {"gasPrice": 999}
+
+
 def test_gas_price_strategy_not_supported(caplog):
     """Test the gas price strategy when not supported."""
     gas_price_strategy = "superfast"
@@ -1559,6 +1595,24 @@ def test_get_gas_price_strategy() -> None:
         "aea_ledger_ethereum.ethereum.requests.get",
         side_effect=requests.exceptions.RequestException(Mock()),
     ):
+        assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+
+    # Malformed JSON body on a 200: response.json() raises ValueError. The
+    # strategy must return the fallback rather than propagate.
+    resp_mock.status_code = 200
+    resp_mock.json = Mock(side_effect=ValueError("not json"))
+    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
+        assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+
+    # Missing speed key on a 200: subscript raises KeyError. Must fall back.
+    resp_mock.json = Mock(return_value={"slow": {"maxFee": 1, "maxPriorityFee": 1}})
+    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
+        assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+
+    # Missing maxFee/maxPriorityFee on a 200: nested subscript raises
+    # KeyError. Must fall back.
+    resp_mock.json = Mock(return_value={"fast": {"unrelated": 0}})
+    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
 
 
