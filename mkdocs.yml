@@ -78,6 +78,7 @@ nav:
       - Profiling: 'runtime-cost.md'
       - Proof of Representation: 'por.md'
       - Security: 'security.md'
+      - Connection resilience: 'connection-resilience.md'
     - Agent Communication:
       - Agent Communication Network: 'acn.md'
       - ACN Connections: 'p2p-connection.md'
