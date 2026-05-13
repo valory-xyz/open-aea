@@ -71,6 +71,36 @@ class ErrorResponse(StatusError):
 
 
 # ---------------------------------------------------------------------------
+# Response parsing
+# ---------------------------------------------------------------------------
+
+
+def _safe_json_loads(body: Union[bytes, str], context: str) -> Any:
+    """Parse a successful IPFS response body as JSON, raising StatusError on failure.
+
+    The 200-status error-body branches already wrap ``json.loads`` in a
+    ``ValueError``/``KeyError`` guard. This helper extends that guard to the
+    success path so a 200 with a non-JSON body (CDN/proxy HTML error page,
+    truncated response, gzipped payload) surfaces as a typed ``StatusError``
+    rather than an unhandled ``ValueError`` in the caller.
+
+    :param body: the response body bytes or text from the IPFS daemon.
+    :param context: short label describing the call site for diagnostic messages.
+    :return: the decoded JSON payload.
+    :raises StatusError: if ``body`` is not valid JSON.
+    """
+    try:
+        return json.loads(body)
+    except ValueError as exc:
+        text = (
+            body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
+        )
+        raise StatusError(
+            f"IPFS API returned 200 but body is not JSON ({context}): {text[:200]!r}"
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
 # Multipart encoding for the IPFS /api/v0/add endpoint
 # ---------------------------------------------------------------------------
 
@@ -387,10 +417,10 @@ class IPFSHTTPClient:
             for line in text.strip().split("\n"):
                 line = line.strip()
                 if line:
-                    results.append(json.loads(line))
+                    results.append(_safe_json_loads(line, f"{endpoint} stream"))
             return results
 
-        return json.loads(body)
+        return _safe_json_loads(body, endpoint)
 
     def id(self, peer: Optional[str] = None) -> Dict:
         """Get node identity info."""
@@ -449,7 +479,7 @@ class IPFSHTTPClient:
         for line in text.strip().split("\n"):
             line = line.strip()
             if line:
-                results.append(json.loads(line))
+                results.append(_safe_json_loads(line, "/add stream"))
 
         # Match ipfshttpclient behavior: single-item result returns a dict,
         # multi-item result returns a list
@@ -480,7 +510,7 @@ class IPFSHTTPClient:
             except (ValueError, KeyError):
                 pass
             raise StatusError(f"IPFS API returned status {status}: {text}")
-        result = json.loads(resp_body)
+        result = _safe_json_loads(resp_body, "/add")
         if "Hash" not in result:
             raise StatusError(f"IPFS API response missing 'Hash' key: {result}")
         return result["Hash"]

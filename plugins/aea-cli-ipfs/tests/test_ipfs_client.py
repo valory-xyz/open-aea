@@ -330,6 +330,64 @@ class TestAddBytesErrorHandling:
             client.add_bytes(b"data")
 
 
+class TestSuccessPathJSONSafety:
+    """Tests for typed errors on non-JSON 200 responses.
+
+    The success-path ``json.loads`` calls in ``_api_post``, ``add``, and
+    ``add_bytes`` route through ``_safe_json_loads`` so a 200 carrying a
+    non-JSON body raises a typed ``StatusError`` instead of an unhandled
+    ``ValueError`` in the caller.
+    """
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_bytes_non_json_200_raises_status_error(
+        self, mock_urlopen: MagicMock
+    ) -> None:
+        """add_bytes raises StatusError when the 200 body is not JSON."""
+        mock_urlopen.return_value = _mock_urlopen(200, b"<html>Bad Gateway</html>")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(StatusError, match="not JSON"):
+            client.add_bytes(b"data")
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_add_stream_malformed_line_raises_status_error(
+        self, mock_urlopen: MagicMock
+    ) -> None:
+        """add raises StatusError when a stream line is not JSON."""
+        ndjson = '{"Name":"a.txt","Hash":"Qm1"}\nnot json at all\n'
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "mydir"
+            root.mkdir()
+            (root / "a.txt").write_text("aaa")
+
+            client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+            with pytest.raises(StatusError, match="not JSON"):
+                client.add(str(root))
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_api_post_non_json_200_raises_status_error(
+        self, mock_urlopen: MagicMock
+    ) -> None:
+        """_api_post (non-stream) raises StatusError when the 200 body is not JSON."""
+        mock_urlopen.return_value = _mock_urlopen(200, b"not json")
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(StatusError, match="not JSON"):
+            client.id()
+
+    @patch("aea_cli_ipfs.ipfs_client.urllib.request.urlopen")
+    def test_api_post_stream_malformed_line_raises_status_error(
+        self, mock_urlopen: MagicMock
+    ) -> None:
+        """_api_post (stream) raises StatusError when a stream line is not JSON."""
+        ndjson = '{"Key":"Qm1"}\n<html>oops</html>\n'
+        mock_urlopen.return_value = _mock_urlopen(200, ndjson.encode())
+        client = IPFSHTTPClient("/ip4/127.0.0.1/tcp/5001")
+        with pytest.raises(StatusError, match="not JSON"):
+            client.repo.gc()
+
+
 class TestTarSafety:
     """Tests for tar extraction safety."""
 
