@@ -57,12 +57,14 @@ from aea_ledger_ethereum.ethereum import (
     EIP1559,
     EIP1559_POLYGON,
     GAS_STATION,
+    GWEI,
     TIP_INCREASE,
     estimate_priority_fee,
     get_base_fee_multiplier,
     get_gas_price_strategy_eip1559_polygon,
 )
 from eth_typing import BlockNumber
+from eth_utils.currency import to_wei
 from requests import HTTPError
 from web3 import Web3
 from web3.datastructures import AttributeDict
@@ -764,14 +766,19 @@ def test_gas_price_strategy_eip1559_fallback_max_gas_fast() -> None:
 @pytest.mark.parametrize(
     "chain_id,expected_max_fee_gwei,expected_tip_gwei,expected_max_gas_fast",
     [
-        (10, 5, 3, 1500),  # Optimism
-        (8453, 5, 3, 1500),  # Base
-        (34443, 5, 3, 1500),  # Mode
-        (252, 5, 3, 1500),  # Fraxtal (OP-stack)
-        (42161, 2, 1, 1500),  # Arbitrum One — 0.1 gwei floor
+        (10, 5, 3, 100),  # Optimism — 100 gwei ceiling, Worldcoin-era headroom
+        (
+            8453,
+            30,
+            3,
+            100,
+        ),  # Base — 100 gwei ceiling; fallback raised to 30 gwei so it stays mineable during Mar 2024-shape sustained congestion
+        (34443, 5, 3, 50),  # Mode — 50 gwei defensive ceiling
+        (252, 5, 3, 50),  # Fraxtal — 50 gwei defensive ceiling
+        (42161, 2, 1, 5),  # Arbitrum One — 5 gwei (~250x the 0.02 gwei floor)
         (42220, 50, 25, 1500),  # Celo — 25 gwei network minimum
-        (137, 6000, 30, 10000),  # Polygon — tip must clear 25 gwei validator floor
-        (100, 5, 1, 1500),  # Gnosis — tuned: 1 gwei tip matches validator floor
+        (137, 6000, 30, 10000),  # Polygon — tip must clear 30 gwei validator floor
+        (100, 5, 1, 30),  # Gnosis — 30 gwei ceiling, 1 gwei tip matches floor
         (1, 20, 3, 1500),  # Ethereum mainnet — unchanged default
         (56, 20, 3, 1500),  # BNB — unchanged (not in map)
         (324, 20, 3, 1500),  # zkSync — unchanged (not in map)
@@ -790,6 +797,104 @@ def test_get_default_gas_strategy_per_chain_fallbacks(
     assert strategy[EIP1559]["max_gas_fast"] == expected_max_gas_fast
 
 
+def _fallback_test(
+    chain_id: int, base_fee_gwei: int, expect_fallback: bool
+) -> Dict[str, Wei]:
+    """Run the eip1559 strategy for ``chain_id`` against a mocked base fee."""
+    from aea_ledger_ethereum.ethereum import EIP1559, get_default_gas_strategy
+
+    strategy_kwargs = get_default_gas_strategy(chain_id)[EIP1559]
+    callable_ = get_gas_price_strategy_eip1559(**strategy_kwargs)
+    web3 = Web3()
+    base_fee = to_wei(base_fee_gwei, GWEI)
+    get_block_mock = mock.patch.object(
+        web3.eth, "get_block", return_value={"baseFeePerGas": base_fee, "number": 1}
+    )
+    fee_history_mock = mock.patch.object(
+        web3.eth, "fee_history", return_value=get_history_data(n_blocks=5)
+    )
+    with get_block_mock, fee_history_mock, mock.patch(
+        "aea_ledger_ethereum.ethereum.estimate_priority_fee",
+        new=lambda *args, **kwargs: to_wei(1, GWEI),
+    ):
+        gas_strategy = callable_(web3, "tx_params")
+
+    fallback = strategy_kwargs["fallback_estimate"]
+    if expect_fallback:
+        assert (
+            gas_strategy == fallback
+        ), f"chain {chain_id}: expected fallback, got {gas_strategy}"
+    else:
+        assert (
+            gas_strategy != fallback
+        ), f"chain {chain_id}: expected computed value, got fallback {fallback}"
+    return gas_strategy
+
+
+@pytest.mark.parametrize(
+    "chain_id,anomaly_base_fee_gwei,expected_max_fee_gwei,expected_tip_gwei",
+    [
+        (100, 150, 5, 1),  # Gnosis: 150 gwei >> 30 ceiling
+        (10, 500, 5, 3),  # Optimism: 500 gwei >> 100 ceiling
+        (8453, 500, 30, 3),  # Base: 500 gwei >> 100 ceiling; fallback raised to 30 gwei
+        (34443, 200, 5, 3),  # Mode: 200 gwei >> 50 ceiling
+        (252, 200, 5, 3),  # Fraxtal: 200 gwei >> 50 ceiling
+        (42161, 100, 2, 1),  # Arbitrum: 100 gwei >> 5 ceiling
+    ],
+)
+def test_chain_anomaly_triggers_fallback(
+    chain_id: int,
+    anomaly_base_fee_gwei: int,
+    expected_max_fee_gwei: int,
+    expected_tip_gwei: int,
+) -> None:
+    """An anomalous base fee triggers fallback on every tuned chain."""
+    gas_strategy = _fallback_test(chain_id, anomaly_base_fee_gwei, expect_fallback=True)
+    assert gas_strategy["maxFeePerGas"] == to_wei(expected_max_fee_gwei, GWEI)
+    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(expected_tip_gwei, GWEI)
+
+
+@pytest.mark.parametrize(
+    "chain_id,normal_base_fee_gwei,expected_max_fee_gwei,ceiling_gwei",
+    [
+        # Each row: base_fee * multiplier (2.0 for base_fee <= 40 gwei) is the
+        # computed maxFeePerGas; the mocked priority fee (1 gwei) is < potential
+        # in every row so it doesn't shift the result.  tip is always 1 gwei.
+        (100, 2, 4, 30),  # Gnosis:    base=2,  potential=4,  ceiling=30
+        (10, 1, 2, 100),  # Optimism:  base=1,  potential=2,  ceiling=100
+        (8453, 1, 2, 100),  # Base:      base=1,  potential=2,  ceiling=100
+        (34443, 1, 2, 50),  # Mode:      base=1,  potential=2,  ceiling=50
+        (252, 1, 2, 50),  # Fraxtal:   base=1,  potential=2,  ceiling=50
+        # Arbitrum: avoid base_fee=1 -- computed (2 gwei, 1 gwei) coincides
+        # with the Arbitrum fallback estimate, defeating the != fallback check.
+        (42161, 2, 4, 5),  # Arbitrum:  base=2,  potential=4,  ceiling=5
+    ],
+)
+def test_chain_normal_fee_does_not_trigger_fallback(
+    chain_id: int,
+    normal_base_fee_gwei: int,
+    expected_max_fee_gwei: int,
+    ceiling_gwei: int,
+) -> None:
+    """A normal base fee returns the EXACT computed values, no fallback.
+
+    Asserts exact equality on both fields -- a wrong-but-below-ceiling
+    regression (e.g. returning zeros) would otherwise sneak through the
+    weaker ``!= fallback`` and ``< ceiling`` checks.
+
+    :param chain_id: chain id to drive the strategy against.
+    :param normal_base_fee_gwei: mocked ``baseFeePerGas`` (gwei).
+    :param expected_max_fee_gwei: expected computed ``maxFeePerGas``
+        (gwei) after multiplier + priority-fee math.
+    :param ceiling_gwei: the chain's ``max_gas_fast`` ceiling, asserted
+        as an upper bound on the computed value.
+    """
+    gas_strategy = _fallback_test(chain_id, normal_base_fee_gwei, expect_fallback=False)
+    assert gas_strategy["maxFeePerGas"] == to_wei(expected_max_fee_gwei, GWEI)
+    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(1, GWEI)
+    assert gas_strategy["maxFeePerGas"] < to_wei(ceiling_gwei, GWEI)
+
+
 def test_get_default_gas_strategy_polygon_applies_to_eip1559_polygon() -> None:
     """Polygon's primary strategy `eip1559_polygon` picks up the override too."""
     from aea_ledger_ethereum.ethereum import EIP1559_POLYGON, get_default_gas_strategy
@@ -801,10 +906,10 @@ def test_get_default_gas_strategy_polygon_applies_to_eip1559_polygon() -> None:
 
 
 def test_ethereum_api_init_applies_chain_specific_fallback() -> None:
-    """`make_ledger_api('ethereum', chain_id=8453)` picks up Base's 5-gwei fallback."""
+    """`make_ledger_api('ethereum', chain_id=8453)` picks up Base's 30-gwei fallback."""
     api = EthereumApi(address="http://127.0.0.1:8545", chain_id=8453)
     fallback = api._gas_price_strategies["eip1559"]["fallback_estimate"]  # noqa: SLF001
-    assert fallback["maxFeePerGas"] == 5 * 10**9
+    assert fallback["maxFeePerGas"] == 30 * 10**9
     assert fallback["maxPriorityFeePerGas"] == 3 * 10**9
 
 
@@ -829,6 +934,76 @@ def test_ethereum_api_init_user_gas_price_strategies_wins() -> None:
     fallback = api._gas_price_strategies["eip1559"]["fallback_estimate"]  # noqa: SLF001
     assert fallback["maxFeePerGas"] == 123
     assert fallback["maxPriorityFeePerGas"] == 456
+
+
+def test_connection_yaml_eip1559_matches_plugin_defaults() -> None:
+    """`valory/ledger`'s `connection.yaml` must not drift from plugin defaults.
+
+    `CHAIN_EIP1559_OVERRIDES` (plugin) and the per-chain ``eip1559`` blocks
+    in `connection.yaml` are maintained manually in lockstep -- this test
+    is the drift detector. For every chain present in both, asserts that
+    `max_gas_fast`, `min_allowed_tip`, and each `fallback_estimate` field
+    match exactly.
+    """
+    import yaml as yaml_module
+    from aea_ledger_ethereum.ethereum import (
+        CHAIN_EIP1559_OVERRIDES,
+        EIP1559,
+        get_default_gas_strategy,
+    )
+
+    # Locate the YAML walking from this file -- repo layout has it at
+    # `packages/valory/connections/ledger/connection.yaml` relative to root.
+    repo_root = Path(__file__).resolve().parents[3]
+    yaml_path = (
+        repo_root / "packages" / "valory" / "connections" / "ledger" / "connection.yaml"
+    )
+    with open(yaml_path, encoding="utf-8") as fp:
+        cfg = yaml_module.safe_load(fp)
+
+    # YAML structure: config.ledger_apis.<name>.{chain_id, gas_price_strategies}
+    ledger_apis = cfg["config"]["ledger_apis"]
+    yaml_by_chain_id: Dict[int, dict] = {
+        entry["chain_id"]: entry["gas_price_strategies"].get("eip1559", {})
+        for entry in ledger_apis.values()
+        if "chain_id" in entry and "gas_price_strategies" in entry
+    }
+
+    drift_errors = []
+    for chain_id, plugin_overrides in CHAIN_EIP1559_OVERRIDES.items():
+        yaml_block = yaml_by_chain_id.get(chain_id)
+        if yaml_block is None:
+            # connection.yaml may not include every tuned chain; skip
+            # silently rather than failing -- the goal is drift detection,
+            # not coverage.
+            continue
+        plugin_strategy = get_default_gas_strategy(chain_id)[EIP1559]
+        for field in ("max_gas_fast", "min_allowed_tip"):
+            if field not in plugin_overrides:
+                # Not overridden in the plugin -- the yaml entry might
+                # still set it; only cross-check explicit overrides.
+                continue
+            plugin_val = plugin_strategy[field]
+            yaml_val = yaml_block.get(field)
+            if plugin_val != yaml_val:
+                drift_errors.append(
+                    f"chain {chain_id}: plugin.{field}={plugin_val} "
+                    f"!= connection.yaml.{field}={yaml_val}"
+                )
+        for fb_key in ("maxFeePerGas", "maxPriorityFeePerGas"):
+            plugin_val = plugin_strategy["fallback_estimate"][fb_key]
+            yaml_val = yaml_block.get("fallback_estimate", {}).get(fb_key)
+            if plugin_val != yaml_val:
+                drift_errors.append(
+                    f"chain {chain_id}: plugin.fallback_estimate.{fb_key}={plugin_val} "
+                    f"!= connection.yaml.fallback_estimate.{fb_key}={yaml_val}"
+                )
+
+    assert (
+        not drift_errors
+    ), "Drift between plugin defaults and connection.yaml:\n  " + "\n  ".join(
+        drift_errors
+    )
 
 
 def test_gas_price_strategy_eth_gasstation():

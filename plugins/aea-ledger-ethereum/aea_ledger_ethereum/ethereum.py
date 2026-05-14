@@ -128,43 +128,70 @@ DEFAULT_GNOSIS_MIN_ALLOWED_TIP = to_wei(1, GWEI)
 # Chains not listed here inherit the defaults entirely (including
 # `DEFAULT_FALLBACK_ESTIMATE`).
 CHAIN_EIP1559_OVERRIDES: Dict[int, Dict[str, Any]] = {
-    # Gnosis: typical base fee <2 gwei; 1 gwei validator floor on priority fee
+    # Gnosis: typical base fee <2 gwei; 1 gwei validator floor on priority fee.
+    # ``max_gas_fast`` set ~4x above legitimate congestion bursts (~5-8 gwei
+    # during Tornado-deposit waves) but well below the range observed during
+    # production RPC anomalies that burned ~45% of an agent's xDAI budget on
+    # a single 694 gwei tx (gnosisscan.io tx 0x727262d9...). Anything above
+    # this ceiling triggers the ``fallback_estimate`` (5/1 gwei) instead.
     100: {
+        "max_gas_fast": 30,
         "min_allowed_tip": DEFAULT_GNOSIS_MIN_ALLOWED_TIP,
         "fallback_estimate": {
             "maxFeePerGas": to_wei(5, GWEI),
             "maxPriorityFeePerGas": to_wei(1, GWEI),
         },
     },
-    # OP-stack L2s: sub-gwei typical; 5 gwei is a generous ceiling; no
-    # enforced tip floor, so default `min_allowed_tip` (1 wei) is fine.
+    # OP-stack L2s (Optimism / Base / Mode / Fraxtal): sub-gwei typical; no
+    # enforced tip floor, so default ``min_allowed_tip`` (1 wei) is fine.
+    # ``max_gas_fast`` sized to preserve operability during legitimate
+    # congestion events (Base sustained ~24 gwei averages with >100 gwei
+    # bursts during the March 2024 Dencun memecoin frenzy; Optimism had
+    # similar Worldcoin-era spikes) while still capping fee-oracle anomalies
+    # at orders of magnitude below the chain-agnostic 1500 gwei default.
     10: {  # Optimism
+        "max_gas_fast": 100,
         "fallback_estimate": {
             "maxFeePerGas": to_wei(5, GWEI),
             "maxPriorityFeePerGas": to_wei(3, GWEI),
         },
     },
-    8453: {  # Base
+    # Base: raised ``fallback_estimate.maxFeePerGas`` to track real
+    # congestion. The March 2024 Dencun memecoin frenzy sustained ~24
+    # gwei daily averages with bursts >100 gwei; a 5 gwei fallback would
+    # have left txs unmineable for hours when the ceiling fires during a
+    # real congestion event. 30 gwei sits above the sustained average so
+    # the fallback stays mineable, and still well below the 100 gwei
+    # ceiling so anomaly-triggered fallbacks remain a clear discount on
+    # the anomalous price.
+    8453: {
+        "max_gas_fast": 100,
         "fallback_estimate": {
-            "maxFeePerGas": to_wei(5, GWEI),
+            "maxFeePerGas": to_wei(30, GWEI),
             "maxPriorityFeePerGas": to_wei(3, GWEI),
         },
     },
     34443: {  # Mode
+        "max_gas_fast": 50,
         "fallback_estimate": {
             "maxFeePerGas": to_wei(5, GWEI),
             "maxPriorityFeePerGas": to_wei(3, GWEI),
         },
     },
     252: {  # Fraxtal (OP-stack)
+        "max_gas_fast": 50,
         "fallback_estimate": {
             "maxFeePerGas": to_wei(5, GWEI),
             "maxPriorityFeePerGas": to_wei(3, GWEI),
         },
     },
-    # Arbitrum One: 0.1 gwei floor, ~0.02 gwei typical; 2 gwei is 20x floor;
-    # no enforced tip floor either.
+    # Arbitrum One: ~0.02 gwei typical (current `ArbGasInfo.getMinimumGasPrice()`
+    # via Arbiscan); no enforced priority-fee floor. 5 gwei is well above any
+    # observed daily-average congestion. See forum proposal for the gas
+    # algorithm changes the floor tracks:
+    # https://forum.arbitrum.foundation/t/aip-raise-the-gas-target-min-l2-base-fee-implement-improvements-to-the-pricing-algorithm/30182
     42161: {
+        "max_gas_fast": 5,
         "fallback_estimate": {
             "maxFeePerGas": to_wei(2, GWEI),
             "maxPriorityFeePerGas": to_wei(1, GWEI),
