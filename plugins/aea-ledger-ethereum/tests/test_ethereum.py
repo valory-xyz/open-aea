@@ -826,44 +826,48 @@ def _fallback_test(
     return gas_strategy
 
 
-def test_gnosis_anomaly_triggers_fallback() -> None:
-    """Gnosis: 150 gwei base fee exceeds the 30 gwei ceiling -> fallback."""
-    gas_strategy = _fallback_test(100, 150, expect_fallback=True)
-    assert gas_strategy["maxFeePerGas"] == to_wei(5, GWEI)
-    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(1, GWEI)
+@pytest.mark.parametrize(
+    "chain_id,anomaly_base_fee_gwei,expected_max_fee_gwei,expected_tip_gwei",
+    [
+        (100, 150, 5, 1),  # Gnosis: 150 gwei >> 30 ceiling
+        (10, 500, 5, 3),  # Optimism: 500 gwei >> 100 ceiling
+        (8453, 500, 5, 3),  # Base: 500 gwei >> 100 ceiling (Mar 2024-shape spike)
+        (34443, 200, 5, 3),  # Mode: 200 gwei >> 50 ceiling
+        (252, 200, 5, 3),  # Fraxtal: 200 gwei >> 50 ceiling
+        (42161, 100, 2, 1),  # Arbitrum: 100 gwei >> 5 ceiling
+    ],
+)
+def test_chain_anomaly_triggers_fallback(
+    chain_id: int,
+    anomaly_base_fee_gwei: int,
+    expected_max_fee_gwei: int,
+    expected_tip_gwei: int,
+) -> None:
+    """An anomalous base fee triggers fallback on every tuned chain."""
+    gas_strategy = _fallback_test(chain_id, anomaly_base_fee_gwei, expect_fallback=True)
+    assert gas_strategy["maxFeePerGas"] == to_wei(expected_max_fee_gwei, GWEI)
+    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(expected_tip_gwei, GWEI)
 
 
-def test_gnosis_normal_fee_does_not_trigger_fallback() -> None:
-    """Gnosis: 2 gwei base fee stays well under the 30 gwei ceiling."""
-    gas_strategy = _fallback_test(100, 2, expect_fallback=False)
-    assert gas_strategy["maxFeePerGas"] < to_wei(30, GWEI)
-
-
-def test_base_anomaly_triggers_fallback() -> None:
-    """Base: 200 gwei base fee exceeds the 100 gwei ceiling -> fallback.
-
-    Symmetric to the Gnosis incident: Base inherits the same missing-
-    `max_gas_fast` shape from `CHAIN_EIP1559_OVERRIDES` and is now
-    explicitly capped at 100 gwei -- generous enough for the March 2024
-    Dencun memecoin congestion (sustained ~24 gwei averages with bursts
-    >100 gwei in individual blocks) but blocks oracle anomalies.
-    """
-    gas_strategy = _fallback_test(8453, 200, expect_fallback=True)
-    assert gas_strategy["maxFeePerGas"] == to_wei(5, GWEI)
-    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(3, GWEI)
-
-
-def test_base_normal_fee_does_not_trigger_fallback() -> None:
-    """Base: 0.005 gwei base fee (typical post-Jovian) stays under the cap."""
-    gas_strategy = _fallback_test(8453, 1, expect_fallback=False)
-    assert gas_strategy["maxFeePerGas"] < to_wei(100, GWEI)
-
-
-def test_arbitrum_anomaly_triggers_fallback() -> None:
-    """Arbitrum One: 10 gwei base fee exceeds the 5 gwei ceiling -> fallback."""
-    gas_strategy = _fallback_test(42161, 10, expect_fallback=True)
-    assert gas_strategy["maxFeePerGas"] == to_wei(2, GWEI)
-    assert gas_strategy["maxPriorityFeePerGas"] == to_wei(1, GWEI)
+@pytest.mark.parametrize(
+    "chain_id,normal_base_fee_gwei,ceiling_gwei",
+    [
+        (100, 2, 30),  # Gnosis
+        (10, 1, 100),  # Optimism
+        (8453, 1, 100),  # Base
+        (34443, 1, 50),  # Mode
+        (252, 1, 50),  # Fraxtal
+        # Arbitrum: avoid base_fee=1 -- computed (2 gwei, 1 gwei) coincides
+        # with the Arbitrum fallback estimate, defeating the != fallback check.
+        (42161, 2, 5),  # base_fee=2 -> 4 gwei computed, still below 5 ceiling
+    ],
+)
+def test_chain_normal_fee_does_not_trigger_fallback(
+    chain_id: int, normal_base_fee_gwei: int, ceiling_gwei: int
+) -> None:
+    """A normal base fee does NOT trigger fallback on any tuned chain."""
+    gas_strategy = _fallback_test(chain_id, normal_base_fee_gwei, expect_fallback=False)
+    assert gas_strategy["maxFeePerGas"] < to_wei(ceiling_gwei, GWEI)
 
 
 def test_get_default_gas_strategy_polygon_applies_to_eip1559_polygon() -> None:
