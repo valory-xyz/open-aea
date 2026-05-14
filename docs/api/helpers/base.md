@@ -268,11 +268,22 @@ Run function, log and return default value on exception.
 
 Does not support async or coroutines!
 
+Callers can pass ``raise_on_try=True`` as a keyword argument to opt out
+of swallowing — the original exception is re-raised unchanged with its
+full traceback so callers that want to propagate failures (e.g.
+integration tests) can do so without touching the decorator.
+
 **Arguments**:
 
 - `error_message`: message template with one `{}` for exception
 - `default_return`: value to return on exception, by default None
 - `logger_method`: name of the logger method or callable to print logs
+
+**Raises**:
+
+- `Exception`: the wrapped function's exception, re-raised unchanged with
+its original traceback, when the wrapped call is invoked with
+``raise_on_try=True``.  # noqa: DAR402
 
 **Returns**:
 

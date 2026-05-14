@@ -21,6 +21,7 @@
 """Scaffold connection and channel."""
 
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Optional
 
 from aea.configurations.base import PublicId
@@ -46,7 +47,14 @@ class LedgerConnection(Connection):
 
     connection_id = PUBLIC_ID
     TIMEOUT = 3
-    MAX_ATTEMPTS = 120
+    MAX_ATTEMPTS = 60
+    # Dedicated executor size for the dispatchers' ``run_in_executor`` calls.
+    # Without an explicit pool, Python's default asyncio executor (shared with
+    # every other agent component) is used. ``RotatingHTTPProvider.make_request``
+    # holds a worker for the duration of its sync retry sleeps, so under
+    # sustained RPC outage threads accumulate; a dedicated, sized pool isolates
+    # ledger work from the rest of the agent and surfaces the cost as config.
+    DEFAULT_MAX_THREAD_WORKERS = 32
 
     def __init__(self, **kwargs: Any):
         """Initialize a connection to interact with a ledger APIs."""
@@ -55,6 +63,7 @@ class LedgerConnection(Connection):
         self._ledger_dispatcher: Optional[LedgerApiRequestDispatcher] = None
         self._contract_dispatcher: Optional[ContractApiRequestDispatcher] = None
         self._response_envelopes: Optional[asyncio.Queue] = None
+        self._executor: Optional[ThreadPoolExecutor] = None
 
         self.task_to_request: Dict[asyncio.Future, Envelope] = {}
         self.api_configs = self.configuration.config.get(
@@ -65,6 +74,9 @@ class LedgerConnection(Connection):
         )
         self.request_retry_timeout = self.configuration.config.get(
             "retry_timeout", self.TIMEOUT
+        )
+        self.max_thread_workers: int = self.configuration.config.get(
+            "max_thread_workers", self.DEFAULT_MAX_THREAD_WORKERS
         )
 
     @property
@@ -84,9 +96,14 @@ class LedgerConnection(Connection):
 
         self.state = ConnectionStates.connecting
 
+        self._executor = ThreadPoolExecutor(
+            max_workers=self.max_thread_workers,
+            thread_name_prefix=f"ledger:{self.connection_id}:",
+        )
         self._ledger_dispatcher = LedgerApiRequestDispatcher(
             self._state,
             loop=self.loop,
+            executor=self._executor,
             api_configs=self.api_configs,
             logger=self.logger,
             retry_attempts=self.request_retry_attempts,
@@ -96,6 +113,7 @@ class LedgerConnection(Connection):
         self._contract_dispatcher = ContractApiRequestDispatcher(
             self._state,
             loop=self.loop,
+            executor=self._executor,
             api_configs=self.api_configs,
             logger=self.logger,
             retry_attempts=self.request_retry_attempts,
@@ -119,6 +137,14 @@ class LedgerConnection(Connection):
         self._ledger_dispatcher = None
         self._contract_dispatcher = None
         self._response_envelopes = None
+        if self._executor is not None:
+            # ``cancel_futures=True`` discards queued tasks; in-flight worker
+            # threads are still left to drain (they own external sockets/file
+            # descriptors via the underlying ledger SDKs and can't be safely
+            # killed mid-call). ``wait=False`` keeps the disconnect path
+            # itself non-blocking.
+            self._executor.shutdown(wait=False, cancel_futures=True)
+            self._executor = None
 
         self.state = ConnectionStates.disconnected
 

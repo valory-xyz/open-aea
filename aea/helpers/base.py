@@ -404,10 +404,18 @@ def try_decorator(
 
     Does not support async or coroutines!
 
+    Callers can pass ``raise_on_try=True`` as a keyword argument to opt out
+    of swallowing — the original exception is re-raised unchanged with its
+    full traceback so callers that want to propagate failures (e.g.
+    integration tests) can do so without touching the decorator.
+
     :param error_message: message template with one `{}` for exception
     :param default_return: value to return on exception, by default None
     :param logger_method: name of the logger method or callable to print logs
     :return: the callable
+    :raises Exception: the wrapped function's exception, re-raised unchanged with
+        its original traceback, when the wrapped call is invoked with
+        ``raise_on_try=True``.  # noqa: DAR402
     """
 
     # for pydocstyle
@@ -416,14 +424,25 @@ def try_decorator(
         def wrapper(*args: Any, **kwargs: Any) -> Callable:
             try:
                 return fn(*args, **kwargs)
-            except (
-                Exception  # pylint: disable=broad-except
-            ) as e:  # pragma: no cover  # generic code
+            except Exception as e:  # pylint: disable=broad-except
                 if kwargs.get("raise_on_try", False):
-                    raise e
+                    # Bare ``raise`` preserves the original traceback frame;
+                    # ``raise e`` would re-anchor the traceback to this line
+                    # and drop the call-site context the log enrichment
+                    # below is trying to surface.
+                    raise
                 if error_message:
                     log = get_logger_method(fn, logger_method)
-                    log(error_message.format(e))
+                    # Include the function's qualified name and the exception
+                    # type so swallowed failures are diagnosable from the log
+                    # without changing the catch semantics. ``str(e)`` alone
+                    # often produces a sparse line (e.g. just ``'maxFee'``
+                    # for a ``KeyError``).
+                    log(
+                        f"{error_message.format(e)} "
+                        f"[function={fn.__qualname__}, "
+                        f"exc_type={type(e).__name__}]"
+                    )
                 return cast(Callable, default_return)
 
         return wrapper

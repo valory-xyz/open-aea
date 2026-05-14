@@ -57,6 +57,9 @@ from aea.helpers.transaction.base import (
 from aea.mail.base import Envelope, Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 
+from packages.valory.connections.ledger import (
+    ledger_dispatcher as ledger_dispatcher_module,
+)
 from packages.valory.connections.ledger.connection import LedgerConnection
 from packages.valory.connections.ledger.ledger_dispatcher import (
     LedgerApiRequestDispatcher,
@@ -751,3 +754,53 @@ class TestLedgerDispatcher:
             assert (
                 actual_times_called == expected_times_called
             ), f"Tried {actual_times_called} times, {expected_times_called} were expected!"
+
+
+class TestLedgerDispatcherRetrySleepCap:
+    """Unit tests for the retry-sleep cap on the ledger dispatcher.
+
+    These tests mock the ledger API and ``asyncio.sleep`` so they do not
+    need a running Ganache node, unlike :class:`TestLedgerDispatcher`.
+    """
+
+    @pytest.mark.asyncio
+    async def test_retry_sleep_is_capped(self) -> None:
+        """Test the per-attempt retry sleep is capped at ``MAX_RETRY_DELAY``.
+
+        With ``retry_timeout=30`` and the linear ramp ``retry_timeout *
+        attempts``, the un-capped sleep would reach 90s on the third attempt.
+        The cap holds each individual sleep at ``MAX_RETRY_DELAY`` (60s),
+        which bounds the worst-case loop without changing the retry count.
+        """
+        dispatcher = LedgerApiRequestDispatcher(
+            AsyncState(ConnectionStates.connected),
+            connection_id=LedgerConnection.connection_id,
+        )
+        mock_api = Mock()
+        message = LedgerApiMessage(
+            performative=LedgerApiMessage.Performative.GET_TRANSACTION_RECEIPT,  # type: ignore
+            dialogue_reference=dispatcher.dialogues.new_self_initiated_dialogue_reference(),
+            transaction_digest=TransactionDigest("asdad", "sdfdsf"),
+            retry_attempts=3,
+            retry_timeout=30,
+        )
+        message.to = dispatcher.dialogues.self_address
+        message.sender = "test"
+        dialogue = dispatcher.dialogues.update(message)
+        assert dialogue is not None
+
+        mock_api.get_transaction_receipt.side_effect = ValueError("rpc down")
+        mock_api.get_transaction.side_effect = ValueError("rpc down")
+
+        sleep_calls: List[float] = []
+
+        async def _fake_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        with patch.object(ledger_dispatcher_module.asyncio, "sleep", new=_fake_sleep):
+            await dispatcher.get_transaction_receipt(mock_api, message, dialogue)
+
+        # The receipt and transaction loops each run for ``retry_attempts``,
+        # so we expect 6 sleeps. The cap holds each one at MAX_RETRY_DELAY.
+        assert sleep_calls == [30.0, 60.0, 60.0, 30.0, 60.0, 60.0]
+        assert all(s <= ledger_dispatcher_module.MAX_RETRY_DELAY for s in sleep_calls)

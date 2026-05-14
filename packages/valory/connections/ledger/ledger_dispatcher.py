@@ -47,6 +47,13 @@ _default_logger = logging.getLogger(
     "aea.packages.valory.connections.ledger.ledger_dispatcher"
 )
 
+# Cap on the per-attempt sleep between transaction-receipt / transaction
+# retries. Without the cap, the linear backoff ``retry_timeout * attempts``
+# grows unboundedly across the ``retry_attempts`` budget; capping each
+# individual sleep here bounds the worst-case loop while preserving the
+# retry count.
+MAX_RETRY_DELAY = 60.0
+
 
 class LedgerApiDialogues(BaseLedgerApiDialogues):
     """The dialogues class keeps track of all dialogues."""
@@ -283,11 +290,11 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning(e)
+                self.logger.warning("%s: %s", type(e).__name__, e)
                 transaction_receipt = None
 
             attempts += 1
-            await asyncio.sleep(retry_timeout * attempts)
+            await asyncio.sleep(min(retry_timeout * attempts, MAX_RETRY_DELAY))
         self.logger.debug(f"Transaction receipt: {transaction_receipt}")
 
         attempts = 0
@@ -306,11 +313,11 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning(e)
+                self.logger.warning("%s: %s", type(e).__name__, e)
                 transaction = None
 
             attempts += 1
-            await asyncio.sleep(retry_timeout * attempts)
+            await asyncio.sleep(min(retry_timeout * attempts, MAX_RETRY_DELAY))
         self.logger.debug(f"Transaction: {transaction}")
 
         if transaction_receipt is None:  # pragma: nocover

@@ -71,6 +71,59 @@ class ErrorResponse(StatusError):
 
 
 # ---------------------------------------------------------------------------
+# Response parsing
+# ---------------------------------------------------------------------------
+
+
+_SAFE_PREVIEW_LIMIT = 80
+
+
+def _safe_preview(body: Union[bytes, str]) -> str:
+    """Render a short, printable preview of a response body for diagnostic messages.
+
+    Bytes are decoded with ``errors="replace"``, non-printable characters are
+    replaced with ``.`` (to prevent terminal-control or NUL bytes from
+    landing in logs) and the result is truncated to keep error messages and
+    logs scan-friendly.
+
+    :param body: the raw body bytes or text from the daemon.
+    :return: a short printable preview string suitable for inclusion in
+        ``StatusError`` messages and logs.
+    """
+    text = body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
+    safe = "".join(c if c.isprintable() else "." for c in text)
+    if len(safe) > _SAFE_PREVIEW_LIMIT:
+        safe = safe[:_SAFE_PREVIEW_LIMIT] + "..."
+    return safe
+
+
+def _safe_json_loads(body: Union[bytes, str], context: str) -> Any:
+    """Parse a successful IPFS response body as JSON, raising StatusError on failure.
+
+    The 200-status error-body branches already wrap ``json.loads`` in a
+    ``ValueError``/``KeyError`` guard. This helper extends that guard to the
+    success path so a 200 with a non-JSON body (CDN/proxy HTML error page,
+    truncated response, gzipped payload) surfaces as a typed ``StatusError``
+    rather than an unhandled ``ValueError`` in the caller. The body preview
+    embedded in the exception message is truncated and printable-only so
+    that arbitrary remote bytes cannot inject terminal-control sequences or
+    fill logs.
+
+    :param body: the response body bytes or text from the IPFS daemon.
+    :param context: short label describing the call site for diagnostic messages.
+    :return: the decoded JSON payload.
+    :raises StatusError: if ``body`` is not valid JSON.
+    """
+    try:
+        return json.loads(body)
+    except ValueError as exc:
+        raise StatusError(
+            f"IPFS API returned 200 but body is not JSON ({context}): "
+            f"{_safe_preview(body)!r}"
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
 # Multipart encoding for the IPFS /api/v0/add endpoint
 # ---------------------------------------------------------------------------
 
@@ -387,10 +440,10 @@ class IPFSHTTPClient:
             for line in text.strip().split("\n"):
                 line = line.strip()
                 if line:
-                    results.append(json.loads(line))
+                    results.append(_safe_json_loads(line, f"{endpoint} stream"))
             return results
 
-        return json.loads(body)
+        return _safe_json_loads(body, endpoint)
 
     def id(self, peer: Optional[str] = None) -> Dict:
         """Get node identity info."""
@@ -449,7 +502,7 @@ class IPFSHTTPClient:
         for line in text.strip().split("\n"):
             line = line.strip()
             if line:
-                results.append(json.loads(line))
+                results.append(_safe_json_loads(line, "/add stream"))
 
         # Match ipfshttpclient behavior: single-item result returns a dict,
         # multi-item result returns a list
@@ -480,7 +533,7 @@ class IPFSHTTPClient:
             except (ValueError, KeyError):
                 pass
             raise StatusError(f"IPFS API returned status {status}: {text}")
-        result = json.loads(resp_body)
+        result = _safe_json_loads(resp_body, "/add")
         if "Hash" not in result:
             raise StatusError(f"IPFS API response missing 'Hash' key: {result}")
         return result["Hash"]

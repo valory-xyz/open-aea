@@ -43,7 +43,7 @@ class RequestDispatcher(ABC):
         self,
         logger: Logger,
         connection_state: AsyncState,
-        retry_attempts: int = 120,
+        retry_attempts: int = 60,
         retry_timeout: int = 3,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         executor: Optional[Executor] = None,
