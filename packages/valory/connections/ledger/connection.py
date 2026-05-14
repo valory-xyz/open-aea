@@ -75,7 +75,7 @@ class LedgerConnection(Connection):
         self.request_retry_timeout = self.configuration.config.get(
             "retry_timeout", self.TIMEOUT
         )
-        self.max_thread_workers = self.configuration.config.get(
+        self.max_thread_workers: int = self.configuration.config.get(
             "max_thread_workers", self.DEFAULT_MAX_THREAD_WORKERS
         )
 
@@ -138,7 +138,12 @@ class LedgerConnection(Connection):
         self._contract_dispatcher = None
         self._response_envelopes = None
         if self._executor is not None:
-            self._executor.shutdown(wait=False)
+            # ``cancel_futures=True`` discards queued tasks; in-flight worker
+            # threads are still left to drain (they own external sockets/file
+            # descriptors via the underlying ledger SDKs and can't be safely
+            # killed mid-call). ``wait=False`` keeps the disconnect path
+            # itself non-blocking.
+            self._executor.shutdown(wait=False, cancel_futures=True)
             self._executor = None
 
         self.state = ConnectionStates.disconnected

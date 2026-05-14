@@ -48,11 +48,10 @@ _default_logger = logging.getLogger(
 )
 
 # Cap on the per-attempt sleep between transaction-receipt / transaction
-# retries. With the default ``retry_attempts=120`` and ``retry_timeout=3``,
-# the un-capped linear backoff ``retry_timeout * attempts`` reaches 360s on
-# the final attempt and the loop spans ~6h before giving up. Capping the
-# per-attempt sleep at 60s bounds the worst-case loop to ~110 minutes while
-# preserving the retry count.
+# retries. Without the cap, the linear backoff ``retry_timeout * attempts``
+# grows unboundedly across the ``retry_attempts`` budget; capping each
+# individual sleep here bounds the worst-case loop while preserving the
+# retry count.
 MAX_RETRY_DELAY = 60.0
 
 
@@ -291,7 +290,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning(e)
+                self.logger.warning("%s: %s", type(e).__name__, e)
                 transaction_receipt = None
 
             attempts += 1
@@ -314,7 +313,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning(e)
+                self.logger.warning("%s: %s", type(e).__name__, e)
                 transaction = None
 
             attempts += 1

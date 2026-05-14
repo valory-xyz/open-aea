@@ -487,7 +487,12 @@ def get_gas_price_strategy_eip1559_polygon(
             return dict(fallback_estimate)
         # JSONDecodeError is a ValueError subclass; KeyError guards schema drift
         # in the gas API response.
-        except (requests.exceptions.RequestException, ValueError, KeyError):
+        except (requests.exceptions.RequestException, ValueError, KeyError) as e:
+            _default_logger.warning(
+                "EIP-1559 gas API call failed (%s: %s); using fallback gas price.",
+                type(e).__name__,
+                e,
+            )
             return dict(fallback_estimate)
 
     return eip1559_price_strategy
@@ -561,10 +566,12 @@ def get_gas_price_strategy(
             return {"gasPrice": wei_result}
         # JSONDecodeError is a ValueError subclass; KeyError guards schema drift
         # in the gas station response.
-        except (requests.exceptions.RequestException, ValueError, KeyError):
+        except (requests.exceptions.RequestException, ValueError, KeyError) as e:
             _default_logger.warning(
-                "Gas station API request or response could not be handled; "
-                "using fallback gas price."
+                "Gas station API request or response could not be handled "
+                "(%s: %s); using fallback gas price.",
+                type(e).__name__,
+                e,
             )
             return fallback
 

@@ -848,13 +848,14 @@ def test_gas_price_strategy_eth_gasstation():
     assert cast(int, result["gasPrice"]) == cast(int, excepted_result / 10 * 1000000000)
 
 
-def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back():
+def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back(caplog):
     """Test eth gasstation returns the fallback when ``response.json()`` raises.
 
     ``response.json()`` raises ``requests.exceptions.JSONDecodeError`` (a
     ``ValueError`` subclass) when the daemon returns a 200 with a non-JSON
     body (e.g. an HTML error page from a CDN). The strategy must return the
-    documented fallback rather than letting the exception escape.
+    documented fallback rather than letting the exception escape, and it
+    must emit a structured warning so operators can spot the API drift.
     """
     callable_ = get_gas_price_strategy("fast", "api_key")
     resp = MagicMock(
@@ -863,15 +864,21 @@ def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back():
     )
     web3_mock = MagicMock()
     web3_mock.to_wei.return_value = 999
-    with patch.object(requests, "get", return_value=resp):
+    with caplog.at_level(logging.WARNING), patch.object(
+        requests, "get", return_value=resp
+    ):
         assert callable_(web3_mock, "tx_params") == {"gasPrice": 999}
+    assert "using fallback gas price" in caplog.text
+    assert "ValueError" in caplog.text
 
 
-def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back():
+def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back(caplog):
     """Test eth gasstation returns the fallback when the speed key is missing.
 
     Without the broadened ``except`` this would have surfaced an unhandled
-    ``ValueError`` from the inner ``isinstance`` check.
+    ``ValueError`` from the inner ``isinstance`` check. The warning log
+    must carry the exception type so operators can tell schema drift apart
+    from transport failures.
     """
     callable_ = get_gas_price_strategy("fast", "api_key")
     resp = MagicMock(
@@ -880,8 +887,12 @@ def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back():
     )
     web3_mock = MagicMock()
     web3_mock.to_wei.return_value = 999
-    with patch.object(requests, "get", return_value=resp):
+    with caplog.at_level(logging.WARNING), patch.object(
+        requests, "get", return_value=resp
+    ):
         assert callable_(web3_mock, "tx_params") == {"gasPrice": 999}
+    assert "using fallback gas price" in caplog.text
+    assert "ValueError" in caplog.text
 
 
 def test_gas_price_strategy_not_supported(caplog):
@@ -1570,7 +1581,7 @@ def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) ->
             eth_api._try_get_revert_reason(tx, raise_on_try=True)
 
 
-def test_get_gas_price_strategy() -> None:
+def test_get_gas_price_strategy(caplog) -> None:
     """Test get_gas_price_strategy and strategies."""
     strategy = get_gas_price_strategy(None)
     assert strategy is rpc_gas_price_strategy_wrapper
@@ -1591,23 +1602,38 @@ def test_get_gas_price_strategy() -> None:
             "maxPriorityFeePerGas": 2000000000,
         }
 
-    with patch(
+    # Transport failure: RequestException → fallback, with a warning that
+    # carries the exception type so operators can correlate with the outage.
+    caplog.clear()
+    with caplog.at_level(logging.WARNING), patch(
         "aea_ledger_ethereum.ethereum.requests.get",
         side_effect=requests.exceptions.RequestException(Mock()),
     ):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+    assert "EIP-1559 gas API call failed" in caplog.text
+    assert "RequestException" in caplog.text
 
     # Malformed JSON body on a 200: response.json() raises ValueError. The
-    # strategy must return the fallback rather than propagate.
+    # strategy must return the fallback rather than propagate, and the
+    # warning must distinguish this from a transport failure.
     resp_mock.status_code = 200
     resp_mock.json = Mock(side_effect=ValueError("not json"))
-    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
+    caplog.clear()
+    with caplog.at_level(logging.WARNING), patch(
+        "aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock
+    ):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+    assert "ValueError" in caplog.text
 
-    # Missing speed key on a 200: subscript raises KeyError. Must fall back.
+    # Missing speed key on a 200: subscript raises KeyError. Must fall back
+    # with a KeyError-flavoured warning.
     resp_mock.json = Mock(return_value={"slow": {"maxFee": 1, "maxPriorityFee": 1}})
-    with patch("aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock):
+    caplog.clear()
+    with caplog.at_level(logging.WARNING), patch(
+        "aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock
+    ):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+    assert "KeyError" in caplog.text
 
     # Missing maxFee/maxPriorityFee on a 200: nested subscript raises
     # KeyError. Must fall back.
