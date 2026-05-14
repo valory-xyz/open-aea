@@ -176,7 +176,7 @@ config:
           min_allowed_tip: 1
           default_priority_fee: null
           fallback_estimate:
-            maxFeePerGas: 5000000000
+            maxFeePerGas: 30000000000
             maxPriorityFeePerGas: 3000000000
           priority_fee_increase_boundary: 200
       is_gas_estimation_enabled: true
