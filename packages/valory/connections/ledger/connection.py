@@ -47,7 +47,7 @@ class LedgerConnection(Connection):
 
     connection_id = PUBLIC_ID
     TIMEOUT = 3
-    MAX_ATTEMPTS = 120
+    MAX_ATTEMPTS = 60
     # Dedicated executor size for the dispatchers' ``run_in_executor`` calls.
     # Without an explicit pool, Python's default asyncio executor (shared with
     # every other agent component) is used. ``RotatingHTTPProvider.make_request``

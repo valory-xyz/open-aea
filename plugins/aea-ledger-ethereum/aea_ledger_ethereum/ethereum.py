@@ -485,9 +485,12 @@ def get_gas_price_strategy_eip1559_polygon(
                 }
             # return a copy; see note in get_gas_price_strategy_eip1559.fallback
             return dict(fallback_estimate)
-        # JSONDecodeError is a ValueError subclass; KeyError guards schema drift
-        # in the gas API response.
-        except (requests.exceptions.RequestException, ValueError, KeyError) as e:
+        except (
+            requests.exceptions.RequestException,
+            ValueError,
+            KeyError,
+            TypeError,
+        ) as e:
             _default_logger.warning(
                 "EIP-1559 gas API call failed (%s: %s); using fallback gas price.",
                 type(e).__name__,

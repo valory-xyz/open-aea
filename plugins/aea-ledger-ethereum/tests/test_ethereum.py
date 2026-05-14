@@ -874,13 +874,17 @@ def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back(caplog)
     assert "ValueError" in caplog.text
 
 
-def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back(caplog):
-    """Test eth gasstation returns the fallback when the speed key is missing.
+def test_gas_price_strategy_eth_gasstation_non_numeric_speed_value_falls_back(
+    caplog,
+):
+    """Test eth gasstation falls back when the speed-key value isn't numeric.
 
-    Without the broadened ``except`` this would have surfaced an unhandled
-    ``ValueError`` from the inner ``isinstance`` check. The warning log
-    must carry the exception type so operators can tell schema drift apart
-    from transport failures.
+    ``response_dict.get(gas_price_strategy, None)`` swallows the missing key,
+    so the actual schema-drift signal is the inner ``isinstance(result,
+    (int, float))`` check, which raises ``ValueError`` when the speed value
+    is ``None`` (here, because the speed key is missing) or any other
+    non-numeric type. The warning log must carry the exception type so
+    operators can tell schema drift apart from transport failures.
 
     :param caplog: pytest log-capture fixture used to pin the warning.
     """
@@ -1642,6 +1646,15 @@ def test_get_gas_price_strategy(caplog) -> None:
     ):
         assert strategy(Mock(), Mock()) == {"gasPrice": 12}
     assert "KeyError" in caplog.text
+
+    # Non-dict body on a 200: subscript raises TypeError. Must fall back.
+    resp_mock.json = Mock(return_value=None)
+    caplog.clear()
+    with caplog.at_level(logging.WARNING), patch(
+        "aea_ledger_ethereum.ethereum.requests.get", return_value=resp_mock
+    ):
+        assert strategy(Mock(), Mock()) == {"gasPrice": 12}
+    assert "TypeError" in caplog.text
 
     # Missing maxFee/maxPriorityFee on a 200: nested subscript raises
     # KeyError. Must fall back.
