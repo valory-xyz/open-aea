@@ -9,6 +9,32 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.5` to `v2.2.6`
+
+This is a non-breaking patch release. It combines two streams: resilience-audit fixes across the framework / ledger connection / IPFS and ethereum plugins (cf. #891 / #910), and per-chain `max_gas_fast` tuning for low-fee chains in `open-aea-ledger-ethereum` (cf. #909 / #911).
+
+### `valory/ledger` connection — bounded retry budget and dedicated executor
+
+The shipped `retry_attempts` default in the connection config dropped from 240 to 60, and each per-attempt sleep is now capped at `MAX_RETRY_DELAY = 60s`. Worst-case loop time under a sustained RPC outage drops from ~6 hours to ~50 minutes. Operators who relied on the longer 240-attempt budget can override `retry_attempts` in their own connection config.
+
+The connection now owns a dedicated `ThreadPoolExecutor` sized by a new `max_thread_workers` config (default 32) rather than sharing Python's default asyncio thread pool. Operators expecting high ledger concurrency should size `max_thread_workers` to exceed peak concurrent retries for their RPC topology.
+
+### `open-aea-ledger-ethereum` — gas-price strategy fallback and per-chain `max_gas_fast`
+
+`get_gas_price_strategy_eip1559_polygon` and `gas_station_gas_price_strategy` now route malformed-response failure modes (`JSONDecodeError`, `KeyError`, `TypeError`) through the documented fallback path. Previously these escaped the `RequestException`-only catch and could surface as transaction-signing failures.
+
+`CHAIN_EIP1559_OVERRIDES` now sets a per-chain `max_gas_fast` for low-fee chains: Gnosis 30 gwei, Optimism / Base 100 gwei, Mode / Fraxtal 50 gwei, Arbitrum One 5 gwei. Until now these inherited the chain-agnostic 1500 gwei ceiling, which left the cap effectively dormant on chains whose normal operating range is 100x lower. The new ceilings are sized to preserve operability during legitimate congestion (the Base Dencun memecoin frenzy is the worst observed historical case) while bounding fee-oracle anomalies. Polygon (10000 gwei ceiling) and Celo (default 1500 gwei) are unchanged.
+
+### `open-aea-cli-ipfs` — typed errors on malformed 200 responses
+
+`IPFSHTTPClient.add`, `add_bytes`, and `_api_post` now raise a typed `StatusError` (with a printable, length-capped body preview) when the daemon returns a 200 status carrying a non-JSON body. Callers that previously crashed with an unhandled `ValueError` on a CDN error page or truncated payload now see the same `StatusError` class they would for any other status failure, which the existing `ipfs_utils.download()` retry loop already handles.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.6"` (and the same `2.2.6` pin for any `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.6`.
+- No agent / package / config edits are required for the default configuration. If you previously set a custom `retry_attempts` in your `valory/ledger` connection config, review it against the new 60-attempt default and the worst-case math in `docs/connection-resilience.md`.
+
 ## `v2.2.4` to `v2.2.5`
 
 This is a non-breaking patch release. It fixes a v2.2.4 regression where `ledger_api.api.eth.<method>(...)` returned plain dicts instead of `AttributeDict` for downstream consumers reaching into the underlying web3 handle directly (most notably open-autonomy's `TxSettler.settle()`, which crashes on `receipt.blockNumber` attribute access). The fix is a structural refactor of RPC rotation; every public surface (`EthereumApi`, `ledger_api.api`, the web3 instance, the rotation behaviour) keeps the same semantics it had before v2.2.4.
