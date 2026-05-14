@@ -57,6 +57,9 @@ from aea.helpers.transaction.base import (
 from aea.mail.base import Envelope, Message
 from aea.protocols.dialogue.base import Dialogue as BaseDialogue
 
+from packages.valory.connections.ledger import (
+    ledger_dispatcher as ledger_dispatcher_module,
+)
 from packages.valory.connections.ledger.connection import LedgerConnection
 from packages.valory.connections.ledger.ledger_dispatcher import (
     LedgerApiRequestDispatcher,
@@ -769,8 +772,6 @@ class TestLedgerDispatcherRetrySleepCap:
         The cap holds each individual sleep at ``MAX_RETRY_DELAY`` (60s),
         which bounds the worst-case loop without changing the retry count.
         """
-        from packages.valory.connections.ledger.ledger_dispatcher import MAX_RETRY_DELAY
-
         dispatcher = LedgerApiRequestDispatcher(
             AsyncState(ConnectionStates.connected),
             connection_id=LedgerConnection.connection_id,
@@ -796,13 +797,10 @@ class TestLedgerDispatcherRetrySleepCap:
         async def _fake_sleep(seconds: float) -> None:
             sleep_calls.append(seconds)
 
-        with patch(
-            "packages.valory.connections.ledger.ledger_dispatcher.asyncio.sleep",
-            new=_fake_sleep,
-        ):
+        with patch.object(ledger_dispatcher_module.asyncio, "sleep", new=_fake_sleep):
             await dispatcher.get_transaction_receipt(mock_api, message, dialogue)
 
         # The receipt and transaction loops each run for ``retry_attempts``,
         # so we expect 6 sleeps. The cap holds each one at MAX_RETRY_DELAY.
         assert sleep_calls == [30.0, 60.0, 60.0, 30.0, 60.0, 60.0]
-        assert all(s <= MAX_RETRY_DELAY for s in sleep_calls)
+        assert all(s <= ledger_dispatcher_module.MAX_RETRY_DELAY for s in sleep_calls)
