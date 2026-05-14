@@ -148,6 +148,25 @@ the rest of the agent. Operators expecting high ledger concurrency
 raise `max_thread_workers` to comfortably exceed peak concurrent
 retries for the deployment's RPC topology.
 
+Pool sizing interacts with the dispatcher's retry budget: a single
+in-flight request can occupy a worker thread until its retry sequence
+finishes, so worst-case occupancy per slot is `retry_attempts × min
+(retry_timeout × attempts, MAX_RETRY_DELAY)`. With `max_workers` slots
+full, new submissions queue on `loop.run_in_executor(...)` and the
+connection appears hung even though the dispatchers are still
+spinning. Two practical consequences:
+
+- `LedgerApiRequestDispatcher` and `ContractApiRequestDispatcher`
+  share the same executor, so ledger-side retries can starve
+  contract-side traffic and vice versa.
+- Now that `RotatingHTTPProvider` exists in the ethereum plugin and
+  handles transport-layer rotation/backoff per call, the shipped
+  `retry_attempts` default is a layered backstop rather than the
+  primary retry mechanism. Keep the value tight (the shipped default
+  is 60) and lean on the provider for short-term transport faults;
+  raise it only if you've removed the provider layer or have a
+  ledger where it doesn't apply.
+
 ### `RotatingHTTPProvider`
 
 `plugins/aea-ledger-ethereum/aea_ledger_ethereum/rpc_rotation.py`.

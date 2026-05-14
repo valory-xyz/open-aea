@@ -245,7 +245,7 @@ config:
       is_gas_estimation_enabled: true
       poa_chain: false
       timeout: 10
-  retry_attempts: 240
+  retry_attempts: 60
   retry_timeout: 3
   max_thread_workers: 32
 excluded_protocols: []
