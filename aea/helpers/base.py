@@ -413,8 +413,6 @@ def try_decorator(
     :param default_return: value to return on exception, by default None
     :param logger_method: name of the logger method or callable to print logs
     :return: the callable
-    :raises Exception: the wrapped function's exception, re-raised unchanged,
-        when called with ``raise_on_try=True``.
     """
 
     # for pydocstyle

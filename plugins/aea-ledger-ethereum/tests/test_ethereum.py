@@ -856,6 +856,8 @@ def test_gas_price_strategy_eth_gasstation_malformed_response_falls_back(caplog)
     body (e.g. an HTML error page from a CDN). The strategy must return the
     documented fallback rather than letting the exception escape, and it
     must emit a structured warning so operators can spot the API drift.
+
+    :param caplog: pytest log-capture fixture used to pin the warning.
     """
     callable_ = get_gas_price_strategy("fast", "api_key")
     resp = MagicMock(
@@ -879,6 +881,8 @@ def test_gas_price_strategy_eth_gasstation_missing_speed_key_falls_back(caplog):
     ``ValueError`` from the inner ``isinstance`` check. The warning log
     must carry the exception type so operators can tell schema drift apart
     from transport failures.
+
+    :param caplog: pytest log-capture fixture used to pin the warning.
     """
     callable_ = get_gas_price_strategy("fast", "api_key")
     resp = MagicMock(
@@ -1582,7 +1586,11 @@ def test_try_get_revert_reason_http_error_propagated(ethereum_testnet_config) ->
 
 
 def test_get_gas_price_strategy(caplog) -> None:
-    """Test get_gas_price_strategy and strategies."""
+    """Test get_gas_price_strategy and strategies.
+
+    :param caplog: pytest log-capture fixture used to pin the warning lines
+        emitted by the polygon EIP-1559 strategy on each fallback path.
+    """
     strategy = get_gas_price_strategy(None)
     assert strategy is rpc_gas_price_strategy_wrapper
     assert "gasPrice" in strategy(Mock(), Mock())

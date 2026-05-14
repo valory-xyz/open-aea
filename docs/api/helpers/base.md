@@ -279,11 +279,6 @@ integration tests) can do so without touching the decorator.
 - `default_return`: value to return on exception, by default None
 - `logger_method`: name of the logger method or callable to print logs
 
-**Raises**:
-
-- `Exception`: the wrapped function's exception, re-raised unchanged,
-when called with ``raise_on_try=True``.
-
 **Returns**:
 
 the callable
