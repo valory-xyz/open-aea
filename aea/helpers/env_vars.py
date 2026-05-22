@@ -272,6 +272,38 @@ def is_strict_list(data: Union[List, Tuple]) -> bool:
     return is_strict
 
 
+_BASH_SAFE_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def is_strict_dict(data: Mapping) -> bool:
+    """
+    Check if a data dict can be safely flattened into per-key env vars.
+
+    A dict is "strict" when every key is a string that matches POSIX-y
+    bash identifier rules: starts with a letter or underscore, contains
+    only letters, digits, and underscores. Non-strict dicts cannot be
+    flattened safely because the resulting env var names would contain
+    characters bash refuses to set (notably ``.``), so callers should
+    JSON-encode such dicts as a single env var instead. This is the
+    counterpart of :func:`is_strict_list` for the dict branch of
+    :func:`generate_env_vars_recursively`.
+
+    For example::
+
+        {"timeout": 30, "retries": 5}
+        # strict: every key is a valid bash identifier
+
+        {"0.0": 0, "1.0": 100}
+        # not strict: keys contain '.' which bash rejects
+
+    :param data: Data dict
+    :return: Boolean specifying whether every key is bash-safe.
+    """
+    return all(
+        isinstance(k, str) and bool(_BASH_SAFE_KEY_RE.match(k)) for k in data.keys()
+    )
+
+
 def list_to_nested_dict(lst: list, val: Any) -> dict:
     """Convert a list to a nested dict."""
     nested_dict = val
@@ -312,17 +344,24 @@ def generate_env_vars_recursively(
     env_var_dict: Dict[str, Any] = {}
 
     if isinstance(data, dict):
-        for key, value in data.items():
-            res = generate_env_vars_recursively(
-                data=value,
-                export_path=[*export_path, key],
-            )
-            if res:
-                env_var = list(res.keys())[0]
-                if env_var in env_var_dict:
-                    dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
-                    res = ensure_json_content(merge_dicts(*dicts))
-            env_var_dict.update(res)
+        if not is_strict_dict(data):
+            restricted, path = export_path_to_env_var_string(export_path=export_path)
+            if restricted:
+                env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
+            else:
+                env_var_dict[path] = json.dumps(data, separators=(",", ":"))
+        else:
+            for key, value in data.items():
+                res = generate_env_vars_recursively(
+                    data=value,
+                    export_path=[*export_path, key],
+                )
+                if res:
+                    env_var = list(res.keys())[0]
+                    if env_var in env_var_dict:
+                        dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
+                        res = ensure_json_content(merge_dicts(*dicts))
+                env_var_dict.update(res)
     elif isinstance(data, list):
         if is_strict_list(data=data):
             restricted, path = export_path_to_env_var_string(export_path=export_path)

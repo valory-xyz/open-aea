@@ -19,6 +19,8 @@
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helper module."""
 
+import json
+import re
 from typing import List
 
 import pytest
@@ -30,6 +32,7 @@ from aea.helpers.env_vars import (
     export_path_to_env_var_string,
     generate_env_vars_recursively,
     is_env_variable,
+    is_strict_dict,
     is_strict_list,
     replace_with_env_var,
 )
@@ -274,3 +277,109 @@ def test_is_strict_list():
     assert not is_strict_list([1, 2, {}])
     assert not is_strict_list([1, 2, [[{}]]])
     assert not is_strict_list([(dict(hello="world"),)])
+
+
+def test_is_strict_dict():
+    """Test is_strict_dict method."""
+    assert is_strict_dict({"timeout": 30, "retries": 5})
+    assert is_strict_dict({"foo_bar": 1, "BAZ": 2, "_x": 3})
+    assert is_strict_dict({})
+    assert not is_strict_dict({"0.0": 0, "1.0": 100})
+    assert not is_strict_dict({"foo-bar": 1})
+    assert not is_strict_dict({"timeout": 30, "0.0": 0})
+    assert not is_strict_dict({"1foo": 1})
+    assert not is_strict_dict({1: "non-string-key"})
+
+
+def test_generate_env_vars_safe_key_dict_flattens_per_key():
+    """Safe-key dicts still flatten per key (unchanged behaviour)."""
+    result = generate_env_vars_recursively(
+        data={"timeout": 30, "retries": 5},
+        export_path=["test", "foo"],
+    )
+    assert result == {
+        "TEST_FOO_TIMEOUT": 30,
+        "TEST_FOO_RETRIES": 5,
+    }
+
+
+def test_generate_env_vars_unsafe_key_dict_json_encodes_whole():
+    """Dict with bash-unsafe keys becomes one JSON-encoded env var.
+
+    Covers the trader case from open-autonomy issue #2243.
+    """
+    data = {
+        "0.0": 0,
+        "0.6": 60000000000000000,
+        "1.0": 1000000000000000000,
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "bet_amount_per_threshold"],
+    )
+    assert result == {
+        "TEST_FOO_BET_AMOUNT_PER_THRESHOLD": json.dumps(data, separators=(",", ":"))
+    }
+    bash_safe = re.compile(r"^[A-Z_][A-Z0-9_]*$")
+    assert all(bash_safe.match(name) for name in result)
+
+
+def test_generate_env_vars_mixed_key_dict_json_encodes_whole():
+    """Mixed safe/unsafe keys also JSON-encode the whole dict."""
+    data = {"timeout": 30, "0.0": 0}
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "trading_config"],
+    )
+    assert result == {
+        "TEST_FOO_TRADING_CONFIG": json.dumps(data, separators=(",", ":"))
+    }
+
+
+def test_generate_env_vars_unsafe_dict_inside_safe_dict_collapses_only_inner():
+    """Unsafe keys collapse at their level; safe siblings still flatten per key."""
+    data = {
+        "bet_kelly_fraction": 1,
+        "bet_amount_per_threshold": {
+            "0.0": 0,
+            "1.0": 1000000000000000000,
+        },
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "strategies_kwargs"],
+    )
+    assert result["TEST_FOO_STRATEGIES_KWARGS_BET_KELLY_FRACTION"] == 1
+    inner = result["TEST_FOO_STRATEGIES_KWARGS_BET_AMOUNT_PER_THRESHOLD"]
+    assert json.loads(inner) == data["bet_amount_per_threshold"]
+
+
+def test_generate_env_vars_unsafe_key_dict_under_models_args_uses_restricted_path():
+    """Production path: unsafe-key dict nested under ``args/<arg>/...`` collapses correctly.
+
+    Under the ``args`` level the framework restricts the env var name to the
+    arg key, nesting any deeper path keys inside the JSON value. The unsafe-key
+    branch must respect that restriction so trader-style overrides land in the
+    same env var the per-key flatten would have collapsed to.
+    """
+    data = {
+        "0.0": 0,
+        "1.0": 1000000000000000000,
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=[
+            "skill",
+            "trader_abci",
+            "models",
+            "params",
+            "args",
+            "strategies_kwargs",
+            "bet_amount_per_threshold",
+        ],
+    )
+    assert result == {
+        "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS": json.dumps(
+            {"bet_amount_per_threshold": data}
+        )
+    }

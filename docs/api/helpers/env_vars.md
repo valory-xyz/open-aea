@@ -126,6 +126,32 @@ parameters:
 
 Boolean specifying whether it's a strict list or not
 
+<a id="aea.helpers.env_vars.is_strict_dict"></a>
+
+#### is`_`strict`_`dict
+
+```python
+def is_strict_dict(data: Mapping) -> bool
+```
+
+Check if a data dict can be safely flattened into per-key env vars.
+
+A dict is "strict" when every key is a string that matches POSIX-y
+bash identifier rules: starts with a letter or underscore, contains
+only letters, digits, and underscores. Non-strict dicts cannot be
+flattened safely because the resulting env var names would contain
+characters bash refuses to set (notably ``.``), so callers should
+JSON-encode such dicts as a single env var instead. This is the
+counterpart of :func:`is_strict_list` for the dict branch of
+
+**Arguments**:
+
+- `data`: Data dict
+
+**Returns**:
+
+Boolean specifying whether every key is bash-safe.
+
 <a id="aea.helpers.env_vars.list_to_nested_dict"></a>
 
 #### list`_`to`_`nested`_`dict
