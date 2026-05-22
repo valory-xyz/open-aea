@@ -414,6 +414,10 @@ class PyProjectToml:
         `optional = true` deps are visible), and dev/test-only entries
         no longer need to be duplicated into main deps to satisfy the
         check.
+
+        :param pyproject_path: path to the pyproject.toml file.
+        :return: a `PyProjectToml` instance, or `None` if the file has
+            no `[tool.poetry.dependencies]` table.
         """
         with pyproject_path.open("rb") as fp:
             config = tomllib.load(fp)
