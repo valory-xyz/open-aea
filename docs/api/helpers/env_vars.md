@@ -126,27 +126,24 @@ parameters:
 
 Boolean specifying whether it's a strict list or not
 
-<a id="aea.helpers.env_vars.is_strict_dict"></a>
+<a id="aea.helpers.env_vars.has_env_safe_keys"></a>
 
-#### is`_`strict`_`dict
+#### has`_`env`_`safe`_`keys
 
 ```python
-def is_strict_dict(data: dict) -> bool
+def has_env_safe_keys(data: dict) -> bool
 ```
 
 Check if a dict can be safely flattened into per-key env vars.
 
-A dict is "strict" when every key is a string matching the bash
-identifier rule `[A-Za-z_][A-Za-z0-9_]*`. Non-strict dicts cannot
-be flattened: the resulting env var names would contain characters
-bash refuses to set (notably `.`), so callers should JSON-encode
-such dicts as a single env var instead. Counterpart of
-`is_strict_list` for the dict branch of
-`generate_env_vars_recursively`.
+Returns True only when every key is a string matching the bash
+identifier rule `[A-Za-z_][A-Za-z0-9_]*`. When this returns False,
+flattening would produce env var names that bash refuses to set
+(notably containing `.`), so callers should JSON-encode the whole
+dict as a single env var instead.
 
-For example, `{"timeout": 30, "retries": 5}` is strict, but
-`{"0.0": 0, "1.0": 100}` is not (the dot in the keys is not a
-valid bash identifier character).
+For example, `{"timeout": 30, "retries": 5}` returns True; while
+`{"0.0": 0, "1.0": 100}` and `{1: "v"}` return False.
 
 **Arguments**:
 
@@ -154,7 +151,7 @@ valid bash identifier character).
 
 **Returns**:
 
-Boolean specifying whether every key is bash-safe.
+True if every key is a valid bash identifier.
 
 <a id="aea.helpers.env_vars.list_to_nested_dict"></a>
 

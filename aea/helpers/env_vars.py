@@ -275,26 +275,45 @@ def is_strict_list(data: Union[List, Tuple]) -> bool:
 _BASH_SAFE_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
-def is_strict_dict(data: dict) -> bool:
+def has_env_safe_keys(data: dict) -> bool:
     """
     Check if a dict can be safely flattened into per-key env vars.
 
-    A dict is "strict" when every key is a string matching the bash
-    identifier rule `[A-Za-z_][A-Za-z0-9_]*`. Non-strict dicts cannot
-    be flattened: the resulting env var names would contain characters
-    bash refuses to set (notably `.`), so callers should JSON-encode
-    such dicts as a single env var instead. Counterpart of
-    `is_strict_list` for the dict branch of
-    `generate_env_vars_recursively`.
+    Returns True only when every key is a string matching the bash
+    identifier rule `[A-Za-z_][A-Za-z0-9_]*`. When this returns False,
+    flattening would produce env var names that bash refuses to set
+    (notably containing `.`), so callers should JSON-encode the whole
+    dict as a single env var instead.
 
-    For example, `{"timeout": 30, "retries": 5}` is strict, but
-    `{"0.0": 0, "1.0": 100}` is not (the dot in the keys is not a
-    valid bash identifier character).
+    For example, `{"timeout": 30, "retries": 5}` returns True; while
+    `{"0.0": 0, "1.0": 100}` and `{1: "v"}` return False.
 
     :param data: Data dict
-    :return: Boolean specifying whether every key is bash-safe.
+    :return: True if every key is a valid bash identifier.
     """
     return all(isinstance(k, str) and _BASH_SAFE_KEY_RE.match(k) for k in data)
+
+
+def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str]:
+    """
+    Encode data as a single JSON-string env var.
+
+    Used when a value cannot be flattened per-leaf (e.g. a list with
+    non-scalar elements, or a dict with bash-unsafe keys). Honours
+    `restrict_model_args`: if the export path is truncated by the model
+    arg restriction, the data is nested under the restricted suffix
+    before encoding so a deeper path key (the model arg's sub-key) is
+    not lost.
+
+    :param data: Value to encode.
+    :param export_path: Path keys leading to the value, from
+        `generate_env_vars_recursively`.
+    :return: (env_var_name, json_value) pair.
+    """
+    restricted, path = export_path_to_env_var_string(export_path=export_path)
+    if restricted:
+        return path, json.dumps(list_to_nested_dict(restricted, data))
+    return path, json.dumps(data, separators=(",", ":"))
 
 
 def list_to_nested_dict(lst: list, val: Any) -> dict:
@@ -337,12 +356,9 @@ def generate_env_vars_recursively(
     env_var_dict: Dict[str, Any] = {}
 
     if isinstance(data, dict):
-        if not is_strict_dict(data):
-            restricted, path = export_path_to_env_var_string(export_path=export_path)
-            if restricted:
-                env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
-            else:
-                env_var_dict[path] = json.dumps(data, separators=(",", ":"))
+        if not has_env_safe_keys(data):
+            path, value = _encode_as_json_env_var(data, export_path)
+            env_var_dict[path] = value
         else:
             for key, value in data.items():
                 res = generate_env_vars_recursively(
@@ -357,11 +373,8 @@ def generate_env_vars_recursively(
                 env_var_dict.update(res)
     elif isinstance(data, list):
         if is_strict_list(data=data):
-            restricted, path = export_path_to_env_var_string(export_path=export_path)
-            if restricted:
-                env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
-            else:
-                env_var_dict[path] = json.dumps(data, separators=(",", ":"))
+            path, value = _encode_as_json_env_var(data, export_path)
+            env_var_dict[path] = value
         else:
             for key, value in enumerate(data):
                 res = generate_env_vars_recursively(

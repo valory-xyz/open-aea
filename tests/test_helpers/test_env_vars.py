@@ -31,8 +31,8 @@ from aea.helpers.env_vars import (
     convert_value_str_to_type,
     export_path_to_env_var_string,
     generate_env_vars_recursively,
+    has_env_safe_keys,
     is_env_variable,
-    is_strict_dict,
     is_strict_list,
     replace_with_env_var,
 )
@@ -279,16 +279,16 @@ def test_is_strict_list():
     assert not is_strict_list([(dict(hello="world"),)])
 
 
-def test_is_strict_dict():
-    """Test is_strict_dict method."""
-    assert is_strict_dict({"timeout": 30, "retries": 5})
-    assert is_strict_dict({"foo_bar": 1, "BAZ": 2, "_x": 3})
-    assert is_strict_dict({})
-    assert not is_strict_dict({"0.0": 0, "1.0": 100})
-    assert not is_strict_dict({"foo-bar": 1})
-    assert not is_strict_dict({"timeout": 30, "0.0": 0})
-    assert not is_strict_dict({"1foo": 1})
-    assert not is_strict_dict({1: "non-string-key"})
+def test_has_env_safe_keys():
+    """Test has_env_safe_keys method."""
+    assert has_env_safe_keys({"timeout": 30, "retries": 5})
+    assert has_env_safe_keys({"foo_bar": 1, "BAZ": 2, "_x": 3})
+    assert has_env_safe_keys({})
+    assert not has_env_safe_keys({"0.0": 0, "1.0": 100})
+    assert not has_env_safe_keys({"foo-bar": 1})
+    assert not has_env_safe_keys({"timeout": 30, "0.0": 0})
+    assert not has_env_safe_keys({"1foo": 1})
+    assert not has_env_safe_keys({1: "non-string-key"})
 
 
 def test_generate_env_vars_safe_key_dict_flattens_per_key():
@@ -390,3 +390,46 @@ def test_generate_env_vars_unsafe_key_dict_under_models_args_uses_restricted_pat
             {"bet_amount_per_threshold": data}
         )
     }
+
+
+def test_unsafe_key_dict_roundtrips_through_dict_template():
+    """End-to-end: unsafe-key dict survives readback via ${dict:default}.
+
+    The agent's effective config has a ${VAR:dict:default} placeholder.
+    With env vars set, the placeholder must resolve to the produced dict,
+    not silently fall back to the default.
+    """
+    data = {
+        "0.0": 0,
+        "0.6": 60000000000000000,
+        "1.0": 1000000000000000000,
+    }
+    env_vars = generate_env_vars_recursively(
+        data={"bet_amount_per_threshold": data},
+        export_path=["skill", "trader_abci"],
+    )
+    fallback = {"only-if-env-missing": 1}
+    placeholder = "${dict:" + json.dumps(fallback) + "}"
+    template = {"bet_amount_per_threshold": placeholder}
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=["skill", "trader_abci"]
+    )
+    assert result["bet_amount_per_threshold"] == data
+
+
+def test_safe_key_numeric_strings_preserved_through_json_encode():
+    """Numeric-looking string keys keep their exact form when JSON-encoded.
+
+    Regression check for a latent bug in the pre-fix per-key flatten path:
+    it round-tripped dict keys through ``json.loads`` which silently
+    rewrote keys like ``"0.10"`` into ``"0.1"``. JSON-encoding the whole
+    dict preserves keys verbatim.
+    """
+    data = {"0.0": 0, "0.10": 5, "1.0": 9}
+    env_vars = generate_env_vars_recursively(
+        data={"thresholds": data}, export_path=["skill", "x"]
+    )
+    encoded = env_vars["SKILL_X_THRESHOLDS"]
+    decoded = json.loads(encoded)
+    assert decoded == data
+    assert set(decoded.keys()) == {"0.0", "0.10", "1.0"}
