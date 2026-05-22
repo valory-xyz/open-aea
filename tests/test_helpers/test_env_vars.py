@@ -355,7 +355,7 @@ def test_generate_env_vars_unsafe_dict_inside_safe_dict_collapses_only_inner():
 
 
 def test_generate_env_vars_empty_dict_returns_empty():
-    """Empty dict is vacuously strict and emits no env vars."""
+    """Empty dict is vacuously safe-keyed and emits no env vars."""
     result = generate_env_vars_recursively(data={}, export_path=["test", "foo"])
     assert result == {}
 
@@ -387,8 +387,65 @@ def test_generate_env_vars_unsafe_key_dict_under_models_args_uses_restricted_pat
     )
     assert result == {
         "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS": json.dumps(
-            {"bet_amount_per_threshold": data}
+            {"bet_amount_per_threshold": data}, separators=(",", ":")
         )
+    }
+
+
+def test_generate_env_vars_float_keys_normalize_to_strings():
+    """PyYAML-parsed float keys travel through env vars as JSON strings.
+
+    YAML allows `0.0: x` (unquoted) which loads as a Python float key.
+    `has_env_safe_keys` rejects non-string keys, the dict gets
+    JSON-encoded, and `json.dumps`/`json.loads` coerces float keys to
+    strings. This is not a regression - the old per-key flatten would
+    have produced bash-invalid `..._0.0` names anyway - but it is an
+    intentional behaviour change. A consumer indexing `config[0.0]`
+    after an env override would hit a `KeyError`; they must index by
+    the stringified key.
+    """
+    data = {0.0: 0, 0.6: 60000000000000000, 1.0: 1000000000000000000}
+    env_vars = generate_env_vars_recursively(
+        data={"bet_amount_per_threshold": data},
+        export_path=["skill", "trader_abci"],
+    )
+    decoded = json.loads(env_vars["SKILL_TRADER_ABCI_BET_AMOUNT_PER_THRESHOLD"])
+    assert set(decoded.keys()) == {"0.0", "0.6", "1.0"}
+    assert all(isinstance(k, str) for k in decoded)
+    assert decoded["0.6"] == 60000000000000000
+
+
+def test_generate_env_vars_restricted_collision_with_unsafe_dict_sibling():
+    """Trader-style: restriction + collision + unsafe-key dict all combine.
+
+    A safe-keyed `strategies_kwargs` under `models/.../args/` holds both
+    a scalar sibling (`bet_kelly_fraction`) and an unsafe-key dict
+    sibling (`bet_amount_per_threshold`). Both collapse to the same
+    `..._STRATEGIES_KWARGS` env var via the `restricted` path and must
+    fuse via the dict-iteration merge_dicts branch. Locks in the merge
+    semantics so a refactor of the collision logic cannot silently drop
+    either sibling.
+    """
+    inner = {"0.0": 0, "1.0": 1000000000000000000}
+    models = {
+        "params": {
+            "args": {
+                "strategies_kwargs": {
+                    "bet_kelly_fraction": 1,
+                    "bet_amount_per_threshold": inner,
+                }
+            }
+        }
+    }
+    result = generate_env_vars_recursively(
+        data=models, export_path=["skill", "trader_abci", "models"]
+    )
+    env_var = "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS"
+    assert list(result.keys()) == [env_var]
+    fused = json.loads(result[env_var])
+    assert fused == {
+        "bet_kelly_fraction": 1,
+        "bet_amount_per_threshold": inner,
     }
 
 

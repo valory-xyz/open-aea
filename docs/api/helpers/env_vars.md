@@ -137,10 +137,11 @@ def has_env_safe_keys(data: dict) -> bool
 Check if a dict can be safely flattened into per-key env vars.
 
 Returns True only when every key is a string matching the bash
-identifier rule `[A-Za-z_][A-Za-z0-9_]*`. When this returns False,
-flattening would produce env var names that bash refuses to set
-(notably containing `.`), so callers should JSON-encode the whole
-dict as a single env var instead.
+identifier rule `[A-Za-z_][A-Za-z0-9_]*`. An empty dict is
+vacuously safe (True). When this returns False, flattening would
+produce env var names that bash refuses to set (notably containing
+`.`), so callers should JSON-encode the whole dict as a single env
+var instead.
 
 For example, `{"timeout": 30, "retries": 5}` returns True; while
 `{"0.0": 0, "1.0": 100}` and `{1: "v"}` return False.
@@ -151,7 +152,8 @@ For example, `{"timeout": 30, "retries": 5}` returns True; while
 
 **Returns**:
 
-True if every key is a valid bash identifier.
+True if every key is a valid bash identifier, or the
+dict is empty.
 
 <a id="aea.helpers.env_vars.list_to_nested_dict"></a>
 

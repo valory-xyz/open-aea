@@ -280,18 +280,28 @@ def has_env_safe_keys(data: dict) -> bool:
     Check if a dict can be safely flattened into per-key env vars.
 
     Returns True only when every key is a string matching the bash
-    identifier rule `[A-Za-z_][A-Za-z0-9_]*`. When this returns False,
-    flattening would produce env var names that bash refuses to set
-    (notably containing `.`), so callers should JSON-encode the whole
-    dict as a single env var instead.
+    identifier rule `[A-Za-z_][A-Za-z0-9_]*`. An empty dict is
+    vacuously safe (True). When this returns False, flattening would
+    produce env var names that bash refuses to set (notably containing
+    `.`), so callers should JSON-encode the whole dict as a single env
+    var instead.
 
     For example, `{"timeout": 30, "retries": 5}` returns True; while
     `{"0.0": 0, "1.0": 100}` and `{1: "v"}` return False.
 
     :param data: Data dict
-    :return: True if every key is a valid bash identifier.
+    :return: True if every key is a valid bash identifier, or the
+        dict is empty.
     """
     return all(isinstance(k, str) and _BASH_SAFE_KEY_RE.match(k) for k in data)
+
+
+def list_to_nested_dict(lst: list, val: Any) -> dict:
+    """Convert a list to a nested dict."""
+    nested_dict = val
+    for item in reversed(lst):
+        nested_dict = {item: nested_dict}
+    return nested_dict
 
 
 def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str]:
@@ -302,8 +312,7 @@ def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str
     non-scalar elements, or a dict with bash-unsafe keys). Honours
     `restrict_model_args`: if the export path is truncated by the model
     arg restriction, the data is nested under the restricted suffix
-    before encoding so a deeper path key (the model arg's sub-key) is
-    not lost.
+    (the deeper path keys) before encoding so they are not lost.
 
     :param data: Value to encode.
     :param export_path: Path keys leading to the value, from
@@ -311,17 +320,8 @@ def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str
     :return: (env_var_name, json_value) pair.
     """
     restricted, path = export_path_to_env_var_string(export_path=export_path)
-    if restricted:
-        return path, json.dumps(list_to_nested_dict(restricted, data))
-    return path, json.dumps(data, separators=(",", ":"))
-
-
-def list_to_nested_dict(lst: list, val: Any) -> dict:
-    """Convert a list to a nested dict."""
-    nested_dict = val
-    for item in reversed(lst):
-        nested_dict = {item: nested_dict}
-    return nested_dict
+    payload = list_to_nested_dict(restricted, data) if restricted else data
+    return path, json.dumps(payload, separators=(",", ":"))
 
 
 def ensure_dict(dict_: Dict[str, Union[dict, str]]) -> dict:
@@ -359,18 +359,18 @@ def generate_env_vars_recursively(
         if not has_env_safe_keys(data):
             path, value = _encode_as_json_env_var(data, export_path)
             env_var_dict[path] = value
-        else:
-            for key, value in data.items():
-                res = generate_env_vars_recursively(
-                    data=value,
-                    export_path=[*export_path, key],
-                )
-                if res:
-                    env_var = list(res.keys())[0]
-                    if env_var in env_var_dict:
-                        dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
-                        res = ensure_json_content(merge_dicts(*dicts))
-                env_var_dict.update(res)
+            return env_var_dict
+        for key, value in data.items():
+            res = generate_env_vars_recursively(
+                data=value,
+                export_path=[*export_path, key],
+            )
+            if res:
+                env_var = list(res.keys())[0]
+                if env_var in env_var_dict:
+                    dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
+                    res = ensure_json_content(merge_dicts(*dicts))
+            env_var_dict.update(res)
     elif isinstance(data, list):
         if is_strict_list(data=data):
             path, value = _encode_as_json_env_var(data, export_path)
