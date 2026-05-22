@@ -354,13 +354,20 @@ def test_generate_env_vars_unsafe_dict_inside_safe_dict_collapses_only_inner():
     assert json.loads(inner) == data["bet_amount_per_threshold"]
 
 
+def test_generate_env_vars_empty_dict_returns_empty():
+    """Empty dict is vacuously strict and emits no env vars."""
+    result = generate_env_vars_recursively(data={}, export_path=["test", "foo"])
+    assert result == {}
+
+
 def test_generate_env_vars_unsafe_key_dict_under_models_args_uses_restricted_path():
     """Production path: unsafe-key dict nested under ``args/<arg>/...`` collapses correctly.
 
     Under the ``args`` level the framework restricts the env var name to the
-    arg key, nesting any deeper path keys inside the JSON value. The unsafe-key
-    branch must respect that restriction so trader-style overrides land in the
-    same env var the per-key flatten would have collapsed to.
+    arg-level key (``strategies_kwargs`` here), nesting any deeper path keys
+    (``bet_amount_per_threshold``) inside the JSON value. The unsafe-key
+    branch must respect that restriction so trader-style overrides land in
+    the same env var the per-key flatten would have collapsed to.
     """
     data = {
         "0.0": 0,

@@ -131,18 +131,22 @@ Boolean specifying whether it's a strict list or not
 #### is`_`strict`_`dict
 
 ```python
-def is_strict_dict(data: Mapping) -> bool
+def is_strict_dict(data: dict) -> bool
 ```
 
-Check if a data dict can be safely flattened into per-key env vars.
+Check if a dict can be safely flattened into per-key env vars.
 
-A dict is "strict" when every key is a string that matches POSIX-y
-bash identifier rules: starts with a letter or underscore, contains
-only letters, digits, and underscores. Non-strict dicts cannot be
-flattened safely because the resulting env var names would contain
-characters bash refuses to set (notably ``.``), so callers should
-JSON-encode such dicts as a single env var instead. This is the
-counterpart of :func:`is_strict_list` for the dict branch of
+A dict is "strict" when every key is a string matching the bash
+identifier rule `[A-Za-z_][A-Za-z0-9_]*`. Non-strict dicts cannot
+be flattened: the resulting env var names would contain characters
+bash refuses to set (notably `.`), so callers should JSON-encode
+such dicts as a single env var instead. Counterpart of
+`is_strict_list` for the dict branch of
+`generate_env_vars_recursively`.
+
+For example, `{"timeout": 30, "retries": 5}` is strict, but
+`{"0.0": 0, "1.0": 100}` is not (the dot in the keys is not a
+valid bash identifier character).
 
 **Arguments**:
 
