@@ -16,6 +16,24 @@ def setup_logger(name: str,
 
 Set up the logger.
 
+Kept as a public helper for downstream consumers outside this repo;
+new in-repo callers should prefer ``logging.getLogger(name)`` and set
+the level directly. Calling ``logging.basicConfig`` at module-import
+time pollutes the root logger and was the cause of the duplicate-log
+bug fixed in `914` (PR `917`).
+
+**Arguments**:
+
+- `name`: logger name.
+- `level`: log level applied to the returned logger.
+- `log_format`: format string passed to ``logging.basicConfig``.
+Only takes effect on the first call when the root logger has no
+handlers yet; subsequent calls are a no-op for the format.
+
+**Returns**:
+
+the configured logger.
+
 <a id="aea.helpers.logging.get_logger"></a>
 
 #### get`_`logger
