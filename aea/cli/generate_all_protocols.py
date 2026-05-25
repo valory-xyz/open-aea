@@ -66,7 +66,6 @@ LIBPROTOC_VERSION = "libprotoc 24.3"
 CUSTOM_TYPE_MODULE_NAME = "custom_types.py"
 PROTOCOL_GENERATOR_DOCSTRING_REGEX = "It was created with protocol buffer compiler version `libprotoc .*` and aea protocol generator version `.*`."
 
-logging.basicConfig(format="[%(asctime)s][%(levelname)s] %(message)s")
 logger = logging.getLogger("generate_all_protocols")
 logger.setLevel(logging.INFO)
 
@@ -460,6 +459,7 @@ def generate_all_protocols(
     check_clean: bool,
 ) -> None:
     """Generate all protocols."""
+    logging.basicConfig(format="[%(asctime)s][%(levelname)s] %(message)s")
 
     _check_preliminaries()
 

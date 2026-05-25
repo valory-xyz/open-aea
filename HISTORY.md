@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## Unreleased
+
+Framework:
+
+- `aea.cli` / `aea.helpers.protocols`: removes the two module-top `logging.basicConfig(...)` calls that fired as a side effect of `import aea.cli` and attached a stderr `StreamHandler` to the root logger. That orphan root handler survived the agent's `logging.config.dictConfig` (the config block has no `root:` key) and caught every `aea.agent.*` record a second time via propagation, producing the `] [INFO]` vs `][INFO]` doubling seen in operator captures. Fix moves the `basicConfig` in `aea/cli/generate_all_protocols.py` into the click command body and switches `aea/helpers/protocols.py` from `setup_logger(__name__)` to `logging.getLogger(__name__)`. Behaviour change for operators: third-party library `INFO`/`DEBUG` logs (e.g. from `web3`, `requests` in the ledger plugins) that the orphan handler previously surfaced now go silent under an agent config without a `root:` block in `logging_config`. `WARNING` and above still appear on stderr via Python's `logging.lastResort` handler, though with that handler's bare-message format (just `%(message)s`, no level or logger-name prefix and no timestamp) rather than the formatted one the orphan installed. Operators who want the previous behaviour (timestamped third-party `INFO`/`DEBUG`) can add a `root:` block to `logging_config` in the agent's `aea-config.yaml`. #914 #917
+
 ## 2.2.6 (2026-05-14)
 
 Framework:

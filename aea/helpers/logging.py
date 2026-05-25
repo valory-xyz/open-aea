@@ -31,7 +31,21 @@ DEFAULT_FORMAT = "[%(asctime)s][%(levelname)s] %(message)s"
 def setup_logger(
     name: str, level: int = logging.INFO, log_format: str = DEFAULT_FORMAT
 ) -> Logger:
-    """Set up the logger."""
+    """Set up the logger.
+
+    Kept as a public helper for downstream consumers outside this repo;
+    new in-repo callers should prefer ``logging.getLogger(name)`` and set
+    the level directly. Calling ``logging.basicConfig`` at module-import
+    time pollutes the root logger and was the cause of the duplicate-log
+    bug fixed in #914 (PR #917).
+
+    :param name: logger name.
+    :param level: log level applied to the returned logger.
+    :param log_format: format string passed to ``logging.basicConfig``.
+        Only takes effect on the first call when the root logger has no
+        handlers yet; subsequent calls are a no-op for the format.
+    :return: the configured logger.
+    """
     logging.basicConfig(format=log_format)
     logger = logging.getLogger(name)
     logger.setLevel(level)
