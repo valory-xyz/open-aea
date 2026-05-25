@@ -17,7 +17,11 @@
 #
 # ------------------------------------------------------------------------------
 
-"""Tests guarding the import-time side effects of the ``aea.cli`` package."""
+"""Tests guarding the import-time side effects of the modules touched by #914.
+
+Centralizes regression tests for ``aea.cli`` and the standalone public
+modules whose module-top ``logging`` calls were changed by the fix.
+"""
 
 import json
 import subprocess  # nosec
@@ -63,6 +67,35 @@ def test_importing_aea_cli_does_not_install_root_handler() -> None:
     )
 
 
+def test_importing_aea_helpers_protocols_does_not_install_root_handler() -> None:
+    """``import aea.helpers.protocols`` must not attach any handler to root.
+
+    Pins the module-top contract directly, independent of the ``aea.cli``
+    import chain. Pre-fix this module triggered the bug by calling
+    ``setup_logger(__name__)`` at module top, which in turn called
+    ``logging.basicConfig(...)`` and installed a stderr ``StreamHandler``
+    on the root logger. Post-fix it uses ``logging.getLogger(__name__)``
+    so the import is side-effect free even when no part of the CLI is
+    imported.
+    """
+    code = textwrap.dedent("""
+        import json
+        import logging
+        import aea.helpers.protocols  # noqa: F401
+        root = logging.getLogger()
+        print(json.dumps([type(h).__name__ for h in root.handlers]))
+        """)
+    output = (
+        subprocess.check_output([sys.executable, "-c", code]).decode().strip()  # nosec
+    )
+    handlers = json.loads(output.splitlines()[-1])
+    assert handlers == [], (
+        "Importing 'aea.helpers.protocols' installed root logger handlers: "
+        f"{handlers}. This re-introduces the duplicate-log bug fixed by "
+        "replacing the module-top setup_logger() call with getLogger()."
+    )
+
+
 def test_agent_log_record_is_not_duplicated_in_combined_stdout_stderr() -> None:
     """End-to-end regression test for the user-visible symptom of #914.
 
@@ -74,11 +107,13 @@ def test_agent_log_record_is_not_duplicated_in_combined_stdout_stderr() -> None:
     does), then emits a log record under ``aea.agent.*`` (the namespace
     skills use through ``AgentLoggerAdapter``).
 
-    The capture has to be OS-level ``2>&1`` because ``basicConfig`` binds
-    ``sys.stderr`` at import time -- an in-process ``sys.stderr`` swap
-    would not catch the orphan handler's output. So the assertion runs
-    over the merged stream the operator would actually see when running
-    ``aea -s run 2>&1 | tee agent.log``.
+    The capture has to be OS-level ``2>&1`` because
+    ``StreamHandler.__init__`` resolves ``sys.stderr`` to a concrete
+    stream reference at handler construction time and ``emit()`` writes
+    to that stored reference; an in-process ``sys.stderr`` swap after
+    construction would not redirect the handler's output. So the
+    assertion runs over the merged stream the operator would actually
+    see when running ``aea -s run 2>&1 | tee agent.log``.
 
     Pre-fix this lands the marker twice (once via the agent's configured
     stdout handler, once via the orphan stderr root handler). Post-fix

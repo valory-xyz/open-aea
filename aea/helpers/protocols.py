@@ -33,6 +33,7 @@ PROTOCOL_SPECIFICATION_ID_IN_SPECIFICATION_REGEX = re.compile(
 )
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 
 def get_protocol_specification_from_readme(package_path: Path) -> str:
