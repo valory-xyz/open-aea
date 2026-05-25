@@ -18,11 +18,19 @@
 # ------------------------------------------------------------------------------
 """Tests for `aea_ci_helpers.check_dependencies.PyProjectToml.load`."""
 
+import logging
+import sys
 import textwrap
 from pathlib import Path
 
+import pytest
 from aea_ci_helpers.check_dependencies import PyProjectToml
 from packaging.specifiers import SpecifierSet
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 SAMPLE_PYPROJECT = textwrap.dedent("""\
     [tool.poetry]
@@ -105,8 +113,14 @@ def test_load_includes_other_groups(tmp_path: Path) -> None:
     assert "mkdocs" in config.dependencies
 
 
-def test_main_deps_win_over_group_deps_on_name_collision(tmp_path: Path) -> None:
-    """If the same package appears in both main and a group, main wins."""
+def test_main_deps_win_over_group_deps_on_name_collision(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """If the same package appears in both main and a group, main wins.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    :param caplog: pytest log-capture fixture for the collision warning.
+    """
     content = textwrap.dedent("""\
         [tool.poetry]
         name = "demo"
@@ -123,11 +137,16 @@ def test_main_deps_win_over_group_deps_on_name_collision(tmp_path: Path) -> None
         """)
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text(content)
-    config = PyProjectToml.load(pyproject)
+    with caplog.at_level(logging.WARNING):
+        config = PyProjectToml.load(pyproject)
     assert config is not None
     assert SpecifierSet(config.dependencies["protobuf"].version) == SpecifierSet(
         "==4.25.0"
     )
+    assert any(
+        "protobuf" in r.getMessage() and "multiple" in r.getMessage()
+        for r in caplog.records
+    ), "expected a collision warning naming the duplicated dependency"
 
 
 def test_load_returns_none_when_no_poetry_table(tmp_path: Path) -> None:
@@ -143,6 +162,8 @@ def test_iter_excludes_python_marker(tmp_path: Path) -> None:
     assert config is not None
     names = {dep.name for dep in config}
     assert "python" not in names
+    # Positive assertion so the test can't pass on an empty iteration.
+    assert "requests" in names
 
 
 def test_iter_scopes_to_main_deps(tmp_path: Path) -> None:
@@ -184,7 +205,10 @@ def test_dump_does_not_hoist_group_deps_to_main(tmp_path: Path) -> None:
     config = PyProjectToml.load(pyproject)
     assert config is not None
     config.dump()
-    rewritten_main = config.config["tool"]["poetry"]["dependencies"]
+    # Re-read the on-disk file (not the in-memory config) so the test
+    # also covers the `tomli_w.dump` write step.
+    with pyproject.open("rb") as fp:
+        rewritten_main = tomllib.load(fp)["tool"]["poetry"]["dependencies"]
     # Main-deps survive:
     assert "open-aea" in rewritten_main
     assert "docker" in rewritten_main
@@ -195,8 +219,14 @@ def test_dump_does_not_hoist_group_deps_to_main(tmp_path: Path) -> None:
         ), f"Group dep {group_name!r} hoisted into [tool.poetry.dependencies]"
 
 
-def test_load_skips_list_form_spec(tmp_path: Path) -> None:
-    """List-form specs (multi-constraint with markers) are skipped, not crashed on."""
+def test_load_skips_list_form_spec(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """List-form specs (multi-constraint with markers) are skipped, not crashed on.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    :param caplog: pytest log-capture fixture for the skip warning.
+    """
     content = textwrap.dedent("""\
         [tool.poetry]
         name = "demo"
@@ -214,14 +244,25 @@ def test_load_skips_list_form_spec(tmp_path: Path) -> None:
         """)
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text(content)
-    config = PyProjectToml.load(pyproject)
+    with caplog.at_level(logging.WARNING):
+        config = PyProjectToml.load(pyproject)
     assert config is not None
     assert "requests" in config.dependencies
     assert "weird" not in config.dependencies
+    assert any(
+        "weird" in r.getMessage() and "unrecognized" in r.getMessage()
+        for r in caplog.records
+    ), "expected a warning that the list-form spec was skipped"
 
 
-def test_load_handles_malformed_group_table(tmp_path: Path) -> None:
-    """A `[tool.poetry.group]` whose entries lack `dependencies` is tolerated."""
+def test_load_handles_malformed_group_table(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A `[tool.poetry.group]` whose entries lack `dependencies` is tolerated.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    :param caplog: pytest log-capture fixture for the skip warning.
+    """
     content = textwrap.dedent("""\
         [tool.poetry]
         name = "demo"
@@ -238,9 +279,14 @@ def test_load_handles_malformed_group_table(tmp_path: Path) -> None:
         """)
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text(content)
-    config = PyProjectToml.load(pyproject)
+    with caplog.at_level(logging.WARNING):
+        config = PyProjectToml.load(pyproject)
     assert config is not None
     assert "requests" in config.dependencies
+    assert any(
+        "dev" in r.getMessage() and "skipping group" in r.getMessage()
+        for r in caplog.records
+    ), "expected a warning that the malformed group was skipped"
 
 
 def test_load_handles_no_group_table(tmp_path: Path) -> None:
@@ -292,3 +338,66 @@ def test_load_normalizes_flask_range_specifier(tmp_path: Path) -> None:
     assert SpecifierSet(config.dependencies["Flask"].version) == SpecifierSet(
         ">=3.1.0,<4.0.0"
     )
+
+
+def test_direct_constructor_without_main_dep_names(tmp_path: Path) -> None:
+    """Constructing directly with `main_dep_names=None` iterates everything."""
+    config = PyProjectToml.load(_write_pyproject(tmp_path))
+    assert config is not None
+    legacy = PyProjectToml(
+        dependencies=config.dependencies,
+        config=config.config,
+        file=config.file,
+        main_dep_names=None,
+    )
+    names = {dep.name for dep in legacy}
+    # With no scoping, group-origin deps are surfaced too.
+    assert "requests" in names
+    assert "pytest-asyncio" in names
+
+
+def test_dump_preserves_main_dict_form_and_extras_collision(
+    tmp_path: Path,
+) -> None:
+    """dump() must not corrupt main dict-form deps or extras lists.
+
+    Regression test: a `docker` name that appears both as a main
+    dict-form dep (`[tool.poetry.dependencies]`) and in
+    `[tool.poetry.extras]` (list-form) must keep both intact after a
+    load + dump roundtrip — only plain-string main deps are rewritten.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    """
+    content = textwrap.dedent("""\
+        [tool.poetry]
+        name = "demo"
+        version = "0.1.0"
+        description = ""
+        authors = ["demo"]
+
+        [tool.poetry.dependencies]
+        python = ">=3.10,<3.15"
+        requests = "*"
+        docker = { version = "==7.1.0", optional = true }
+
+        [tool.poetry.extras]
+        docker = ["docker"]
+
+        [tool.poetry.group.dev.dependencies]
+        protobuf = "*"
+        """)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(content)
+    config = PyProjectToml.load(pyproject)
+    assert config is not None
+    config.dump()
+    with pyproject.open("rb") as fp:
+        reloaded = tomllib.load(fp)
+    deps = reloaded["tool"]["poetry"]["dependencies"]
+    # Main dict-form dep keeps optional=true (not flattened to a string).
+    assert isinstance(deps["docker"], dict), "dict-form 'docker' was flattened"
+    assert deps["docker"].get("optional") is True
+    # Extras list survives intact.
+    assert reloaded["tool"]["poetry"]["extras"]["docker"] == ["docker"]
+    # Group dep is not hoisted into main.
+    assert "protobuf" not in deps

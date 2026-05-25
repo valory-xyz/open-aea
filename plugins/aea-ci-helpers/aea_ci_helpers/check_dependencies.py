@@ -339,6 +339,7 @@ class PyProjectToml:
         config: Dict[str, Dict],
         file: Path,
         main_dep_names: Optional[Set[str]] = None,
+        string_dep_names: Optional[Set[str]] = None,
     ) -> None:
         """Initialize object."""
         self.dependencies = dependencies
@@ -350,10 +351,14 @@ class PyProjectToml:
         # `pytest-asyncio` declared in `[tool.poetry.group.dev.dependencies]`
         # must satisfy a package-YAML dependency declaration), but they
         # don't get cross-compared against `tox.ini` or hoisted into
-        # `[tool.poetry.dependencies]` by `--update` mode.
-        self._main_dep_names: Optional[Set[str]] = (
-            set(main_dep_names) if main_dep_names is not None else None
-        )
+        # `[tool.poetry.dependencies]` by `--update` mode. The only caller
+        # (`load`) passes a freshly-built set, so no defensive copy.
+        self._main_dep_names = main_dep_names
+        # Names of deps that originated from a plain-string spec (e.g.
+        # `requests = "*"`). Only these are rewritten by `dump()`;
+        # dict-form entries carry metadata (`optional`, `path`,
+        # `develop`, `markers`) the `name = version` form can't represent.
+        self._string_dep_names = string_dep_names
 
     def __iter__(self) -> Iterator[Dependency]:
         """Iterate dependencies as Dependency objects."""
@@ -406,7 +411,9 @@ class PyProjectToml:
         return version
 
     @classmethod
-    def _dependency_from_spec(cls, name: str, spec: Any) -> Optional[Dependency]:
+    def _dependency_from_spec(
+        cls, name: str, spec: Any, pyproject_path: Path
+    ) -> Optional[Dependency]:
         """Build a Dependency from a poetry dep spec (string or dict)."""
         if isinstance(spec, str):
             return Dependency(name=name, version=cls._normalize_version(spec))
@@ -417,13 +424,15 @@ class PyProjectToml:
                 extras=spec.get("extras"),
             )
         # Lists (multiple constraints with markers) and other shapes are
-        # rare in our repos; surface them as a warning so a future
-        # contributor knows the entry was skipped rather than silently
-        # treated as declared.
+        # rare in our repos; surface them as a warning (with the file
+        # path, for monorepo debuggability) so a future contributor
+        # knows the entry was skipped rather than silently treated as
+        # declared.
         logging.warning(
-            "Skipping unrecognized dependency spec for %r in pyproject.toml: "
+            "Skipping unrecognized dependency spec for %r in %s: "
             "expected str or dict, got %s.",
             name,
+            pyproject_path,
             type(spec).__name__,
         )
         return None
@@ -458,6 +467,8 @@ class PyProjectToml:
         except KeyError:
             return None
 
+        string_dep_names: Set[str] = set()
+
         def _ingest(table: Dict[str, Any]) -> None:
             for name, spec in table.items():
                 if name in dependencies:
@@ -466,15 +477,18 @@ class PyProjectToml:
                     # Main wins (tighter version pins in dev groups are
                     # not the checker's concern); flag the silent drop.
                     logging.warning(
-                        "Dependency %r appears in multiple pyproject.toml "
-                        "tables; keeping the first occurrence (main wins).",
+                        "Dependency %r appears in multiple tables in %s; "
+                        "keeping the first occurrence (main wins).",
                         name,
+                        pyproject_path,
                     )
                     continue
-                dep = cls._dependency_from_spec(name, spec)
+                dep = cls._dependency_from_spec(name, spec, pyproject_path)
                 if dep is None:
                     continue
                 dependencies[name] = dep
+                if isinstance(spec, str):
+                    string_dep_names.add(name)
 
         _ingest(main_deps)
         main_dep_names: Set[str] = set(dependencies)
@@ -486,31 +500,46 @@ class PyProjectToml:
                 pyproject_path,
             )
             group_tables = {}
-        for group in group_tables.values():
+        for group_name, group in group_tables.items():
             group_deps = group.get("dependencies") if isinstance(group, dict) else None
             if isinstance(group_deps, dict):
                 _ingest(group_deps)
+            else:
+                logging.warning(
+                    "[tool.poetry.group.%s.dependencies] in %s is not a "
+                    "table or is missing; skipping group.",
+                    group_name,
+                    pyproject_path,
+                )
 
         return cls(
             dependencies=dependencies,
             config=config,
             file=pyproject_path,
             main_dep_names=main_dep_names,
+            string_dep_names=string_dep_names,
         )
 
     def dump(self) -> None:
-        """Dump to file."""
-        # Only main runtime deps get hoisted into `[tool.poetry.dependencies]`
-        # — group-origin entries are left in their original tables so
-        # `--update` mode doesn't (a) duplicate them across sections and
-        # (b) lose dict-form metadata (`extras`, `markers`, `optional`,
-        # `path`, `develop`) that the `name = version` form can't carry.
-        main_names = self._main_dep_names
-        self.config["tool"]["poetry"]["dependencies"] = {
-            package.name: package.version if package.version != "" else "*"
-            for package in self.dependencies.values()
-            if main_names is None or package.name in main_names
-        }
+        """Dump to file.
+
+        Only updates the version of main deps that originated from a
+        plain-string spec (e.g. ``requests = "*"``). Dict-form entries
+        (``docker = { version = "==7.1.0", optional = true }``) carry
+        metadata that the ``name = version`` form can't represent, so
+        they're left untouched. Group-origin deps aren't in
+        ``[tool.poetry.dependencies]`` and are never written there.
+        """
+        deps_table = self.config["tool"]["poetry"]["dependencies"]
+        for name, dep in self.dependencies.items():
+            if (
+                self._string_dep_names is not None
+                and name not in self._string_dep_names
+            ):
+                continue
+            if name not in deps_table:
+                continue
+            deps_table[name] = dep.version if dep.version != "" else "*"
         with self.file.open("wb") as fp:
             tomli_w.dump(self.config, fp)
 
