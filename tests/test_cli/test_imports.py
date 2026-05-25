@@ -28,33 +28,44 @@ import subprocess  # nosec
 import sys
 import textwrap
 
+import pytest
 
-def test_importing_aea_cli_does_not_install_root_handler() -> None:
-    """``import aea.cli`` must not attach any handler to the root logger.
 
-    The agent's ``logging_config`` is applied via ``logging.config.dictConfig``
-    (called from ``AEABuilder.build()`` in the real runtime; this test exercises
-    the same code path by calling ``dictConfig`` directly in test 2). Any
-    handler attached to the root logger before that point survives the
-    ``dictConfig`` call (the agent's config block has no ``root:`` key) and
-    produces duplicated log output: one copy via the agent's configured
-    ``aea``-logger handlers, one copy via the orphan root handler that
-    propagation also reaches.
+@pytest.mark.parametrize(
+    "module",
+    [
+        "aea.cli",
+        "aea.helpers.protocols",
+        "aea.cli.generate_all_protocols",
+    ],
+)
+def test_importing_module_does_not_install_root_handler(module: str) -> None:
+    """Importing the named module must not attach any handler to the root logger.
+
+    Pre-fix, three import paths each installed a stderr ``StreamHandler``
+    on root via module-top ``logging.basicConfig``: ``aea.cli`` (which
+    transitively pulled in the other two), ``aea.helpers.protocols`` (via
+    ``setup_logger(__name__)``), and ``aea.cli.generate_all_protocols``
+    (via a direct module-top ``basicConfig`` call). The orphan handler
+    survived ``logging.config.dictConfig`` (which has no ``root:`` key in
+    the default agent config) and produced doubled output via propagation
+    to root.
 
     The intentional ``aea``-logger handler installed by
-    ``aea/cli/utils/loggers.py`` is *not* a problem because the agent's
+    ``aea/cli/utils/loggers.py`` is *not* the bug; the agent's
     ``dictConfig`` non-incremental mode replaces it cleanly when it
-    applies a ``loggers.aea`` block. The bug is solely the root-logger
-    orphan, which is what this test pins.
+    applies a ``loggers.aea`` block. This test pins only the root-logger
+    contract: post-fix, importing any of these modules is side-effect
+    free.
 
-    The test runs in a subprocess so it observes the *clean* state of the
-    interpreter immediately after ``import aea.cli``, independent of any
-    handlers the test runner itself may have attached.
+    The test runs in a subprocess so it observes the clean interpreter
+    state immediately after import, independent of any handlers the
+    test runner itself may have attached.
     """
-    code = textwrap.dedent("""
+    code = textwrap.dedent(f"""
         import json
         import logging
-        import aea.cli  # noqa: F401
+        import {module}  # noqa: F401
         root = logging.getLogger()
         print(json.dumps([type(h).__name__ for h in root.handlers]))
         """)
@@ -63,38 +74,9 @@ def test_importing_aea_cli_does_not_install_root_handler() -> None:
     )
     handlers = json.loads(output.splitlines()[-1])
     assert handlers == [], (
-        "Importing 'aea.cli' installed root logger handlers: "
-        f"{handlers}. This re-introduces the duplicate-log bug fixed by "
-        "removing the import-time logging.basicConfig calls."
-    )
-
-
-def test_importing_aea_helpers_protocols_does_not_install_root_handler() -> None:
-    """``import aea.helpers.protocols`` must not attach any handler to root.
-
-    Pins the module-top contract directly, independent of the ``aea.cli``
-    import chain. Pre-fix this module triggered the bug by calling
-    ``setup_logger(__name__)`` at module top, which in turn called
-    ``logging.basicConfig(...)`` and installed a stderr ``StreamHandler``
-    on the root logger. Post-fix it uses ``logging.getLogger(__name__)``
-    so the import is side-effect free even when no part of the CLI is
-    imported.
-    """
-    code = textwrap.dedent("""
-        import json
-        import logging
-        import aea.helpers.protocols  # noqa: F401
-        root = logging.getLogger()
-        print(json.dumps([type(h).__name__ for h in root.handlers]))
-        """)
-    output = (
-        subprocess.check_output([sys.executable, "-c", code]).decode().strip()  # nosec
-    )
-    handlers = json.loads(output.splitlines()[-1])
-    assert handlers == [], (
-        "Importing 'aea.helpers.protocols' installed root logger handlers: "
-        f"{handlers}. This re-introduces the duplicate-log bug fixed by "
-        "replacing the module-top setup_logger() call with getLogger()."
+        f"Importing {module!r} installed root logger handlers: {handlers}. "
+        "This re-introduces the duplicate-log bug fixed by removing the "
+        "import-time logging.basicConfig calls."
     )
 
 

@@ -33,17 +33,17 @@ def setup_logger(
 ) -> Logger:
     """Set up the logger.
 
-    Public helper retained for downstream callers in open-autonomy
-    (``chain/tx.py``, ``analyse/service.py``, and
-    ``plugins/aea-helpers/aea_helpers/bump_dependencies.py``). The in-repo
-    call in ``aea/helpers/protocols.py`` was removed in #914 because
-    ``logging.basicConfig`` at module-import time pollutes the root logger
-    and produces duplicate agent log lines under ``aea -s run``. New
-    in-repo callers should prefer ``logging.getLogger(name)`` directly.
+    Kept as a public helper for downstream consumers outside this repo;
+    new in-repo callers should prefer ``logging.getLogger(name)`` and set
+    the level directly. Calling ``logging.basicConfig`` at module-import
+    time pollutes the root logger and was the cause of the duplicate-log
+    bug fixed in #914 (PR #917).
 
     :param name: logger name.
-    :param level: log level.
+    :param level: log level applied to the returned logger.
     :param log_format: format string passed to ``logging.basicConfig``.
+        Only takes effect on the first call when the root logger has no
+        handlers yet; subsequent calls are a no-op for the format.
     :return: the configured logger.
     """
     logging.basicConfig(format=log_format)
