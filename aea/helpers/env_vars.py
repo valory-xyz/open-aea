@@ -21,6 +21,7 @@
 """Implementation of the environment variables support."""
 
 import json
+import logging
 import re
 from collections.abc import Mapping as MappingType
 from typing import Any, Dict, List, Mapping, Optional, Tuple, Union, cast
@@ -32,6 +33,8 @@ from aea.helpers.constants import (
     JSON_TYPES,
     NULL_EQUIVALENTS,
 )
+
+_logger = logging.getLogger(__name__)
 
 ENV_VARIABLE_RE = re.compile(r"^\$\{(([A-Z0-9_]+):?)?([a-z]+)?(:(.+))?}$")
 MODELS = "models"
@@ -304,7 +307,9 @@ def list_to_nested_dict(lst: list, val: Any) -> dict:
     return nested_dict
 
 
-def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str]:
+def _encode_as_json_env_var(
+    data: JSON_TYPES, export_path: List[str]
+) -> Tuple[str, str]:
     """
     Encode data as a single JSON-string env var.
 
@@ -314,14 +319,23 @@ def _encode_as_json_env_var(data: Any, export_path: List[str]) -> Tuple[str, str
     arg restriction, the data is nested under the restricted suffix
     (the deeper path keys) before encoding so they are not lost.
 
-    :param data: Value to encode.
+    :param data: JSON-encodable value to encode.
     :param export_path: Path keys leading to the value, from
         `generate_env_vars_recursively`.
     :return: (env_var_name, json_value) pair.
+    :raises ValueError: if ``data`` contains a value ``json.dumps`` cannot
+        serialise. The export path is included in the message so the
+        operator can locate the offending config key.
     """
     restricted, path = export_path_to_env_var_string(export_path=export_path)
     payload = list_to_nested_dict(restricted, data) if restricted else data
-    return path, json.dumps(payload, separators=(",", ":"))
+    try:
+        encoded = json.dumps(payload, separators=(",", ":"))
+    except TypeError as e:
+        raise ValueError(
+            f"Cannot JSON-encode value at export path {export_path}: {e}"
+        ) from e
+    return path, encoded
 
 
 def ensure_dict(dict_: Dict[str, Union[dict, str]]) -> dict:
@@ -357,6 +371,22 @@ def generate_env_vars_recursively(
 
     if isinstance(data, dict):
         if not has_env_safe_keys(data):
+            safe_keys = [
+                k for k in data if isinstance(k, str) and _BASH_SAFE_KEY_RE.match(k)
+            ]
+            if safe_keys:
+                # Mixed-key dict: per-key env var overrides for the safe
+                # keys silently stop applying once the whole dict is
+                # JSON-encoded. Warn so the operator can see why their
+                # override does not take effect.
+                _logger.warning(
+                    "Collapsing mixed-key dict at export path %s to a "
+                    "single JSON env var because of bash-unsafe keys; "
+                    "per-key overrides for safe keys %s will no longer "
+                    "apply. Set the whole-dict env var instead.",
+                    export_path,
+                    safe_keys,
+                )
             path, value = _encode_as_json_env_var(data, export_path)
             env_var_dict[path] = value
             return env_var_dict
@@ -385,7 +415,9 @@ def generate_env_vars_recursively(
     else:
         restricted, path = export_path_to_env_var_string(export_path=export_path)
         if restricted:
-            env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
+            env_var_dict[path] = json.dumps(
+                list_to_nested_dict(restricted, data), separators=(",", ":")
+            )
         else:
             env_var_dict[path] = data
 

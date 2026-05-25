@@ -20,7 +20,6 @@
 """This module contains the tests for the helper module."""
 
 import json
-import re
 from typing import List
 
 import pytest
@@ -289,6 +288,8 @@ def test_has_env_safe_keys():
     assert not has_env_safe_keys({"timeout": 30, "0.0": 0})
     assert not has_env_safe_keys({"1foo": 1})
     assert not has_env_safe_keys({1: "non-string-key"})
+    assert not has_env_safe_keys({"": 1})
+    assert not has_env_safe_keys({None: 1})
 
 
 def test_generate_env_vars_safe_key_dict_flattens_per_key():
@@ -320,8 +321,9 @@ def test_generate_env_vars_unsafe_key_dict_json_encodes_whole():
     assert result == {
         "TEST_FOO_BET_AMOUNT_PER_THRESHOLD": json.dumps(data, separators=(",", ":"))
     }
-    bash_safe = re.compile(r"^[A-Z_][A-Z0-9_]*$")
-    assert all(bash_safe.match(name) for name in result)
+    # The literal bug: the pre-fix per-key flatten produced names like
+    # `..._BET_AMOUNT_PER_THRESHOLD_0.0` containing `.`, which bash rejects.
+    assert all("." not in name for name in result)
 
 
 def test_generate_env_vars_mixed_key_dict_json_encodes_whole():
@@ -413,6 +415,65 @@ def test_generate_env_vars_float_keys_normalize_to_strings():
     assert set(decoded.keys()) == {"0.0", "0.6", "1.0"}
     assert all(isinstance(k, str) for k in decoded)
     assert decoded["0.6"] == 60000000000000000
+
+
+def test_generate_env_vars_float_keys_under_models_args_use_restricted_path():
+    """Production-shape: PyYAML float keys + the ``models/.../args`` restriction.
+
+    The literal trader / open-autonomy #2243 input shape: an unquoted YAML
+    map keyed by floats (``0.0:``, ``0.6:``, ``1.0:``) under
+    ``models/params/args/strategies_kwargs``. Test 8
+    (``test_generate_env_vars_float_keys_normalize_to_strings``) covers
+    float-key string-normalisation without the restriction path, and test
+    7 (``..._under_models_args_uses_restricted_path``) covers the
+    restriction with string keys. This locks in the combination: the
+    `args` restriction fires, the dict is JSON-encoded, and the float
+    keys are coerced to strings inside the JSON value.
+    """
+    data = {0.0: 0, 0.6: 60000000000000000, 1.0: 1000000000000000000}
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=[
+            "skill",
+            "trader_abci",
+            "models",
+            "params",
+            "args",
+            "strategies_kwargs",
+            "bet_amount_per_threshold",
+        ],
+    )
+    env_var = "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS"
+    assert list(result.keys()) == [env_var]
+    decoded = json.loads(result[env_var])
+    assert decoded == {
+        "bet_amount_per_threshold": {
+            "0.0": 0,
+            "0.6": 60000000000000000,
+            "1.0": 1000000000000000000,
+        }
+    }
+
+
+def test_generate_env_vars_unsafe_dict_with_unserializable_value_raises_with_path():
+    """Non-JSON-serialisable values inside an unsafe-key dict surface clearly.
+
+    PyYAML can produce non-JSON-encodable values from constructor hooks
+    (unquoted ISO dates load as ``datetime.date``, etc.). Without the
+    wrapper the operator would see a bare ``TypeError`` from inside
+    ``json.dumps`` with no reference to which config key triggered it.
+    The fix re-raises as ``ValueError`` with the export path so the
+    offending location is locatable. ``set`` is used here as a simple
+    stand-in for any non-JSON-encodable value.
+    """
+    data = {"0.0": {1, 2, 3}}
+    with pytest.raises(ValueError) as exc_info:
+        generate_env_vars_recursively(
+            data=data,
+            export_path=["test", "foo", "thresholds"],
+        )
+    assert "export path" in str(exc_info.value)
+    assert "['test', 'foo', 'thresholds']" in str(exc_info.value)
 
 
 def test_generate_env_vars_restricted_collision_with_unsafe_dict_sibling():
