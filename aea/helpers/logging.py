@@ -31,7 +31,21 @@ DEFAULT_FORMAT = "[%(asctime)s][%(levelname)s] %(message)s"
 def setup_logger(
     name: str, level: int = logging.INFO, log_format: str = DEFAULT_FORMAT
 ) -> Logger:
-    """Set up the logger."""
+    """Set up the logger.
+
+    Public helper retained for downstream callers in open-autonomy
+    (``chain/tx.py``, ``analyse/service.py``, and
+    ``plugins/aea-helpers/aea_helpers/bump_dependencies.py``). The in-repo
+    call in ``aea/helpers/protocols.py`` was removed in #914 because
+    ``logging.basicConfig`` at module-import time pollutes the root logger
+    and produces duplicate agent log lines under ``aea -s run``. New
+    in-repo callers should prefer ``logging.getLogger(name)`` directly.
+
+    :param name: logger name.
+    :param level: log level.
+    :param log_format: format string passed to ``logging.basicConfig``.
+    :return: the configured logger.
+    """
     logging.basicConfig(format=log_format)
     logger = logging.getLogger(name)
     logger.setLevel(level)

@@ -33,11 +33,13 @@ def test_importing_aea_cli_does_not_install_root_handler() -> None:
     """``import aea.cli`` must not attach any handler to the root logger.
 
     The agent's ``logging_config`` is applied via ``logging.config.dictConfig``
-    when ``AEABuilder.build()`` is called. Any handler attached to the root
-    logger before that point survives the ``dictConfig`` call (the agent's
-    config block has no ``root:`` key) and produces duplicated log output:
-    one copy via the agent's configured ``aea``-logger handlers, one copy
-    via the orphan root handler that propagation also reaches.
+    (called from ``AEABuilder.build()`` in the real runtime; this test exercises
+    the same code path by calling ``dictConfig`` directly in test 2). Any
+    handler attached to the root logger before that point survives the
+    ``dictConfig`` call (the agent's config block has no ``root:`` key) and
+    produces duplicated log output: one copy via the agent's configured
+    ``aea``-logger handlers, one copy via the orphan root handler that
+    propagation also reaches.
 
     The intentional ``aea``-logger handler installed by
     ``aea/cli/utils/loggers.py`` is *not* a problem because the agent's
@@ -161,7 +163,13 @@ def test_agent_log_record_is_not_duplicated_in_combined_stdout_stderr() -> None:
     )
     combined = result.stdout.decode()
     occurrences = combined.count(marker)
+    assert occurrences > 0, (
+        "Marker never appeared in combined stdout+stderr — the agent-side "
+        "logger path is broken, not the orphan-handler bug. Full combined "
+        f"output:\n{combined}"
+    )
     assert occurrences == 1, (
-        f"Expected the agent log record to appear exactly once in combined "
-        f"stdout+stderr; got {occurrences}. Full combined output:\n{combined}"
+        f"Marker appeared {occurrences} times in combined stdout+stderr — "
+        "the #914 duplicate-log bug has regressed. Full combined "
+        f"output:\n{combined}"
     )
