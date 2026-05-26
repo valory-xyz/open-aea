@@ -68,6 +68,36 @@ def test_from_dir():
     assert isinstance(contract.contract_interface, dict)
 
 
+def test_from_config_registers_contract_under_canonical_dotted_path():
+    """Loaded contract module is registered under a canonical dotted path.
+
+    The `sys.modules` cache entry must use the packages-prefixed dotted path,
+    not the bare ``"contracts"`` key. Without this, two contracts loaded in
+    the same process would overwrite each other under the same bare entry.
+    """
+    import sys
+
+    directory = Path(ROOT_DIR, "tests", "data", "dummy_contract")
+    configuration = load_component_configuration(ComponentType.CONTRACT, directory)
+    configuration._directory = directory
+    configuration = cast(ContractConfig, configuration)
+
+    expected_key = (
+        f"packages.{configuration.public_id.author}"
+        f".contracts.{configuration.public_id.name}.contract"
+    )
+    sys.modules.pop(expected_key, None)
+    sys.modules.pop("contracts", None)
+    try:
+        Contract.from_config(configuration)
+        assert expected_key in sys.modules
+        assert "contracts" not in sys.modules
+    finally:
+        sys.modules.pop(expected_key, None)
+        if str(configuration.public_id) in contract_registry.specs:
+            contract_registry.specs.pop(str(configuration.public_id))
+
+
 def test_from_config_and_registration():
     """Tests the from config method and contract registry registration."""
 

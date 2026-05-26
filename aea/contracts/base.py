@@ -123,7 +123,14 @@ class Contract(Component):
             raise ValueError("Configuration must be associated with a directory.")
         directory = configuration.directory
         load_aea_package(configuration)
-        contract_module = load_module(CONTRACTS, directory / "contract.py")
+        # Use the canonical packages-prefixed dotted path so the cache entry
+        # `load_module` writes to `sys.modules` does not clobber a bare key
+        # (`"contracts"`) across contracts loaded in the same process.
+        dotted_path = (
+            f"packages.{configuration.public_id.author}"
+            f".{CONTRACTS}.{configuration.public_id.name}.contract"
+        )
+        contract_module = load_module(dotted_path, directory / "contract.py")
         classes = inspect.getmembers(contract_module, inspect.isclass)
         contract_class_name = cast(str, configuration.class_name)
         contract_classes = list(filter(lambda x: x[0] == contract_class_name, classes))

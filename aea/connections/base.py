@@ -30,6 +30,7 @@ from typing import Any, Callable, Generator, Optional, Set, TYPE_CHECKING, cast
 
 from aea.components.base import Component, load_aea_package
 from aea.configurations.base import ComponentType, ConnectionConfig
+from aea.configurations.constants import CONNECTIONS
 from aea.configurations.data_types import PublicId
 from aea.configurations.loader import load_component_configuration
 from aea.crypto.wallet import CryptoStore
@@ -284,9 +285,15 @@ class Connection(Component, ABC):
                 "Connection module '{}' not found.".format(connection_module_path)
             )
         load_aea_package(configuration)
-        connection_module = load_module(
-            "connection_module", directory / "connection.py"
+        # Use the canonical packages-prefixed dotted path so the cache entry
+        # `load_module` writes to `sys.modules` does not clobber a bare key
+        # (`"connection_module"`) across connections loaded in the same
+        # process.
+        dotted_path = (
+            f"packages.{configuration.public_id.author}"
+            f".{CONNECTIONS}.{configuration.public_id.name}.connection"
         )
+        connection_module = load_module(dotted_path, directory / "connection.py")
         classes = inspect.getmembers(connection_module, inspect.isclass)
         connection_class_name = cast(str, configuration.class_name)
         connection_classes = list(
