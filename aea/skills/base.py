@@ -759,7 +759,14 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    component_module = load_module(component_type_name_plural, Path(path))
+    # Use the canonical packages-prefixed dotted path so the cache entry
+    # `load_module` writes to `sys.modules` does not clobber a bare key like
+    # `"behaviours"` across skills loaded in the same process.
+    dotted_path = (
+        f"packages.{skill_context.skill_id.author}"
+        f".skills.{skill_context.skill_id.name}.{component_type_name_plural}"
+    )
+    component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
     # Filter mirrors `_SkillComponentLoader._filter_classes`: keep
     # SkillComponent subclasses except those provided by the framework

@@ -401,7 +401,11 @@ def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
     if not configuration_data:
         raise ValueError("Service configuration file was empty.")
     service_config, *overrides = configuration_data
-    if service_config is None:
+    # The head document must be a mapping. `safe_load_all` happily returns
+    # `[None]` / `[False]` / `[0]` / `[""]` / `[[]]` for malformed YAML
+    # (bare `---`, just a scalar, etc.). Surface those at parse time rather
+    # than as opaque AttributeErrors from the downstream validator.
+    if not isinstance(service_config, dict):
         raise ValueError("Service configuration file was empty.")
     return service_config, overrides
 

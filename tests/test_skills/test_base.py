@@ -460,6 +460,113 @@ def test_load_module_resolves_via_sys_modules_on_re_import():
     assert importlib.import_module(canonical) is cached
 
 
+def _make_skill_component_loader_for_dummy_skill():
+    """Construct a fully-initialised `_SkillComponentLoader` for the dummy fixture.
+
+    Uses the normal `__init__` path so every invariant the production loader
+    relies on (including `skill_directory` and `skill_dotted_path`) is set
+    consistently — tests that touch private methods through this loader will
+    survive future refactors that read additional state from `self`.
+    """
+    skill_dir = Path(ROOT_DIR, "tests", "data", "dummy_skill")
+    configuration = load_component_configuration(
+        ComponentType.SKILL, skill_dir, skip_consistency_check=True
+    )
+    configuration._directory = skill_dir  # pylint: disable=protected-access
+    skill_context = MagicMock()
+    return _SkillComponentLoader(configuration, skill_context)
+
+
+def test_parse_module_keeps_classes_under_canonical_long_path(tmp_path, monkeypatch):
+    """The legacy `_parse_module` path keeps this skill's own classes.
+
+    After `_parse_module` was switched to call `load_module` with the canonical
+    long dotted path (`packages.<author>.skills.<name>.<file>`), classes
+    defined in the loaded module carry that long `__module__`. The old
+    "exclude classes whose `__module__` starts with this skill's path"
+    clause — present in the legacy filter before this PR — would now wrongly
+    drop them. This test pins the filter alignment with `_filter_classes`.
+    """
+
+    class _LocalBehaviour(Behaviour):
+        def setup(self):  # pragma: nocover
+            pass
+
+        def act(self):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    # __module__ matches the dotted path `_parse_module` now computes for
+    # this skill's `behaviours.py`. A class loaded by the real `load_module`
+    # under that name would observe exactly this value.
+    _LocalBehaviour.__module__ = "packages.local_author.skills.local.behaviours"
+
+    import types as types_module
+
+    fake_module = types_module.ModuleType("fake_behaviours")
+    fake_module.LocalBehaviour = _LocalBehaviour  # type: ignore[attr-defined]
+
+    monkeypatch.setattr("aea.skills.base.load_module", lambda *_a, **_k: fake_module)
+
+    behaviour_file = tmp_path / "behaviours.py"
+    behaviour_file.write_text("# stub\n")
+
+    skill_context = MagicMock()
+    skill_context.skill_id = PublicId.from_str("local_author/local:0.1.0")
+
+    result = Behaviour.parse_module(
+        behaviour_file,
+        {"local_b": SkillComponentConfiguration("LocalBehaviour")},
+        skill_context,
+    )
+    assert "local_b" in result, (
+        "the legacy parse_module path dropped a class loaded under the "
+        f"canonical long dotted path; got {sorted(result.keys())}"
+    )
+    assert isinstance(result["local_b"], _LocalBehaviour)
+
+
+def test_unused_class_warning_includes_init_py_level_components():
+    """The unused-class warning fires for `__init__.py`-level components.
+
+    `SkillComponent` subclasses defined at the skill's ``__init__.py`` level
+    have ``__module__`` equal to ``self.skill_dotted_path`` exactly, with no
+    trailing dot. Without the exact-match clause they would be silently
+    filtered out and the "found but not declared" warning would never fire.
+    """
+
+    class _InitPyHandler(Handler):
+        def setup(self):  # pragma: nocover
+            pass
+
+        def handle(self, message):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    loader = _make_skill_component_loader_for_dummy_skill()
+    # Pin __module__ to the skill's dotted path exactly — the shape a class
+    # defined directly in `packages/<a>/skills/<n>/__init__.py` would have.
+    _InitPyHandler.__module__ = loader.skill_dotted_path
+
+    init_py_path = Path(loader.skill_directory, "__init__.py")
+    loader._print_warning_message_for_unused_classes(
+        component_classes_by_path={
+            init_py_path: {("_InitPyHandler", _InitPyHandler)},
+        },
+        used_classes=set(),
+    )
+    warnings = [
+        call.args[0] for call in loader.skill_context.logger.warning.call_args_list
+    ]
+    assert any(
+        "_InitPyHandler" in msg for msg in warnings
+    ), f"Expected a warning mentioning the __init__.py-level class; got {warnings!r}"
+
+
 def test_load_skill_filter_keeps_cross_skill_re_exports():
     """Cross-skill re-exports survive `_filter_classes`.
 
@@ -467,10 +574,6 @@ def test_load_skill_filter_keeps_cross_skill_re_exports():
     the canonical FSM composition idiom where a skill re-exports a parent's
     ``AbciDialogues`` / ``HttpHandler`` etc. as its own — must be kept.
     """
-    from aea.configurations.base import PublicId
-    from aea.skills.base import _SkillComponentLoader
-
-    skill_dotted_path = "packages.dummy_author.skills.composer"
 
     class _ForeignHandler(Handler):
         """A Handler whose __module__ belongs to a different skill."""
@@ -489,11 +592,7 @@ def test_load_skill_filter_keeps_cross_skill_re_exports():
     # surfaces it via a top-level import.
     _ForeignHandler.__module__ = "packages.dummy_author.skills.parent.handlers"
 
-    loader = _SkillComponentLoader.__new__(_SkillComponentLoader)
-    loader.skill_dotted_path = skill_dotted_path
-    loader.configuration = MagicMock()
-    loader.configuration.public_id = PublicId.from_str("dummy_author/composer:0.1.0")
-
+    loader = _make_skill_component_loader_for_dummy_skill()
     kept = loader._filter_classes([("AbciHandler", _ForeignHandler)])
     assert kept == [("AbciHandler", _ForeignHandler)], (
         "Cross-skill re-exports must survive the filter; composition skills "

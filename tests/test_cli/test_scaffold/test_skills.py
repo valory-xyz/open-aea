@@ -365,19 +365,29 @@ class TestScaffoldSkillPreservesCtxCwdToLocalRegistry:
         import aea.cli.scaffold as scaffold_module
 
         captured = {}
-        original = scaffold_module.create_symlink_vendor_to_local
 
-        def spy(ctx, *args, **kwargs):
-            captured["symlink_cwd"] = ctx.cwd
-            return original(ctx, *args, **kwargs)
+        def spy_vendor_to_local(ctx, *args, **kwargs):
+            captured["vendor_to_local_cwd"] = ctx.cwd
+            # Stub the side effect — the test only cares about ctx.cwd at
+            # call time, not about whether the symlink would succeed in the
+            # tmp setup. Returning None matches the production helper's type.
+            return None
+
+        def spy_packages_to_vendor(ctx, *args, **kwargs):
+            captured["packages_to_vendor_cwd"] = ctx.cwd
+            return None
 
         # Use a fresh resource name to avoid collisions with the other test
         # in this class (the class shares a single setup_class fixture).
         resource_name = "another_resource"
         with unittest.mock.patch.object(
-            scaffold_module, "create_symlink_vendor_to_local", side_effect=spy
+            scaffold_module,
+            "create_symlink_vendor_to_local",
+            side_effect=spy_vendor_to_local,
         ), unittest.mock.patch.object(
-            scaffold_module, "create_symlink_packages_to_vendor"
+            scaffold_module,
+            "create_symlink_packages_to_vendor",
+            side_effect=spy_packages_to_vendor,
         ):
             result = self.runner.invoke(
                 cli,
@@ -393,15 +403,15 @@ class TestScaffoldSkillPreservesCtxCwdToLocalRegistry:
                 standalone_mode=False,
             )
         assert result.exit_code == 0, result.output
-        assert (
-            "symlink_cwd" in captured
-        ), "create_symlink_vendor_to_local was not invoked"
-        # The symlink helper must NOT see the registry author path; it must
-        # see the original agent cwd that `scaffold_item` was entered with.
-        assert not captured["symlink_cwd"].endswith(AUTHOR), (
-            "symlinks must be created relative to the agent cwd, not the "
-            f"registry path swap. Got ctx.cwd={captured['symlink_cwd']!r}"
+        assert {"vendor_to_local_cwd", "packages_to_vendor_cwd"} <= captured.keys(), (
+            "both symlink helpers must be invoked; " f"got {sorted(captured.keys())}"
         )
+        # Both helpers must see the agent cwd, not the registry path swap.
+        for key, cwd in captured.items():
+            assert not cwd.endswith(AUTHOR), (
+                f"{key} saw the registry author path instead of the agent cwd: "
+                f"{cwd!r}"
+            )
 
     @classmethod
     def teardown_class(cls):

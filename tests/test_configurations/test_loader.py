@@ -167,10 +167,20 @@ def test_parse_service_yaml_empty_raises():
         parse_service_yaml(StringIO(""))
 
 
-def test_parse_service_yaml_null_head_raises():
-    """A stream whose head document is null (e.g. a bare `---`) is treated as empty."""
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "---\n",  # null head (None)
+        "false\n",  # boolean scalar
+        "0\n",  # int scalar
+        "''\n",  # empty string scalar
+        "[]\n",  # list (sequence head)
+    ],
+)
+def test_parse_service_yaml_non_mapping_head_raises(raw):
+    """A stream whose head document is not a YAML mapping is treated as empty."""
     with pytest.raises(ValueError, match="Service configuration file was empty."):
-        parse_service_yaml(StringIO("---\n"))
+        parse_service_yaml(StringIO(raw))
 
 
 @pytest.mark.parametrize("spec_file_path", protocol_specification_files)
