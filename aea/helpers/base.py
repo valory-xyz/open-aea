@@ -127,14 +127,24 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     :raises ValueError: if the filepath provided is not a module.  # noqa: DAR402
     :raises Exception: if the execution of the module raises exception.  # noqa: DAR402
     """
+    # Reuse a cache entry that already points at the same source file:
+    # re-executing would create a duplicate copy of every class defined
+    # in it, breaking class identity for any caller that already holds
+    # a reference (e.g. via an earlier `from ... import X`).
+    existing = sys.modules.get(dotted_path)
+    if existing is not None:
+        existing_file = getattr(existing, "__file__", None)
+        if (
+            existing_file is not None
+            and Path(existing_file).resolve() == Path(filepath).resolve()
+        ):
+            return existing
     spec = importlib.util.spec_from_file_location(dotted_path, str(filepath))
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
-    # Register before exec so that a subsequent normal `import` of the same
-    # dotted path returns the same module object instead of re-executing the
-    # file and producing a second copy of every class defined in it. Snapshot
-    # any prior entry first so a failed exec restores the previous value
-    # (rather than destroying it), and pops the new stub if there was no
-    # prior entry.
+    # Register before exec so a downstream `import` of the same dotted
+    # path during exec resolves to this module. On exec failure, restore
+    # any prior entry (or pop if none) instead of leaving a half-built
+    # stub in sys.modules.
     _prior = sys.modules.get(dotted_path)
     sys.modules[dotted_path] = module
     try:

@@ -455,6 +455,37 @@ def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
+def test_load_module_reuses_cached_module_for_same_file(tmp_path):
+    """`load_module` reuses the cached module for the same source file.
+
+    When sys.modules already has an entry at this dotted path pointing
+    at the same file, `load_module` returns it as-is instead of
+    re-executing the source. Re-executing would create duplicate class
+    objects for callers that already hold references to the original
+    definitions (e.g. via an earlier ``from ... import X``).
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    src = tmp_path / "cached_source.py"
+    src.write_text("class Marker:\n    pass\n")
+    dotted_path = "tests_b3_cache_reuse"
+    sys.modules.pop(dotted_path, None)
+    try:
+        first = load_module(dotted_path, src)
+        first_marker = first.Marker  # type: ignore[attr-defined]
+
+        # A second call with the same dotted path + same file must not
+        # re-execute the source. Reuse means the returned module is the
+        # same object and `Marker` is the same class identity.
+        second = load_module(dotted_path, src)
+        assert second is first, "load_module re-executed despite a cache hit"
+        assert second.Marker is first_marker  # type: ignore[attr-defined]
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
 def test_load_module_restores_prior_sys_modules_entry_on_exec_failure(tmp_path):
     """A failed load_module call restores the prior sys.modules entry.
 
