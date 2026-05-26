@@ -33,6 +33,7 @@ from aea.configurations.base import ComponentType, ConnectionConfig
 from aea.configurations.constants import CONNECTIONS
 from aea.configurations.data_types import PublicId
 from aea.configurations.loader import load_component_configuration
+from aea.configurations.utils import package_dotted_path
 from aea.crypto.wallet import CryptoStore
 from aea.exceptions import (
     AEAComponentLoadException,
@@ -285,13 +286,11 @@ class Connection(Component, ABC):
                 "Connection module '{}' not found.".format(connection_module_path)
             )
         load_aea_package(configuration)
-        # Use the canonical packages-prefixed dotted path so the cache entry
-        # `load_module` writes to `sys.modules` does not clobber a bare key
-        # (`"connection_module"`) across connections loaded in the same
-        # process.
-        dotted_path = (
-            f"packages.{configuration.public_id.author}"
-            f".{CONNECTIONS}.{configuration.public_id.name}.connection"
+        dotted_path = package_dotted_path(
+            configuration.public_id.author,
+            CONNECTIONS,
+            configuration.public_id.name,
+            "connection",
         )
         connection_module = load_module(dotted_path, directory / "connection.py")
         classes = inspect.getmembers(connection_module, inspect.isclass)

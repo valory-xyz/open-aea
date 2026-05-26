@@ -34,7 +34,34 @@ from aea.configurations.base import (
     PublicId,
     SkillConfig,
 )
+from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageIdPrefix
+
+
+def package_dotted_path(
+    author: str,
+    package_type_plural: str,
+    package_name: str,
+    file_stem: str,
+) -> str:
+    """
+    Build the canonical dotted import path for a file inside an AEA package.
+
+    The result has the form ``packages.<author>.<plural>.<name>.<stem>`` —
+    the path under which AEA component loaders register the loaded module
+    in ``sys.modules`` so that a subsequent ordinary
+    ``from packages.<author>.<plural>.<name>.<stem> import X`` resolves to
+    the same module object instead of re-executing the file.
+
+    :param author: package author (e.g. ``"valory"``).
+    :param package_type_plural: plural package-type token (``"skills"`` /
+        ``"contracts"`` / ``"connections"`` / ``"protocols"``).
+    :param package_name: the package's local name.
+    :param file_stem: source file stem without the ``.py`` suffix
+        (``"contract"`` / ``"connection"`` / ``"behaviours"`` / ...).
+    :return: the canonical packages-prefixed dotted import path.
+    """
+    return f"{PACKAGES}.{author}.{package_type_plural}.{package_name}.{file_stem}"
 
 
 @singledispatch

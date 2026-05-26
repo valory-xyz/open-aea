@@ -286,6 +286,12 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
         if to_local_registry:
             ctx.cwd = str(registry_path / author_name)
             fingerprint_item(ctx, item_type, new_public_id)
+            # Restore now (not just in the `finally` below) so the remaining
+            # happy-path steps — the agent-config write at `open_file(
+            # os.path.join(ctx.cwd, DEFAULT_AEA_CONFIG_FILE), "w")` and the
+            # `--with-symlinks` calls to `create_symlink_vendor_to_local` /
+            # `create_symlink_packages_to_vendor` — see the original agent
+            # directory instead of the registry author path.
             ctx.cwd = preserve_cwd
         else:
             fingerprint_item(ctx, item_type, new_public_id)

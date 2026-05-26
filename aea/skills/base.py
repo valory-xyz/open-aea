@@ -42,6 +42,7 @@ from aea.configurations.base import (
     SkillConfig,
 )
 from aea.configurations.loader import load_component_configuration
+from aea.configurations.utils import package_dotted_path
 from aea.context.base import AgentContext
 from aea.exceptions import (
     AEAActException,
@@ -759,12 +760,11 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    # Use the canonical packages-prefixed dotted path so the cache entry
-    # `load_module` writes to `sys.modules` does not clobber a bare key like
-    # `"behaviours"` across skills loaded in the same process.
-    dotted_path = (
-        f"packages.{skill_context.skill_id.author}"
-        f".skills.{skill_context.skill_id.name}.{component_type_name_plural}"
+    dotted_path = package_dotted_path(
+        skill_context.skill_id.author,
+        "skills",
+        skill_context.skill_id.name,
+        component_type_name_plural,
     )
     component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
