@@ -924,11 +924,10 @@ class _SkillComponentLoader:
         )
         return module_paths
 
-    @classmethod
-    def _compute_module_dotted_path(cls, module_path: Path) -> str:
+    def _compute_module_dotted_path(self, module_path: Path) -> str:
         """Compute the dotted path for a skill module."""
         suffix = ".".join(module_path.with_name(module_path.stem).parts)
-        return suffix
+        return f"{self.skill_dotted_path}.{suffix}"
 
     def _filter_classes(
         self, classes: List[Tuple[str, Type]]
@@ -937,23 +936,21 @@ class _SkillComponentLoader:
         Filter classes of skill components.
 
         The following filters are applied:
-        - the class must be a subclass of "SkillComponent";
-        - its __module__ attribute must not start with 'aea.' (we exclude classes provided by the framework)
-        - its __module__ attribute starts with the expected dotted path of this skill.
-            In particular, it should not be imported from another skill.
+        - the class must be a subclass of ``SkillComponent``;
+        - its ``__module__`` attribute must not start with ``aea.``
+          (classes provided by the framework are excluded).
+
+        Cross-skill re-exports (composition skills binding another skill's
+        ``Handler``, ``Dialogues`` etc. as their own) are kept by design:
+        such classes have a ``__module__`` from another skill and pass
+        the filter.
 
         :param classes: a list of pairs (class name, class object)
         :return: a list of the same kind, but filtered with only skill component classes.
         """
         filtered_classes = filter(
             lambda name_and_class: issubclass(name_and_class[1], SkillComponent)
-            # the following condition filters out classes imported from 'aea'
-            and not str.startswith(name_and_class[1].__module__, "aea.")
-            # the following condition filters out classes imported
-            # from other skills
-            and not str.startswith(
-                name_and_class[1].__module__, self.skill_dotted_path + "."
-            ),
+            and not str.startswith(name_and_class[1].__module__, "aea."),
             classes,
         )
         classes = list(filtered_classes)
@@ -1189,7 +1186,9 @@ class _SkillComponentLoader:
             # filter out classes that are from other packages
             set_of_unused_classes = set(
                 filter(
-                    lambda x: not str.startswith(x.__module__, "packages."),
+                    lambda x: str.startswith(
+                        x.__module__, self.skill_dotted_path + "."
+                    ),
                     set_of_unused_classes,
                 )
             )

@@ -129,6 +129,10 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     """
     spec = importlib.util.spec_from_file_location(dotted_path, str(filepath))
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
+    # Register before exec so that a subsequent normal `import` of the same
+    # dotted path returns the same module object instead of re-executing the
+    # file and producing a second copy of every class defined in it.
+    sys.modules[dotted_path] = module
     spec.loader.exec_module(module)  # type: ignore
     return module
 

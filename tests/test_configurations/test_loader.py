@@ -43,6 +43,7 @@ from aea.configurations.base import (
 from aea.configurations.loader import (
     ConfigLoader,
     load_protocol_specification_from_string,
+    parse_service_yaml,
 )
 from aea.configurations.validation import make_jsonschema_base_uri
 from aea.exceptions import AEAEnforceError
@@ -141,6 +142,29 @@ def test_config_loader_load_service_config(*_mocks):
         config_loader.dump(dummy_service_config, config_file.open("w+"))
         service_config = config_loader.load(config_file.open("r"))
         assert any(getattr(service_config, key) == val for key, val in config.items())
+
+
+def test_parse_service_yaml_returns_head_and_overrides():
+    """parse_service_yaml splits the service head from override documents."""
+    stream = StringIO("name: svc\nauthor: valory\n---\npublic_id: valory/foo:0.1.0\n")
+    head, overrides = parse_service_yaml(stream)
+    assert head["name"] == "svc"
+    assert head["author"] == "valory"
+    assert len(overrides) == 1
+    assert overrides[0]["public_id"] == "valory/foo:0.1.0"
+
+
+def test_parse_service_yaml_no_overrides():
+    """A service.yaml without trailing documents returns an empty overrides list."""
+    head, overrides = parse_service_yaml(StringIO("name: svc\nauthor: valory\n"))
+    assert head["name"] == "svc"
+    assert overrides == []
+
+
+def test_parse_service_yaml_empty_raises():
+    """An empty stream raises ValueError rather than returning an empty head."""
+    with pytest.raises(ValueError, match="Service configuration file was empty."):
+        parse_service_yaml(StringIO(""))
 
 
 @pytest.mark.parametrize("spec_file_path", protocol_specification_files)

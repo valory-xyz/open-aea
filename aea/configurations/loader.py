@@ -29,6 +29,7 @@ from typing import (
     List,
     Optional,
     TextIO,
+    Tuple,
     Type,
     TypeVar,
     Union,
@@ -320,11 +321,7 @@ class ConfigLoader(Generic[T], BaseConfigLoader):
 
     def _load_service_config(self, file_pointer: TextIO) -> PackageConfiguration:
         """Load a service configuration."""
-        configuration_data = yaml_load_all(file_pointer)
-        if not configuration_data:
-            raise ValueError("Service configuration file was empty.")
-
-        service_config, *overrides = configuration_data
+        service_config, overrides = parse_service_yaml(file_pointer)
         self.validate(service_config)
         key_order = list(service_config.keys())
         service = self.configuration_class.from_json(service_config)
@@ -382,6 +379,29 @@ class ConfigLoader(Generic[T], BaseConfigLoader):
             component_id, component_configuration_json
         )
         return component_id
+
+
+def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
+    """
+    Parse a service configuration YAML stream into its raw documents.
+
+    Returns the head service configuration document and any override
+    documents without applying schema validation or constructing a
+    typed configuration object. Callers that need to apply additional
+    transformations (e.g. environment variable substitution) before
+    validation can use this helper as the parse step.
+
+    :param file_pointer: an open text stream pointing at a service.yaml.
+    :return: a ``(service_config, overrides)`` tuple where ``service_config``
+        is the head document and ``overrides`` is the list of trailing
+        documents.
+    :raises ValueError: if the YAML stream is empty.
+    """
+    configuration_data = yaml_load_all(file_pointer)
+    if not configuration_data:
+        raise ValueError("Service configuration file was empty.")
+    service_config, *overrides = configuration_data
+    return service_config, overrides
 
 
 class ConfigLoaders:

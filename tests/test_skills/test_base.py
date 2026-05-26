@@ -365,6 +365,51 @@ def test_load_skill():
     assert isinstance(skill, Skill)
 
 
+def test_load_skill_components_have_canonical_module_paths():
+    """Loaded skill component classes carry the long packages-prefixed __module__.
+
+    The skill loader assigns ``packages.<author>.skills.<name>.<file>`` as the
+    module dotted path. Classes defined inside the skill's modules therefore
+    end up with a ``__module__`` that starts with the skill's package prefix,
+    which means a downstream ``from packages.<author>.skills.<name>.<file>``
+    import returns the same module object instead of re-executing the file
+    and producing a duplicate class.
+    """
+    agent_context = MagicMock(agent_name="name")
+    skill = Skill.from_dir(
+        Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
+    )
+    expected_prefix = "packages.dummy_author.skills.dummy."
+    for behaviour in skill.behaviours.values():
+        assert type(behaviour).__module__.startswith(expected_prefix), (
+            f"behaviour {type(behaviour).__name__} has __module__="
+            f"{type(behaviour).__module__!r}, expected to start with "
+            f"{expected_prefix!r}"
+        )
+    for handler in skill.handlers.values():
+        assert type(handler).__module__.startswith(expected_prefix), (
+            f"handler {type(handler).__name__} has __module__="
+            f"{type(handler).__module__!r}, expected to start with "
+            f"{expected_prefix!r}"
+        )
+
+
+def test_load_module_registers_in_sys_modules():
+    """``load_module`` puts the loaded module in sys.modules under its dotted path."""
+    import sys
+
+    from aea.helpers.base import load_module
+
+    dotted_path = "tests.data.dummy_skill.behaviours_b3_smoke"
+    filepath = Path(ROOT_DIR, "tests", "data", "dummy_skill", "behaviours.py")
+    sys.modules.pop(dotted_path, None)
+    try:
+        module = load_module(dotted_path, filepath)
+        assert sys.modules.get(dotted_path) is module
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
 def test_behaviour():
     """Test behaviour initialization."""
 
