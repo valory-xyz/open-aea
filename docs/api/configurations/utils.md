@@ -13,13 +13,11 @@ def package_dotted_path(author: str, package_type_plural: str,
                         package_name: str, file_stem: str) -> str
 ```
 
-Build the canonical dotted import path for a file inside an AEA package.
+Compose the canonical dotted path string for a file inside an AEA package.
 
-The result has the form ``packages.<author>.<plural>.<name>.<stem>`` —
-the path under which AEA component loaders register the loaded module
-in ``sys.modules`` so that a subsequent ordinary
-``from packages.<author>.<plural>.<name>.<stem> import X`` resolves to
-the same module object instead of re-executing the file.
+Returns a string of the form ``packages.<author>.<plural>.<name>.<stem>``.
+Has no side effects; callers register the loaded module in
+``sys.modules`` themselves (see ``aea.helpers.base.load_module``).
 
 **Arguments**:
 
@@ -32,7 +30,7 @@ the same module object instead of re-executing the file.
 
 **Returns**:
 
-the canonical packages-prefixed dotted import path.
+the composed packages-prefixed dotted path string.
 
 <a id="aea.configurations.utils.replace_component_ids"></a>
 

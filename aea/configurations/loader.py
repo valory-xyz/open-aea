@@ -381,7 +381,9 @@ class ConfigLoader(Generic[T], BaseConfigLoader):
         return component_id
 
 
-def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
+def parse_service_yaml(
+    file_pointer: TextIO,
+) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """
     Parse a service configuration YAML stream into its raw documents.
 
@@ -397,10 +399,7 @@ def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
         documents.
     :raises ValueError: if the stream is empty, or if the head document is
         not a YAML mapping (e.g. a bare ``---``, a scalar, or a sequence).
-    :raises yaml.YAMLError: if the stream contains malformed YAML and the
-        underlying parser fails. The exception is propagated as-is so
-        callers can handle parse errors and shape errors distinctly.
-        # noqa: DAR402
+    :raises yaml.YAMLError: if the stream contains malformed YAML and the underlying parser fails (propagated as-is so callers can handle parse errors and shape errors distinctly).  # noqa: DAR402
     """
     configuration_data = yaml_load_all(file_pointer)
     if not configuration_data:

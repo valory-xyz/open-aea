@@ -761,17 +761,16 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    # Mirror `_SkillComponentLoader._compute_module_dotted_path` so the
-    # legacy and main loader paths compute the same dotted key for the
-    # same physical file, including subpackage files such as
-    # `<skill>/subpkg/behaviours.py`. The skill directory is recovered
-    # via an explicit `getattr` chain (so a missing attribute on a real
-    # `SkillContext` surfaces as `None`, not as a swallowed
-    # `AttributeError`) and the `relative_to` call's narrow exceptions
-    # are caught only at the point they can legitimately fire. Ad-hoc
-    # test callers with a `MagicMock` skill context land in the
-    # ``skill_dir is None`` branch and fall back to the bare stem,
-    # matching the legacy behaviour for flat paths.
+    # Build the same canonical dotted key the main loader uses for the
+    # same physical file (including subpackage files such as
+    # `<skill>/subpkg/behaviours.py`) so `sys.modules` cache hits across
+    # both load paths. The skill directory is recovered via an explicit
+    # `getattr` chain (so a missing attribute on a real `SkillContext`
+    # surfaces as `None`, not as a swallowed `AttributeError`); the
+    # `relative_to` call's narrow exceptions are caught only at the
+    # point they can fire. Ad-hoc test callers with a `MagicMock` skill
+    # context land in the ``skill_dir is None`` branch and fall back to
+    # the bare stem, matching the legacy behaviour for flat paths.
     file_stem = Path(path).stem
     parent_parts: Tuple[str, ...] = ()
     skill_dir = getattr(
@@ -793,10 +792,10 @@ def _parse_module(
     )
     component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
-    # Filter mirrors `_SkillComponentLoader._filter_classes`: keep
-    # SkillComponent subclasses except those provided by the framework
-    # (`aea.*`). Cross-skill re-exports (composition idiom) are kept by
-    # design — they have a `__module__` from another skill, not `aea.`.
+    # Keep `SkillComponent` subclasses except those provided by the
+    # framework (`aea.*`). Cross-skill re-exports (composition idiom)
+    # have a `__module__` from another skill, not `aea.`, and are kept
+    # by design.
     component_classes = list(
         filter(
             lambda x: x[0] in component_names
