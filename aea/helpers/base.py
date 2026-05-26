@@ -133,18 +133,21 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     :raises ValueError: if the filepath provided is not a module.  # noqa: DAR402
     :raises Exception: if the execution of the module raises exception.  # noqa: DAR402
     """
-    # Reuse a cache entry that already points at the same source file:
-    # re-executing would create a duplicate copy of every class defined
-    # in it, breaking class identity for any caller that already holds
-    # a reference (e.g. via an earlier `from ... import X`).
+    # If the dotted path is already in ``sys.modules``, reuse it instead
+    # of re-executing the file. Re-execution creates a duplicate copy of
+    # every class defined in the source, breaking class identity for
+    # callers that already hold a reference (e.g. via an earlier
+    # ``from ... import X``). This mirrors Python's own import
+    # semantics: once registered, the cached module is the canonical
+    # one for that dotted path. ``__file__`` is intentionally NOT
+    # compared — in test fixtures the same logical package may be
+    # reached through different physical files (vendor copy in a
+    # tmpdir vs the source tree) but both register the same dotted
+    # path and must resolve to the same module object across the whole
+    # process.
     existing = sys.modules.get(dotted_path)
     if existing is not None:
-        existing_file = getattr(existing, "__file__", None)
-        if (
-            existing_file is not None
-            and Path(existing_file).resolve() == Path(filepath).resolve()
-        ):
-            return existing
+        return existing
     spec = importlib.util.spec_from_file_location(dotted_path, str(filepath))
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
     # Register before exec so a downstream `import` of the same dotted

@@ -505,33 +505,49 @@ def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
-def test_load_module_reuses_cached_module_for_same_file(tmp_path):
-    """`load_module` reuses the cached module for the same source file.
+def test_load_module_reuses_cached_module_for_same_dotted_path(tmp_path):
+    """`load_module` reuses any module already cached at the dotted path.
 
-    When sys.modules already has an entry at this dotted path pointing
-    at the same file, `load_module` returns it as-is instead of
-    re-executing the source. Re-executing would create duplicate class
-    objects for callers that already hold references to the original
-    definitions (e.g. via an earlier ``from ... import X``).
+    Whether the second call points at the same physical file or a
+    different one (e.g. a vendor copy in a tmpdir vs the source tree
+    in test fixtures), `load_module` returns the cached object — never
+    re-executes. Re-execution would create duplicate class objects
+    for callers that already hold references to the original
+    definitions (e.g. via an earlier ``from ... import X``). Mirrors
+    Python's own import semantics: once registered, the cached module
+    is canonical for that dotted path.
     """
     import sys
 
     from aea.helpers.base import load_module
 
-    src = tmp_path / "cached_source.py"
-    src.write_text("class Marker:\n    pass\n")
+    same_src = tmp_path / "cached_source.py"
+    same_src.write_text("class Marker:\n    pass\n")
+    other_src = tmp_path / "different_source.py"
+    other_src.write_text("class Other:\n    pass\n")
+
     dotted_path = "tests_b3_cache_reuse"
     sys.modules.pop(dotted_path, None)
     try:
-        first = load_module(dotted_path, src)
+        first = load_module(dotted_path, same_src)
         first_marker = first.Marker  # type: ignore[attr-defined]
 
-        # A second call with the same dotted path + same file must not
-        # re-execute the source. Reuse means the returned module is the
-        # same object and `Marker` is the same class identity.
-        second = load_module(dotted_path, src)
-        assert second is first, "load_module re-executed despite a cache hit"
+        # Same file → reuse.
+        second = load_module(dotted_path, same_src)
+        assert second is first, "load_module re-executed for the same file"
         assert second.Marker is first_marker  # type: ignore[attr-defined]
+
+        # Different file at the same dotted path → still reuse the
+        # cached module. ``Marker`` survives; ``Other`` is NOT defined
+        # on the returned module because the second source was never
+        # executed.
+        third = load_module(dotted_path, other_src)
+        assert third is first, (
+            "load_module re-executed when the cached dotted path was "
+            "called with a different physical file"
+        )
+        assert hasattr(third, "Marker")
+        assert not hasattr(third, "Other")
     finally:
         sys.modules.pop(dotted_path, None)
 
@@ -561,38 +577,6 @@ def test_load_module_restores_explicit_none_prior_on_exec_failure(tmp_path):
             "silently unblocking a deliberately-disabled import."
         )
         assert sys.modules[dotted_path] is None
-    finally:
-        sys.modules.pop(dotted_path, None)
-
-
-def test_load_module_restores_prior_sys_modules_entry_on_exec_failure(tmp_path):
-    """A failed load_module call restores the prior sys.modules entry.
-
-    If a working module was already registered under the dotted path, the
-    rollback must restore it instead of popping it. Popping would destroy
-    a healthy module just because a later load attempt at the same key
-    happened to fail.
-    """
-    import sys
-    import types as types_module
-
-    from aea.helpers.base import load_module
-
-    broken = tmp_path / "broken_with_prior.py"
-    broken.write_text("raise RuntimeError('boom at import time')\n")
-    dotted_path = "tests_b3_prior_entry_survival"
-
-    prior = types_module.ModuleType(dotted_path)
-    prior.marker = "i was here first"  # type: ignore[attr-defined]
-    sys.modules[dotted_path] = prior
-    try:
-        with pytest.raises(RuntimeError, match="boom at import time"):
-            load_module(dotted_path, broken)
-        assert sys.modules.get(dotted_path) is prior, (
-            "load_module's rollback destroyed a prior sys.modules entry "
-            "instead of restoring it."
-        )
-        assert getattr(sys.modules[dotted_path], "marker", None) == "i was here first"
     finally:
         sys.modules.pop(dotted_path, None)
 
