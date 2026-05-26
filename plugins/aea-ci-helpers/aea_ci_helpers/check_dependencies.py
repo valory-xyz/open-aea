@@ -395,8 +395,14 @@ class PyProjectToml:
         return None, 0
 
     @staticmethod
-    def _normalize_version(version: str) -> str:
+    def _normalize_version(version: Any) -> str:
         """Normalize a poetry version constraint to a pip-style specifier."""
+        # TOML can legally produce a non-string `version` (e.g.
+        # `version = 7` -> int). The type hint promises str, but the
+        # caller passes `spec.get("version", "")` straight from parsed
+        # TOML, so guard rather than trust.
+        if not isinstance(version, str):
+            return ""
         if version in ("", "*"):
             return ""
         if version.startswith("^"):
@@ -459,8 +465,14 @@ class PyProjectToml:
             also triggers on a missing `[tool]` / `[tool.poetry]`
             parent).
         """
-        with pyproject_path.open("rb") as fp:
-            config = tomllib.load(fp)
+        try:
+            with pyproject_path.open("rb") as fp:
+                config = tomllib.load(fp)
+        except (tomllib.TOMLDecodeError, OSError) as exc:
+            # A malformed/truncated file shouldn't kill a monorepo sweep
+            # with an opaque traceback; surface it and skip this file.
+            logging.error("Failed to parse %s: %s", pyproject_path, exc)
+            return None
         dependencies: OrderedDictType[str, Dependency] = OrderedDict()
         try:
             main_deps = config["tool"]["poetry"]["dependencies"]
@@ -468,20 +480,36 @@ class PyProjectToml:
             return None
 
         string_dep_names: Set[str] = set()
+        # Populated after the main ingest so `_ingest` (closure) can tell
+        # a main-vs-group collision from a group-vs-group one.
+        main_dep_names: Set[str] = set()
 
         def _ingest(table: Dict[str, Any]) -> None:
             for name, spec in table.items():
                 if name in dependencies:
-                    # Main is ingested first, so this branch only fires
-                    # when a group entry collides with a main entry.
-                    # Main wins (tighter version pins in dev groups are
-                    # not the checker's concern); flag the silent drop.
-                    logging.warning(
-                        "Dependency %r appears in multiple tables in %s; "
-                        "keeping the first occurrence (main wins).",
-                        name,
-                        pyproject_path,
-                    )
+                    # `_ingest` runs once for main then once per group, so
+                    # a collision is either main-vs-group or group-vs-group.
+                    # The kept value is whatever landed first; only call it
+                    # "main wins" when main is actually involved.
+                    kept = dependencies[name].version or "*"
+                    if name in main_dep_names:
+                        logging.warning(
+                            "Dependency %r appears in both main and a group "
+                            "in %s; main wins (kept %r, dropped %r).",
+                            name,
+                            pyproject_path,
+                            kept,
+                            spec,
+                        )
+                    else:
+                        logging.warning(
+                            "Dependency %r appears in multiple groups in %s; "
+                            "first occurrence wins (kept %r, dropped %r).",
+                            name,
+                            pyproject_path,
+                            kept,
+                            spec,
+                        )
                     continue
                 dep = cls._dependency_from_spec(name, spec, pyproject_path)
                 if dep is None:
@@ -491,7 +519,7 @@ class PyProjectToml:
                     string_dep_names.add(name)
 
         _ingest(main_deps)
-        main_dep_names: Set[str] = set(dependencies)
+        main_dep_names.update(dependencies)
 
         group_tables = config["tool"]["poetry"].get("group", {})
         if not isinstance(group_tables, dict):

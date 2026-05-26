@@ -47,6 +47,7 @@ SAMPLE_PYPROJECT = textwrap.dedent("""\
     docker = { version = "==7.1.0", optional = true }
     open-aea-ledger-ethereum-hwi = { version = "==2.2.1", optional = true }
     open-aea-ledger-ethereum = { version = "==2.2.1", optional = true, extras = [] }
+    pywin32 = { version = ">=304", markers = "sys_platform == 'win32'" }
 
     [tool.poetry.extras]
     docker = ["docker"]
@@ -143,10 +144,10 @@ def test_main_deps_win_over_group_deps_on_name_collision(
     assert SpecifierSet(config.dependencies["protobuf"].version) == SpecifierSet(
         "==4.25.0"
     )
-    assert any(
-        "protobuf" in r.getMessage() and "multiple" in r.getMessage()
-        for r in caplog.records
-    ), "expected a collision warning naming the duplicated dependency"
+    msg = next(r.getMessage() for r in caplog.records if "protobuf" in r.getMessage())
+    # Names the dep, says main wins, and logs both colliding versions.
+    assert "main wins" in msg
+    assert "==4.25.0" in msg and "*" in msg
 
 
 def test_load_returns_none_when_no_poetry_table(tmp_path: Path) -> None:
@@ -379,6 +380,7 @@ def test_dump_preserves_main_dict_form_and_extras_collision(
         python = ">=3.10,<3.15"
         requests = "*"
         docker = { version = "==7.1.0", optional = true }
+        pywin32 = { version = ">=304", markers = "sys_platform == 'win32'" }
 
         [tool.poetry.extras]
         docker = ["docker"]
@@ -397,7 +399,47 @@ def test_dump_preserves_main_dict_form_and_extras_collision(
     # Main dict-form dep keeps optional=true (not flattened to a string).
     assert isinstance(deps["docker"], dict), "dict-form 'docker' was flattened"
     assert deps["docker"].get("optional") is True
+    # Environment markers survive (would install on every OS if dropped).
+    assert isinstance(deps["pywin32"], dict), "dict-form 'pywin32' was flattened"
+    assert deps["pywin32"].get("markers") == "sys_platform == 'win32'"
     # Extras list survives intact.
     assert reloaded["tool"]["poetry"]["extras"]["docker"] == ["docker"]
     # Group dep is not hoisted into main.
     assert "protobuf" not in deps
+
+
+def test_group_vs_group_collision_keeps_first_group(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Two groups declaring the same dep: first wins, warning must not say 'main wins'.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    :param caplog: pytest log-capture fixture for the collision warning.
+    """
+    content = textwrap.dedent("""\
+        [tool.poetry]
+        name = "demo"
+        version = "0.1.0"
+        description = ""
+        authors = ["demo"]
+
+        [tool.poetry.dependencies]
+        python = ">=3.10,<3.15"
+
+        [tool.poetry.group.dev.dependencies]
+        requests = "==1.0.0"
+
+        [tool.poetry.group.docs.dependencies]
+        requests = "==2.0.0"
+        """)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(content)
+    with caplog.at_level(logging.WARNING):
+        config = PyProjectToml.load(pyproject)
+    assert config is not None
+    assert SpecifierSet(config.dependencies["requests"].version) == SpecifierSet(
+        "==1.0.0"
+    )
+    msg = next(r.getMessage() for r in caplog.records if "requests" in r.getMessage())
+    assert "main wins" not in msg
+    assert "multiple groups" in msg
