@@ -35,7 +35,6 @@ from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, cast
 
 import click
-import tomli_w
 
 try:
     import tomllib  # Python 3.11+
@@ -548,28 +547,77 @@ class PyProjectToml:
             string_dep_names=string_dep_names,
         )
 
-    def dump(self) -> None:
-        """Dump to file.
+    def _group_origin_names(self) -> Set[str]:
+        """Names declared under any `[tool.poetry.group.*.dependencies]`."""
+        groups = self.config.get("tool", {}).get("poetry", {}).get("group", {})
+        names: Set[str] = set()
+        if isinstance(groups, dict):
+            for group in groups.values():
+                deps = group.get("dependencies") if isinstance(group, dict) else None
+                if isinstance(deps, dict):
+                    names.update(deps)
+        return names
 
-        Only updates the version of main deps that originated from a
-        plain-string spec (e.g. ``requests = "*"``). Dict-form entries
+    def dump(self) -> None:
+        """Dump to file (line-based, preserving comments and formatting).
+
+        Rewrites string-form main deps in place inside
+        ``[tool.poetry.dependencies]`` and appends any newly-added deps
+        (e.g. introduced by ``update()`` in ``--update`` mode, which adds
+        package-/tox-discovered names not yet in pyproject) at the end of
+        that table.  Dict-form entries
         (``docker = { version = "==7.1.0", optional = true }``) carry
-        metadata that the ``name = version`` form can't represent, so
-        they're left untouched. Group-origin deps aren't in
-        ``[tool.poetry.dependencies]`` and are never written there.
+        metadata that ``Dependency.to_pipfile_string()`` cannot
+        represent, so they pass through verbatim; every other section,
+        plus comments and inline-table formatting, is left untouched.
+
+        Replaces the previous ``tomli_w.dump`` rebuild, which stripped
+        comments and reformatted inline tables on every ``--update``.
         """
-        deps_table = self.config["tool"]["poetry"]["dependencies"]
-        for name, dep in self.dependencies.items():
-            if (
-                self._string_dep_names is not None
-                and name not in self._string_dep_names
-            ):
+        lines = self.file.read_text(encoding="utf-8").split("\n")
+        out: List[str] = []
+        in_main_deps = False
+        seen: Set[str] = set()
+        group_origin = self._group_origin_names()
+
+        def _append_new_main_deps() -> None:
+            # Deps in `self.dependencies` that never appeared as a line in
+            # the main table and aren't group-origin are newly added (via
+            # `update()`); emit them as plain-string form (`update()`
+            # never carries dict-form metadata). Group-origin deps stay
+            # in their own tables.
+            for name, dep in self.dependencies.items():
+                if name in seen or name in group_origin or name in self.ignore:
+                    continue
+                out.append(dep.to_pipfile_string())
+                seen.add(name)
+
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("["):
+                # Leaving the main-deps table — flush newly-added deps
+                # before the next section header (they still belong to
+                # the table per TOML, since only a header ends a table).
+                if in_main_deps:
+                    _append_new_main_deps()
+                in_main_deps = stripped == "[tool.poetry.dependencies]"
+                out.append(line)
                 continue
-            if name not in deps_table:
-                continue
-            deps_table[name] = dep.version if dep.version != "" else "*"
-        with self.file.open("wb") as fp:
-            tomli_w.dump(self.config, fp)
+            if in_main_deps and " = " in line:
+                package = line.split(" = ")[0].strip()
+                seen.add(package)
+                # Only rewrite plain-string deps; dict-form lines (and
+                # the `python = ...` marker) pass through verbatim so
+                # `optional` / `path` / `develop` / `markers` survive.
+                if package in self.dependencies and (
+                    self._string_dep_names is None or package in self._string_dep_names
+                ):
+                    out.append(self.dependencies[package].to_pipfile_string())
+                    continue
+            out.append(line)
+        if in_main_deps:  # file ended while still inside the table
+            _append_new_main_deps()
+        self.file.write_text("\n".join(out), encoding="utf-8")
 
 
 def load_packages_dependencies(packages_dir: Path) -> List:

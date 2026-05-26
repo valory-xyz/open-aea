@@ -27,6 +27,8 @@ import pytest
 from aea_ci_helpers.check_dependencies import PyProjectToml
 from packaging.specifiers import SpecifierSet
 
+from aea.configurations.data_types import Dependency
+
 if sys.version_info >= (3, 11):
     import tomllib
 else:
@@ -443,3 +445,70 @@ def test_group_vs_group_collision_keeps_first_group(
     msg = next(r.getMessage() for r in caplog.records if "requests" in r.getMessage())
     assert "main wins" not in msg
     assert "multiple groups" in msg
+
+
+def test_dump_persists_newly_added_dep(tmp_path: Path) -> None:
+    """A main dep added via update() is written to the main table on dump().
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    """
+    content = textwrap.dedent("""\
+        [tool.poetry]
+        name = "demo"
+        version = "0.1.0"
+        description = ""
+        authors = ["demo"]
+
+        [tool.poetry.dependencies]
+        python = ">=3.10,<3.15"
+        requests = "*"
+
+        [tool.poetry.extras]
+        cli = ["requests"]
+        """)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(content)
+    config = PyProjectToml.load(pyproject)
+    assert config is not None
+    # Simulate `--update` discovering a package-YAML dep not yet in pyproject.
+    config.update(Dependency(name="newdep", version="==1.0.0"))
+    config.dump()
+    with pyproject.open("rb") as fp:
+        reloaded = tomllib.load(fp)
+    deps = reloaded["tool"]["poetry"]["dependencies"]
+    assert "newdep" in deps, "newly-added dep dropped by dump()"
+    assert SpecifierSet(str(deps["newdep"])) == SpecifierSet("==1.0.0")
+    # The new key lands in the main table, not leaked into extras.
+    assert "newdep" not in reloaded["tool"]["poetry"]["extras"]
+
+
+def test_dump_preserves_comments_and_inline_tables(tmp_path: Path) -> None:
+    """dump() leaves comments and inline-table formatting intact.
+
+    :param tmp_path: pytest-provided temp dir for the sample pyproject.
+    """
+    content = textwrap.dedent("""\
+        [tool.poetry]
+        name = "demo"
+        version = "0.1.0"
+        description = ""
+        authors = ["demo"]
+
+        [tool.poetry.dependencies]
+        # Core dependencies
+        python = ">=3.10,<3.15"
+        requests = "*"
+        # Optional deps for extras
+        docker = { version = "==7.1.0", optional = true }
+        """)
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(content)
+    config = PyProjectToml.load(pyproject)
+    assert config is not None
+    config.dump()
+    after = pyproject.read_text()
+    assert "# Core dependencies" in after
+    assert "# Optional deps for extras" in after
+    # Inline table is not expanded into a [tool.poetry.dependencies.docker] sub-table.
+    assert 'docker = { version = "==7.1.0", optional = true }' in after
+    assert "[tool.poetry.dependencies.docker]" not in after
