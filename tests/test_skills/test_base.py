@@ -410,6 +410,97 @@ def test_load_module_registers_in_sys_modules():
         sys.modules.pop(dotted_path, None)
 
 
+def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
+    """If `exec_module` raises, the broken stub is removed from sys.modules.
+
+    Without rollback, a transient module-level error (syntax error, missing
+    env var at import time, etc.) permanently poisons sys.modules with a
+    half-initialised stub. Subsequent imports for the same dotted path
+    would then return the broken object rather than retrying the load.
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    broken = tmp_path / "broken.py"
+    broken.write_text("raise RuntimeError('boom at import time')\n")
+    dotted_path = "tests_b3_broken_module"
+    sys.modules.pop(dotted_path, None)
+    try:
+        with pytest.raises(RuntimeError, match="boom at import time"):
+            load_module(dotted_path, broken)
+        assert (
+            dotted_path not in sys.modules
+        ), "load_module must roll back its sys.modules entry on exec failure"
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
+def test_load_module_resolves_via_sys_modules_on_re_import():
+    """A normal `import` of the just-loaded dotted path returns the same object.
+
+    The skill loader pre-loads parent `__init__.py` files and then calls
+    ``load_module`` for individual files (`behaviours.py`, etc.). Without the
+    sys.modules write, a subsequent ``from packages.X.skills.Y.foo import Bar``
+    would re-execute `foo.py` and produce a second copy of every class. With
+    the write, the import is a cache hit.
+    """
+    import importlib
+    import sys
+
+    agent_context = MagicMock(agent_name="name")
+    Skill.from_dir(
+        Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
+    )
+    canonical = "packages.dummy_author.skills.dummy.behaviours"
+    assert canonical in sys.modules, sorted(
+        k for k in sys.modules if k.startswith("packages.dummy_author.")
+    )
+    cached = sys.modules[canonical]
+    assert importlib.import_module(canonical) is cached
+
+
+def test_load_skill_filter_keeps_cross_skill_re_exports():
+    """Cross-skill re-exports survive `_filter_classes`.
+
+    SkillComponent subclasses whose ``__module__`` points at another skill —
+    the canonical FSM composition idiom where a skill re-exports a parent's
+    ``AbciDialogues`` / ``HttpHandler`` etc. as its own — must be kept.
+    """
+    from aea.configurations.base import PublicId
+    from aea.skills.base import _SkillComponentLoader
+
+    skill_dotted_path = "packages.dummy_author.skills.composer"
+
+    class _ForeignHandler(Handler):
+        """A Handler whose __module__ belongs to a different skill."""
+
+        def setup(self):  # pragma: nocover
+            pass
+
+        def handle(self, message):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    # Simulate the cross-skill re-export: the class was defined in another
+    # skill's package, but `getmembers` on the composing skill's module
+    # surfaces it via a top-level import.
+    _ForeignHandler.__module__ = "packages.dummy_author.skills.parent.handlers"
+
+    loader = _SkillComponentLoader.__new__(_SkillComponentLoader)
+    loader.skill_dotted_path = skill_dotted_path
+    loader.configuration = MagicMock()
+    loader.configuration.public_id = PublicId.from_str("dummy_author/composer:0.1.0")
+
+    kept = loader._filter_classes([("AbciHandler", _ForeignHandler)])
+    assert kept == [("AbciHandler", _ForeignHandler)], (
+        "Cross-skill re-exports must survive the filter; composition skills "
+        "rely on this to bind a parent skill's Handler as their own."
+    )
+
+
 def test_behaviour():
     """Test behaviour initialization."""
 

@@ -167,6 +167,12 @@ def test_parse_service_yaml_empty_raises():
         parse_service_yaml(StringIO(""))
 
 
+def test_parse_service_yaml_null_head_raises():
+    """A stream whose head document is null (e.g. a bare `---`) is treated as empty."""
+    with pytest.raises(ValueError, match="Service configuration file was empty."):
+        parse_service_yaml(StringIO("---\n"))
+
+
 @pytest.mark.parametrize("spec_file_path", protocol_specification_files)
 def test_load_protocol_specification(spec_file_path):
     """Test for the utility function 'load_protocol_specification'"""

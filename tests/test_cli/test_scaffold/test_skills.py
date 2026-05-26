@@ -355,6 +355,54 @@ class TestScaffoldSkillPreservesCtxCwdToLocalRegistry:
             f"pre={captured['pre']!r} post={captured['post']!r}"
         )
 
+    def test_symlinks_block_sees_restored_cwd(self):
+        """`--with-symlinks` + `--to-local-registry` must see the original `ctx.cwd`.
+
+        If the inline restore between `fingerprint_item` and the symlink
+        helpers is dropped, those helpers would create vendor symlinks under
+        the registry author dir instead of the agent dir.
+        """
+        import aea.cli.scaffold as scaffold_module
+
+        captured = {}
+        original = scaffold_module.create_symlink_vendor_to_local
+
+        def spy(ctx, *args, **kwargs):
+            captured["symlink_cwd"] = ctx.cwd
+            return original(ctx, *args, **kwargs)
+
+        # Use a fresh resource name to avoid collisions with the other test
+        # in this class (the class shares a single setup_class fixture).
+        resource_name = "another_resource"
+        with unittest.mock.patch.object(
+            scaffold_module, "create_symlink_vendor_to_local", side_effect=spy
+        ), unittest.mock.patch.object(
+            scaffold_module, "create_symlink_packages_to_vendor"
+        ):
+            result = self.runner.invoke(
+                cli,
+                [
+                    *CLI_LOG_OPTION,
+                    "--registry-path=packages",
+                    "scaffold",
+                    "--to-local-registry",
+                    "--with-symlinks",
+                    "skill",
+                    resource_name,
+                ],
+                standalone_mode=False,
+            )
+        assert result.exit_code == 0, result.output
+        assert (
+            "symlink_cwd" in captured
+        ), "create_symlink_vendor_to_local was not invoked"
+        # The symlink helper must NOT see the registry author path; it must
+        # see the original agent cwd that `scaffold_item` was entered with.
+        assert not captured["symlink_cwd"].endswith(AUTHOR), (
+            "symlinks must be created relative to the agent cwd, not the "
+            f"registry path swap. Got ctx.cwd={captured['symlink_cwd']!r}"
+        )
+
     @classmethod
     def teardown_class(cls):
         """Tear the test down."""

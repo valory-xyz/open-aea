@@ -761,15 +761,15 @@ def _parse_module(
     component_names = set(config.class_name for _, config in component_configs.items())
     component_module = load_module(component_type_name_plural, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
+    # Filter mirrors `_SkillComponentLoader._filter_classes`: keep
+    # SkillComponent subclasses except those provided by the framework
+    # (`aea.*`). Cross-skill re-exports (composition idiom) are kept by
+    # design — they have a `__module__` from another skill, not `aea.`.
     component_classes = list(
         filter(
             lambda x: x[0] in component_names
             and issubclass(x[1], component_class)
-            and not str.startswith(x[1].__module__, "aea.")
-            and not str.startswith(
-                x[1].__module__,
-                f"packages.{skill_context.skill_id.author}.skills.{skill_context.skill_id.name}",
-            ),
+            and not str.startswith(x[1].__module__, "aea."),
             classes,
         )
     )
@@ -1183,12 +1183,14 @@ class _SkillComponentLoader:
             set_of_unused_classes = set(
                 filter(lambda x: x not in used_classes, set_of_classes)
             )
-            # filter out classes that are from other packages
+            # Filter out classes that are from other packages. Match both
+            # submodule classes (`packages.<a>.skills.<n>.foo.Bar`) and
+            # classes defined at the skill's `__init__.py` level (whose
+            # `__module__` equals `self.skill_dotted_path` exactly).
             set_of_unused_classes = set(
                 filter(
-                    lambda x: str.startswith(
-                        x.__module__, self.skill_dotted_path + "."
-                    ),
+                    lambda x: x.__module__ == self.skill_dotted_path
+                    or str.startswith(x.__module__, self.skill_dotted_path + "."),
                     set_of_unused_classes,
                 )
             )

@@ -401,6 +401,8 @@ def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
     if not configuration_data:
         raise ValueError("Service configuration file was empty.")
     service_config, *overrides = configuration_data
+    if service_config is None:
+        raise ValueError("Service configuration file was empty.")
     return service_config, overrides
 
 
