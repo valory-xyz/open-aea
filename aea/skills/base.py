@@ -760,11 +760,18 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
+    # Key by the source file stem (not the plural type-name) so this legacy
+    # path uses the same canonical dotted path as
+    # `_SkillComponentLoader._compute_module_dotted_path` for the same file.
+    # For canonically-named files (`behaviours.py`, `handlers.py`,
+    # `models.py`) the two collapse to the same key; for arbitrarily-named
+    # files used by custom packages they would otherwise diverge and
+    # produce two module objects for one source.
     dotted_path = package_dotted_path(
         skill_context.skill_id.author,
         "skills",
         skill_context.skill_id.name,
-        component_type_name_plural,
+        Path(path).stem,
     )
     component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
@@ -916,6 +923,11 @@ class _SkillComponentLoader:
         Get all the Python modules of the skill package.
 
         We ignore '__pycache__' Python modules as they are not relevant.
+        We also ignore ``__init__.py`` files because ``load_aea_package``
+        has already registered them in ``sys.modules`` under the parent
+        package's dotted path; loading them again here would create a
+        second module object for the same source file and reintroduce
+        the dual-class-object problem this loader is built to avoid.
 
         :return: a set of paths pointing to all the Python modules in the skill.
         """
@@ -925,7 +937,9 @@ class _SkillComponentLoader:
             map(
                 lambda p: Path(p).relative_to(self.skill_directory),
                 filter(
-                    lambda x: not re.match(ignore_regex, x.name), all_python_modules
+                    lambda x: not re.match(ignore_regex, x.name)
+                    and x.name != "__init__.py",
+                    all_python_modules,
                 ),
             )
         )
@@ -948,9 +962,12 @@ class _SkillComponentLoader:
           (classes provided by the framework are excluded).
 
         Cross-skill re-exports (composition skills binding another skill's
-        ``Handler``, ``Dialogues`` etc. as their own) are kept by design:
-        such classes have a ``__module__`` from another skill and pass
-        the filter.
+        ``Handler``, ``Model``, etc. as their own — including the
+        ``Model``-wrapped dialogues classes such as ``AbciDialogues``) are
+        kept by design: such classes have a ``__module__`` from another
+        skill and pass the filter. Framework dialogue base classes from
+        ``aea.protocols.dialogue.base`` are not ``SkillComponent``
+        subclasses and are filtered out by the first condition anyway.
 
         :param classes: a list of pairs (class name, class object)
         :return: a list of the same kind, but filtered with only skill component classes.

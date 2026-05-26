@@ -413,6 +413,62 @@ class TestScaffoldSkillPreservesCtxCwdToLocalRegistry:
                 f"{cwd!r}"
             )
 
+    def test_ctx_cwd_restored_on_exception_after_local_registry_swap(self):
+        """`scaffold_item`'s `finally` restores `ctx.cwd` on exception.
+
+        Callers must observe the original `ctx.cwd` even when the inner
+        fingerprint step (or any subsequent step before the `finally`)
+        raises after the local-registry path swap. This is what the
+        try/finally was added for.
+        """
+        import aea.cli.scaffold as scaffold_module
+
+        captured = {}
+        original_scaffold_item = scaffold_module.scaffold_item
+
+        def fail_after_swap(ctx, *args, **kwargs):  # noqa: D401
+            """Stand-in for `fingerprint_item` that raises after the swap."""
+            captured["during"] = ctx.cwd
+            raise RuntimeError("boom after local-registry cwd swap")
+
+        def scaffold_spy(ctx, *args, **kwargs):
+            captured["pre"] = ctx.cwd
+            try:
+                return original_scaffold_item(ctx, *args, **kwargs)
+            finally:
+                captured["post"] = ctx.cwd
+
+        resource_name = "exc_resource"
+        with unittest.mock.patch.object(
+            scaffold_module, "scaffold_item", side_effect=scaffold_spy
+        ), unittest.mock.patch.object(
+            scaffold_module, "fingerprint_item", side_effect=fail_after_swap
+        ):
+            result = self.runner.invoke(
+                cli,
+                [
+                    *CLI_LOG_OPTION,
+                    "--registry-path=packages",
+                    "scaffold",
+                    "--to-local-registry",
+                    "skill",
+                    resource_name,
+                ],
+                standalone_mode=False,
+            )
+        # The CLI surfaces the runtime error as a click.ClickException
+        # produced by scaffold_item's `except Exception` handler — exit
+        # code is therefore non-zero.
+        assert result.exit_code != 0, result.output
+        assert {"pre", "during", "post"} <= captured.keys(), captured
+        # The swap happened (fingerprint_item saw the registry author path)…
+        assert captured["during"].endswith(AUTHOR), captured["during"]
+        # …and the finally restored ctx.cwd before scaffold_item returned.
+        assert captured["post"] == captured["pre"], (
+            "scaffold_item leaked ctx.cwd to the caller on the exception "
+            f"path: pre={captured['pre']!r} post={captured['post']!r}"
+        )
+
     @classmethod
     def teardown_class(cls):
         """Tear the test down."""

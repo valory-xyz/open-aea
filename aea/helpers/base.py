@@ -131,14 +131,19 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
     # Register before exec so that a subsequent normal `import` of the same
     # dotted path returns the same module object instead of re-executing the
-    # file and producing a second copy of every class defined in it. Roll the
-    # entry back if exec fails so a transient module-level error does not
-    # permanently poison sys.modules with a half-initialised stub.
+    # file and producing a second copy of every class defined in it. Snapshot
+    # any prior entry first so a failed exec restores the previous value
+    # (rather than destroying it), and pops the new stub if there was no
+    # prior entry.
+    _prior = sys.modules.get(dotted_path)
     sys.modules[dotted_path] = module
     try:
         spec.loader.exec_module(module)  # type: ignore
-    except BaseException:
-        sys.modules.pop(dotted_path, None)
+    except BaseException:  # pylint: disable=broad-except
+        if _prior is None:
+            sys.modules.pop(dotted_path, None)
+        else:
+            sys.modules[dotted_path] = _prior
         raise
     return module
 

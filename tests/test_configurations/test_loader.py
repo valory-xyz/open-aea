@@ -178,9 +178,22 @@ def test_parse_service_yaml_empty_raises():
     ],
 )
 def test_parse_service_yaml_non_mapping_head_raises(raw):
-    """A stream whose head document is not a YAML mapping is treated as empty."""
-    with pytest.raises(ValueError, match="Service configuration file was empty."):
+    """A stream whose head document is not a YAML mapping raises a distinct ValueError."""
+    with pytest.raises(
+        ValueError,
+        match="Service configuration head document must be a YAML mapping",
+    ):
         parse_service_yaml(StringIO(raw))
+
+
+def test_parse_service_yaml_propagates_yaml_error_on_malformed_stream():
+    """Malformed YAML (scanner / parser errors) surfaces as yaml.YAMLError.
+
+    Documented in the helper's docstring so callers know to handle parse
+    errors and shape errors distinctly.
+    """
+    with pytest.raises(yaml.YAMLError):
+        parse_service_yaml(StringIO("{unclosed"))
 
 
 @pytest.mark.parametrize("spec_file_path", protocol_specification_files)

@@ -251,7 +251,12 @@ validation can use this helper as the parse step.
 
 **Raises**:
 
-- `ValueError`: if the YAML stream is empty.
+- `ValueError`: if the stream is empty, or if the head document is
+not a YAML mapping (e.g. a bare ``---``, a scalar, or a sequence).
+- `yaml.YAMLError`: if the stream contains malformed YAML and the
+underlying parser fails. The exception is propagated as-is so
+callers can handle parse errors and shape errors distinctly.
+# noqa: DAR402
 
 **Returns**:
 

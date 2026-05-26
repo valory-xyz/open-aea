@@ -395,18 +395,28 @@ def parse_service_yaml(file_pointer: TextIO) -> Tuple[Dict, List[Dict]]:
     :return: a ``(service_config, overrides)`` tuple where ``service_config``
         is the head document and ``overrides`` is the list of trailing
         documents.
-    :raises ValueError: if the YAML stream is empty.
+    :raises ValueError: if the stream is empty, or if the head document is
+        not a YAML mapping (e.g. a bare ``---``, a scalar, or a sequence).
+    :raises yaml.YAMLError: if the stream contains malformed YAML and the
+        underlying parser fails. The exception is propagated as-is so
+        callers can handle parse errors and shape errors distinctly.
+        # noqa: DAR402
     """
     configuration_data = yaml_load_all(file_pointer)
     if not configuration_data:
         raise ValueError("Service configuration file was empty.")
     service_config, *overrides = configuration_data
-    # The head document must be a mapping. `safe_load_all` happily returns
+    # The head document must be a mapping. `yaml_load_all` happily returns
     # `[None]` / `[False]` / `[0]` / `[""]` / `[[]]` for malformed YAML
-    # (bare `---`, just a scalar, etc.). Surface those at parse time rather
-    # than as opaque AttributeErrors from the downstream validator.
+    # (bare `---`, a scalar, a sequence, etc.) — surface those at parse
+    # time rather than as opaque AttributeErrors from the downstream
+    # validator. Distinct from the empty-stream message so an operator
+    # reading the traceback can tell the two cases apart.
     if not isinstance(service_config, dict):
-        raise ValueError("Service configuration file was empty.")
+        raise ValueError(
+            "Service configuration head document must be a YAML mapping, "
+            f"got {type(service_config).__name__}."
+        )
     return service_config, overrides
 
 

@@ -20,6 +20,7 @@
 """This module contains the tests for the base classes for the skills."""
 
 import shutil
+import types
 import unittest.mock
 from pathlib import Path
 from queue import Queue
@@ -365,6 +366,24 @@ def test_load_skill():
     assert isinstance(skill, Skill)
 
 
+def test_skill_loader_skips_init_py_in_python_modules():
+    """`_get_python_modules` excludes `__init__.py`.
+
+    `load_aea_package` (called earlier in the load_skill path) already
+    registers a skill's ``__init__.py`` under ``packages.<a>.skills.<n>``.
+    If `_get_python_modules` returned ``__init__.py`` too, the downstream
+    `load_module` call would create a second module object for the same
+    source file under ``packages.<a>.skills.<n>.__init__`` — exactly the
+    dual-class-object failure mode this PR is built to avoid.
+    """
+    loader = _make_skill_component_loader_for_dummy_skill()
+    module_paths = loader._get_python_modules()
+    init_files = [p for p in module_paths if p.name == "__init__.py"]
+    assert init_files == [], (
+        "_get_python_modules must not return __init__.py files; " f"got {init_files}"
+    )
+
+
 def test_load_skill_components_have_canonical_module_paths():
     """Loaded skill component classes carry the long packages-prefixed __module__.
 
@@ -436,6 +455,38 @@ def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
+def test_load_module_restores_prior_sys_modules_entry_on_exec_failure(tmp_path):
+    """A failed load_module call restores the prior sys.modules entry.
+
+    If a working module was already registered under the dotted path, the
+    rollback must restore it instead of popping it. Popping would destroy
+    a healthy module just because a later load attempt at the same key
+    happened to fail.
+    """
+    import sys
+    import types as types_module
+
+    from aea.helpers.base import load_module
+
+    broken = tmp_path / "broken_with_prior.py"
+    broken.write_text("raise RuntimeError('boom at import time')\n")
+    dotted_path = "tests_b3_prior_entry_survival"
+
+    prior = types_module.ModuleType(dotted_path)
+    prior.marker = "i was here first"  # type: ignore[attr-defined]
+    sys.modules[dotted_path] = prior
+    try:
+        with pytest.raises(RuntimeError, match="boom at import time"):
+            load_module(dotted_path, broken)
+        assert sys.modules.get(dotted_path) is prior, (
+            "load_module's rollback destroyed a prior sys.modules entry "
+            "instead of restoring it."
+        )
+        assert getattr(sys.modules[dotted_path], "marker", None) == "i was here first"
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
 def test_load_module_resolves_via_sys_modules_on_re_import():
     """A normal `import` of the just-loaded dotted path returns the same object.
 
@@ -475,6 +526,50 @@ def _make_skill_component_loader_for_dummy_skill():
     configuration._directory = skill_dir  # pylint: disable=protected-access
     skill_context = MagicMock()
     return _SkillComponentLoader(configuration, skill_context)
+
+
+def test_parse_module_keys_by_file_stem_not_type_plural(tmp_path, monkeypatch):
+    """`_parse_module` keys the loaded module by the file stem.
+
+    A custom skill may have a `strategy.py` parsed via `Model.parse_module`.
+    `_compute_module_dotted_path` would key it under
+    ``packages.<a>.skills.<n>.strategy``. If `_parse_module` keyed instead
+    by the plural type-name (``models``) the two cache entries would
+    diverge and reintroduce the dual-module-object problem this PR
+    eliminates.
+    """
+    captured = {}
+
+    class _DummyModel(Model):
+        def __init__(self, **kwargs):  # pragma: nocover
+            pass
+
+    _DummyModel.__module__ = "packages.dummy_author.skills.dummy.strategy"
+    fake_module = types.ModuleType("fake_strategy")
+    fake_module.S = _DummyModel  # type: ignore[attr-defined]
+
+    def fake_load_module(dotted_path, *_args, **_kwargs):
+        captured["dotted_path"] = dotted_path
+        return fake_module
+
+    monkeypatch.setattr("aea.skills.base.load_module", fake_load_module)
+
+    strategy_file = tmp_path / "strategy.py"
+    strategy_file.write_text("# stub\n")
+
+    skill_context = MagicMock()
+    skill_context.skill_id = PublicId.from_str("dummy_author/dummy:0.1.0")
+
+    Model.parse_module(
+        strategy_file,
+        {"s": SkillComponentConfiguration("S")},
+        skill_context,
+    )
+    assert captured["dotted_path"] == ("packages.dummy_author.skills.dummy.strategy"), (
+        "Legacy parse_module path must key its load_module call by the "
+        f"file stem to match _compute_module_dotted_path. Got "
+        f"{captured['dotted_path']!r}."
+    )
 
 
 def test_parse_module_keeps_classes_under_canonical_long_path(tmp_path, monkeypatch):
