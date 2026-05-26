@@ -475,7 +475,7 @@ class PyProjectToml:
             raw_version = spec.get("version", "")
             if not isinstance(raw_version, str):
                 logging.warning(
-                    "Non-string version %r for %r in %s; treating as " "unconstrained.",
+                    "Non-string version %r for %r in %s; treating as unconstrained.",
                     raw_version,
                     name,
                     pyproject_path,
