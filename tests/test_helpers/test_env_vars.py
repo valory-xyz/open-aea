@@ -19,6 +19,7 @@
 # ------------------------------------------------------------------------------
 """This module contains the tests for the helper module."""
 
+import json
 from typing import List
 
 import pytest
@@ -29,6 +30,7 @@ from aea.helpers.env_vars import (
     convert_value_str_to_type,
     export_path_to_env_var_string,
     generate_env_vars_recursively,
+    has_env_safe_keys,
     is_env_variable,
     is_strict_list,
     replace_with_env_var,
@@ -274,3 +276,278 @@ def test_is_strict_list():
     assert not is_strict_list([1, 2, {}])
     assert not is_strict_list([1, 2, [[{}]]])
     assert not is_strict_list([(dict(hello="world"),)])
+
+
+def test_has_env_safe_keys():
+    """Test has_env_safe_keys method."""
+    assert has_env_safe_keys({"timeout": 30, "retries": 5})
+    assert has_env_safe_keys({"foo_bar": 1, "BAZ": 2, "_x": 3})
+    assert has_env_safe_keys({})
+    assert not has_env_safe_keys({"0.0": 0, "1.0": 100})
+    assert not has_env_safe_keys({"foo-bar": 1})
+    assert not has_env_safe_keys({"timeout": 30, "0.0": 0})
+    assert not has_env_safe_keys({"1foo": 1})
+    assert not has_env_safe_keys({1: "non-string-key"})
+    assert not has_env_safe_keys({"": 1})
+    assert not has_env_safe_keys({None: 1})
+
+
+def test_generate_env_vars_safe_key_dict_flattens_per_key():
+    """Safe-key dicts still flatten per key (unchanged behaviour)."""
+    result = generate_env_vars_recursively(
+        data={"timeout": 30, "retries": 5},
+        export_path=["test", "foo"],
+    )
+    assert result == {
+        "TEST_FOO_TIMEOUT": 30,
+        "TEST_FOO_RETRIES": 5,
+    }
+
+
+def test_generate_env_vars_unsafe_key_dict_json_encodes_whole():
+    """Dict with bash-unsafe keys becomes one JSON-encoded env var.
+
+    Covers the trader case from open-autonomy issue #2243.
+    """
+    data = {
+        "0.0": 0,
+        "0.6": 60000000000000000,
+        "1.0": 1000000000000000000,
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "bet_amount_per_threshold"],
+    )
+    assert result == {
+        "TEST_FOO_BET_AMOUNT_PER_THRESHOLD": json.dumps(data, separators=(",", ":"))
+    }
+    # The literal bug: the pre-fix per-key flatten produced names like
+    # `..._BET_AMOUNT_PER_THRESHOLD_0.0` containing `.`, which bash rejects.
+    assert all("." not in name for name in result)
+
+
+def test_generate_env_vars_mixed_key_dict_json_encodes_whole():
+    """Mixed safe/unsafe keys also JSON-encode the whole dict."""
+    data = {"timeout": 30, "0.0": 0}
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "trading_config"],
+    )
+    assert result == {
+        "TEST_FOO_TRADING_CONFIG": json.dumps(data, separators=(",", ":"))
+    }
+
+
+def test_generate_env_vars_unsafe_dict_inside_safe_dict_collapses_only_inner():
+    """Unsafe keys collapse at their level; safe siblings still flatten per key."""
+    data = {
+        "bet_kelly_fraction": 1,
+        "bet_amount_per_threshold": {
+            "0.0": 0,
+            "1.0": 1000000000000000000,
+        },
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=["test", "foo", "strategies_kwargs"],
+    )
+    assert result["TEST_FOO_STRATEGIES_KWARGS_BET_KELLY_FRACTION"] == 1
+    inner = result["TEST_FOO_STRATEGIES_KWARGS_BET_AMOUNT_PER_THRESHOLD"]
+    assert json.loads(inner) == data["bet_amount_per_threshold"]
+
+
+def test_generate_env_vars_empty_dict_returns_empty():
+    """Empty dict is vacuously safe-keyed and emits no env vars."""
+    result = generate_env_vars_recursively(data={}, export_path=["test", "foo"])
+    assert result == {}
+
+
+def test_generate_env_vars_unsafe_key_dict_under_models_args_uses_restricted_path():
+    """Production path: unsafe-key dict nested under ``args/<arg>/...`` collapses correctly.
+
+    Under the ``args`` level the framework restricts the env var name to the
+    arg-level key (``strategies_kwargs`` here), nesting any deeper path keys
+    (``bet_amount_per_threshold``) inside the JSON value. The unsafe-key
+    branch must respect that restriction so trader-style overrides land in
+    the same env var the per-key flatten would have collapsed to.
+    """
+    data = {
+        "0.0": 0,
+        "1.0": 1000000000000000000,
+    }
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=[
+            "skill",
+            "trader_abci",
+            "models",
+            "params",
+            "args",
+            "strategies_kwargs",
+            "bet_amount_per_threshold",
+        ],
+    )
+    assert result == {
+        "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS": json.dumps(
+            {"bet_amount_per_threshold": data}, separators=(",", ":")
+        )
+    }
+
+
+def test_generate_env_vars_float_keys_normalize_to_strings():
+    """PyYAML-parsed float keys travel through env vars as JSON strings.
+
+    YAML allows `0.0: x` (unquoted) which loads as a Python float key.
+    `has_env_safe_keys` rejects non-string keys, the dict gets
+    JSON-encoded, and `json.dumps`/`json.loads` coerces float keys to
+    strings. This is not a regression - the old per-key flatten would
+    have produced bash-invalid `..._0.0` names anyway - but it is an
+    intentional behaviour change. A consumer indexing `config[0.0]`
+    after an env override would hit a `KeyError`; they must index by
+    the stringified key.
+    """
+    data = {0.0: 0, 0.6: 60000000000000000, 1.0: 1000000000000000000}
+    env_vars = generate_env_vars_recursively(
+        data={"bet_amount_per_threshold": data},
+        export_path=["skill", "trader_abci"],
+    )
+    decoded = json.loads(env_vars["SKILL_TRADER_ABCI_BET_AMOUNT_PER_THRESHOLD"])
+    assert set(decoded.keys()) == {"0.0", "0.6", "1.0"}
+    assert all(isinstance(k, str) for k in decoded)
+    assert decoded["0.6"] == 60000000000000000
+
+
+def test_generate_env_vars_float_keys_under_models_args_use_restricted_path():
+    """Production-shape: PyYAML float keys + the ``models/.../args`` restriction.
+
+    The literal trader / open-autonomy #2243 input shape: an unquoted YAML
+    map keyed by floats (``0.0:``, ``0.6:``, ``1.0:``) under
+    ``models/params/args/strategies_kwargs``. Test 8
+    (``test_generate_env_vars_float_keys_normalize_to_strings``) covers
+    float-key string-normalisation without the restriction path, and test
+    7 (``..._under_models_args_uses_restricted_path``) covers the
+    restriction with string keys. This locks in the combination: the
+    `args` restriction fires, the dict is JSON-encoded, and the float
+    keys are coerced to strings inside the JSON value.
+    """
+    data = {0.0: 0, 0.6: 60000000000000000, 1.0: 1000000000000000000}
+    result = generate_env_vars_recursively(
+        data=data,
+        export_path=[
+            "skill",
+            "trader_abci",
+            "models",
+            "params",
+            "args",
+            "strategies_kwargs",
+            "bet_amount_per_threshold",
+        ],
+    )
+    env_var = "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS"
+    assert list(result.keys()) == [env_var]
+    decoded = json.loads(result[env_var])
+    assert decoded == {
+        "bet_amount_per_threshold": {
+            "0.0": 0,
+            "0.6": 60000000000000000,
+            "1.0": 1000000000000000000,
+        }
+    }
+
+
+def test_generate_env_vars_unsafe_dict_with_unserializable_value_raises_with_path():
+    """Non-JSON-serialisable values inside an unsafe-key dict surface clearly.
+
+    PyYAML can produce non-JSON-encodable values from constructor hooks
+    (unquoted ISO dates load as ``datetime.date``, etc.). Without the
+    wrapper the operator would see a bare ``TypeError`` from inside
+    ``json.dumps`` with no reference to which config key triggered it.
+    The fix re-raises as ``ValueError`` with the export path so the
+    offending location is locatable. ``set`` is used here as a simple
+    stand-in for any non-JSON-encodable value.
+    """
+    data = {"0.0": {1, 2, 3}}
+    with pytest.raises(ValueError) as exc_info:
+        generate_env_vars_recursively(
+            data=data,
+            export_path=["test", "foo", "thresholds"],
+        )
+    assert "export path" in str(exc_info.value)
+    assert "['test', 'foo', 'thresholds']" in str(exc_info.value)
+
+
+def test_generate_env_vars_restricted_collision_with_unsafe_dict_sibling():
+    """Trader-style: restriction + collision + unsafe-key dict all combine.
+
+    A safe-keyed `strategies_kwargs` under `models/.../args/` holds both
+    a scalar sibling (`bet_kelly_fraction`) and an unsafe-key dict
+    sibling (`bet_amount_per_threshold`). Both collapse to the same
+    `..._STRATEGIES_KWARGS` env var via the `restricted` path and must
+    fuse via the dict-iteration merge_dicts branch. Locks in the merge
+    semantics so a refactor of the collision logic cannot silently drop
+    either sibling.
+    """
+    inner = {"0.0": 0, "1.0": 1000000000000000000}
+    models = {
+        "params": {
+            "args": {
+                "strategies_kwargs": {
+                    "bet_kelly_fraction": 1,
+                    "bet_amount_per_threshold": inner,
+                }
+            }
+        }
+    }
+    result = generate_env_vars_recursively(
+        data=models, export_path=["skill", "trader_abci", "models"]
+    )
+    env_var = "SKILL_TRADER_ABCI_MODELS_PARAMS_ARGS_STRATEGIES_KWARGS"
+    assert list(result.keys()) == [env_var]
+    fused = json.loads(result[env_var])
+    assert fused == {
+        "bet_kelly_fraction": 1,
+        "bet_amount_per_threshold": inner,
+    }
+
+
+def test_unsafe_key_dict_roundtrips_through_dict_template():
+    """End-to-end: unsafe-key dict survives readback via ${dict:default}.
+
+    The agent's effective config has a ${VAR:dict:default} placeholder.
+    With env vars set, the placeholder must resolve to the produced dict,
+    not silently fall back to the default.
+    """
+    data = {
+        "0.0": 0,
+        "0.6": 60000000000000000,
+        "1.0": 1000000000000000000,
+    }
+    env_vars = generate_env_vars_recursively(
+        data={"bet_amount_per_threshold": data},
+        export_path=["skill", "trader_abci"],
+    )
+    fallback = {"only-if-env-missing": 1}
+    placeholder = "${dict:" + json.dumps(fallback) + "}"
+    template = {"bet_amount_per_threshold": placeholder}
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=["skill", "trader_abci"]
+    )
+    assert result["bet_amount_per_threshold"] == data
+
+
+def test_safe_key_numeric_strings_preserved_through_json_encode():
+    """Numeric-looking string keys keep their exact form when JSON-encoded.
+
+    Regression check for a latent bug in the pre-fix per-key flatten path:
+    it round-tripped dict keys through ``json.loads`` which silently
+    rewrote keys like ``"0.10"`` into ``"0.1"``. JSON-encoding the whole
+    dict preserves keys verbatim.
+    """
+    data = {"0.0": 0, "0.10": 5, "1.0": 9}
+    env_vars = generate_env_vars_recursively(
+        data={"thresholds": data}, export_path=["skill", "x"]
+    )
+    encoded = env_vars["SKILL_X_THRESHOLDS"]
+    decoded = json.loads(encoded)
+    assert decoded == data
+    assert set(decoded.keys()) == {"0.0", "0.10", "1.0"}

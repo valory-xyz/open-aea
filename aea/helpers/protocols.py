@@ -19,20 +19,21 @@
 
 """Protocol helpers."""
 
+import logging
 import re
 from pathlib import Path
 from typing import Match, cast
 
 from aea.configurations.loader import load_protocol_specification_from_string
 from aea.exceptions import enforce
-from aea.helpers.logging import setup_logger
 
 SPECIFICATION_REGEX = re.compile(r"(---\nname.*\.\.\.)", re.DOTALL)
 PROTOCOL_SPECIFICATION_ID_IN_SPECIFICATION_REGEX = re.compile(
     "^protocol_specification_id: (.*)$", re.MULTILINE
 )
 
-_logger = setup_logger(__name__)
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 
 def get_protocol_specification_from_readme(package_path: Path) -> str:

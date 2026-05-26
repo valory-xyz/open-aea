@@ -21,6 +21,7 @@
 """Implementation of the environment variables support."""
 
 import json
+import logging
 import re
 from collections.abc import Mapping as MappingType
 from typing import Any, Dict, List, Mapping, Optional, Tuple, Union, cast
@@ -32,6 +33,8 @@ from aea.helpers.constants import (
     JSON_TYPES,
     NULL_EQUIVALENTS,
 )
+
+_logger = logging.getLogger(__name__)
 
 ENV_VARIABLE_RE = re.compile(r"^\$\{(([A-Z0-9_]+):?)?([a-z]+)?(:(.+))?}$")
 MODELS = "models"
@@ -272,12 +275,67 @@ def is_strict_list(data: Union[List, Tuple]) -> bool:
     return is_strict
 
 
+_BASH_SAFE_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def has_env_safe_keys(data: dict) -> bool:
+    """
+    Check if a dict can be safely flattened into per-key env vars.
+
+    Returns True only when every key is a string matching the bash
+    identifier rule `[A-Za-z_][A-Za-z0-9_]*`. An empty dict is
+    vacuously safe (True). When this returns False, flattening would
+    produce env var names that bash refuses to set (notably containing
+    `.`), so callers should JSON-encode the whole dict as a single env
+    var instead.
+
+    For example, `{"timeout": 30, "retries": 5}` returns True; while
+    `{"0.0": 0, "1.0": 100}` and `{1: "v"}` return False.
+
+    :param data: Data dict
+    :return: True if every key is a valid bash identifier, or the
+        dict is empty.
+    """
+    return all(isinstance(k, str) and _BASH_SAFE_KEY_RE.match(k) for k in data)
+
+
 def list_to_nested_dict(lst: list, val: Any) -> dict:
     """Convert a list to a nested dict."""
     nested_dict = val
     for item in reversed(lst):
         nested_dict = {item: nested_dict}
     return nested_dict
+
+
+def _encode_as_json_env_var(
+    data: JSON_TYPES, export_path: List[str]
+) -> Tuple[str, str]:
+    """
+    Encode data as a single JSON-string env var.
+
+    Used when a value cannot be flattened per-leaf (e.g. a list with
+    non-scalar elements, or a dict with bash-unsafe keys). Honours
+    `restrict_model_args`: if the export path is truncated by the model
+    arg restriction, the data is nested under the restricted suffix
+    (the deeper path keys) before encoding so they are not lost.
+
+    :param data: JSON-encodable value to encode.
+    :param export_path: Path keys leading to the value, from
+        `generate_env_vars_recursively`.
+    :return: (env_var_name, json_value) pair.
+    :raises ValueError: if ``data`` contains a value ``json.dumps`` cannot
+        serialise. The export path is included in the message so the
+        operator can locate the offending config key.
+    """
+    restricted, path = export_path_to_env_var_string(export_path=export_path)
+    payload = list_to_nested_dict(restricted, data) if restricted else data
+    try:
+        encoded = json.dumps(payload, separators=(",", ":"))
+    except TypeError as e:
+        raise ValueError(
+            f"Cannot JSON-encode value at export path {export_path}: {e}"
+        ) from e
+    return path, encoded
 
 
 def ensure_dict(dict_: Dict[str, Union[dict, str]]) -> dict:
@@ -312,6 +370,26 @@ def generate_env_vars_recursively(
     env_var_dict: Dict[str, Any] = {}
 
     if isinstance(data, dict):
+        if not has_env_safe_keys(data):
+            safe_keys = [
+                k for k in data if isinstance(k, str) and _BASH_SAFE_KEY_RE.match(k)
+            ]
+            if safe_keys:
+                # Mixed-key dict: per-key env var overrides for the safe
+                # keys silently stop applying once the whole dict is
+                # JSON-encoded. Warn so the operator can see why their
+                # override does not take effect.
+                _logger.warning(
+                    "Collapsing mixed-key dict at export path %s to a "
+                    "single JSON env var because of bash-unsafe keys; "
+                    "per-key overrides for safe keys %s will no longer "
+                    "apply. Set the whole-dict env var instead.",
+                    export_path,
+                    safe_keys,
+                )
+            path, value = _encode_as_json_env_var(data, export_path)
+            env_var_dict[path] = value
+            return env_var_dict
         for key, value in data.items():
             res = generate_env_vars_recursively(
                 data=value,
@@ -325,11 +403,8 @@ def generate_env_vars_recursively(
             env_var_dict.update(res)
     elif isinstance(data, list):
         if is_strict_list(data=data):
-            restricted, path = export_path_to_env_var_string(export_path=export_path)
-            if restricted:
-                env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
-            else:
-                env_var_dict[path] = json.dumps(data, separators=(",", ":"))
+            path, value = _encode_as_json_env_var(data, export_path)
+            env_var_dict[path] = value
         else:
             for key, value in enumerate(data):
                 res = generate_env_vars_recursively(
@@ -340,7 +415,9 @@ def generate_env_vars_recursively(
     else:
         restricted, path = export_path_to_env_var_string(export_path=export_path)
         if restricted:
-            env_var_dict[path] = json.dumps(list_to_nested_dict(restricted, data))
+            env_var_dict[path] = json.dumps(
+                list_to_nested_dict(restricted, data), separators=(",", ":")
+            )
         else:
             env_var_dict[path] = data
 
