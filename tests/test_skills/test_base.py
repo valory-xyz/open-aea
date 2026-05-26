@@ -389,6 +389,11 @@ def test_compute_module_dotted_path_for_init_py_returns_skill_dotted_path():
         loader._compute_module_dotted_path(Path("subpkg") / "__init__.py")
         == f"{loader.skill_dotted_path}.subpkg"
     )
+    # Depth-2 nested subpackage joins every parent directory.
+    assert (
+        loader._compute_module_dotted_path(Path("subpkg") / "inner" / "__init__.py")
+        == f"{loader.skill_dotted_path}.subpkg.inner"
+    )
 
 
 def test_skill_loader_reuses_load_aea_package_module_for_init_py():

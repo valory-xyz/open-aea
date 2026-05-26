@@ -761,22 +761,30 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    # Mirror `_SkillComponentLoader._compute_module_dotted_path` so that
-    # the legacy path and the main loader compute the same dotted key for
-    # the same physical file, including subpackage files such as
+    # Mirror `_SkillComponentLoader._compute_module_dotted_path` so the
+    # legacy and main loader paths compute the same dotted key for the
+    # same physical file, including subpackage files such as
     # `<skill>/subpkg/behaviours.py`. The skill directory is recovered
-    # from the skill context when present; if it isn't (e.g. ad-hoc test
-    # callers with a `MagicMock` skill context) we fall back to the bare
-    # file stem, matching the legacy behaviour for flat paths.
+    # via an explicit `getattr` chain (so a missing attribute on a real
+    # `SkillContext` surfaces as `None`, not as a swallowed
+    # `AttributeError`) and the `relative_to` call's narrow exceptions
+    # are caught only at the point they can legitimately fire. Ad-hoc
+    # test callers with a `MagicMock` skill context land in the
+    # ``skill_dir is None`` branch and fall back to the bare stem,
+    # matching the legacy behaviour for flat paths.
     file_stem = Path(path).stem
     parent_parts: Tuple[str, ...] = ()
-    try:
-        skill_dir = skill_context.skill.configuration.directory  # type: ignore[union-attr]
-        if skill_dir is not None:
+    skill_dir = getattr(
+        getattr(getattr(skill_context, "skill", None), "configuration", None),
+        "directory",
+        None,
+    )
+    if skill_dir is not None:
+        try:
             relative = Path(path).resolve().relative_to(Path(skill_dir).resolve())
             parent_parts = relative.parent.parts
-    except (AttributeError, TypeError, ValueError, OSError):
-        pass
+        except (ValueError, OSError):
+            pass
     dotted_path = package_dotted_path(
         skill_context.skill_id.author,
         SKILLS,

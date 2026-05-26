@@ -161,7 +161,10 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
         if _prior is _NO_PRIOR_MODULE:
             sys.modules.pop(dotted_path, None)
         else:
-            sys.modules[dotted_path] = _prior
+            # Cast because typeshed declares ``sys.modules`` as a
+            # ``dict[str, ModuleType]`` but CPython accepts ``None`` at
+            # runtime as the block-import sentinel.
+            sys.modules[dotted_path] = cast(types.ModuleType, _prior)
         raise
     return module
 
