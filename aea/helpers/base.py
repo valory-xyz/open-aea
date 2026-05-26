@@ -74,6 +74,12 @@ IPFS_HASH_REGEX = f"(({IPFS_HASH_REGEX_V0})|({IPFS_HASH_REGEX_v1}))"
 _default_logger = logging.getLogger(__name__)
 
 
+# Sentinel used by `load_module` to distinguish "no prior sys.modules entry"
+# from "prior entry was explicitly `None`" — the latter is a valid CPython
+# idiom that blocks an import, so we must preserve it on rollback.
+_NO_PRIOR_MODULE = object()
+
+
 def _get_module(spec: ModuleSpec) -> Optional[types.ModuleType]:
     """Try to execute a module. Return None if the attempt fail."""
     try:
@@ -144,13 +150,15 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     # Register before exec so a downstream `import` of the same dotted
     # path during exec resolves to this module. On exec failure, restore
     # any prior entry (or pop if none) instead of leaving a half-built
-    # stub in sys.modules.
-    _prior = sys.modules.get(dotted_path)
+    # stub in sys.modules. Use a sentinel for the "no prior entry" case
+    # so an explicit `sys.modules[key] = None` (the CPython block-import
+    # idiom) survives the rollback.
+    _prior = sys.modules.get(dotted_path, _NO_PRIOR_MODULE)
     sys.modules[dotted_path] = module
     try:
         spec.loader.exec_module(module)  # type: ignore
     except BaseException:  # pylint: disable=broad-except
-        if _prior is None:
+        if _prior is _NO_PRIOR_MODULE:
             sys.modules.pop(dotted_path, None)
         else:
             sys.modules[dotted_path] = _prior

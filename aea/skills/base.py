@@ -41,6 +41,7 @@ from aea.configurations.base import (
     SkillComponentConfiguration,
     SkillConfig,
 )
+from aea.configurations.constants import SKILLS
 from aea.configurations.loader import load_component_configuration
 from aea.configurations.utils import package_dotted_path
 from aea.context.base import AgentContext
@@ -760,18 +761,27 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    # Key by the source file stem (not the plural type-name) so this legacy
-    # path uses the same canonical dotted path as
-    # `_SkillComponentLoader._compute_module_dotted_path` for the same file.
-    # For canonically-named files (`behaviours.py`, `handlers.py`,
-    # `models.py`) the two collapse to the same key; for arbitrarily-named
-    # files used by custom packages they would otherwise diverge and
-    # produce two module objects for one source.
+    # Mirror `_SkillComponentLoader._compute_module_dotted_path` so that
+    # the legacy path and the main loader compute the same dotted key for
+    # the same physical file, including subpackage files such as
+    # `<skill>/subpkg/behaviours.py`. The skill directory is recovered
+    # from the skill context when present; if it isn't (e.g. ad-hoc test
+    # callers with a `MagicMock` skill context) we fall back to the bare
+    # file stem, matching the legacy behaviour for flat paths.
+    file_stem = Path(path).stem
+    parent_parts: Tuple[str, ...] = ()
+    try:
+        skill_dir = skill_context.skill.configuration.directory  # type: ignore[union-attr]
+        if skill_dir is not None:
+            relative = Path(path).resolve().relative_to(Path(skill_dir).resolve())
+            parent_parts = relative.parent.parts
+    except (AttributeError, TypeError, ValueError, OSError):
+        pass
     dotted_path = package_dotted_path(
         skill_context.skill_id.author,
-        "skills",
+        SKILLS,
         skill_context.skill_id.name,
-        Path(path).stem,
+        ".".join(parent_parts + (file_stem,)),
     )
     component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)

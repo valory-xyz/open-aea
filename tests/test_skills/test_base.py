@@ -531,6 +531,35 @@ def test_load_module_reuses_cached_module_for_same_file(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
+def test_load_module_restores_explicit_none_prior_on_exec_failure(tmp_path):
+    """An explicit ``sys.modules[key] = None`` survives the rollback.
+
+    ``None`` is the CPython block-import idiom; the rollback must
+    distinguish "absent" from "explicit None" and preserve the latter.
+    Popping the explicit-None sentinel would silently unblock an import
+    the caller deliberately disabled.
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    broken = tmp_path / "broken_with_none_prior.py"
+    broken.write_text("raise RuntimeError('boom at import time')\n")
+    dotted_path = "tests_b3_none_prior_survival"
+
+    sys.modules[dotted_path] = None  # type: ignore[assignment]
+    try:
+        with pytest.raises(RuntimeError, match="boom at import time"):
+            load_module(dotted_path, broken)
+        assert dotted_path in sys.modules, (
+            "load_module's rollback removed the explicit-None prior, "
+            "silently unblocking a deliberately-disabled import."
+        )
+        assert sys.modules[dotted_path] is None
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
 def test_load_module_restores_prior_sys_modules_entry_on_exec_failure(tmp_path):
     """A failed load_module call restores the prior sys.modules entry.
 
@@ -602,6 +631,50 @@ def _make_skill_component_loader_for_dummy_skill():
     configuration._directory = skill_dir  # pylint: disable=protected-access
     skill_context = MagicMock()
     return _SkillComponentLoader(configuration, skill_context)
+
+
+def test_parse_module_preserves_subpackage_path_in_dotted_key(tmp_path, monkeypatch):
+    """`_parse_module`'s dotted key matches the main loader for subpackages.
+
+    A flat file produces the same key under both paths trivially; a
+    subpackage file diverges if `_parse_module` drops parent
+    directories. This test pins the alignment so the dual-class-object
+    problem doesn't reappear via the legacy entry points for
+    subpackage files.
+    """
+    skill_root = tmp_path / "myskill"
+    (skill_root / "subpkg").mkdir(parents=True)
+    behaviour_file = skill_root / "subpkg" / "behaviours.py"
+    behaviour_file.write_text("# stub\n")
+
+    captured = {}
+
+    def fake_load_module(dotted_path, *_args, **_kwargs):
+        captured["dotted_path"] = dotted_path
+        fake = types.ModuleType("fake")
+        return fake
+
+    monkeypatch.setattr("aea.skills.base.load_module", fake_load_module)
+
+    skill_context = MagicMock()
+    skill_context.skill_id = PublicId.from_str("dummy_author/myskill:0.1.0")
+    skill_context.skill.configuration.directory = skill_root
+
+    try:
+        Behaviour.parse_module(
+            behaviour_file,
+            {"b": SkillComponentConfiguration("FakeBehaviour")},
+            skill_context,
+        )
+    except Exception:  # pragma: nocover
+        pass
+
+    assert captured["dotted_path"] == (
+        "packages.dummy_author.skills.myskill.subpkg.behaviours"
+    ), (
+        "legacy parse_module path must preserve subpackage parents in the "
+        f"dotted key; got {captured['dotted_path']!r}."
+    )
 
 
 def test_parse_module_keys_by_file_stem_not_type_plural(tmp_path, monkeypatch):
