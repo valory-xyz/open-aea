@@ -923,11 +923,6 @@ class _SkillComponentLoader:
         Get all the Python modules of the skill package.
 
         We ignore '__pycache__' Python modules as they are not relevant.
-        We also ignore ``__init__.py`` files because ``load_aea_package``
-        has already registered them in ``sys.modules`` under the parent
-        package's dotted path; loading them again here would create a
-        second module object for the same source file and reintroduce
-        the dual-class-object problem this loader is built to avoid.
 
         :return: a set of paths pointing to all the Python modules in the skill.
         """
@@ -937,16 +932,29 @@ class _SkillComponentLoader:
             map(
                 lambda p: Path(p).relative_to(self.skill_directory),
                 filter(
-                    lambda x: not re.match(ignore_regex, x.name)
-                    and x.name != "__init__.py",
-                    all_python_modules,
+                    lambda x: not re.match(ignore_regex, x.name), all_python_modules
                 ),
             )
         )
         return module_paths
 
     def _compute_module_dotted_path(self, module_path: Path) -> str:
-        """Compute the dotted path for a skill module."""
+        """Compute the dotted path for a skill module.
+
+        ``__init__.py`` files are registered by ``load_aea_package``
+        under the parent package's dotted path (no ``.__init__``
+        suffix). Return that exact key so ``load_module`` cache-hits
+        on the already-loaded module instead of re-executing the file
+        (which would create duplicate class objects).
+
+        :param module_path: the module path, relative to the skill directory.
+        :return: the canonical dotted import path for that module.
+        """
+        if module_path.name == "__init__.py":
+            parent_parts = module_path.parent.parts
+            if not parent_parts:
+                return self.skill_dotted_path
+            return f"{self.skill_dotted_path}.{'.'.join(parent_parts)}"
         suffix = ".".join(module_path.with_name(module_path.stem).parts)
         return f"{self.skill_dotted_path}.{suffix}"
 

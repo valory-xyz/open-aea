@@ -366,22 +366,67 @@ def test_load_skill():
     assert isinstance(skill, Skill)
 
 
-def test_skill_loader_skips_init_py_in_python_modules():
-    """`_get_python_modules` excludes `__init__.py`.
+def test_compute_module_dotted_path_for_init_py_returns_skill_dotted_path():
+    """The skill's own `__init__.py` maps to `self.skill_dotted_path` exactly.
 
-    `load_aea_package` (called earlier in the load_skill path) already
-    registers a skill's ``__init__.py`` under ``packages.<a>.skills.<n>``.
-    If `_get_python_modules` returned ``__init__.py`` too, the downstream
-    `load_module` call would create a second module object for the same
-    source file under ``packages.<a>.skills.<n>.__init__`` — exactly the
-    dual-class-object failure mode this PR is built to avoid.
+    `load_aea_package` registers the skill's `__init__.py` under
+    ``packages.<a>.skills.<n>`` (no trailing ``.__init__`` suffix). The
+    loader must compute that same key so its subsequent `load_module`
+    call cache-hits and does NOT re-execute the file — re-execution
+    would create a second module object with duplicate class
+    identities, the dual-class-object problem the loader is built to
+    avoid. Discovery of components defined directly in `__init__.py`
+    is preserved because the cached module is still inspected via
+    `inspect.getmembers`.
     """
     loader = _make_skill_component_loader_for_dummy_skill()
-    module_paths = loader._get_python_modules()
-    init_files = [p for p in module_paths if p.name == "__init__.py"]
-    assert init_files == [], (
-        "_get_python_modules must not return __init__.py files; " f"got {init_files}"
+    assert (
+        loader._compute_module_dotted_path(Path("__init__.py"))
+        == loader.skill_dotted_path
     )
+    # Subpackage __init__.py uses the subpackage name with no further suffix.
+    assert (
+        loader._compute_module_dotted_path(Path("subpkg") / "__init__.py")
+        == f"{loader.skill_dotted_path}.subpkg"
+    )
+
+
+def test_skill_loader_reuses_load_aea_package_module_for_init_py():
+    """The AEA loader must not re-execute the skill's `__init__.py`.
+
+    After ``load_aea_package`` registers the skill's `__init__.py` in
+    sys.modules at ``self.skill_dotted_path``, the subsequent
+    ``load_module`` call for that same file must cache-hit and return
+    the already-registered module — not execute the file a second time
+    and create duplicate class objects.
+    """
+    import sys
+
+    from aea.components.base import perform_load_aea_package
+    from aea.helpers.base import load_module
+
+    loader = _make_skill_component_loader_for_dummy_skill()
+    skill_dotted_path = loader.skill_dotted_path
+    init_py = loader.skill_directory / "__init__.py"
+
+    sys.modules.pop(skill_dotted_path, None)
+    perform_load_aea_package(
+        loader.skill_directory,
+        loader.configuration.public_id.author,
+        "skills",
+        loader.configuration.public_id.name,
+    )
+    pre = sys.modules[skill_dotted_path]
+    sentinel = object()
+    pre._b3_sentinel = sentinel  # type: ignore[attr-defined]
+    try:
+        post = load_module(skill_dotted_path, init_py)
+        assert post is pre, "load_module re-executed the skill's __init__.py"
+        assert (
+            getattr(post, "_b3_sentinel", None) is sentinel
+        ), "sentinel lost: a fresh module object was created"
+    finally:
+        sys.modules.pop(skill_dotted_path, None)
 
 
 def test_load_skill_components_have_canonical_module_paths():
