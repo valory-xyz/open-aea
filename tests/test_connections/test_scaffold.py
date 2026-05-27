@@ -88,7 +88,7 @@ class TestScaffoldConnectionAndRun(AEATestCaseEmpty):
             try:
                 proc.expect_all(
                     [
-                        "Error while connecting <class 'connection_module.MyScaffoldAsyncConnection'>: NotImplementedError()"
+                        "Error while connecting <class 'packages.default_author.connections.my_con.connection.MyScaffoldAsyncConnection'>: NotImplementedError()"
                     ],
                     timeout=50,
                 )
