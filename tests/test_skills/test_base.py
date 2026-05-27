@@ -511,16 +511,17 @@ def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
-def test_load_module_reuses_cached_module_for_same_file(tmp_path):
-    """`load_module` reuses the cached module when the file matches.
+def test_load_module_reuses_cached_module_for_same_dotted_path(tmp_path):
+    """`load_module` reuses any module already cached at the dotted path.
 
-    Re-executing the same source would create duplicate class objects
-    and break class identity for callers that already hold a reference
-    (e.g. via an earlier ``from ... import X``). When the caller asks
-    for the same dotted path with a *different* physical file, the
-    cache is bypassed and the new file is executed — the caller has
-    explicitly pointed `load_module` at a different source and
-    expects to see it.
+    Whether the second call points at the same physical file or a
+    different one (e.g. a vendor copy in a tmpdir vs the source tree
+    in test fixtures), `load_module` returns the cached object — never
+    re-executes. Re-execution would create duplicate class objects
+    for callers that already hold references to the original
+    definitions (e.g. via an earlier ``from ... import X``). Mirrors
+    Python's own import semantics: once registered, the cached module
+    is canonical for that dotted path.
     """
     import sys
 
@@ -537,21 +538,22 @@ def test_load_module_reuses_cached_module_for_same_file(tmp_path):
         first = load_module(dotted_path, same_src)
         first_marker = first.Marker  # type: ignore[attr-defined]
 
-        # Same file → cache hit, identical module object.
+        # Same file → reuse.
         second = load_module(dotted_path, same_src)
         assert second is first, "load_module re-executed for the same file"
         assert second.Marker is first_marker  # type: ignore[attr-defined]
 
-        # Different file at the same dotted path → re-execute. The
-        # returned module reflects the new source: ``Other`` is
-        # defined, ``Marker`` is not.
+        # Different file at the same dotted path → still reuse the
+        # cached module. ``Marker`` survives; ``Other`` is NOT defined
+        # on the returned module because the second source was never
+        # executed.
         third = load_module(dotted_path, other_src)
-        assert third is not first, (
-            "load_module returned the stale cached module instead of "
-            "executing the new source"
+        assert third is first, (
+            "load_module re-executed when the cached dotted path was "
+            "called with a different physical file"
         )
-        assert hasattr(third, "Other")
-        assert not hasattr(third, "Marker")
+        assert hasattr(third, "Marker")
+        assert not hasattr(third, "Other")
     finally:
         sys.modules.pop(dotted_path, None)
 

@@ -1336,19 +1336,43 @@ class TestRunFailsWhenConnectionClassNotPresent(AEATestCaseEmpty):
         ).write_text("import packages.valory.protocols.http")
 
     def test_run(self):
-        """Run the test."""
+        """Run the test.
+
+        ``aea run`` is invoked as a subprocess via ``PexpectWrapper`` —
+        the same pattern as ``test_run[None]`` above. A subprocess
+        starts with an empty ``sys.modules`` (the production scenario),
+        so ``load_module`` reads the stubbed ``connection.py`` from
+        disk and surfaces the documented "Connection class … not
+        found" error, exactly as an end user would see it.
+        """
         expected_message = (
-            "Package loading error: An error occurred while loading connection {}: Connection class '{"
-            "}' not found.".format(self.connection_id, "HTTPClientConnection")
+            f"Package loading error: An error occurred while loading "
+            f"connection {self.connection_id}: Connection class "
+            f"'HTTPClientConnection' not found."
         )
-        with pytest.raises(ClickException, match=expected_message):
-            self.run_cli_command(
+        process = PexpectWrapper(  # nosec
+            [
+                sys.executable,
+                "-m",
+                "aea.cli",
                 "--skip-consistency-check",
                 "run",
                 "--connections",
                 self.connection_id,
-                cwd=self._get_cwd(),
-            )
+            ],
+            cwd=self._get_cwd(),
+            env=os.environ.copy(),
+            maxread=10000,
+            encoding="utf-8",
+            logfile=sys.stdout,
+        )
+        try:
+            process.expect(re.escape(expected_message), timeout=30)
+            process.wait_to_complete(10)
+            assert process.returncode not in (None, 0)
+        finally:
+            process.terminate()
+            process.wait_to_complete(10)
 
 
 class TestRunFailsWhenProtocolConfigFileNotFound:
