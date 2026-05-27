@@ -9,6 +9,48 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.6` to `v2.2.7`
+
+This is a non-breaking patch release covering: upstream hooks that let open-autonomy drop three local workarounds (cf. [open-autonomy#2485](https://github.com/valory-xyz/open-autonomy/issues/2485), open-aea #918), a fix for double-formatted agent log lines (cf. #914 / #917), an env-var encoding fix for service overrides with bash-unsafe dict keys (cf. [open-autonomy#2243](https://github.com/valory-xyz/open-autonomy/issues/2243), #915), an `aea-ci check-dependencies` fix for grouped and optional-without-`extras` pyproject deps (#916), and a docs rewrite of `docs/connection-resilience.md` (#912).
+
+### `aea.configurations.loader.parse_service_yaml` — public service-YAML parse helper
+
+`parse_service_yaml(file_pointer) -> (head, overrides)` is now exposed at module level. It parses a service YAML stream into the head document and trailing override documents without schema validation. `ConfigLoader._load_service_config` delegates to it, so the behaviour of `aea` itself is unchanged. Packagers that need to substitute environment variables in the head document before running their own validator can call this helper directly instead of maintaining a copy of the parse-and-split logic. The helper raises `ValueError("Service configuration file was empty.")` when the head document is not a mapping (empty stream, bare `---`, or a YAML scalar) so the failure surfaces at parse time rather than as an opaque `AttributeError` downstream.
+
+### `aea.cli.scaffold.scaffold_item` — no longer leaks `ctx.cwd`
+
+`scaffold_item` now saves `ctx.cwd` on entry and restores it via `try ... finally`. Previously the `--to-local-registry` branch swapped `ctx.cwd` to `<registry_path>/<author>` (so the inner `fingerprint_item` call resolved correctly) but never restored it, leaking the registry path back to callers and to the post-fingerprint `--with-symlinks` block. Downstream wrappers that bracketed `scaffold_item` with their own `preserve_cwd = ctx.cwd; ...; ctx.cwd = preserve_cwd` can drop the workaround.
+
+### Canonical skill / contract / connection module paths
+
+The skill, contract, and connection loaders now register loaded modules in `sys.modules` under their canonical packages-prefixed dotted path (`packages.<author>.<plural>.<name>.<file>`) instead of bare short names (`"behaviours"`, `"contracts"`, `"connection_module"`). The skill loader's `_compute_module_dotted_path` returns the canonical path, `_filter_classes` and the unused-class warning filter drop the now-redundant "starts with skill dotted path" exclusion, and the legacy `_parse_module` is aligned with the same key shape. `load_module` reuses any module already registered at the requested dotted path — re-executing a file already loaded under the same canonical key would create duplicate class objects for callers that already hold a reference — and rolls back its `sys.modules` write on `exec_module` failure.
+
+Net effect for callers: each source file produces a single class object across the whole process, so downstream registries keyed by `class.__module__` shrink from "short + long" to one entry. Cross-skill re-exports — the canonical FSM composition idiom where a parent skill's `AbciDialogues` is imported into a child's `skill.yaml` — still pass the filter and load as before.
+
+### `aea.cli` / `aea.helpers.protocols` — no more double-formatted log lines
+
+Two module-top `logging.basicConfig(...)` calls that fired as a side effect of `import aea.cli` and attached an orphan stderr `StreamHandler` to the root logger have been removed. The orphan handler survived the agent's `logging.config.dictConfig` (which has no `root:` block) and caught every `aea.agent.*` record a second time via propagation, producing the `] [INFO]` vs `][INFO]` doubling visible in operator captures.
+
+Behaviour change for operators: third-party library `INFO`/`DEBUG` logs (e.g. from `web3`, `requests` in the ledger plugins) that the orphan handler previously surfaced now go silent under an agent config without a `root:` block in `logging_config`. `WARNING` and above still appear on stderr via Python's `logging.lastResort` handler, though with that handler's bare-message format (just `%(message)s`, no level/logger-name prefix and no timestamp) rather than the formatted one the orphan installed. Operators who want the previous behaviour can add a `root:` block to `logging_config` in `aea-config.yaml`.
+
+### Env-var encoding for dicts with bash-unsafe keys
+
+`aea.helpers.env_vars.generate_env_vars_recursively` now JSON-encodes a whole dict as a single env var when any key fails the bash identifier rule. A service override like `bet_amount_per_threshold: {0.0: ..., 0.6: ..., 1.0: ...}` previously expanded to env var names like `..._BET_AMOUNT_PER_THRESHOLD_0.0` that bash rejects at export time, so the override silently never reached the agent. The whole dict now travels as one JSON-encoded value (matching the existing `is_strict_list` handling). All-safe-key dicts still flatten per key — no change for the common case. Also fixes a latent corruption where numeric-looking string keys were silently rewritten through `json.loads` inside the per-key path. Agent-side reads through `convert_value_str_to_type` decode the placeholder unchanged.
+
+### `aea-ci check-dependencies` — grouped and optional-without-`extras` deps
+
+`PyProjectToml.load` in `open-aea-ci-helpers` now reads `[tool.poetry.group.*.dependencies]` tables (e.g. `dev`, `docs`) in addition to the main `[tool.poetry.dependencies]` block, and accepts dict-form entries that omit the `extras` key (so `{version = "...", optional = true}` deps are no longer silently dropped). Anyone running `aea-ci check-dependencies --check` locally against a project with grouped or optional-without-extras deps will see far fewer spurious "not found" misses.
+
+### `docs/connection-resilience.md` rewrite
+
+The connection-resilience guide added in v2.2.6 has been rewritten to make the protocol's role in retry-policy choice explicit. New section "What the protocol's speech acts imply" groups the protocols in the repo by failure-channel shape (typed-error, status-with-classification, response-only, routing-failure) so the policy a connection should pick is grounded in the protocol's `speech_acts` and reply rules. Terminology aligned with the framework convention (`speech_acts` over "vocabulary"; "performatives" given as the FIPA synonym). Cross-links added to the surrounding doc set. Net 261 → 91 lines for the same coverage plus the new section.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.7"` (and the same `2.2.7` pin for any `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.7`.
+- No agent / package / config edits are required for the default configuration. If you depend on third-party `INFO`/`DEBUG` log lines being visible on stderr without an explicit `root:` block in `logging_config`, add one to your `aea-config.yaml`.
+
 ## `v2.2.5` to `v2.2.6`
 
 This is a non-breaking patch release. It combines two streams: resilience-audit fixes across the framework / ledger connection / IPFS and ethereum plugins (cf. #891 / #910), and per-chain `max_gas_fast` tuning for low-fee chains in `open-aea-ledger-ethereum` (cf. #909 / #911).
