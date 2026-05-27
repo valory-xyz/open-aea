@@ -764,17 +764,15 @@ def _parse_module(
     # Build the same canonical dotted key the main loader uses for the
     # same physical file (including subpackage files such as
     # `<skill>/subpkg/behaviours.py`) so `sys.modules` cache hits across
-    # both load paths. The skill directory is recovered via an explicit
-    # `getattr` chain (so a missing attribute on a real `SkillContext`
-    # surfaces as `None`, not as a swallowed `AttributeError`); the
-    # `relative_to` call's narrow exceptions are caught only at the
-    # point they can fire. Ad-hoc test callers with a `MagicMock` skill
-    # context land in the ``skill_dir is None`` branch and fall back to
-    # the bare stem, matching the legacy behaviour for flat paths.
+    # both load paths. `SkillContext` stores the Skill on the private
+    # `_skill` attribute (no public `skill` property — see the
+    # ``self._skill_context._skill = self`` assignment in ``Skill.__init__``),
+    # so we walk that explicitly. The `relative_to` call's narrow
+    # exceptions are caught only at the point they can fire.
     file_stem = Path(path).stem
     parent_parts: Tuple[str, ...] = ()
     skill_dir = getattr(
-        getattr(getattr(skill_context, "skill", None), "configuration", None),
+        getattr(getattr(skill_context, "_skill", None), "configuration", None),
         "directory",
         None,
     )

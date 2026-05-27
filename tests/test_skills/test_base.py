@@ -627,9 +627,11 @@ def test_parse_module_preserves_subpackage_path_in_dotted_key(tmp_path, monkeypa
 
     A flat file produces the same key under both paths trivially; a
     subpackage file diverges if `_parse_module` drops parent
-    directories. This test pins the alignment so the dual-class-object
-    problem doesn't reappear via the legacy entry points for
-    subpackage files.
+    directories. Drives through a real `SkillContext` + `Skill` (not a
+    `MagicMock`) so the production attribute path —
+    ``skill_context._skill.configuration.directory`` — is exercised.
+    A regression on that path would auto-vivify on a Mock and silently
+    pass; here it surfaces.
     """
     skill_root = tmp_path / "myskill"
     (skill_root / "subpkg").mkdir(parents=True)
@@ -640,20 +642,19 @@ def test_parse_module_preserves_subpackage_path_in_dotted_key(tmp_path, monkeypa
 
     def fake_load_module(dotted_path, *_args, **_kwargs):
         captured["dotted_path"] = dotted_path
-        fake = types.ModuleType("fake")
-        return fake
+        return types.ModuleType("fake")
 
     monkeypatch.setattr("aea.skills.base.load_module", fake_load_module)
 
-    skill_context = MagicMock()
-    skill_context.skill_id = PublicId.from_str("dummy_author/myskill:0.1.0")
-    skill_context.skill.configuration.directory = skill_root
+    configuration = SkillConfig(name="myskill", author="dummy_author")
+    configuration._directory = skill_root  # pylint: disable=protected-access
+    skill = Skill(configuration=configuration)
 
     try:
         Behaviour.parse_module(
             behaviour_file,
             {"b": SkillComponentConfiguration("FakeBehaviour")},
-            skill_context,
+            skill.skill_context,
         )
     except Exception:  # pragma: nocover
         pass
