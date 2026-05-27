@@ -186,11 +186,13 @@ def test_from_dir():
 def test_from_dir_registers_connection_under_canonical_dotted_path():
     """Loaded connection module is registered under a canonical dotted path.
 
-    The `sys.modules` cache entry must use the packages-prefixed dotted path,
-    not the bare ``"connection_module"`` key. Without this, two connections
-    loaded in the same process would overwrite each other under the same
-    bare entry.
+    The `sys.modules` cache entry must use the packages-prefixed dotted
+    path, not the bare ``"connection_module"`` key. The cached
+    connection class must also be identity-equal to the class resolvable
+    via ``importlib.import_module`` — proving the cached module is the
+    one that owns the class (no duplicate produced by re-execution).
     """
+    import importlib
     import sys
 
     dummy_connection_dir = os.path.join(CUR_PATH, "data", "dummy_connection")
@@ -203,9 +205,19 @@ def test_from_dir_registers_connection_under_canonical_dotted_path():
     sys.modules.pop(expected_key, None)
     sys.modules.pop("connection_module", None)
     try:
-        Connection.from_dir(dummy_connection_dir, identity, crypto_store, data_dir)
+        connection = Connection.from_dir(
+            dummy_connection_dir, identity, crypto_store, data_dir
+        )
         assert expected_key in sys.modules
         assert "connection_module" not in sys.modules
+
+        cached = sys.modules[expected_key]
+        connection_class = type(connection)
+        resolved_class = getattr(
+            importlib.import_module(expected_key), connection_class.__name__
+        )
+        assert resolved_class is connection_class
+        assert getattr(cached, connection_class.__name__) is connection_class
     finally:
         sys.modules.pop(expected_key, None)
 

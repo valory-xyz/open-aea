@@ -71,10 +71,14 @@ def test_from_dir():
 def test_from_config_registers_contract_under_canonical_dotted_path():
     """Loaded contract module is registered under a canonical dotted path.
 
-    The `sys.modules` cache entry must use the packages-prefixed dotted path,
-    not the bare ``"contracts"`` key. Without this, two contracts loaded in
-    the same process would overwrite each other under the same bare entry.
+    The `sys.modules` cache entry must use the packages-prefixed dotted
+    path, not the bare ``"contracts"`` key. A second load with the
+    same dotted path must reuse the cached module instead of producing
+    a duplicate — verified by asserting that ``Contract.from_config``
+    called twice yields a contract class identity-equal to the one
+    resolvable via ``importlib.import_module``.
     """
+    import importlib
     import sys
 
     directory = Path(ROOT_DIR, "tests", "data", "dummy_contract")
@@ -92,6 +96,15 @@ def test_from_config_registers_contract_under_canonical_dotted_path():
         Contract.from_config(configuration)
         assert expected_key in sys.modules
         assert "contracts" not in sys.modules
+
+        # Class identity is preserved across an `importlib.import_module`
+        # round-trip: the cached module is the one that owns the class.
+        cached = sys.modules[expected_key]
+        contract_class = getattr(cached, configuration.class_name)
+        resolved_class = getattr(
+            importlib.import_module(expected_key), configuration.class_name
+        )
+        assert resolved_class is contract_class
     finally:
         sys.modules.pop(expected_key, None)
         if str(configuration.public_id) in contract_registry.specs:

@@ -48,8 +48,8 @@ def package_dotted_path(
     Compose the canonical dotted path string for a file inside an AEA package.
 
     Returns a string of the form ``packages.<author>.<plural>.<name>.<stem>``.
-    Has no side effects; callers register the loaded module in
-    ``sys.modules`` themselves (see ``aea.helpers.base.load_module``).
+    Has no side effects; the loaded module is registered in
+    ``sys.modules`` by ``aea.helpers.base.load_module``.
 
     :param author: package author (e.g. ``"valory"``).
     :param package_type_plural: plural package-type token (``"skills"`` /

@@ -74,12 +74,6 @@ IPFS_HASH_REGEX = f"(({IPFS_HASH_REGEX_V0})|({IPFS_HASH_REGEX_v1}))"
 _default_logger = logging.getLogger(__name__)
 
 
-# Sentinel used by `load_module` to distinguish "no prior sys.modules entry"
-# from "prior entry was explicitly `None`" — the latter is a valid CPython
-# idiom that blocks an import, so we must preserve it on rollback.
-_NO_PRIOR_MODULE = object()
-
-
 def _get_module(spec: ModuleSpec) -> Optional[types.ModuleType]:
     """Try to execute a module. Return None if the attempt fail."""
     try:
@@ -137,37 +131,32 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     # of re-executing the file. Re-execution creates a duplicate copy of
     # every class defined in the source, breaking class identity for
     # callers that already hold a reference (e.g. via an earlier
-    # ``from ... import X``). This mirrors Python's own import
-    # semantics: once registered, the cached module is the canonical
-    # one for that dotted path. ``__file__`` is intentionally NOT
-    # compared — in test fixtures the same logical package may be
-    # reached through different physical files (vendor copy in a
-    # tmpdir vs the source tree) but both register the same dotted
-    # path and must resolve to the same module object across the whole
-    # process.
-    existing = sys.modules.get(dotted_path)
-    if existing is not None:
+    # ``from ... import X``). ``__file__`` is intentionally NOT compared
+    # — in test fixtures the same logical package may be reached
+    # through different physical files (vendor copy in a tmpdir vs the
+    # source tree) but both register the same dotted path and must
+    # resolve to the same module object across the whole process. An
+    # explicit ``None`` entry is CPython's block-import sentinel: raise
+    # ``ImportError`` to match the standard import semantics rather
+    # than silently overwriting it with a fresh exec.
+    if dotted_path in sys.modules:
+        existing = sys.modules[dotted_path]
+        if existing is None:
+            raise ImportError(f"import of {dotted_path!r} halted; None in sys.modules")
         return existing
     spec = importlib.util.spec_from_file_location(dotted_path, str(filepath))
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
     # Register before exec so a downstream `import` of the same dotted
-    # path during exec resolves to this module. On exec failure, restore
-    # any prior entry (or pop if none) instead of leaving a half-built
-    # stub in sys.modules. Use a sentinel for the "no prior entry" case
-    # so an explicit `sys.modules[key] = None` (the CPython block-import
-    # idiom) survives the rollback.
-    _prior = sys.modules.get(dotted_path, _NO_PRIOR_MODULE)
+    # path during exec resolves to this module. We only reach this point
+    # when the key was absent (the cache-hit and block-import branches
+    # above covered the other two cases), so on exec failure we pop the
+    # half-built stub rather than restoring a prior entry that, by
+    # construction, did not exist.
     sys.modules[dotted_path] = module
     try:
         spec.loader.exec_module(module)  # type: ignore
     except BaseException:  # pylint: disable=broad-except
-        if _prior is _NO_PRIOR_MODULE:
-            sys.modules.pop(dotted_path, None)
-        else:
-            # Cast because typeshed declares ``sys.modules`` as a
-            # ``dict[str, ModuleType]`` but CPython accepts ``None`` at
-            # runtime as the block-import sentinel.
-            sys.modules[dotted_path] = cast(types.ModuleType, _prior)
+        sys.modules.pop(dotted_path, None)
         raise
     return module
 

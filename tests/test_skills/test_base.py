@@ -437,29 +437,35 @@ def test_skill_loader_reuses_load_aea_package_module_for_init_py():
 def test_load_skill_components_have_canonical_module_paths():
     """Loaded skill component classes carry the long packages-prefixed __module__.
 
-    The skill loader assigns ``packages.<author>.skills.<name>.<file>`` as the
-    module dotted path. Classes defined inside the skill's modules therefore
-    end up with a ``__module__`` that starts with the skill's package prefix,
-    which means a downstream ``from packages.<author>.skills.<name>.<file>``
-    import returns the same module object instead of re-executing the file
-    and producing a duplicate class.
+    The skill loader assigns ``packages.<author>.skills.<name>.<file>`` as
+    the module dotted path. Beyond the prefix check, the class object the
+    loader produced must be **identity-equal** to the class resolved via
+    ``importlib.import_module(__module__)`` — that's the user-facing
+    contract this PR establishes: a single class object per source file,
+    so e.g. open-autonomy's ``_MetaPayload.registry`` shrinks from two
+    entries (short + long) to one. A regression that re-executed the
+    file would stamp the same ``__module__`` on a duplicate class and
+    pass a prefix-only assertion; the identity check rejects it.
     """
+    import importlib
+
     agent_context = MagicMock(agent_name="name")
     skill = Skill.from_dir(
         Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
     )
     expected_prefix = "packages.dummy_author.skills.dummy."
-    for behaviour in skill.behaviours.values():
-        assert type(behaviour).__module__.startswith(expected_prefix), (
-            f"behaviour {type(behaviour).__name__} has __module__="
-            f"{type(behaviour).__module__!r}, expected to start with "
-            f"{expected_prefix!r}"
+    for component in list(skill.behaviours.values()) + list(skill.handlers.values()):
+        cls = type(component)
+        assert cls.__module__.startswith(expected_prefix), (
+            f"{cls.__name__} has __module__={cls.__module__!r}, expected "
+            f"to start with {expected_prefix!r}"
         )
-    for handler in skill.handlers.values():
-        assert type(handler).__module__.startswith(expected_prefix), (
-            f"handler {type(handler).__name__} has __module__="
-            f"{type(handler).__module__!r}, expected to start with "
-            f"{expected_prefix!r}"
+        resolved = getattr(importlib.import_module(cls.__module__), cls.__name__)
+        assert resolved is cls, (
+            f"{cls.__name__} loaded by the skill loader is not "
+            f"identity-equal to the class resolvable via "
+            f"importlib.import_module({cls.__module__!r}) — "
+            "re-execution / duplicate-class regression."
         )
 
 
@@ -552,30 +558,32 @@ def test_load_module_reuses_cached_module_for_same_dotted_path(tmp_path):
         sys.modules.pop(dotted_path, None)
 
 
-def test_load_module_restores_explicit_none_prior_on_exec_failure(tmp_path):
-    """An explicit ``sys.modules[key] = None`` survives the rollback.
+def test_load_module_raises_import_error_on_explicit_none_block_sentinel(
+    tmp_path,
+):
+    """An explicit ``sys.modules[key] = None`` raises ``ImportError``.
 
-    ``None`` is the CPython block-import idiom; the rollback must
-    distinguish "absent" from "explicit None" and preserve the latter.
-    Popping the explicit-None sentinel would silently unblock an import
-    the caller deliberately disabled.
+    ``None`` is CPython's block-import sentinel. `load_module` mirrors
+    standard import semantics: it raises ``ImportError`` rather than
+    overwriting the sentinel with a fresh exec, and the sentinel
+    survives the failed call so the caller's deliberate block stays
+    in place.
     """
     import sys
 
     from aea.helpers.base import load_module
 
-    broken = tmp_path / "broken_with_none_prior.py"
-    broken.write_text("raise RuntimeError('boom at import time')\n")
-    dotted_path = "tests_b3_none_prior_survival"
+    src = tmp_path / "should_not_be_loaded.py"
+    src.write_text("class Marker:\n    pass\n")
+    dotted_path = "tests_b3_block_import_sentinel"
 
     sys.modules[dotted_path] = None  # type: ignore[assignment]
     try:
-        with pytest.raises(RuntimeError, match="boom at import time"):
-            load_module(dotted_path, broken)
-        assert dotted_path in sys.modules, (
-            "load_module's rollback removed the explicit-None prior, "
-            "silently unblocking a deliberately-disabled import."
-        )
+        with pytest.raises(ImportError, match="None in sys.modules"):
+            load_module(dotted_path, src)
+        assert (
+            dotted_path in sys.modules
+        ), "load_module unexpectedly removed the explicit-None prior"
         assert sys.modules[dotted_path] is None
     finally:
         sys.modules.pop(dotted_path, None)
