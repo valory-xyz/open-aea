@@ -61,6 +61,10 @@ def _split_inline_comment(text: str) -> Tuple[str, str]:
     that preceded the ``#``, so re-assembly preserves the original gap;
     it is ``""`` when there is no trailing comment.
 
+    TOML escape sequences inside basic strings are not honored (an
+    escaped quote would be read as closing the string) — not exercised
+    by our pyprojects, where values are plain version specifiers.
+
     :param text: the line body (without its trailing newline).
     :return: a ``(code, comment)`` tuple.
     """
@@ -399,19 +403,28 @@ class PyProjectToml:
             return
         if dependency.name in self.dependencies and dependency.version == "":
             return
-        # `dump()` only rewrites string-form deps, so an update to a
-        # dict-form main dep (with `optional`/`markers`/etc.) is a no-op
-        # on write — warn so a `--update` that appears to do nothing is
-        # not silent.
-        if (
-            dependency.name in self.dependencies
-            and self._string_dep_names is not None
-            and dependency.name not in self._string_dep_names
-            and dependency.name in (self._main_dep_names or set())
-        ):
+        # `dump()` only rewrites string-form *main* dep lines, so an
+        # update to anything else is an in-memory-only change that the
+        # file won't reflect: group-origin deps (rewritten only in their
+        # own table, which dump() leaves verbatim) and dict-form main
+        # deps (carry `optional`/`markers`/etc. the rewrite can't emit).
+        # Warn so a `--update` that appears to do nothing isn't silent.
+        will_not_persist = (
+            self._string_dep_names is not None
+            and dependency.name in self.dependencies
+            and (
+                dependency.name in self._group_dep_names
+                or (
+                    dependency.name in (self._main_dep_names or set())
+                    and dependency.name not in self._string_dep_names
+                )
+            )
+        )
+        if will_not_persist:
             logging.warning(
-                "Update to dict-form dependency %r will not be written by "
-                "dump(); bump it manually in pyproject.toml.",
+                "Update to %r changes only in-memory state; dump() will not "
+                "write it (group-origin or dict-form). Bump it manually in "
+                "pyproject.toml.",
                 dependency.name,
             )
         self.dependencies[dependency.name] = dependency
@@ -540,6 +553,15 @@ class PyProjectToml:
             main_deps = config["tool"]["poetry"]["dependencies"]
         except KeyError:
             return None
+        if not isinstance(main_deps, dict):
+            # Syntactically valid TOML but wrong shape (e.g.
+            # `dependencies = ["foo"]`); fail cleanly instead of an
+            # opaque AttributeError on `.items()`.
+            logging.warning(
+                "[tool.poetry.dependencies] in %s is not a table; skipping.",
+                pyproject_path,
+            )
+            return None
 
         string_dep_names: Set[str] = set()
         group_dep_names: Set[str] = set()
@@ -638,13 +660,22 @@ class PyProjectToml:
         comments on rewritten lines), inline-table formatting and the
         original newline style, is left untouched.
         """
-        content = self.file.read_text(encoding="utf-8")
+        # Read with newline="" so `\r\n` survives (the default universal
+        # newline mode would translate it to `\n` before we can preserve
+        # it); write the same way so we don't re-translate on output.
+        with self.file.open("r", encoding="utf-8", newline="") as fp:
+            content = fp.read()
         eol = "\r\n" if "\r\n" in content else "\n"
         out: List[str] = []
         in_main_deps = False
         seen: Set[str] = set()
+        # Index in `out` just after the last emitted main-dep line, so
+        # newly-added deps are inserted right after the existing deps
+        # rather than below any trailing blank/comment lines that visually
+        # belong to the next section.
+        main_insert_idx: Optional[int] = None
 
-        def _append_new_main_deps() -> None:
+        def _flush_new_main_deps() -> None:
             # Deps in `self.dependencies` that never appeared as a line in
             # the main table and aren't group-origin are newly added (via
             # `update()`); emit them as plain-string form (`update()`
@@ -657,10 +688,14 @@ class PyProjectToml:
                 and name not in self._group_dep_names
                 and name not in self.ignore
             ]
-            if pending and out and not out[-1].endswith(("\n", "\r")):
+            if not pending:
+                return
+            idx = main_insert_idx if main_insert_idx is not None else len(out)
+            # Appending at EOF where the last line lacks a newline.
+            if idx == len(out) and out and not out[-1].endswith(("\n", "\r")):
                 out[-1] = out[-1] + eol
-            for name, dep in pending:
-                out.append(dep.to_pipfile_string() + eol)
+            out[idx:idx] = [dep.to_pipfile_string() + eol for _, dep in pending]
+            for name, _ in pending:
                 seen.add(name)
 
         for raw in content.splitlines(keepends=True):
@@ -669,11 +704,14 @@ class PyProjectToml:
             stripped = body.strip()
             if stripped.startswith("["):
                 # Leaving the main-deps table — flush newly-added deps
-                # before the next section header (they still belong to
-                # the table per TOML, since only a header ends a table).
+                # (they still belong to the table per TOML, since only a
+                # header ends a table).
                 if in_main_deps:
-                    _append_new_main_deps()
-                in_main_deps = stripped == "[tool.poetry.dependencies]"
+                    _flush_new_main_deps()
+                # Strip any trailing in-line comment on the header before
+                # comparing, e.g. `[tool.poetry.dependencies]  # runtime`.
+                header = stripped.split("#", 1)[0].strip()
+                in_main_deps = header == "[tool.poetry.dependencies]"
                 out.append(raw)
                 continue
             if in_main_deps:
@@ -681,7 +719,7 @@ class PyProjectToml:
                 if match:
                     # Mark every top-level key as seen *before* deciding to
                     # rewrite, so a key in no-space form (`pkg="*"`) isn't
-                    # re-appended as a duplicate by `_append_new_main_deps`.
+                    # re-appended as a duplicate by `_flush_new_main_deps`.
                     package = match.group(1)
                     seen.add(package)
                     # Only rewrite plain-string deps; dict-form lines (and
@@ -697,14 +735,18 @@ class PyProjectToml:
                             + comment
                             + line_eol
                         )
-                        continue
+                    else:
+                        out.append(raw)
+                    main_insert_idx = len(out)
+                    continue
             out.append(raw)
         if in_main_deps:  # file ended while still inside the table
-            _append_new_main_deps()
-        self.file.write_text("".join(out), encoding="utf-8")
+            _flush_new_main_deps()
+        with self.file.open("w", encoding="utf-8", newline="") as fp:
+            fp.write("".join(out))
 
 
-def load_packages_dependencies(packages_dir: Path) -> List:
+def load_packages_dependencies(packages_dir: Path) -> List[Dependency]:
     """Return a list of package dependencies."""
     package_manager = PackageManagerV1.from_dir(packages_dir=packages_dir)
     dependencies: Dict[str, Any] = {}
@@ -736,7 +778,7 @@ def load_packages_dependencies(packages_dir: Path) -> List:
 
 
 def update_dependencies(
-    packages_dependencies: List,
+    packages_dependencies: List[Dependency],
     tox: ToxFile,
     pipfile: Optional[Pipfile] = None,
     pyproject: Optional[PyProjectToml] = None,
@@ -771,7 +813,7 @@ def update_dependencies(
 
 
 def check_dependencies(
-    packages_dependencies: List,
+    packages_dependencies: List[Dependency],
     tox: ToxFile,
     pipfile: Optional[Pipfile] = None,
     pyproject: Optional[PyProjectToml] = None,
