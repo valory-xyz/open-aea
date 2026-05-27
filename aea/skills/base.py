@@ -41,7 +41,9 @@ from aea.configurations.base import (
     SkillComponentConfiguration,
     SkillConfig,
 )
+from aea.configurations.constants import SKILLS
 from aea.configurations.loader import load_component_configuration
+from aea.configurations.utils import package_dotted_path
 from aea.context.base import AgentContext
 from aea.exceptions import (
     AEAActException,
@@ -759,17 +761,44 @@ def _parse_module(
     if component_configs == {}:
         return components
     component_names = set(config.class_name for _, config in component_configs.items())
-    component_module = load_module(component_type_name_plural, Path(path))
+    # Build the same canonical dotted key the main loader uses for the
+    # same physical file (including subpackage files such as
+    # `<skill>/subpkg/behaviours.py`) so `sys.modules` cache hits across
+    # both load paths. `SkillContext` stores the Skill on the private
+    # `_skill` attribute (no public `skill` property — see the
+    # ``self._skill_context._skill = self`` assignment in ``Skill.__init__``),
+    # so we walk that explicitly. The `relative_to` call's narrow
+    # exceptions are caught only at the point they can fire.
+    file_stem = Path(path).stem
+    parent_parts: Tuple[str, ...] = ()
+    skill_dir = getattr(
+        getattr(getattr(skill_context, "_skill", None), "configuration", None),
+        "directory",
+        None,
+    )
+    if skill_dir is not None:
+        try:
+            relative = Path(path).resolve().relative_to(Path(skill_dir).resolve())
+            parent_parts = relative.parent.parts
+        except (ValueError, OSError):
+            pass
+    dotted_path = package_dotted_path(
+        skill_context.skill_id.author,
+        SKILLS,
+        skill_context.skill_id.name,
+        ".".join(parent_parts + (file_stem,)),
+    )
+    component_module = load_module(dotted_path, Path(path))
     classes = inspect.getmembers(component_module, inspect.isclass)
+    # Keep `SkillComponent` subclasses except those provided by the
+    # framework (`aea.*`). Cross-skill re-exports (composition idiom)
+    # have a `__module__` from another skill, not `aea.`, and are kept
+    # by design.
     component_classes = list(
         filter(
             lambda x: x[0] in component_names
             and issubclass(x[1], component_class)
-            and not str.startswith(x[1].__module__, "aea.")
-            and not str.startswith(
-                x[1].__module__,
-                f"packages.{skill_context.skill_id.author}.skills.{skill_context.skill_id.name}",
-            ),
+            and not str.startswith(x[1].__module__, "aea."),
             classes,
         )
     )
@@ -924,11 +953,25 @@ class _SkillComponentLoader:
         )
         return module_paths
 
-    @classmethod
-    def _compute_module_dotted_path(cls, module_path: Path) -> str:
-        """Compute the dotted path for a skill module."""
+    def _compute_module_dotted_path(self, module_path: Path) -> str:
+        """Compute the dotted path for a skill module.
+
+        ``__init__.py`` files are registered by ``load_aea_package``
+        under the parent package's dotted path (no ``.__init__``
+        suffix). Return that exact key so ``load_module`` cache-hits
+        on the already-loaded module instead of re-executing the file
+        (which would create duplicate class objects).
+
+        :param module_path: the module path, relative to the skill directory.
+        :return: the canonical dotted import path for that module.
+        """
+        if module_path.name == "__init__.py":
+            parent_parts = module_path.parent.parts
+            if not parent_parts:
+                return self.skill_dotted_path
+            return f"{self.skill_dotted_path}.{'.'.join(parent_parts)}"
         suffix = ".".join(module_path.with_name(module_path.stem).parts)
-        return suffix
+        return f"{self.skill_dotted_path}.{suffix}"
 
     def _filter_classes(
         self, classes: List[Tuple[str, Type]]
@@ -937,23 +980,24 @@ class _SkillComponentLoader:
         Filter classes of skill components.
 
         The following filters are applied:
-        - the class must be a subclass of "SkillComponent";
-        - its __module__ attribute must not start with 'aea.' (we exclude classes provided by the framework)
-        - its __module__ attribute starts with the expected dotted path of this skill.
-            In particular, it should not be imported from another skill.
+        - the class must be a subclass of ``SkillComponent``;
+        - its ``__module__`` attribute must not start with ``aea.``
+          (classes provided by the framework are excluded).
+
+        Cross-skill re-exports (composition skills binding another skill's
+        ``Handler``, ``Model``, etc. as their own — including the
+        ``Model``-wrapped dialogues classes such as ``AbciDialogues``) are
+        kept by design: such classes have a ``__module__`` from another
+        skill and pass the filter. Framework dialogue base classes from
+        ``aea.protocols.dialogue.base`` are not ``SkillComponent``
+        subclasses and are filtered out by the first condition anyway.
 
         :param classes: a list of pairs (class name, class object)
         :return: a list of the same kind, but filtered with only skill component classes.
         """
         filtered_classes = filter(
             lambda name_and_class: issubclass(name_and_class[1], SkillComponent)
-            # the following condition filters out classes imported from 'aea'
-            and not str.startswith(name_and_class[1].__module__, "aea.")
-            # the following condition filters out classes imported
-            # from other skills
-            and not str.startswith(
-                name_and_class[1].__module__, self.skill_dotted_path + "."
-            ),
+            and not str.startswith(name_and_class[1].__module__, "aea."),
             classes,
         )
         classes = list(filtered_classes)
@@ -1186,10 +1230,14 @@ class _SkillComponentLoader:
             set_of_unused_classes = set(
                 filter(lambda x: x not in used_classes, set_of_classes)
             )
-            # filter out classes that are from other packages
+            # Filter out classes that are from other packages. Match both
+            # submodule classes (`packages.<a>.skills.<n>.foo.Bar`) and
+            # classes defined at the skill's `__init__.py` level (whose
+            # `__module__` equals `self.skill_dotted_path` exactly).
             set_of_unused_classes = set(
                 filter(
-                    lambda x: not str.startswith(x.__module__, "packages."),
+                    lambda x: x.__module__ == self.skill_dotted_path
+                    or str.startswith(x.__module__, self.skill_dotted_path + "."),
                     set_of_unused_classes,
                 )
             )

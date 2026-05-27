@@ -4,6 +4,34 @@
 
 AEA configuration utils.
 
+<a id="aea.configurations.utils.package_dotted_path"></a>
+
+#### package`_`dotted`_`path
+
+```python
+def package_dotted_path(author: str, package_type_plural: str,
+                        package_name: str, file_stem: str) -> str
+```
+
+Compose the canonical dotted path string for a file inside an AEA package.
+
+Returns a string of the form ``packages.<author>.<plural>.<name>.<stem>``.
+Has no side effects; the loaded module is registered in
+``sys.modules`` by ``aea.helpers.base.load_module``.
+
+**Arguments**:
+
+- `author`: package author (e.g. ``"valory"``).
+- `package_type_plural`: plural package-type token (``"skills"`` /
+``"contracts"`` / ``"connections"`` / ``"protocols"``).
+- `package_name`: the package's local name.
+- `file_stem`: source file stem without the ``.py`` suffix
+(``"contract"`` / ``"connection"`` / ``"behaviours"`` / ...).
+
+**Returns**:
+
+the composed packages-prefixed dotted path string.
+
 <a id="aea.configurations.utils.replace_component_ids"></a>
 
 #### replace`_`component`_`ids

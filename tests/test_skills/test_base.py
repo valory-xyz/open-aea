@@ -20,6 +20,7 @@
 """This module contains the tests for the base classes for the skills."""
 
 import shutil
+import types
 import unittest.mock
 from pathlib import Path
 from queue import Queue
@@ -363,6 +364,482 @@ def test_load_skill():
         Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
     )
     assert isinstance(skill, Skill)
+
+
+def test_compute_module_dotted_path_for_init_py_returns_skill_dotted_path():
+    """The skill's own `__init__.py` maps to `self.skill_dotted_path` exactly.
+
+    `load_aea_package` registers the skill's `__init__.py` under
+    ``packages.<a>.skills.<n>`` (no trailing ``.__init__`` suffix). The
+    loader must compute that same key so its subsequent `load_module`
+    call cache-hits and does NOT re-execute the file — re-execution
+    would create a second module object with duplicate class
+    identities, the dual-class-object problem the loader is built to
+    avoid. Discovery of components defined directly in `__init__.py`
+    is preserved because the cached module is still inspected via
+    `inspect.getmembers`.
+    """
+    loader = _make_skill_component_loader_for_dummy_skill()
+    assert (
+        loader._compute_module_dotted_path(Path("__init__.py"))
+        == loader.skill_dotted_path
+    )
+    # Subpackage __init__.py uses the subpackage name with no further suffix.
+    assert (
+        loader._compute_module_dotted_path(Path("subpkg") / "__init__.py")
+        == f"{loader.skill_dotted_path}.subpkg"
+    )
+    # Depth-2 nested subpackage joins every parent directory.
+    assert (
+        loader._compute_module_dotted_path(Path("subpkg") / "inner" / "__init__.py")
+        == f"{loader.skill_dotted_path}.subpkg.inner"
+    )
+
+
+def test_skill_loader_reuses_load_aea_package_module_for_init_py():
+    """The AEA loader must not re-execute the skill's `__init__.py`.
+
+    After ``load_aea_package`` registers the skill's `__init__.py` in
+    sys.modules at ``self.skill_dotted_path``, the subsequent
+    ``load_module`` call for that same file must cache-hit and return
+    the already-registered module — not execute the file a second time
+    and create duplicate class objects.
+    """
+    import sys
+
+    from aea.components.base import perform_load_aea_package
+    from aea.helpers.base import load_module
+
+    loader = _make_skill_component_loader_for_dummy_skill()
+    skill_dotted_path = loader.skill_dotted_path
+    init_py = loader.skill_directory / "__init__.py"
+
+    sys.modules.pop(skill_dotted_path, None)
+    perform_load_aea_package(
+        loader.skill_directory,
+        loader.configuration.public_id.author,
+        "skills",
+        loader.configuration.public_id.name,
+    )
+    pre = sys.modules[skill_dotted_path]
+    sentinel = object()
+    pre._b3_sentinel = sentinel  # type: ignore[attr-defined]
+    try:
+        post = load_module(skill_dotted_path, init_py)
+        assert post is pre, "load_module re-executed the skill's __init__.py"
+        assert (
+            getattr(post, "_b3_sentinel", None) is sentinel
+        ), "sentinel lost: a fresh module object was created"
+    finally:
+        sys.modules.pop(skill_dotted_path, None)
+
+
+def test_load_skill_components_have_canonical_module_paths():
+    """Loaded skill component classes carry the long packages-prefixed __module__.
+
+    The skill loader assigns ``packages.<author>.skills.<name>.<file>`` as
+    the module dotted path. Beyond the prefix check, the class object the
+    loader produced must be **identity-equal** to the class resolved via
+    ``importlib.import_module(__module__)`` — that's the user-facing
+    contract this PR establishes: a single class object per source file,
+    so e.g. open-autonomy's ``_MetaPayload.registry`` shrinks from two
+    entries (short + long) to one. A regression that re-executed the
+    file would stamp the same ``__module__`` on a duplicate class and
+    pass a prefix-only assertion; the identity check rejects it.
+    """
+    import importlib
+
+    agent_context = MagicMock(agent_name="name")
+    skill = Skill.from_dir(
+        Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
+    )
+    expected_prefix = "packages.dummy_author.skills.dummy."
+    for component in list(skill.behaviours.values()) + list(skill.handlers.values()):
+        cls = type(component)
+        assert cls.__module__.startswith(expected_prefix), (
+            f"{cls.__name__} has __module__={cls.__module__!r}, expected "
+            f"to start with {expected_prefix!r}"
+        )
+        resolved = getattr(importlib.import_module(cls.__module__), cls.__name__)
+        assert resolved is cls, (
+            f"{cls.__name__} loaded by the skill loader is not "
+            f"identity-equal to the class resolvable via "
+            f"importlib.import_module({cls.__module__!r}) — "
+            "re-execution / duplicate-class regression."
+        )
+
+
+def test_load_module_registers_in_sys_modules():
+    """``load_module`` puts the loaded module in sys.modules under its dotted path."""
+    import sys
+
+    from aea.helpers.base import load_module
+
+    dotted_path = "tests.data.dummy_skill.behaviours_b3_smoke"
+    filepath = Path(ROOT_DIR, "tests", "data", "dummy_skill", "behaviours.py")
+    sys.modules.pop(dotted_path, None)
+    try:
+        module = load_module(dotted_path, filepath)
+        assert sys.modules.get(dotted_path) is module
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
+def test_load_module_pops_sys_modules_on_exec_failure(tmp_path):
+    """If `exec_module` raises, the broken stub is removed from sys.modules.
+
+    Without rollback, a transient module-level error (syntax error, missing
+    env var at import time, etc.) permanently poisons sys.modules with a
+    half-initialised stub. Subsequent imports for the same dotted path
+    would then return the broken object rather than retrying the load.
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    broken = tmp_path / "broken.py"
+    broken.write_text("raise RuntimeError('boom at import time')\n")
+    dotted_path = "tests_b3_broken_module"
+    sys.modules.pop(dotted_path, None)
+    try:
+        with pytest.raises(RuntimeError, match="boom at import time"):
+            load_module(dotted_path, broken)
+        assert (
+            dotted_path not in sys.modules
+        ), "load_module must roll back its sys.modules entry on exec failure"
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
+def test_load_module_reuses_cached_module_for_same_dotted_path(tmp_path):
+    """`load_module` reuses any module already cached at the dotted path.
+
+    Whether the second call points at the same physical file or a
+    different one (e.g. a vendor copy in a tmpdir vs the source tree
+    in test fixtures), `load_module` returns the cached object — never
+    re-executes. Re-execution would create duplicate class objects
+    for callers that already hold references to the original
+    definitions (e.g. via an earlier ``from ... import X``). Mirrors
+    Python's own import semantics: once registered, the cached module
+    is canonical for that dotted path.
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    same_src = tmp_path / "cached_source.py"
+    same_src.write_text("class Marker:\n    pass\n")
+    other_src = tmp_path / "different_source.py"
+    other_src.write_text("class Other:\n    pass\n")
+
+    dotted_path = "tests_b3_cache_reuse"
+    sys.modules.pop(dotted_path, None)
+    try:
+        first = load_module(dotted_path, same_src)
+        first_marker = first.Marker  # type: ignore[attr-defined]
+
+        # Same file → reuse.
+        second = load_module(dotted_path, same_src)
+        assert second is first, "load_module re-executed for the same file"
+        assert second.Marker is first_marker  # type: ignore[attr-defined]
+
+        # Different file at the same dotted path → still reuse the
+        # cached module. ``Marker`` survives; ``Other`` is NOT defined
+        # on the returned module because the second source was never
+        # executed.
+        third = load_module(dotted_path, other_src)
+        assert third is first, (
+            "load_module re-executed when the cached dotted path was "
+            "called with a different physical file"
+        )
+        assert hasattr(third, "Marker")
+        assert not hasattr(third, "Other")
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
+def test_load_module_raises_import_error_on_explicit_none_block_sentinel(
+    tmp_path,
+):
+    """An explicit ``sys.modules[key] = None`` raises ``ImportError``.
+
+    ``None`` is CPython's block-import sentinel. `load_module` mirrors
+    standard import semantics: it raises ``ImportError`` rather than
+    overwriting the sentinel with a fresh exec, and the sentinel
+    survives the failed call so the caller's deliberate block stays
+    in place.
+    """
+    import sys
+
+    from aea.helpers.base import load_module
+
+    src = tmp_path / "should_not_be_loaded.py"
+    src.write_text("class Marker:\n    pass\n")
+    dotted_path = "tests_b3_block_import_sentinel"
+
+    sys.modules[dotted_path] = None  # type: ignore[assignment]
+    try:
+        with pytest.raises(ImportError, match="None in sys.modules"):
+            load_module(dotted_path, src)
+        assert (
+            dotted_path in sys.modules
+        ), "load_module unexpectedly removed the explicit-None prior"
+        assert sys.modules[dotted_path] is None
+    finally:
+        sys.modules.pop(dotted_path, None)
+
+
+def test_load_module_resolves_via_sys_modules_on_re_import():
+    """A normal `import` of the just-loaded dotted path returns the same object.
+
+    The skill loader pre-loads parent `__init__.py` files and then calls
+    ``load_module`` for individual files (`behaviours.py`, etc.). Without the
+    sys.modules write, a subsequent ``from packages.X.skills.Y.foo import Bar``
+    would re-execute `foo.py` and produce a second copy of every class. With
+    the write, the import is a cache hit.
+    """
+    import importlib
+    import sys
+
+    agent_context = MagicMock(agent_name="name")
+    Skill.from_dir(
+        Path(ROOT_DIR, "tests", "data", "dummy_skill"), agent_context=agent_context
+    )
+    canonical = "packages.dummy_author.skills.dummy.behaviours"
+    assert canonical in sys.modules, sorted(
+        k for k in sys.modules if k.startswith("packages.dummy_author.")
+    )
+    cached = sys.modules[canonical]
+    assert importlib.import_module(canonical) is cached
+
+
+def _make_skill_component_loader_for_dummy_skill():
+    """Construct a fully-initialised `_SkillComponentLoader` for the dummy fixture.
+
+    Uses the normal `__init__` path so every invariant the production loader
+    relies on (including `skill_directory` and `skill_dotted_path`) is set
+    consistently — tests that touch private methods through this loader will
+    survive future refactors that read additional state from `self`.
+    """
+    skill_dir = Path(ROOT_DIR, "tests", "data", "dummy_skill")
+    configuration = load_component_configuration(
+        ComponentType.SKILL, skill_dir, skip_consistency_check=True
+    )
+    configuration._directory = skill_dir  # pylint: disable=protected-access
+    skill_context = MagicMock()
+    return _SkillComponentLoader(configuration, skill_context)
+
+
+def test_parse_module_preserves_subpackage_path_in_dotted_key(tmp_path, monkeypatch):
+    """`_parse_module`'s dotted key matches the main loader for subpackages.
+
+    A flat file produces the same key under both paths trivially; a
+    subpackage file diverges if `_parse_module` drops parent
+    directories. Drives through a real `SkillContext` + `Skill` (not a
+    `MagicMock`) so the production attribute path —
+    ``skill_context._skill.configuration.directory`` — is exercised.
+    A regression on that path would auto-vivify on a Mock and silently
+    pass; here it surfaces.
+    """
+    skill_root = tmp_path / "myskill"
+    (skill_root / "subpkg").mkdir(parents=True)
+    behaviour_file = skill_root / "subpkg" / "behaviours.py"
+    behaviour_file.write_text("# stub\n")
+
+    captured = {}
+
+    def fake_load_module(dotted_path, *_args, **_kwargs):
+        captured["dotted_path"] = dotted_path
+        return types.ModuleType("fake")
+
+    monkeypatch.setattr("aea.skills.base.load_module", fake_load_module)
+
+    configuration = SkillConfig(name="myskill", author="dummy_author")
+    configuration._directory = skill_root  # pylint: disable=protected-access
+    skill = Skill(configuration=configuration)
+
+    try:
+        Behaviour.parse_module(
+            behaviour_file,
+            {"b": SkillComponentConfiguration("FakeBehaviour")},
+            skill.skill_context,
+        )
+    except Exception:  # pragma: nocover
+        pass
+
+    assert captured["dotted_path"] == (
+        "packages.dummy_author.skills.myskill.subpkg.behaviours"
+    ), (
+        "legacy parse_module path must preserve subpackage parents in the "
+        f"dotted key; got {captured['dotted_path']!r}."
+    )
+
+
+def test_parse_module_keys_by_file_stem_not_type_plural(tmp_path, monkeypatch):
+    """`_parse_module` keys the loaded module by the file stem.
+
+    A custom skill may have a `strategy.py` parsed via `Model.parse_module`.
+    `_compute_module_dotted_path` would key it under
+    ``packages.<a>.skills.<n>.strategy``. If `_parse_module` keyed instead
+    by the plural type-name (``models``) the two cache entries would
+    diverge and reintroduce the dual-module-object problem this PR
+    eliminates.
+    """
+    captured = {}
+
+    class _DummyModel(Model):
+        def __init__(self, **kwargs):  # pragma: nocover
+            pass
+
+    _DummyModel.__module__ = "packages.dummy_author.skills.dummy.strategy"
+    fake_module = types.ModuleType("fake_strategy")
+    fake_module.S = _DummyModel  # type: ignore[attr-defined]
+
+    def fake_load_module(dotted_path, *_args, **_kwargs):
+        captured["dotted_path"] = dotted_path
+        return fake_module
+
+    monkeypatch.setattr("aea.skills.base.load_module", fake_load_module)
+
+    strategy_file = tmp_path / "strategy.py"
+    strategy_file.write_text("# stub\n")
+
+    skill_context = MagicMock()
+    skill_context.skill_id = PublicId.from_str("dummy_author/dummy:0.1.0")
+
+    Model.parse_module(
+        strategy_file,
+        {"s": SkillComponentConfiguration("S")},
+        skill_context,
+    )
+    assert captured["dotted_path"] == ("packages.dummy_author.skills.dummy.strategy"), (
+        "Legacy parse_module path must key its load_module call by the "
+        f"file stem to match _compute_module_dotted_path. Got "
+        f"{captured['dotted_path']!r}."
+    )
+
+
+def test_parse_module_keeps_classes_under_canonical_long_path(tmp_path, monkeypatch):
+    """The legacy `_parse_module` path keeps this skill's own classes.
+
+    After `_parse_module` was switched to call `load_module` with the canonical
+    long dotted path (`packages.<author>.skills.<name>.<file>`), classes
+    defined in the loaded module carry that long `__module__`. The old
+    "exclude classes whose `__module__` starts with this skill's path"
+    clause — present in the legacy filter before this PR — would now wrongly
+    drop them. This test pins the filter alignment with `_filter_classes`.
+    """
+
+    class _LocalBehaviour(Behaviour):
+        def setup(self):  # pragma: nocover
+            pass
+
+        def act(self):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    # __module__ matches the dotted path `_parse_module` now computes for
+    # this skill's `behaviours.py`. A class loaded by the real `load_module`
+    # under that name would observe exactly this value.
+    _LocalBehaviour.__module__ = "packages.local_author.skills.local.behaviours"
+
+    import types as types_module
+
+    fake_module = types_module.ModuleType("fake_behaviours")
+    fake_module.LocalBehaviour = _LocalBehaviour  # type: ignore[attr-defined]
+
+    monkeypatch.setattr("aea.skills.base.load_module", lambda *_a, **_k: fake_module)
+
+    behaviour_file = tmp_path / "behaviours.py"
+    behaviour_file.write_text("# stub\n")
+
+    skill_context = MagicMock()
+    skill_context.skill_id = PublicId.from_str("local_author/local:0.1.0")
+
+    result = Behaviour.parse_module(
+        behaviour_file,
+        {"local_b": SkillComponentConfiguration("LocalBehaviour")},
+        skill_context,
+    )
+    assert "local_b" in result, (
+        "the legacy parse_module path dropped a class loaded under the "
+        f"canonical long dotted path; got {sorted(result.keys())}"
+    )
+    assert isinstance(result["local_b"], _LocalBehaviour)
+
+
+def test_unused_class_warning_includes_init_py_level_components():
+    """The unused-class warning fires for `__init__.py`-level components.
+
+    `SkillComponent` subclasses defined at the skill's ``__init__.py`` level
+    have ``__module__`` equal to ``self.skill_dotted_path`` exactly, with no
+    trailing dot. Without the exact-match clause they would be silently
+    filtered out and the "found but not declared" warning would never fire.
+    """
+
+    class _InitPyHandler(Handler):
+        def setup(self):  # pragma: nocover
+            pass
+
+        def handle(self, message):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    loader = _make_skill_component_loader_for_dummy_skill()
+    # Pin __module__ to the skill's dotted path exactly — the shape a class
+    # defined directly in `packages/<a>/skills/<n>/__init__.py` would have.
+    _InitPyHandler.__module__ = loader.skill_dotted_path
+
+    init_py_path = Path(loader.skill_directory, "__init__.py")
+    loader._print_warning_message_for_unused_classes(
+        component_classes_by_path={
+            init_py_path: {("_InitPyHandler", _InitPyHandler)},
+        },
+        used_classes=set(),
+    )
+    warnings = [
+        call.args[0] for call in loader.skill_context.logger.warning.call_args_list
+    ]
+    assert any(
+        "_InitPyHandler" in msg for msg in warnings
+    ), f"Expected a warning mentioning the __init__.py-level class; got {warnings!r}"
+
+
+def test_load_skill_filter_keeps_cross_skill_re_exports():
+    """Cross-skill re-exports survive `_filter_classes`.
+
+    SkillComponent subclasses whose ``__module__`` points at another skill —
+    the canonical FSM composition idiom where a skill re-exports a parent's
+    ``AbciDialogues`` / ``HttpHandler`` etc. as its own — must be kept.
+    """
+
+    class _ForeignHandler(Handler):
+        """A Handler whose __module__ belongs to a different skill."""
+
+        def setup(self):  # pragma: nocover
+            pass
+
+        def handle(self, message):  # pragma: nocover
+            pass
+
+        def teardown(self):  # pragma: nocover
+            pass
+
+    # Simulate the cross-skill re-export: the class was defined in another
+    # skill's package, but `getmembers` on the composing skill's module
+    # surfaces it via a top-level import.
+    _ForeignHandler.__module__ = "packages.dummy_author.skills.parent.handlers"
+
+    loader = _make_skill_component_loader_for_dummy_skill()
+    kept = loader._filter_classes([("AbciHandler", _ForeignHandler)])
+    assert kept == [("AbciHandler", _ForeignHandler)], (
+        "Cross-skill re-exports must survive the filter; composition skills "
+        "rely on this to bind a parent skill's Handler as their own."
+    )
 
 
 def test_behaviour():

@@ -244,6 +244,9 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
         )
 
     ctx.clean_paths.append(str(dest))
+    # Save ctx.cwd so the local-registry path swap below does not leak out
+    # of this call.
+    preserve_cwd = ctx.cwd
     try:
         # copy the item package into the agent project.
         src = Path(os.path.join(AEA_DIR, item_type_plural, "scaffold"))
@@ -283,6 +286,12 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
         if to_local_registry:
             ctx.cwd = str(registry_path / author_name)
             fingerprint_item(ctx, item_type, new_public_id)
+            # Restore now (not just in the `finally` below) so the
+            # `--with-symlinks` calls to `create_symlink_vendor_to_local` /
+            # `create_symlink_packages_to_vendor` further down — both of
+            # which read `ctx.cwd` — see the original agent directory
+            # instead of the registry author path.
+            ctx.cwd = preserve_cwd
         else:
             fingerprint_item(ctx, item_type, new_public_id)
 
@@ -314,6 +323,8 @@ def scaffold_item(ctx: Context, item_type: str, item_name: str) -> None:
         )
     except Exception as e:
         raise click.ClickException(str(e))
+    finally:
+        ctx.cwd = preserve_cwd
 
 
 def _scaffold_dm_handler(ctx: Context) -> None:

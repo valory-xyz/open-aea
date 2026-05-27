@@ -127,9 +127,37 @@ def load_module(dotted_path: str, filepath: Path) -> types.ModuleType:
     :raises ValueError: if the filepath provided is not a module.  # noqa: DAR402
     :raises Exception: if the execution of the module raises exception.  # noqa: DAR402
     """
+    # If the dotted path is already in ``sys.modules``, reuse it instead
+    # of re-executing the file. Re-execution creates a duplicate copy of
+    # every class defined in the source, breaking class identity for
+    # callers that already hold a reference (e.g. via an earlier
+    # ``from ... import X``). ``__file__`` is intentionally NOT compared
+    # — in test fixtures the same logical package may be reached
+    # through different physical files (vendor copy in a tmpdir vs the
+    # source tree) but both register the same dotted path and must
+    # resolve to the same module object across the whole process. An
+    # explicit ``None`` entry is CPython's block-import sentinel: raise
+    # ``ImportError`` to match the standard import semantics rather
+    # than silently overwriting it with a fresh exec.
+    if dotted_path in sys.modules:
+        existing = sys.modules[dotted_path]
+        if existing is None:
+            raise ImportError(f"import of {dotted_path!r} halted; None in sys.modules")
+        return existing
     spec = importlib.util.spec_from_file_location(dotted_path, str(filepath))
     module = importlib.util.module_from_spec(cast(ModuleSpec, spec))
-    spec.loader.exec_module(module)  # type: ignore
+    # Register before exec so a downstream `import` of the same dotted
+    # path during exec resolves to this module. We only reach this point
+    # when the key was absent (the cache-hit and block-import branches
+    # above covered the other two cases), so on exec failure we pop the
+    # half-built stub rather than restoring a prior entry that, by
+    # construction, did not exist.
+    sys.modules[dotted_path] = module
+    try:
+        spec.loader.exec_module(module)  # type: ignore
+    except BaseException:  # pylint: disable=broad-except
+        sys.modules.pop(dotted_path, None)
+        raise
     return module
 
 

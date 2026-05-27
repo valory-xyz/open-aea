@@ -229,6 +229,39 @@ Load agent configuration from configuration json data.
 
 AgentConfig instance
 
+<a id="aea.configurations.loader.parse_service_yaml"></a>
+
+#### parse`_`service`_`yaml
+
+```python
+def parse_service_yaml(
+        file_pointer: TextIO) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]
+```
+
+Parse a service configuration YAML stream into its raw documents.
+
+Returns the head service configuration document and any override
+documents without applying schema validation or constructing a
+typed configuration object. Callers that need to apply additional
+transformations (e.g. environment variable substitution) before
+validation can use this helper as the parse step.
+
+**Arguments**:
+
+- `file_pointer`: an open text stream pointing at a service.yaml.
+
+**Raises**:
+
+- `ValueError`: if the stream is empty, or if the head document is
+not a YAML mapping (e.g. a bare ``---``, a scalar, or a sequence).
+- `yaml.YAMLError`: if the stream contains malformed YAML and the underlying parser fails (propagated as-is so callers can handle parse errors and shape errors distinctly).  # noqa: DAR402
+
+**Returns**:
+
+a ``(service_config, overrides)`` tuple where ``service_config``
+is the head document and ``overrides`` is the list of trailing
+documents.
+
 <a id="aea.configurations.loader.ConfigLoaders"></a>
 
 ## ConfigLoaders Objects

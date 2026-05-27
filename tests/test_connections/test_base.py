@@ -183,6 +183,45 @@ def test_from_dir():
     )
 
 
+def test_from_dir_registers_connection_under_canonical_dotted_path():
+    """Loaded connection module is registered under a canonical dotted path.
+
+    The `sys.modules` cache entry must use the packages-prefixed dotted
+    path, not the bare ``"connection_module"`` key. The cached
+    connection class must also be identity-equal to the class resolvable
+    via ``importlib.import_module`` — proving the cached module is the
+    one that owns the class (no duplicate produced by re-execution).
+    """
+    import importlib
+    import sys
+
+    dummy_connection_dir = os.path.join(CUR_PATH, "data", "dummy_connection")
+    identity = MagicMock()
+    identity.name = "agent_name"
+    crypto_store = MagicMock()
+    data_dir = MagicMock()
+
+    expected_key = "packages.fetchai.connections.dummy.connection"
+    sys.modules.pop(expected_key, None)
+    sys.modules.pop("connection_module", None)
+    try:
+        connection = Connection.from_dir(
+            dummy_connection_dir, identity, crypto_store, data_dir
+        )
+        assert expected_key in sys.modules
+        assert "connection_module" not in sys.modules
+
+        cached = sys.modules[expected_key]
+        connection_class = type(connection)
+        resolved_class = getattr(
+            importlib.import_module(expected_key), connection_class.__name__
+        )
+        assert resolved_class is connection_class
+        assert getattr(cached, connection_class.__name__) is connection_class
+    finally:
+        sys.modules.pop(expected_key, None)
+
+
 def test_from_config_exception_path():
     """Test Connection.from_config with exception"""
     dummy_connection_dir = os.path.join(CUR_PATH, "data", "dummy_connection")

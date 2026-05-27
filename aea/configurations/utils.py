@@ -34,7 +34,32 @@ from aea.configurations.base import (
     PublicId,
     SkillConfig,
 )
+from aea.configurations.constants import PACKAGES
 from aea.configurations.data_types import PackageIdPrefix
+
+
+def package_dotted_path(
+    author: str,
+    package_type_plural: str,
+    package_name: str,
+    file_stem: str,
+) -> str:
+    """
+    Compose the canonical dotted path string for a file inside an AEA package.
+
+    Returns a string of the form ``packages.<author>.<plural>.<name>.<stem>``.
+    Has no side effects; the loaded module is registered in
+    ``sys.modules`` by ``aea.helpers.base.load_module``.
+
+    :param author: package author (e.g. ``"valory"``).
+    :param package_type_plural: plural package-type token (``"skills"`` /
+        ``"contracts"`` / ``"connections"`` / ``"protocols"``).
+    :param package_name: the package's local name.
+    :param file_stem: source file stem without the ``.py`` suffix
+        (``"contract"`` / ``"connection"`` / ``"behaviours"`` / ...).
+    :return: the composed packages-prefixed dotted path string.
+    """
+    return f"{PACKAGES}.{author}.{package_type_plural}.{package_name}.{file_stem}"
 
 
 @singledispatch

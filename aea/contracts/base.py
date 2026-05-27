@@ -30,6 +30,7 @@ from aea.components.base import Component, load_aea_package
 from aea.configurations.base import ComponentType, ContractConfig, PublicId
 from aea.configurations.constants import CONTRACTS
 from aea.configurations.loader import load_component_configuration
+from aea.configurations.utils import package_dotted_path
 from aea.crypto.base import LedgerApi
 from aea.crypto.registries import Registry, ledger_apis_registry, make_ledger_api_cls
 from aea.exceptions import AEAComponentLoadException, AEAException
@@ -123,7 +124,13 @@ class Contract(Component):
             raise ValueError("Configuration must be associated with a directory.")
         directory = configuration.directory
         load_aea_package(configuration)
-        contract_module = load_module(CONTRACTS, directory / "contract.py")
+        dotted_path = package_dotted_path(
+            configuration.public_id.author,
+            CONTRACTS,
+            configuration.public_id.name,
+            "contract",
+        )
+        contract_module = load_module(dotted_path, directory / "contract.py")
         classes = inspect.getmembers(contract_module, inspect.isclass)
         contract_class_name = cast(str, configuration.class_name)
         contract_classes = list(filter(lambda x: x[0] == contract_class_name, classes))

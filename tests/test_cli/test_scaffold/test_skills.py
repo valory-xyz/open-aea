@@ -279,6 +279,206 @@ class TestScaffoldSkillToRegistry:
             pass
 
 
+class TestScaffoldSkillPreservesCtxCwdToLocalRegistry:
+    """Scaffolding into a local registry must not leak ctx.cwd to the caller."""
+
+    @classmethod
+    def setup_class(cls):
+        """Set the test up."""
+        cls.runner = CliRunner()
+        cls.agent_name = "myagent"
+        cls.resource_name = "myresource"
+        cls.cwd = os.getcwd()
+        cls.t = tempfile.mkdtemp()
+        dir_path = Path("packages")
+        tmp_dir = cls.t / dir_path
+        src_dir = cls.cwd / Path(ROOT_DIR, dir_path)
+        shutil.copytree(str(src_dir), str(tmp_dir))
+
+        os.chdir(cls.t)
+        result = cls.runner.invoke(
+            cli, [*CLI_LOG_OPTION, "init", "--local", "--author", AUTHOR]
+        )
+        assert result.exit_code == 0
+
+    def test_ctx_cwd_unchanged_after_scaffold_item(self):
+        """scaffold_item must restore ctx.cwd it temporarily mutates."""
+        import aea.cli.scaffold as scaffold_module
+
+        captured = {}
+        original_scaffold_item = scaffold_module.scaffold_item
+        original_fingerprint_item = scaffold_module.fingerprint_item
+
+        def fingerprint_spy(ctx, *args, **kwargs):
+            captured["during"] = ctx.cwd
+            return original_fingerprint_item(ctx, *args, **kwargs)
+
+        def scaffold_spy(ctx, *args, **kwargs):
+            captured["pre"] = ctx.cwd
+            result = original_scaffold_item(ctx, *args, **kwargs)
+            captured["post"] = ctx.cwd
+            return result
+
+        with unittest.mock.patch.object(
+            scaffold_module, "scaffold_item", side_effect=scaffold_spy
+        ), unittest.mock.patch.object(
+            scaffold_module, "fingerprint_item", side_effect=fingerprint_spy
+        ):
+            result = self.runner.invoke(
+                cli,
+                [
+                    *CLI_LOG_OPTION,
+                    "--registry-path=packages",
+                    "scaffold",
+                    "--to-local-registry",
+                    "skill",
+                    self.resource_name,
+                ],
+                standalone_mode=False,
+            )
+        assert result.exit_code == 0, result.output
+
+        # All three observations were recorded.
+        assert {"pre", "during", "post"} <= captured.keys(), captured
+
+        # The mutation actually happens: at fingerprint time ctx.cwd points
+        # at the registry author directory, not at the original agent cwd.
+        assert captured["during"] != captured["pre"], (
+            "fingerprint_item should observe the local-registry path swap; "
+            f"pre={captured['pre']!r} during={captured['during']!r}"
+        )
+        assert captured["during"].endswith(AUTHOR), captured["during"]
+
+        # The mutation is reversed by the time scaffold_item returns.
+        assert captured["post"] == captured["pre"], (
+            "scaffold_item leaked ctx.cwd to the caller: "
+            f"pre={captured['pre']!r} post={captured['post']!r}"
+        )
+
+    def test_symlinks_block_sees_restored_cwd(self):
+        """`--with-symlinks` + `--to-local-registry` must see the original `ctx.cwd`.
+
+        If the inline restore between `fingerprint_item` and the symlink
+        helpers is dropped, those helpers would create vendor symlinks under
+        the registry author dir instead of the agent dir.
+        """
+        import aea.cli.scaffold as scaffold_module
+
+        captured = {}
+
+        def spy_vendor_to_local(ctx, *args, **kwargs):
+            captured["vendor_to_local_cwd"] = ctx.cwd
+            # Stub the side effect — the test only cares about ctx.cwd at
+            # call time, not about whether the symlink would succeed in the
+            # tmp setup. Returning None matches the production helper's type.
+            return None
+
+        def spy_packages_to_vendor(ctx, *args, **kwargs):
+            captured["packages_to_vendor_cwd"] = ctx.cwd
+            return None
+
+        # Use a fresh resource name to avoid collisions with the other test
+        # in this class (the class shares a single setup_class fixture).
+        resource_name = "another_resource"
+        with unittest.mock.patch.object(
+            scaffold_module,
+            "create_symlink_vendor_to_local",
+            side_effect=spy_vendor_to_local,
+        ), unittest.mock.patch.object(
+            scaffold_module,
+            "create_symlink_packages_to_vendor",
+            side_effect=spy_packages_to_vendor,
+        ):
+            result = self.runner.invoke(
+                cli,
+                [
+                    *CLI_LOG_OPTION,
+                    "--registry-path=packages",
+                    "scaffold",
+                    "--to-local-registry",
+                    "--with-symlinks",
+                    "skill",
+                    resource_name,
+                ],
+                standalone_mode=False,
+            )
+        assert result.exit_code == 0, result.output
+        assert {"vendor_to_local_cwd", "packages_to_vendor_cwd"} <= captured.keys(), (
+            "both symlink helpers must be invoked; " f"got {sorted(captured.keys())}"
+        )
+        # Both helpers must see the agent cwd, not the registry path swap.
+        for key, cwd in captured.items():
+            assert not cwd.endswith(AUTHOR), (
+                f"{key} saw the registry author path instead of the agent cwd: "
+                f"{cwd!r}"
+            )
+
+    def test_ctx_cwd_restored_on_exception_after_local_registry_swap(self):
+        """`scaffold_item`'s `finally` restores `ctx.cwd` on exception.
+
+        Callers must observe the original `ctx.cwd` even when the inner
+        fingerprint step (or any subsequent step before the `finally`)
+        raises after the local-registry path swap. This is what the
+        try/finally was added for.
+        """
+        import aea.cli.scaffold as scaffold_module
+
+        captured = {}
+        original_scaffold_item = scaffold_module.scaffold_item
+
+        def fail_after_swap(ctx, *args, **kwargs):  # noqa: D401
+            """Stand-in for `fingerprint_item` that raises after the swap."""
+            captured["during"] = ctx.cwd
+            raise RuntimeError("boom after local-registry cwd swap")
+
+        def scaffold_spy(ctx, *args, **kwargs):
+            captured["pre"] = ctx.cwd
+            try:
+                return original_scaffold_item(ctx, *args, **kwargs)
+            finally:
+                captured["post"] = ctx.cwd
+
+        resource_name = "exc_resource"
+        with unittest.mock.patch.object(
+            scaffold_module, "scaffold_item", side_effect=scaffold_spy
+        ), unittest.mock.patch.object(
+            scaffold_module, "fingerprint_item", side_effect=fail_after_swap
+        ):
+            result = self.runner.invoke(
+                cli,
+                [
+                    *CLI_LOG_OPTION,
+                    "--registry-path=packages",
+                    "scaffold",
+                    "--to-local-registry",
+                    "skill",
+                    resource_name,
+                ],
+                standalone_mode=False,
+            )
+        # The CLI surfaces the runtime error as a click.ClickException
+        # produced by scaffold_item's `except Exception` handler — exit
+        # code is therefore non-zero.
+        assert result.exit_code != 0, result.output
+        assert {"pre", "during", "post"} <= captured.keys(), captured
+        # The swap happened (fingerprint_item saw the registry author path)…
+        assert captured["during"].endswith(AUTHOR), captured["during"]
+        # …and the finally restored ctx.cwd before scaffold_item returned.
+        assert captured["post"] == captured["pre"], (
+            "scaffold_item leaked ctx.cwd to the caller on the exception "
+            f"path: pre={captured['pre']!r} post={captured['post']!r}"
+        )
+
+    @classmethod
+    def teardown_class(cls):
+        """Tear the test down."""
+        os.chdir(cls.cwd)
+        try:
+            shutil.rmtree(cls.t)
+        except (OSError, IOError):
+            pass
+
+
 class TestScaffoldSkillFailsWhenDirectoryAlreadyExists:
     """Test that the command 'aea scaffold skill' fails when a folder with 'scaffold' name already."""
 
