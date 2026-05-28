@@ -33,7 +33,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-ledger-ethereum",
-    version="2.2.6",
+    version="2.2.7",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of Ethereum.",
