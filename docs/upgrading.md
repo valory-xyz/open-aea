@@ -9,6 +9,22 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.7` to `v2.2.8`
+
+This is a non-breaking patch release. It contains a single fix: a thread-safety race in `open-aea-ledger-ethereum`'s `try_get_gas_pricing` that caused `tx["gasPrice"]` to be set to a dict instead of an integer under concurrent load (cf. #921).
+
+### `open-aea-ledger-ethereum` — `try_get_gas_pricing` no longer mutates the shared `Web3` instance
+
+`try_get_gas_pricing` previously called `w3.eth.set_gas_price_strategy` / `generate_gas_price()` / restore to invoke the strategy. This created a race window: a concurrent `build_transaction` call that reached `fill_transaction_defaults` while the strategy was temporarily set would observe a non-None `generate_gas_price()` result, force `is_dynamic_fee_transaction = False`, and store the entire strategy-returned dict as `tx["gasPrice"]` (e.g. `{"maxFeePerGas": 2000000000, "maxPriorityFeePerGas": 300000000}`). Downstream code then crashed with `TypeError: unsupported operand type(s) for *: 'dict' and 'float'`.
+
+The fix calls the strategy callable directly — `gas_price_strategy_callable(self._api, None)` — which never touches `w3.eth._gas_price_strategy`. No caller-visible behaviour change under single-threaded use.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea-ledger-ethereum==2.2.8"` (and the same `2.2.8` pin for any other `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.8`.
+- No agent / package / config edits are required.
+
 ## `v2.2.6` to `v2.2.7`
 
 This is a non-breaking patch release covering: upstream hooks that let open-autonomy drop three local workarounds (cf. [open-autonomy#2485](https://github.com/valory-xyz/open-autonomy/issues/2485), open-aea #918), a fix for double-formatted agent log lines (cf. #914 / #917), an env-var encoding fix for service overrides with bash-unsafe dict keys (cf. [open-autonomy#2243](https://github.com/valory-xyz/open-autonomy/issues/2243), #915), an `aea-ci check-dependencies` fix for grouped and optional-without-`extras` pyproject deps (#916), and a docs rewrite of `docs/connection-resilience.md` (#912).

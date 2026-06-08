@@ -1,5 +1,11 @@
 # Release History - open AEA
 
+## 2.2.8 (2026-06-08)
+
+Plugins:
+
+- `open-aea-ledger-ethereum` (`try_get_gas_pricing`): eliminates a thread-safety race that caused `tx["gasPrice"]` to be set to a dict (e.g. `{"maxFeePerGas": ..., "maxPriorityFeePerGas": ...}`) instead of an integer. The previous implementation temporarily mutated `w3.eth._gas_price_strategy` via `set_gas_price_strategy` / `generate_gas_price()` / restore. A concurrent `build_transaction` call would invoke `fill_transaction_defaults` inside that window, observe a non-None `generate_gas_price()` result, force `is_dynamic_fee_transaction = False`, and store the entire strategy-returned dict as `tx["gasPrice"]`. Downstream arithmetic on that dict crashed with `TypeError: unsupported operand type(s) for *: 'dict' and 'float'`, surfacing as an HTTP 500 in Pearl's backend. Fix calls the strategy callable directly — `gas_price_strategy_callable(self._api, None)` — which is what `generate_gas_price()` did internally but never touches `w3.eth._gas_price_strategy`. The race window is eliminated. #921
+
 ## 2.2.7 (2026-05-27)
 
 Framework:
