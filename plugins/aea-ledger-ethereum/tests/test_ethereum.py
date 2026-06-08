@@ -28,6 +28,7 @@ import os
 import random
 import re
 import tempfile
+import threading
 import time
 from enum import Enum
 from pathlib import Path
@@ -67,6 +68,7 @@ from eth_typing import BlockNumber
 from eth_utils.currency import to_wei
 from requests import HTTPError
 from web3 import Web3
+from web3._utils.transactions import fill_transaction_defaults
 from web3.datastructures import AttributeDict
 from web3.exceptions import ContractLogicError
 from web3.types import FeeHistory, Wei
@@ -1885,3 +1887,129 @@ def test_update_with_gas_estimate_method_raise_on_try(
                 },
                 raise_on_try=True,
             )
+
+
+def test_try_get_gas_pricing_does_not_mutate_w3_strategy() -> None:
+    """try_get_gas_pricing must never call set_gas_price_strategy on the shared w3 instance.
+
+    Mutating w3.eth._gas_price_strategy is not thread-safe: a concurrent
+    build_transaction call can observe the temporary strategy inside
+    fill_transaction_defaults and set tx["gasPrice"] to a dict instead of an
+    int, causing a TypeError later when arithmetic is applied to it.
+
+    With the fix, the strategy callable is invoked directly without touching
+    w3.eth at all, so this test passes.  Without the fix, set_gas_price_strategy
+    is called twice (set + restore) and the assertion fails.
+    """
+    ethereum_api = EthereumApi(address="http://localhost:8545", chain_id=100)
+
+    GAS_PRICE = {"maxFeePerGas": 2_000_000_000, "maxPriorityFeePerGas": 300_000_000}
+
+    def mock_strategy(w3: Web3, tx_params: object) -> dict:
+        return GAS_PRICE
+
+    mutations: list = []
+    original_set = ethereum_api._api.eth.set_gas_price_strategy
+
+    def tracking_set(fn: object) -> None:
+        mutations.append(fn)
+        original_set(fn)  # type: ignore[arg-type]
+
+    with mock.patch.object(
+        ethereum_api,
+        "_get_gas_price_strategy",
+        return_value=("eip1559", mock_strategy),
+    ):
+        ethereum_api._api.eth.set_gas_price_strategy = tracking_set  # type: ignore[method-assign]
+        try:
+            ethereum_api.try_get_gas_pricing("eip1559")
+        finally:
+            ethereum_api._api.eth.set_gas_price_strategy = original_set  # type: ignore[method-assign]
+
+    assert mutations == [], (
+        "try_get_gas_pricing called set_gas_price_strategy, which creates a "
+        "thread-safety race window with concurrent build_transaction calls."
+    )
+
+
+def test_try_get_gas_pricing_concurrent_fill_transaction_defaults() -> None:
+    """Regression test for gasPrice being set to a dict during a concurrent build_transaction.
+
+    Root cause: try_get_gas_pricing used to temporarily set a gas price strategy
+    on the shared w3.eth object.  While the strategy was active, a concurrent
+    fill_transaction_defaults call (from build_transaction / w3_tx.build_transaction)
+    would observe a non-None generate_gas_price() result and store the entire
+    returned dict as tx["gasPrice"], producing:
+
+        tx["gasPrice"] = {"maxFeePerGas": ..., "maxPriorityFeePerGas": ...}
+
+    Downstream code then crashed with:
+
+        TypeError: unsupported operand type(s) for *: 'dict' and 'float'
+
+    This test makes the race deterministic: a threading.Event pauses the strategy
+    callable at the exact moment fill_transaction_defaults runs, so the race
+    window is always entered.
+
+    With the fix, w3.eth._gas_price_strategy is never mutated, so
+    fill_transaction_defaults sees generate_gas_price() == None, correctly
+    identifies an EIP-1559 transaction, and omits the gasPrice field entirely.
+    """
+    ethereum_api = EthereumApi(address="http://localhost:8545", chain_id=100)
+
+    GAS_PRICE = {"maxFeePerGas": 2_000_000_000, "maxPriorityFeePerGas": 300_000_000}
+
+    # Events for deterministic ordering.
+    strategy_executing = threading.Event()
+    fill_done = threading.Event()
+
+    call_count = [0]
+
+    def pausing_strategy(w3: Web3, tx_params: object) -> dict:
+        """Pause on the first invocation to open the race window."""
+        call_count[0] += 1
+        if call_count[0] == 1:
+            strategy_executing.set()
+            fill_done.wait(timeout=5)
+        return GAS_PRICE
+
+    corrupted: list = []
+
+    def run_get_gas() -> None:
+        with mock.patch.object(
+            ethereum_api,
+            "_get_gas_price_strategy",
+            return_value=("eip1559", pausing_strategy),
+        ):
+            ethereum_api.try_get_gas_pricing("eip1559")
+
+    def run_fill() -> None:
+        strategy_executing.wait(timeout=5)
+        # An EIP-1559 transaction like those built by get_raw_safe_transaction.
+        tx = {
+            "from": "0x742d35Cc6634C0532925a3b8D4C9c8aF8a9C7f5",
+            "to": "0x742d35Cc6634C0532925a3b8D4C9c8aF8a9C7f5",
+            "value": 0,
+            "nonce": 0,
+            "chainId": 100,
+            "maxFeePerGas": 2_000_000_000,
+            "maxPriorityFeePerGas": 300_000_000,
+            "gas": 21_000,
+            "data": b"",
+        }
+        result = fill_transaction_defaults(ethereum_api._api, tx)
+        if isinstance(result.get("gasPrice"), dict):
+            corrupted.append(result["gasPrice"])
+        fill_done.set()
+
+    t1 = threading.Thread(target=run_get_gas)
+    t2 = threading.Thread(target=run_fill)
+    t1.start()
+    t2.start()
+    t1.join(timeout=10)
+    t2.join(timeout=10)
+
+    assert not corrupted, (
+        f"tx['gasPrice'] was corrupted to a dict {corrupted}. "
+        "try_get_gas_pricing is still mutating w3.eth._gas_price_strategy."
+    )

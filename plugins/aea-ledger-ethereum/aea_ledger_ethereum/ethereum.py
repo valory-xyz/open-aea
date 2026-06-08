@@ -1409,14 +1409,7 @@ class EthereumApi(LedgerApi, EthereumHelper):
             return None
         gas_price_strategy, gas_price_strategy_callable = retrieved_strategy
 
-        prior_strategy = (
-            self._api.eth._gas_price_strategy  # pylint: disable=protected-access
-        )
-        try:
-            self._api.eth.set_gas_price_strategy(gas_price_strategy_callable)
-            gas_price = self._api.eth.generate_gas_price()
-        finally:
-            self._api.eth.set_gas_price_strategy(prior_strategy)  # pragma: nocover
+        gas_price = gas_price_strategy_callable(self._api, None)
 
         if gas_price is None or old_price is None:
             return gas_price
