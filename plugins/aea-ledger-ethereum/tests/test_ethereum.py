@@ -1221,14 +1221,15 @@ def test_build_transaction(ethereum_testnet_config):
             ),
         )
 
-        assert result == dict(
-            nonce=0,
-            value=0,
-            gas=0,
-            gasPrice=0,
-            maxFeePerGas=0,
-            maxPriorityFeePerGas=0,
-        )
+        assert result == {
+            "from": "sender_address",
+            "nonce": 0,
+            "value": 0,
+            "gas": 0,
+            "gasPrice": 0,
+            "maxFeePerGas": 0,
+            "maxPriorityFeePerGas": 0,
+        }
 
         with mock.patch.object(
             EthereumApi,
@@ -1245,7 +1246,12 @@ def test_build_transaction(ethereum_testnet_config):
                 ),
             )
 
-            assert result == dict(nonce=0, value=0, gas=0)
+            assert result == {
+                "from": "sender_address",
+                "nonce": 0,
+                "value": 0,
+                "gas": 0,
+            }
 
         # try get gas estimates if _is_gas_estimation_enabled
         with mock.patch.object(
@@ -1271,7 +1277,60 @@ def test_build_transaction(ethereum_testnet_config):
                 ),
             )
 
-            assert result == dict(nonce=0, value=0, gas=12)
+            assert result == {
+                "from": "sender_address",
+                "nonce": 0,
+                "value": 0,
+                "gas": 12,
+            }
+
+
+def test_build_transaction_passes_from_to_gas_estimate(ethereum_testnet_config):
+    """`from` reaches `eth.estimate_gas` so the node sees the real sender.
+
+    Regression: without `from`, the JSON-RPC node defaults `msg.sender`
+    to the zero address. Tokens that guard `approve` with
+    `require(owner != address(0), ...)` (e.g. Circle USDC) reject the
+    estimate and `build_transaction` returns `None`.
+    """
+
+    def pass_tx_params(tx_params):
+        return tx_params
+
+    tx_mock = MagicMock()
+    tx_mock.build_transaction = pass_tx_params
+
+    method_mock = MagicMock(return_value=tx_mock)
+    contract_instance = MagicMock()
+    contract_instance.functions.dummy_method = method_mock
+
+    eth_api = EthereumApi(**ethereum_testnet_config)
+
+    seen: Dict[str, JSONLike] = {}
+
+    def fake_estimate_gas(transaction, block_identifier=None):
+        seen["tx"] = dict(transaction)
+        return 42
+
+    with mock.patch(
+        "web3.eth.Eth.get_transaction_count", return_value=0
+    ), mock.patch.object(
+        EthereumApi, "try_get_gas_pricing", return_value={"gas": 0}
+    ), mock.patch.object(
+        eth_api, "_is_gas_estimation_enabled", return_value=True
+    ), mock.patch(
+        "web3.eth.Eth.estimate_gas", side_effect=fake_estimate_gas
+    ):
+        result = eth_api.build_transaction(
+            contract_instance=contract_instance,
+            method_name="dummy_method",
+            method_args={},
+            tx_args=dict(sender_address="0xabc", eth_value=0),
+        )
+
+    assert seen["tx"]["from"] == "0xabc"
+    assert result["from"] == "0xabc"
+    assert result["gas"] == 42
 
 
 def test_get_transaction_transfer_logs(ethereum_testnet_config):
