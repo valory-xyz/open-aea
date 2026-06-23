@@ -1292,6 +1292,9 @@ def test_build_transaction_passes_from_to_gas_estimate(ethereum_testnet_config):
     to the zero address. Tokens that guard `approve` with
     `require(owner != address(0), ...)` (e.g. Circle USDC) reject the
     estimate and `build_transaction` returns `None`.
+
+    :param ethereum_testnet_config: testnet config fixture used to
+        construct an ``EthereumApi`` instance.
     """
 
     def pass_tx_params(tx_params):
