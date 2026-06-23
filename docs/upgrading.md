@@ -17,7 +17,7 @@ This is a non-breaking patch release. It contains a single fix: `open-aea-ledger
 
 `build_transaction` previously assembled `tx_params` with `nonce`, `value`, and gas-pricing fields but no `from`. Web3's `contract.functions.<m>().build_transaction(tx_params)` therefore produced a transaction dict without a `from` field, and the subsequent `update_with_gas_estimate` call sent that dict to `eth_estimateGas`. The JSON-RPC node defaults missing `from` to the zero address, so any contract method whose state checks reject `msg.sender == 0x0` (notably ERC20 `approve` on tokens guarded by `require(owner != address(0), ...)`, e.g. Circle USDC) reverts during the estimate. `build_transaction` then returned `None` via the wrapping `try_decorator`, leaving callers without a usable transaction.
 
-The fix sets `tx_params["from"] = tx_args["sender_address"]` alongside the existing nonce read. No other behaviour change.
+The fix routes `tx_args["sender_address"]` through `self.api.to_checksum_address(...)` once and uses the result for both the nonce lookup and `tx_params["from"]`, matching the handling already in `get_transfer_transaction` / `get_deploy_transaction`. This avoids strict-node or middleware rejection on non-checksummed input. No other behaviour change.
 
 ### Concrete upgrade steps
 
