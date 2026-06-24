@@ -1876,8 +1876,10 @@ class EthereumApi(LedgerApi, EthereumHelper):
 
         tx_args = cast(Dict, tx_args)
 
-        nonce = self.api.eth.get_transaction_count(tx_args["sender_address"])
+        sender_address = self.api.to_checksum_address(tx_args["sender_address"])
+        nonce = self.api.eth.get_transaction_count(sender_address)
         tx_params = {
+            "from": sender_address,
             "nonce": nonce,
             "value": tx_args["value"] if "value" in tx_args else 0,
             "gas": 1,  # set this as a placeholder to avoid estimation on build_transaction()

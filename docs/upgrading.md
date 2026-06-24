@@ -9,6 +9,22 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.8` to `v2.2.9`
+
+This is a non-breaking patch release. It contains a single fix: `open-aea-ledger-ethereum`'s `EthereumApi.build_transaction` now passes the sender address as `from` when building the contract transaction, so the subsequent `eth_estimateGas` call reaches the node with the real sender instead of the zero address.
+
+### `open-aea-ledger-ethereum` — `EthereumApi.build_transaction` populates `from`
+
+`build_transaction` previously assembled `tx_params` with `nonce`, `value`, and gas-pricing fields but no `from`. Web3's `contract.functions.<m>().build_transaction(tx_params)` therefore produced a transaction dict without a `from` field, and the subsequent `update_with_gas_estimate` call sent that dict to `eth_estimateGas`. The JSON-RPC node defaults missing `from` to the zero address, so any contract method whose state checks reject `msg.sender == 0x0` (notably ERC20 `approve` on tokens guarded by `require(owner != address(0), ...)`, e.g. Circle USDC) reverts during the estimate. `build_transaction` then returned `None` via the wrapping `try_decorator`, leaving callers without a usable transaction.
+
+The fix routes `tx_args["sender_address"]` through `self.api.to_checksum_address(...)` once and uses the result for both the nonce lookup and `tx_params["from"]`, matching the handling already in `get_transfer_transaction` / `get_deploy_transaction`. This avoids strict-node or middleware rejection on non-checksummed input. No other behaviour change.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea-ledger-ethereum==2.2.9"` (and the same `2.2.9` pin for any other `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.9`.
+- No agent / package / config edits are required.
+
 ## `v2.2.7` to `v2.2.8`
 
 This is a non-breaking patch release. It contains a single fix: a thread-safety race in `open-aea-ledger-ethereum`'s `try_get_gas_pricing` that caused `tx["gasPrice"]` to be set to a dict instead of an integer under concurrent load (cf. #921).
