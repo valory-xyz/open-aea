@@ -1,0 +1,16 @@
+version: "2"
+linters:
+  settings:
+    staticcheck:
+      # Match golangci-lint v1 default behavior: v2 folded stylecheck (ST*)
+      # and quickfix (QF*) into staticcheck; they were not enabled before.
+      checks:
+        - all
+        - -ST*
+        - -QF*
+  exclusions:
+    # Restore v1 default exclusions (e.g. errcheck on deferred Close).
+    presets:
+      - common-false-positives
+      - legacy
+      - std-error-handling
