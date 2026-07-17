@@ -51,7 +51,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -115,7 +115,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -221,7 +221,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -324,7 +324,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: Install protolint (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -355,7 +355,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -395,7 +395,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: Install dependencies (ubuntu-latest)
         run: |
           sudo apt-get update --fix-missing
@@ -474,7 +474,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - if: matrix.os == 'ubuntu-latest'
         name: Install dependencies (ubuntu-latest)
         run: |
@@ -615,7 +615,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/setup-go@v5.2.0
         with:
-          go-version: '1.25.0'
+          go-version: '1.25.7'
       - name: libp2p_node build/vet/test
         shell: bash
         working-directory: packages/valory/connections/p2p_libp2p/libp2p_node
