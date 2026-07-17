@@ -1,16 +1,17 @@
+# Keeps golangci-lint v2 behavior equivalent to the v1.64.5 defaults this
+# repo was linted with: v2 dropped the built-in exclusion presets and folded
+# the (previously non-default) style/quickfix checks into staticcheck.
 version: "2"
+
 linters:
   settings:
     staticcheck:
-      # Match golangci-lint v1 default behavior: v2 folded stylecheck (ST*)
-      # and quickfix (QF*) into staticcheck; they were not enabled before.
       checks:
         - all
-        - -ST*
-        - -QF*
+        - "-ST*" # style checks were a separate, non-default linter in v1
+        - "-QF*" # quickfix suggestions, not defects
   exclusions:
-    # Restore v1 default exclusions (e.g. errcheck on deferred Close).
     presets:
+      - std-error-handling
       - common-false-positives
       - legacy
-      - std-error-handling

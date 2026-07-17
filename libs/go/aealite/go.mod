@@ -1,6 +1,6 @@
 module aealite
 
-go 1.25.0
+go 1.25.7
 
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4
