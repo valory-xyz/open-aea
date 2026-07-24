@@ -15,20 +15,26 @@ fingerprint:
   consts.py: bafybeihrr6ms7ctgqldwff4jrqph443vmlt4fblapkk6wlrh3mljerdlfm
   libp2p_node/Makefile: bafybeibewfzffabce5pg4ci4adhni7isqj2v7nt4ybdprltskksd47tcha
   libp2p_node/README.md: bafybeibke3cczx7lh4cmu4w6ofggrkm32mdzj6isjq4xo7isjproqg3y4y
+  libp2p_node/acn/audit_findings_test.go: bafybeihedfj26w3oz2vmahdqmcphtkhxhaafhowxah7a5msxw7vu3n3kli
   libp2p_node/acn/utils.go: bafybeiaftfq27ykd5kc3qauchb3vmnt6pt5jxzmsfykes4b4wptojtdhb4
   libp2p_node/aea/api.go: bafybeibgyntafcoa36vcbhcmc6u66yksh3gudqnflxap3xxwmw6kad3riq
+  libp2p_node/aea/audit_findings_test.go: bafybeidhbpu756tawlqpoj6glipps4x5owglqvr5isr35ievh5jg3otxpa
   libp2p_node/aea/envelope.pb.go: bafybeias5ehwnx7neqgxxl5ptt2kapvtknwqdadb337aw6peq4xuvywhei
   libp2p_node/aea/envelope.proto: bafybeidqraaogak5eh7ew2syzou4dh6xwq4owxh7vtilfpvbkzk3njrbm4
   libp2p_node/aea/pipe.go: bafybeiddrqphqhua4tvallg2vcdv4rn3zig3ajtlv3n4etzzqampsos5yu
   libp2p_node/aea/utils.go: bafybeic76r6eymbeg5a5wet3hyc2g5olxxxe3ubaibhblvusamcdkgvb6m
+  libp2p_node/audits/doc.go: bafybeiei5zlbocpkeibiyi2uhsz5o273gvs3pkvrk62xb2nwugxy2ripuu
+  libp2p_node/audits/dockerfile_audit_test.go: bafybeih6273y6c6nar6kjzszsgt4ktyp5a7vuru22aca4ocwacopqsr7ye
   libp2p_node/common/common.go: bafybeihmyggp45opu6scnojnre24az45ovbulde3gcnmupyvt5grddl424
   libp2p_node/dht/common/handlers.go: bafybeid6os5awfboi4vytxlntigc3gkf2gdlupi3ai73ybqfvudcvrarpu
   libp2p_node/dht/dhtclient/dhtclient.go: bafybeihoq34266ltkuejpibk4rxr3ol4c75vntcp5ffolw4atihhc4qmua
   libp2p_node/dht/dhtclient/dhtclient_test.go: bafybeibcrgm7e5xr6gdnl3jqdwz6d4p3ddolljxd2b7nawdqxp2o4g4ng4
   libp2p_node/dht/dhtclient/options.go: bafybeifjtkrqpyfac3vtrke5ad6wb2ktxyurv2ha24k6rmkcow7yejpfoe
+  libp2p_node/dht/dhtnode/audit_findings_test.go: bafybeif56ej4l4zrkzpsz4nu27byp3qxbrou5wb4t3dxy6q57x4arfjzyi
   libp2p_node/dht/dhtnode/dhtnode.go: bafybeih7xu6rpzgvqf5l4wr3vwapbumjb7wzsjgr6gyoqet2yyjdhbhllm
   libp2p_node/dht/dhtnode/streams.go: bafybeiglkbzmp7imgcg544cb3kr4xq3hopoockqoaxbgveeszclvtq4pni
   libp2p_node/dht/dhtnode/utils.go: bafybeidcexzxxx32dffxz7qaw4c6uwp2lf5ielnoskvisz5upgj37qr6v4
+  libp2p_node/dht/dhtpeer/audit_findings_test.go: bafybeifm72gjylmcxe6mfh7kxoxf4gfat7n2m4ins4wdwwdcz7a4lgizku
   libp2p_node/dht/dhtpeer/benchmarks_test.go: bafybeihqq2mpj22vsqbhdaemgdtcoq5k7c6co2cd65holtjfoxrppidwni
   libp2p_node/dht/dhtpeer/dhtpeer.go: bafybeig7rkh7lwbbj7oi242kzwjnxhsk5mheztnobymal6zxoydsxlrepm
   libp2p_node/dht/dhtpeer/dhtpeer_test.go: bafybeieewgktckok6v4cswmq5ffo4vkraahpuchgvrlkcb4fyd4phywbxa
@@ -37,6 +43,7 @@ fingerprint:
   libp2p_node/dht/dhtpeer/options.go: bafybeifbkouahfffwu277bhcyh7ohhrziy435eloj2wim7fd42dawfervy
   libp2p_node/dht/dhtpeer/utils.go: bafybeig733qrkn5io6usih7chm5ranptao6xao4cihyfgpjps3gt5hbnqu
   libp2p_node/dht/dhttests/dhttests.go: bafybeidjjs2zwenhxhoqqqx65nuu4rwsuo4buqwlytjy2fc72nrv55uswq
+  libp2p_node/dht/monitoring/audit_findings_test.go: bafybeia7lxlr4imhhc6274jvdj7zkve75o3rfnhw64qslw2ifydiefc5zy
   libp2p_node/dht/monitoring/file.go: bafybeifmj5vvaacy4potovdkiqvektaymntsbun6i4niaehj5af3nhu64e
   libp2p_node/dht/monitoring/prometheus.go: bafybeibgmu5h7hl2ygzfw3lvg4eaihzrnyqacc4zvjxzpk2b6xb7c3yrrq
   libp2p_node/dht/monitoring/service.go: bafybeicgbzqxi4jpae3w4es4owhdt63rd4limt4o46gbdanaia2buxddhy
@@ -52,6 +59,7 @@ fingerprint:
   libp2p_node/protocols/acn/v1_0_0/acn.pb.go: bafybeibhoxaaq6mnc654gaguljypkj2qwhd3epi6d3zc4t5x24bdvfnvdy
   libp2p_node/protocols/acn/v1_0_0/acn.proto: bafybeigvgpfuxg67fymghnd5pfi7lvjf7ntkagkl2tlr3dzbwhxb5ekkjm
   libp2p_node/protocols/acn/v1_0_0/acn.yaml: bafybeiaciincxvcb4imlzpdiju62tzafm6hodxvthhz67xeqjfaamg3upa
+  libp2p_node/utils/audit_findings_test.go: bafybeicykxrgoss2bspheaz54jezdk455ehqk4nu2wr6adm2zlypskxrti
   libp2p_node/utils/utils.go: bafybeiagqll6a3pj7y5hmegoac7lxw5g5v6rxm3x3jkekrmhdlc25462va
   libp2p_node/utils/utils_test.go: bafybeibs5rbsuyh3xnbaocvglufl6whs754b2wjro63v726vupynucyp2q
   tests/__init__.py: bafybeieftcbmxxpe7okvm3ycualpyec6xys4nx5tihcjii7lqxd3w5lx7e

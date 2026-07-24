@@ -14,12 +14,12 @@
 | connection/fetchai/stub/0.21.0                                | `bafybeihjlr7xeurjm56ckji3gjjlao4pykkgk5xcdmfpjraxwyaljmlh4q` |
 | connection/valory/ledger/0.19.0                               | `bafybeicynh5l5f5f5jpx72qwzis7jvmxk5p4eqltk32uxbj2pgu2x4rqz4` |
 | connection/valory/http_server/0.22.0                          | `bafybeihs6dufyaa5l4uorplzx3wiyna5qlq2x43tmyl3yonkl265vspdle` |
-| connection/valory/p2p_libp2p/0.1.0                            | `bafybeibi5w3kw54uqrjwfcsxxnomwkykglckxyshyxgj7dl7gxytf6asmu` |
+| connection/valory/p2p_libp2p/0.1.0                            | `bafybeidntvd5fsic5dzakvu7pai5cjqizb4idi2cklhtpfqspmdb7fz72a` |
 | connection/valory/p2p_libp2p_client/0.1.0                     | `bafybeielj3jso3wvrarp5n5rq7llpw4vgxybqiyensgjalb5ubfiawwhhu` |
 | connection/valory/p2p_libp2p_mailbox/0.1.0                    | `bafybeifdbpetirc5id7v3y6wop5mylqh726mo7jgscl2jl3t4f7vusqcnq` |
 | connection/fetchai/local/0.20.0                               | `bafybeichu3hdecg2xk5luddc4qxkaluhnbk2qxiastdkp4ujwbftuhpyry` |
 | connection/valory/http_client/0.23.0                          | `bafybeihel6sg2yayxu7lqygaswdgciaxpqrgsbl5rwx74c6znu5qz2edd4` |
-| connection/valory/test_libp2p/0.1.0                           | `bafybeiehgjf47f5gvj7gw44glu6awp23ugqsdnsbv2cqeem4gfkgn3oz4y` |
+| connection/valory/test_libp2p/0.1.0                           | `bafybeigievcnsr3fzhl64exwrygag6k3u7olqzymidqngmmt5i2qdz72eq` |
 | skill/fetchai/echo/0.19.0                                     | `bafybeieqhk2g6l4pitjmuwbtt7n6vx3wawclygjv5cywjjrgay66lzq74u` |
 | skill/fetchai/error_test_skill/0.1.0                          | `bafybeiclf3qlci56sk5bw2jh3k52dc4o3hsqmn34msfud5qlsm65j7nrtm` |
 | skill/fetchai/http_echo/0.20.0                                | `bafybeie7j4y6ppruwf33fydd34yxaiwnhtpn7ocri37gslsnbvjfs7pg7m` |
