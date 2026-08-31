@@ -780,3 +780,84 @@ def test_nested_model_arg_leaf_raises_when_sub_path_missing_and_no_default():
     }
     with pytest.raises(ValueError, match="does not contain `Content-Type`"):
         apply_env_variables(template, env_variables=env_vars, path=TRADER_MODELS_PATH)
+
+
+def test_list_of_dicts_under_model_arg_keeps_every_element():
+    """Every element of a non-strict list under a collapsed arg survives the fold.
+
+    The per-index branch folds each element to the same arg-level env var,
+    so without the collision merge only the last index survived and the
+    earlier leaves silently fell back to their packaged defaults.
+    """
+    data = _trader_models({"routes": [{"url": "a"}, {"url": "b"}]})
+    env_vars = generate_env_vars_recursively(data=data, export_path=TRADER_MODELS_PATH)
+    assert list(env_vars) == ["SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_ROUTES"]
+    assert json.loads(env_vars["SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_ROUTES"]) == {
+        "0": {"url": "a"},
+        "1": {"url": "b"},
+    }
+    template = _trader_models(
+        {"routes": [{"url": "${str:DEFAULT_0}"}, {"url": "${str:DEFAULT_1}"}]}
+    )
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == data
+
+
+def test_non_restricted_list_of_dicts_still_flattens_per_index():
+    """Outside the arg restriction each element keeps its own env var."""
+    result = generate_env_vars_recursively(
+        data={"cert_requests": [{"public_key": "k0"}, {"public_key": "k1"}]},
+        export_path=["connection", "x"],
+    )
+    assert result == {
+        "CONNECTION_X_CERT_REQUESTS_0_PUBLIC_KEY": "k0",
+        "CONNECTION_X_CERT_REQUESTS_1_PUBLIC_KEY": "k1",
+    }
+
+
+def test_unsafe_key_collapse_outside_model_args_is_not_indexed():
+    """Known gap: the unsafe-key collapse has no `restricted` to index by.
+
+    `_encode_as_json_env_var` collapses a dict for two independent reasons -
+    the model-arg path truncation and bash-unsafe keys. Only the first
+    produces a `restricted` sub-path, so outside `models/<model>/args` the
+    generated env var is never read back and the leaf silently keeps its
+    packaged default. Closing this needs the consumer to find the nearest
+    collapsed ancestor rather than deriving the sub-path from the model-arg
+    rule alone; pinned here so the remaining half stays visible.
+    """
+    data = {"config": {"headers": {"Content-Type": "application/json"}}}
+    env_vars = generate_env_vars_recursively(data=data, export_path=["connection", "x"])
+    assert env_vars == {
+        "CONNECTION_X_CONFIG_HEADERS": '{"Content-Type":"application/json"}'
+    }
+    template = {"config": {"headers": {"Content-Type": "${str:PACKAGED_DEFAULT}"}}}
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=["connection", "x"]
+    )
+    assert result["config"]["headers"]["Content-Type"] == "PACKAGED_DEFAULT"
+
+
+def test_hand_written_folded_override_keeps_its_json_type():
+    """A folded value is taken at the type the operator wrote, not `type_str`.
+
+    Coercing would have to run `convert_value_str_to_type` on an already
+    decoded value, which turns JSON `false` into `True` and raises on dicts
+    and lists, so the declared type is advisory for folded values.
+    """
+    template = _trader_models(
+        {"opts": {"timeout": "${int:30}", "flag": "${bool:true}"}}
+    )
+    env_vars = {
+        "SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_OPTS": json.dumps(
+            {"timeout": 30.5, "flag": False}
+        )
+    }
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    opts = result["x_subgraph"]["args"]["opts"]
+    assert opts == {"timeout": 30.5, "flag": False}
+    assert opts["flag"] is False

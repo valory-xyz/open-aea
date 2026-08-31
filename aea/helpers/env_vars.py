@@ -405,6 +405,16 @@ def merge_dicts(a: dict, b: dict) -> dict:
     return merged
 
 
+def _fuse_collision(env_var_dict: Dict, res: Dict) -> Dict:
+    """Merge a generated env var into an already generated one of the same name."""
+    if res:
+        env_var = list(res.keys())[0]
+        if env_var in env_var_dict:
+            dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
+            return ensure_json_content(merge_dicts(*dicts))
+    return res
+
+
 def generate_env_vars_recursively(
     data: Union[Dict, List],
     export_path: List[str],
@@ -438,12 +448,7 @@ def generate_env_vars_recursively(
                 data=value,
                 export_path=[*export_path, key],
             )
-            if res:
-                env_var = list(res.keys())[0]
-                if env_var in env_var_dict:
-                    dicts = (ensure_dict(dict_) for dict_ in (env_var_dict, res))
-                    res = ensure_json_content(merge_dicts(*dicts))
-            env_var_dict.update(res)
+            env_var_dict.update(_fuse_collision(env_var_dict, res))
     elif isinstance(data, list):
         if is_strict_list(data=data):
             path, value = _encode_as_json_env_var(data, export_path)
@@ -454,7 +459,7 @@ def generate_env_vars_recursively(
                     data=value,
                     export_path=[*export_path, str(key)],
                 )
-                env_var_dict.update(res)
+                env_var_dict.update(_fuse_collision(env_var_dict, res))
     else:
         restricted, path = export_path_to_env_var_string(export_path=export_path)
         if restricted:
