@@ -106,11 +106,21 @@ def parse_list(var_prefix: str, env_variables: dict) -> str:
     return json.dumps({json.loads(key): val for key, val in values.items()})
 
 
+def _index_restricted(payload: Any, restricted: List[str]) -> Any:
+    """Index a collapsed model argument by the folded sub-path; inverse of `list_to_nested_dict`."""
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    for key in restricted:
+        payload = payload[key]
+    return payload
+
+
 def replace_with_env_var(
     value: str,
     env_variables: dict,
     default_value: Any = NotSet,
     default_var_name: Optional[str] = None,
+    restricted: Optional[List[str]] = None,
 ) -> JSON_TYPES:
     """Replace env var with value."""
     result = ENV_VARIABLE_RE.match(value)
@@ -119,12 +129,39 @@ def replace_with_env_var(
         return value
 
     _, var_name, type_str, _, default = result.groups()
-    if var_name is None and default_var_name is not None:
+    used_default_var_name = var_name is None and default_var_name is not None
+    if used_default_var_name:
         var_name = default_var_name
 
+    env_value: Any = NotSet
+    missing_sub_path: Optional[str] = None
     if var_name in env_variables:
-        var_value = env_variables[var_name]
-    elif type_str == "list":
+        env_value = env_variables[var_name]
+        # Only a path-derived name can collide with the collapsed parent argument;
+        # an explicitly named placeholder addresses its own value.
+        if used_default_var_name and restricted:
+            try:
+                env_value = _index_restricted(env_value, restricted)
+            except (ValueError, KeyError, TypeError) as exc:
+                _logger.warning(
+                    "Env var `%s` is set but sub-path %s could not be read from it "
+                    "(%s); falling back to the default for this value.",
+                    var_name,
+                    restricted,
+                    exc,
+                )
+                missing_sub_path = ".".join(restricted)
+                env_value = NotSet
+            else:
+                if not isinstance(env_value, str):
+                    # values folded in keep their JSON type; only a str needs coercing
+                    return env_value
+
+    if env_value is not NotSet:
+        var_value = env_value
+    elif type_str == "list" and var_name not in env_variables:
+        # `parse_list` scans for `<var_name>_<idx>` siblings and cannot tolerate
+        # `var_name` itself being a key, which it never was before indexing existed.
         var_value = parse_list(
             var_prefix=var_name,
             env_variables=env_variables,
@@ -134,6 +171,10 @@ def replace_with_env_var(
         var_value = default
     elif default_value is not NotSet:
         var_value = default_value
+    elif missing_sub_path is not None:
+        raise ValueError(
+            f"`{var_name}` is set but does not contain `{missing_sub_path}` and no default value set! Please ensure a .env file is provided."
+        )
     else:
         raise ValueError(
             f"`{var_name}` not found in env variables and no default value set! Please ensure a .env file is provided."
@@ -178,11 +219,13 @@ def apply_env_variables(
         }
 
     if is_env_variable(data):
+        restricted, var_name = export_path_to_env_var_string(export_path=path)
         return replace_with_env_var(
             data,
             env_variables,
             default_value,
-            default_var_name=export_path_to_env_var_string(export_path=path)[1],
+            default_var_name=var_name,
+            restricted=restricted,
         )
 
     return data

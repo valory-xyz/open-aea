@@ -53,7 +53,8 @@ Parse list object.
 def replace_with_env_var(value: str,
                          env_variables: dict,
                          default_value: Any = NotSet,
-                         default_var_name: Optional[str] = None) -> JSON_TYPES
+                         default_var_name: Optional[str] = None,
+                         restricted: Optional[List[str]] = None) -> JSON_TYPES
 ```
 
 Replace env var with value.

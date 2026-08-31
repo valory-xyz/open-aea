@@ -25,6 +25,7 @@ from typing import List
 import pytest
 
 from aea.helpers.env_vars import (
+    RESTRICTION_EXCEPTIONS,
     apply_env_variables,
     apply_env_variables_on_agent_config,
     convert_value_str_to_type,
@@ -551,3 +552,231 @@ def test_safe_key_numeric_strings_preserved_through_json_encode():
     decoded = json.loads(encoded)
     assert decoded == data
     assert set(decoded.keys()) == {"0.0", "0.10", "1.0"}
+
+
+TRADER_HEADERS_VAR = "SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_HEADERS"
+TRADER_MODELS_PATH = ["skill", "trader_abci", "models"]
+
+
+def _trader_models(args: dict) -> dict:
+    """Wrap model args in the ``models/<model>/args`` shape."""
+    return {"x_subgraph": {"args": args}}
+
+
+def test_nested_model_arg_leaf_resolves_from_collapsed_env_var():
+    """A leaf under a collapsed model arg gets its own value, not the whole arg."""
+    headers = {"Content-Type": "application/json", "Accept": "text/plain"}
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models({"headers": headers}),
+        export_path=TRADER_MODELS_PATH,
+    )
+    assert list(env_vars) == [TRADER_HEADERS_VAR]
+
+    template = _trader_models(
+        {
+            "headers": {
+                "Content-Type": "${str:application/json}",
+                "Accept": "${str:text/plain}",
+            }
+        }
+    )
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models({"headers": headers})
+
+
+def test_nested_model_arg_leaf_falls_back_to_inline_default_without_env():
+    """With no env var set the inline defaults still apply."""
+    template = _trader_models({"headers": {"Content-Type": "${str:application/json}"}})
+    result = apply_env_variables(template, env_variables={}, path=TRADER_MODELS_PATH)
+    assert result == _trader_models({"headers": {"Content-Type": "application/json"}})
+
+
+def test_nested_model_arg_leaf_picks_up_operator_override():
+    """An operator overriding the whole collapsed arg reaches the right leaf."""
+    template = _trader_models(
+        {
+            "headers": {
+                "Content-Type": "${str:application/json}",
+                "Accept": "${str:text/plain}",
+            }
+        }
+    )
+    env_vars = {
+        TRADER_HEADERS_VAR: json.dumps(
+            {"Content-Type": "application/xml", "Accept": "*/*"}
+        )
+    }
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models(
+        {"headers": {"Content-Type": "application/xml", "Accept": "*/*"}}
+    )
+
+
+def test_nested_model_arg_typed_leaves_do_not_crash_agent_load():
+    """Safe-keyed nested args with typed leaves round-trip without coercion errors."""
+    opts = {"timeout": 30, "retries": 5}
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models({"opts": opts}),
+        export_path=TRADER_MODELS_PATH,
+    )
+    template = _trader_models({"opts": {"timeout": "${int:1}", "retries": "${int:1}"}})
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models({"opts": opts})
+
+
+def test_nested_model_arg_leaf_falls_back_when_env_var_is_not_json():
+    """A hand-set non-JSON value falls back to the inline default, never raises."""
+    template = _trader_models({"headers": {"Content-Type": "${str:application/json}"}})
+    result = apply_env_variables(
+        template,
+        env_variables={TRADER_HEADERS_VAR: "not-json"},
+        path=TRADER_MODELS_PATH,
+    )
+    assert result == _trader_models({"headers": {"Content-Type": "application/json"}})
+
+
+def test_nested_model_arg_leaf_falls_back_when_sub_path_missing():
+    """Valid JSON that lacks the leaf's sub-path falls back to the inline default."""
+    template = _trader_models({"headers": {"Content-Type": "${str:application/json}"}})
+    env_vars = {TRADER_HEADERS_VAR: json.dumps({"Accept": "*/*"})}
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models({"headers": {"Content-Type": "application/json"}})
+
+
+@pytest.mark.parametrize("arg", sorted(RESTRICTION_EXCEPTIONS))
+def test_exempt_model_arg_is_not_indexed(arg: str):
+    """`RESTRICTION_EXCEPTIONS` args keep their per-leaf env vars."""
+    exempt = {"all_participants": "0xdead"}
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models({arg: exempt}),
+        export_path=TRADER_MODELS_PATH,
+    )
+    assert list(env_vars) == [
+        f"SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_{arg.upper()}_ALL_PARTICIPANTS"
+    ]
+    template = _trader_models({arg: {"all_participants": "${str:0xbeef}"}})
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models({arg: exempt})
+
+
+def test_scalar_model_arg_is_unaffected():
+    """A scalar directly under `args` has no restricted sub-path."""
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models({"url": "https://example.com"}),
+        export_path=TRADER_MODELS_PATH,
+    )
+    assert env_vars == {
+        "SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_URL": "https://example.com"
+    }
+    result = apply_env_variables(
+        _trader_models({"url": "${str:https://fallback.com}"}),
+        env_variables=env_vars,
+        path=TRADER_MODELS_PATH,
+    )
+    assert result == _trader_models({"url": "https://example.com"})
+
+
+def test_explicitly_named_placeholder_is_not_indexed():
+    """An explicit `${VAR:type:default}` addresses its own value, not a sub-path."""
+    template = _trader_models({"headers": {"Content-Type": "${MY_HEADER:str:none}"}})
+    result = apply_env_variables(
+        template,
+        env_variables={"MY_HEADER": "application/xml"},
+        path=TRADER_MODELS_PATH,
+    )
+    assert result == _trader_models({"headers": {"Content-Type": "application/xml"}})
+
+
+def test_nested_list_leaf_falls_back_when_sub_path_missing():
+    """A `${list}` leaf whose sub-path is absent must not reach `parse_list`.
+
+    `parse_list` splits on `<var_prefix>_<idx>` and cannot tolerate the
+    prefix itself being a key, which only became reachable once a present
+    env var could fail to index.
+    """
+    template = _trader_models({"opts": {"urls": '${list:["fallback"]}'}})
+    env_vars = {"SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_OPTS": json.dumps({"n": 1})}
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models({"opts": {"urls": ["fallback"]}})
+
+
+def test_nested_list_leaf_resolves_from_collapsed_env_var():
+    """A `${list}` leaf present in the collapsed arg resolves to the real list."""
+    data = {"opts": {"urls": ["a", "b"]}}
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models(data), export_path=TRADER_MODELS_PATH
+    )
+    result = apply_env_variables(
+        _trader_models({"opts": {"urls": '${list:["fallback"]}'}}),
+        env_variables=env_vars,
+        path=TRADER_MODELS_PATH,
+    )
+    assert result == _trader_models(data)
+
+
+def test_nested_model_arg_folded_values_keep_their_json_type():
+    """Folded non-str values bypass coercion and keep their decoded JSON type.
+
+    `convert_value_str_to_type` expects a string; a folded `false` would
+    coerce to `True` and a folded list would make `json.loads` raise.
+    """
+    data = {
+        "opts": {"off": False, "nothing": None, "items": [1, 2], "mapping": {"a": 1}}
+    }
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models(data), export_path=TRADER_MODELS_PATH
+    )
+    template = _trader_models(
+        {
+            "opts": {
+                "off": "${bool:true}",
+                "nothing": "${str:something}",
+                "items": "${list:[]}",
+                "mapping": '${dict:{"b":2}}',
+            }
+        }
+    )
+    result = apply_env_variables(
+        template, env_variables=env_vars, path=TRADER_MODELS_PATH
+    )
+    assert result == _trader_models(data)
+    assert result["x_subgraph"]["args"]["opts"]["off"] is False
+
+
+def test_deeply_nested_model_arg_leaf_resolves():
+    """A leaf three levels below `args` folds a multi-key sub-path and reads back."""
+    data = {"a": {"b": {"c": "deep"}}}
+    env_vars = generate_env_vars_recursively(
+        data=_trader_models(data), export_path=TRADER_MODELS_PATH
+    )
+    assert list(env_vars) == ["SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_A"]
+    result = apply_env_variables(
+        _trader_models({"a": {"b": {"c": "${str:fallback}"}}}),
+        env_variables=env_vars,
+        path=TRADER_MODELS_PATH,
+    )
+    assert result == _trader_models(data)
+
+
+def test_nested_model_arg_leaf_raises_when_sub_path_missing_and_no_default():
+    """With no default of any kind the failure is reported, not silently wrong."""
+    template = _trader_models({"headers": {"Content-Type": "${str}"}})
+    env_vars = {
+        "SKILL_TRADER_ABCI_MODELS_X_SUBGRAPH_ARGS_HEADERS": json.dumps(
+            {"Accept": "*/*"}
+        )
+    }
+    with pytest.raises(ValueError, match="does not contain `Content-Type`"):
+        apply_env_variables(template, env_variables=env_vars, path=TRADER_MODELS_PATH)
