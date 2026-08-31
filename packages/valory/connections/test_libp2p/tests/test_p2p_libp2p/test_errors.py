@@ -124,16 +124,27 @@ class TestP2PLibp2pConnectionFailureSetupNewConnection(BaseP2PLibp2pTest):
             )
 
 
+STUB_DNS = {
+    "localhost": "127.0.0.1",
+    "fetch.ai": "104.26.2.97",
+    "acn.fetch.ai": "104.26.3.97",
+}
+
+
 @SKIP_WINDOWS
 def test_libp2p_connection_mixed_ip_address() -> None:
     """Test correct public uri ip and entry peers ips configuration."""
-    assert _ip_all_private_or_all_public([]) is True
-    assert _ip_all_private_or_all_public(["127.0.0.1", "127.0.0.1"]) is True
-    assert _ip_all_private_or_all_public(["localhost", "127.0.0.1"]) is True
-    assert _ip_all_private_or_all_public(["10.0.0.1", "127.0.0.1"]) is False
-    assert _ip_all_private_or_all_public(["fetch.ai", "127.0.0.1"]) is False
-    assert _ip_all_private_or_all_public(["104.26.2.97", "127.0.0.1"]) is False
-    assert _ip_all_private_or_all_public(["fetch.ai", "acn.fetch.ai"]) is True
+    with patch(
+        "packages.valory.connections.p2p_libp2p.connection.gethostbyname",
+        side_effect=lambda host: STUB_DNS.get(host, host),
+    ):
+        assert _ip_all_private_or_all_public([]) is True
+        assert _ip_all_private_or_all_public(["127.0.0.1", "127.0.0.1"]) is True
+        assert _ip_all_private_or_all_public(["localhost", "127.0.0.1"]) is True
+        assert _ip_all_private_or_all_public(["10.0.0.1", "127.0.0.1"]) is False
+        assert _ip_all_private_or_all_public(["fetch.ai", "127.0.0.1"]) is False
+        assert _ip_all_private_or_all_public(["104.26.2.97", "127.0.0.1"]) is False
+        assert _ip_all_private_or_all_public(["fetch.ai", "acn.fetch.ai"]) is True
 
 
 @pytest.mark.skipif(
