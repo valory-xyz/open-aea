@@ -35,6 +35,7 @@ import pytest
 from aea.configurations.base import ConnectionConfig
 from aea.multiplexer import Multiplexer
 
+from packages.valory.connections.p2p_libp2p import connection as p2p_libp2p_connection
 from packages.valory.connections.p2p_libp2p.connection import (
     LIBP2P_NODE_MODULE_NAME,
     Libp2pNode,
@@ -134,8 +135,9 @@ STUB_DNS = {
 @SKIP_WINDOWS
 def test_libp2p_connection_mixed_ip_address() -> None:
     """Test correct public uri ip and entry peers ips configuration."""
-    with patch(
-        "packages.valory.connections.p2p_libp2p.connection.gethostbyname",
+    with patch.object(
+        p2p_libp2p_connection,
+        "gethostbyname",
         side_effect=lambda host: STUB_DNS.get(host, host),
     ):
         assert _ip_all_private_or_all_public([]) is True
