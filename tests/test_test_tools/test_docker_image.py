@@ -82,14 +82,15 @@ class TestHelloWorldImage:
 
         magic_mock = mock.MagicMock()
         magic_mock.image.tags = [self.image.tag]
-        ContainerCollection = docker.models.containers.ContainerCollection
-        with mock.patch.object(ContainerCollection, "list", return_value=[magic_mock]):
-            with mock.patch.object(magic_mock, "stop"):
-                any(launch_image(self.image))
-                assert magic_mock.stop.call_count == 1
+        client = mock.MagicMock()
+        client.containers.list.return_value = [magic_mock]
+        with mock.patch.object(docker, "from_env", return_value=client):
+            any(launch_image(self.image))
+            assert magic_mock.stop.call_count == 1
 
+    @mock.patch.object(docker, "from_env", return_value=mock.MagicMock())
     @mock.patch.object(HelloWorldImage, "wait", return_value=False)
-    def test_image_wait_returns_false(self, _) -> None:
+    def test_image_wait_returns_false(self, *_) -> None:
         """Test wait returns False"""
 
         with mock.patch("pytest.fail") as m:
