@@ -32,7 +32,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-ledger-solana",
-    version="2.2.9",
+    version="2.2.10",
     author="Valory AG",
     license="Apache-2.0",
     description="Python package wrapping the public and private key cryptography and ledger api of solana.",
