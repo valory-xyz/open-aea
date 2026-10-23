@@ -1,5 +1,19 @@
 # Release History - open AEA
 
+## 2.2.10 (2026-10-23)
+
+AEA:
+
+- `aea.helpers.env_vars`: `apply_env_variables` now indexes a collapsed model-arg env var with the leaf's sub-path instead of applying the whole JSON value to every placeholder under it. Since 1.58.0, nested model args such as `headers: {Content-Type: ...}` resolved to the entire collapsed JSON string, and non-`str` leaves crashed agent load. #931
+
+Packages:
+
+- `connection/valory/p2p_libp2p`: `libp2p_node` synced with open-acn HEAD; `golang.org/x/crypto` v0.52.0, `golang.org/x/net` v0.55.0, `go` 1.25.7. #928
+
+Images:
+
+- `valory/open-aea-user`, `open-aea-deploy` and `open-aea-develop` are rebuilt on refreshed base images, picking up their current CA certificates. The dev dependency cap `certifi<=2022.6.15.1` is lifted to `>=2026.10.19`, so `open-aea-develop` no longer trusts the compromised eMudhra intermediates.
+
 ## 2.2.9 (2026-06-23)
 
 Plugins:

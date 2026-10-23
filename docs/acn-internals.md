@@ -223,7 +223,7 @@ When an ACN peer wants to join the network, it has
 to start from a list of _bootstrap peers_, i.e.
 a list of ACN peers to connect with (at least one).
 
-Each node handles four different types of <a href="https://docs.libp2p.io/concepts/stream-multiplexing/" target="_blank">libp2p streams</a>:
+Each node handles four different types of <a href="https://github.com/libp2p/specs/blob/master/connections/README.md" target="_blank">libp2p streams</a>:
 
 - the _notification stream_, identified by the URI `/aea-notif/`:
   this stream is used by new peers to notify their existence to

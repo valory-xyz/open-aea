@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "open-aea"
-version = "2.2.9"
+version = "2.2.10"
 description = "Open AEA Framework"
 authors = ["developer-valory <develope@valory.xyz>"]
 license = "Apache-2.0"
@@ -52,7 +52,7 @@ idna = "<=3.3"
 cosmpy = ">=0.11.0,<0.12"
 web3 = ">=7.0.0,<8"
 google-api-python-client = "<=2.60.0"
-certifi = "<=2022.6.15.1"
+certifi = ">=2026.10.19"
 mistune = "==2.0.3"
 tomte = {version = "==0.7.0", extras = ["tox", "tests"]}
 docspec = "==2.2.1"

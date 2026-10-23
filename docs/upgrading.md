@@ -9,6 +9,20 @@ Below we describe the additional manual steps required to upgrade between differ
 
 ### Upgrade guide
 
+## `v2.2.9` to `v2.2.10`
+
+This is a non-breaking patch release.
+
+- Nested model args overridden through env vars now resolve per leaf instead of to the whole collapsed JSON value. If you worked around this by flattening such args, the workaround still works.
+- `connection/valory/p2p_libp2p` has a new hash; run `autonomy packages sync` (or `aea packages sync`) to pick it up.
+- The Docker images are rebuilt on refreshed base images, picking up their current CA certificates. The develop image now installs certifi >= 2026.10.19, which drops the compromised eMudhra intermediates.
+
+### Concrete upgrade steps
+
+- `pip install --upgrade "open-aea[all]==2.2.10"` (and the same `2.2.10` pin for any other `open-aea-*` plugin you use).
+- `aea --version` should report `2.2.10`.
+- No agent / config edits are required.
+
 ## `v2.2.8` to `v2.2.9`
 
 This is a non-breaking patch release. It contains a single fix: `open-aea-ledger-ethereum`'s `EthereumApi.build_transaction` now passes the sender address as `from` when building the contract transaction, so the subsequent `eth_estimateGas` call reaches the node with the real sender instead of the zero address.

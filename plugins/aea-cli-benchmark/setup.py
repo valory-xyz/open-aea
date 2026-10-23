@@ -32,7 +32,7 @@ def _read_long_description() -> str:
 
 setup(
     name="open-aea-cli-benchmark",
-    version="2.2.9",
+    version="2.2.10",
     author="Valory AG",
     license="Apache-2.0",
     description="CLI extension for AEA framework benchmarking.",
