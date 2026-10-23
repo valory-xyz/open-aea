@@ -12,7 +12,7 @@ Packages:
 
 Images:
 
-- `valory/open-aea-user`, `open-aea-deploy` and `open-aea-develop` are rebuilt and pull certifi 2026.10.19, which drops the root behind the compromised eMudhra intermediates.
+- `valory/open-aea-user`, `open-aea-deploy` and `open-aea-develop` are rebuilt on refreshed base images, picking up their current CA certificates. The dev dependency cap `certifi<=2022.6.15.1` is lifted to `>=2026.10.19`, so `open-aea-develop` no longer trusts the compromised eMudhra intermediates.
 
 ## 2.2.9 (2026-06-23)
 

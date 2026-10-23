@@ -15,7 +15,7 @@ This is a non-breaking patch release.
 
 - Nested model args overridden through env vars now resolve per leaf instead of to the whole collapsed JSON value. If you worked around this by flattening such args, the workaround still works.
 - `connection/valory/p2p_libp2p` has a new hash; run `autonomy packages sync` (or `aea packages sync`) to pick it up.
-- The Docker images are rebuilt and pull certifi 2026.10.19, which no longer trusts the compromised eMudhra intermediate CAs.
+- The Docker images are rebuilt on refreshed base images, picking up their current CA certificates. The develop image now installs certifi >= 2026.10.19, which drops the compromised eMudhra intermediates.
 
 ### Concrete upgrade steps
 
