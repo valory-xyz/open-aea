@@ -54,6 +54,12 @@ _default_logger = logging.getLogger(
 # retry count.
 MAX_RETRY_DELAY = 60.0
 
+# Exceptions a ledger API raises while a transaction is not mined yet (web3
+# raises ``TransactionNotFound``). Polling hits them routinely, so the retry
+# loops log them at debug instead of warning. They are matched by class name to
+# keep this connection free of ledger-specific dependencies.
+PENDING_TRANSACTION_ERRORS = frozenset({"TransactionNotFound"})
+
 
 class LedgerApiDialogues(BaseLedgerApiDialogues):
     """The dialogues class keeps track of all dialogues."""
@@ -290,7 +296,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning("%s: %s", type(e).__name__, e)
+                self._log_retry_error(e)
                 transaction_receipt = None
 
             attempts += 1
@@ -313,7 +319,7 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                     timeout=retry_timeout,
                 )
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.warning("%s: %s", type(e).__name__, e)
+                self._log_retry_error(e)
                 transaction = None
 
             attempts += 1
@@ -419,6 +425,18 @@ class LedgerApiRequestDispatcher(RequestDispatcher):
                 ),
             ),
         )
+
+    def _log_retry_error(self, exception: Exception) -> None:
+        """
+        Log an exception raised while polling for a transaction or its receipt.
+
+        :param exception: the exception.
+        """
+        exc_type = type(exception).__name__
+        if exc_type in PENDING_TRANSACTION_ERRORS:
+            self.logger.debug("%s: %s", exc_type, exception)
+        else:
+            self.logger.warning("%s: %s", exc_type, exception)
 
     def get_error_message(
         self,

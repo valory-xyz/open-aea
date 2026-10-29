@@ -21,7 +21,7 @@ fingerprint:
   tests/test_strategy.py: bafybeidbfxev4oq6g5kkl7uk6bjfyes55577ae3d65hcqube6bmnbryrwe
 fingerprint_ignore_patterns: []
 connections:
-- valory/ledger:0.19.0:bafybeicynh5l5f5f5jpx72qwzis7jvmxk5p4eqltk32uxbj2pgu2x4rqz4
+- valory/ledger:0.19.0:bafybeiafj4tc22eq4rtw3ztn7pew6kksaftqc4hexeoflsbymlrzv5x6lm
 contracts:
 - fetchai/erc1155:0.22.0:bafybeicmo3rzgvp2s7xrxlksumnmkrprvwttbouvfq7owibl7uvgivygqq
 protocols:
