@@ -11,12 +11,12 @@ fingerprint:
   base.py: bafybeia2z2yz4okgonmrtuunyuwizctrtd3rqzcx76vcyvw24kr6w4avsm
   connection.py: bafybeiare2uynhcgbdovjrsarrk3llklsjkj7itw6r4wpsoa6nhhsmoire
   contract_dispatcher.py: bafybeicnsfw2lvsx73f3bvc44sd7p3q2imhxt3yg5tvuw36ktjfgd7lxpm
-  ledger_dispatcher.py: bafybeib6tb2idrur636mxk4h3utfv7ly6j3bckh277nmq56fnptyzkznuq
+  ledger_dispatcher.py: bafybeifc4rgjny47isjdbx45resokncvm5ihx6dgu4faxhl2iyt22dd37i
   tests/__init__.py: bafybeifku7ttsmbj4gfx6dkgjvwypx7v5ysfqlzof6vh4p7gujakjtuwhe
   tests/conftest.py: bafybeibvvorlz3xqgyq2htiazeygbcytvyn2cqkscg54lgylnqk2d5d4mm
   tests/test_contract_dispatcher.py: bafybeih6qu32kqj2enq3poc4i2capp4lipxwgsiv7d5amdyyx6brggrtby
   tests/test_ledger.py: bafybeidkrnzd5h4uqkgail3ii5ii2n7u3d5zpii2kcezdhmdysxzqwwa6q
-  tests/test_ledger_api.py: bafybeiel7oc2qbbiybw5sis5qgosveuxde3thikppcmplxuyzx4ddot7lq
+  tests/test_ledger_api.py: bafybeifcd4fz55sbv7x6o4hg3kxfu3fill27s4j2nahyr7h3zsjllc5ml4
 fingerprint_ignore_patterns: []
 connections: []
 protocols:

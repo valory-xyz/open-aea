@@ -39,6 +39,7 @@ from aea_ledger_ethereum.test_tools.fixture_helpers import (  # noqa: F401 pylin
 )
 from eth_typing import BlockNumber
 from web3.eth import Eth
+from web3.exceptions import TransactionNotFound
 from web3.types import FeeHistory, Wei
 
 from aea.common import Address
@@ -804,3 +805,60 @@ class TestLedgerDispatcherRetrySleepCap:
         # so we expect 6 sleeps. The cap holds each one at MAX_RETRY_DELAY.
         assert sleep_calls == [30.0, 60.0, 60.0, 30.0, 60.0, 60.0]
         assert all(s <= ledger_dispatcher_module.MAX_RETRY_DELAY for s in sleep_calls)
+
+
+class TestLedgerDispatcherRetryLogging:
+    """Unit tests for the log level of errors raised while polling for a receipt."""
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "error, expected_level",
+        (
+            (
+                TransactionNotFound("Transaction with hash: '0xabc' not found."),
+                logging.DEBUG,
+            ),
+            (ValueError("rpc down"), logging.WARNING),
+        ),
+    )
+    async def test_retry_error_log_level(
+        self,
+        error: Exception,
+        expected_level: int,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Test a not-yet-mined transaction logs at debug and other errors at warning."""
+        dispatcher = LedgerApiRequestDispatcher(
+            AsyncState(ConnectionStates.connected),
+            connection_id=LedgerConnection.connection_id,
+        )
+        mock_api = Mock()
+        message = LedgerApiMessage(
+            performative=LedgerApiMessage.Performative.GET_TRANSACTION_RECEIPT,  # type: ignore
+            dialogue_reference=dispatcher.dialogues.new_self_initiated_dialogue_reference(),
+            transaction_digest=TransactionDigest("asdad", "sdfdsf"),
+            retry_attempts=1,
+            retry_timeout=1,
+        )
+        message.to = dispatcher.dialogues.self_address
+        message.sender = "test"
+        dialogue = dispatcher.dialogues.update(message)
+        assert dialogue is not None
+
+        mock_api.get_transaction_receipt.side_effect = error
+        mock_api.get_transaction.side_effect = error
+
+        async def _fake_sleep(_seconds: float) -> None:
+            """Skip the retry delay."""
+
+        with caplog.at_level(
+            logging.DEBUG, logger=dispatcher.logger.name
+        ), patch.object(ledger_dispatcher_module.asyncio, "sleep", new=_fake_sleep):
+            await dispatcher.get_transaction_receipt(mock_api, message, dialogue)
+
+        expected_message = f"{type(error).__name__}: {error}"
+        levels = [
+            r.levelno for r in caplog.records if r.getMessage() == expected_message
+        ]
+        # one log line each from the receipt loop and the transaction loop
+        assert levels == [expected_level, expected_level]
